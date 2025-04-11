@@ -1,0 +1,9 @@
+
+User-agent: *
+Allow: /
+Allow: /mascotas
+Allow: /donaciones
+Allow: /publicar
+Allow: /nosotros
+
+Sitemap: https://nsfwclothes.store/sitemap.xml

@@ -1,0 +1,414 @@
+<template>
+  <div class="min-h-screen bg-amber-50">
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden bg-emerald-700 text-white">
+      <div class="absolute inset-0 z-0">
+        <img
+          src="/placeholder.webp?height=600&width=1600"
+          alt="Mascotas rescatadas"
+          class="h-full w-full object-cover opacity-20"
+        />
+      </div>
+      <div class="container relative z-10 mx-auto px-4 py-16 md:py-24">
+        <div class="max-w-3xl">
+          <h1 class="mb-6 text-4xl font-bold md:text-5xl">Tu donación puede salvar vidas</h1>
+          <p class="mb-8 text-xl text-emerald-100 md:text-2xl">
+            Ayúdanos a continuar nuestra misión de rescatar y encontrar hogares para mascotas
+            abandonadas.
+          </p>
+        </div>
+      </div>
+
+      <!-- Wave divider -->
+      <div class="absolute bottom-0 left-0 right-0">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" fill="#fffbeb">
+          <path
+            d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"
+          />
+        </svg>
+      </div>
+    </section>
+
+    <div class="container mx-auto px-4 py-12">
+      <!-- Impact Stats -->
+      <section class="mb-16">
+        <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
+          <div
+            class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105"
+          >
+            <div
+              class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100"
+            >
+              <PawPrintIcon class="h-10 w-10 text-emerald-600" />
+            </div>
+            <h3 class="mb-2 text-3xl font-bold text-emerald-800">1,240</h3>
+            <p class="text-gray-600">Mascotas rescatadas</p>
+          </div>
+
+          <div
+            class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105"
+          >
+            <div
+              class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100"
+            >
+              <HomeIcon class="h-10 w-10 text-emerald-600" />
+            </div>
+            <h3 class="mb-2 text-3xl font-bold text-emerald-800">985</h3>
+            <p class="text-gray-600">Adopciones exitosas</p>
+          </div>
+
+          <div
+            class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105"
+          >
+            <div
+              class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100"
+            >
+              <HeartIcon class="h-10 w-10 text-emerald-600" />
+            </div>
+            <h3 class="mb-2 text-3xl font-bold text-emerald-800">$125,000</h3>
+            <p class="text-gray-600">Donaciones recibidas</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Donation Options -->
+      <section class="mb-16">
+        <h2 class="mb-4 text-center text-3xl font-bold text-emerald-800 md:text-4xl">
+          ¿Cómo puedes ayudar?
+        </h2>
+        <p class="mx-auto mb-12 max-w-3xl text-center text-gray-600">
+          Tu contribución, sin importar su tamaño, puede marcar una gran diferencia en la vida de
+          una mascota necesitada.
+        </p>
+
+        <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
+          <div
+            v-for="(option, index) in donationOptions"
+            :key="index"
+            class="overflow-hidden rounded-lg bg-white shadow-md transition-shadow hover:shadow-lg"
+          >
+            <div class="p-6">
+              <div class="mb-4 flex items-center">
+                <div class="mr-4 rounded-full bg-emerald-100 p-3">
+                  <component :is="option.icon" class="h-6 w-6 text-emerald-600" />
+                </div>
+                <h3 class="text-xl font-semibold text-emerald-800">
+                  {{ option.title }}
+                </h3>
+              </div>
+              <p class="mb-6 text-gray-600">{{ option.description }}</p>
+              <a
+                :href="option.link"
+                class="block w-full rounded-lg bg-emerald-600 py-2 text-center font-medium text-white transition-colors hover:bg-emerald-700"
+              >
+                {{ option.buttonText }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="mb-16">
+
+
+        <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
+
+          <!--Patreon-->
+          <NuxtLink to="https://patreon.com/AdoptaZulia">  
+            <div class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105">
+              <h1>Patreon</h1>
+          <NuxtImg src="https://www.patreon.com/donate_button.png" alt="Patreon" />
+          </div>
+        </NuxtLink>
+
+          <!--Ko-fi-->
+          <NuxtLink to="https://ko-fi.com/adoptazulia">
+            <div class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105">
+              <h1>Ko-fi</h1>
+              <NuxtImg src="https://storage.ko-fi.com/cdn/kofi3.png" alt="Ko-fi" />
+            </div>
+          </NuxtLink>
+
+          <!--PayPal-->
+          <NuxtLink to="https://paypal.me/adoptazulia">
+            <div class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105">
+              <h1>PayPal</h1>
+              <NuxtImg src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="PayPal" />
+            </div>
+          </NuxtLink>
+
+
+        
+        </div>
+      </section>
+
+      <!-- FAQ Section -->
+      <section class="mb-16">
+        <h2 class="mb-4 text-center text-3xl font-bold text-emerald-800 md:text-4xl">
+          Preguntas frecuentes
+        </h2>
+        <p class="mx-auto mb-12 max-w-3xl text-center text-gray-600">
+          Respuestas a las preguntas más comunes sobre donaciones y cómo ayudar.
+        </p>
+
+        <div class="mx-auto max-w-3xl space-y-4">
+          <div
+            v-for="(faq, index) in faqs"
+            :key="index"
+            class="overflow-hidden rounded-lg border border-gray-200"
+          >
+            <button
+              class="flex w-full items-center justify-between bg-white p-4 text-left transition-colors hover:bg-gray-50"
+              @click="toggleFaq(index)"
+            >
+              <span class="font-medium text-emerald-800">{{ faq.question }}</span>
+              <ChevronDownIcon
+                class="h-5 w-5 text-emerald-600 transition-transform"
+                :class="{ 'rotate-180 transform': openFaq === index }"
+              />
+            </button>
+            <div v-show="openFaq === index" class="border-t border-gray-200 bg-gray-50 p-4">
+              <p class="text-gray-700">{{ faq.answer }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA Section -->
+      <section class="overflow-hidden rounded-2xl bg-emerald-700">
+        <div class="p-8 text-center md:p-12">
+          <h2 class="mb-4 text-3xl font-bold text-white md:text-4xl">Cada donación cuenta</h2>
+          <p class="mx-auto mb-8 max-w-3xl text-emerald-100">
+            Juntos podemos hacer la diferencia en la vida de miles de mascotas abandonadas. Tu apoyo
+            es fundamental para continuar nuestra labor.
+          </p>
+          <div class="flex flex-col justify-center gap-4 sm:flex-row">
+            <a
+              href="#donate"
+              class="inline-flex items-center justify-center rounded-lg bg-white px-6 py-3 text-lg font-semibold text-emerald-700 transition-colors hover:bg-emerald-50"
+            >
+              <HeartIcon class="mr-2 h-5 w-5" />
+              Donar ahora
+            </a>
+            <a
+              href="/contacto"
+              class="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-6 py-3 text-lg font-semibold text-white transition-colors hover:bg-emerald-500"
+            >
+              <MessageCircleIcon class="mr-2 h-5 w-5" />
+              Contactar
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed } from 'vue'
+import {
+  PawPrintIcon,
+  HomeIcon,
+  HeartIcon,
+  CreditCardIcon,
+  CheckIcon,
+  StarIcon,
+  ChevronDownIcon,
+  MessageCircleIcon,
+  GiftIcon,
+  CalendarIcon,
+} from 'lucide-vue-next'
+
+// Donation options
+const donationOptions = [
+  {
+    title: 'Donación única',
+    description:
+      'Realiza una donación puntual del importe que desees para ayudar a nuestras mascotas.',
+    icon: HeartIcon,
+    link: '#donate',
+    buttonText: 'Donar ahora',
+  },
+  {
+    title: 'Donación mensual',
+    description:
+      'Conviértete en socio y ayuda de forma regular. Puedes cancelar en cualquier momento.',
+    icon: CalendarIcon,
+    link: '#monthly',
+    buttonText: 'Ser socio',
+  },
+  {
+    title: 'Donación en especie',
+    description: 'Dona alimentos, medicinas, mantas o cualquier otro material que pueda ser útil.',
+    icon: GiftIcon,
+    link: '/contacto',
+    buttonText: 'Más información',
+  },
+]
+
+// One-time donation
+const donationAmounts = [10, 25, 50, 100]
+const selectedAmount = ref(25)
+const customAmount = ref('')
+const donorInfo = ref({
+  name: '',
+  email: '',
+  message: '',
+  anonymous: false,
+})
+
+const finalAmount = computed(() => {
+  if (customAmount.value) {
+    return parseFloat(customAmount.value)
+  }
+  return selectedAmount.value
+})
+
+const selectAmount = (amount) => {
+  selectedAmount.value = amount
+  customAmount.value = ''
+}
+
+const processDonation = (method) => {
+  // Aquí iría la lógica para procesar el pago
+  console.log(`Procesando donación de ${finalAmount.value}$ mediante ${method}`)
+  console.log('Información del donante:', donorInfo.value)
+
+  // En una implementación real, aquí se redigiría a la pasarela de pago
+  alert(
+    `Gracias por tu donación de ${finalAmount.value}$. En una implementación real, serías redirigido a la pasarela de pago.`
+  )
+}
+
+// Monthly plans
+const monthlyPlans = [
+  {
+    title: 'Plan Básico',
+    amount: 10,
+    description: 'Ayuda básica para nuestras mascotas',
+    benefits: [
+      'Alimentación para 1 mascota al mes',
+      'Boletín mensual de noticias',
+      'Certificado de donación',
+    ],
+    recommended: false,
+  },
+  {
+    title: 'Plan Protector',
+    amount: 25,
+    description: 'Ayuda integral para nuestras mascotas',
+    benefits: [
+      'Alimentación para 3 mascotas al mes',
+      'Tratamientos veterinarios básicos',
+      'Boletín mensual de noticias',
+      'Certificado de donación',
+      'Mención en nuestra web',
+    ],
+    recommended: true,
+  },
+  {
+    title: 'Plan Guardian',
+    amount: 50,
+    description: 'Ayuda completa para nuestras mascotas',
+    benefits: [
+      'Alimentación para 6 mascotas al mes',
+      'Tratamientos veterinarios completos',
+      'Boletín mensual de noticias',
+      'Certificado de donación',
+      'Mención en nuestra web',
+      'Visitas exclusivas al refugio',
+    ],
+    recommended: false,
+  },
+]
+
+const selectMonthlyPlan = (plan) => {
+  // Aquí iría la lógica para seleccionar un plan mensual
+  console.log(`Plan seleccionado: ${plan.title} - ${plan.amount}$/mes`)
+
+  // En una implementación real, aquí se redigiría a un formulario de suscripción
+  alert(
+    `Has seleccionado el plan ${plan.title} por ${plan.amount}$/mes. En una implementación real, serías redirigido a un formulario de suscripción.`
+  )
+}
+
+// Testimonials
+const testimonials = [
+  {
+    name: 'Carlos Rodríguez',
+    type: 'Donante mensual',
+    image: '/placeholder.webp?height=100&width=100',
+    quote:
+      'Me encanta saber que mi contribución mensual ayuda a tantas mascotas necesitadas. El equipo de AdoptaPet siempre me mantiene informado sobre cómo se utilizan mis donaciones.',
+  },
+  {
+    name: 'Laura Martínez',
+    type: 'Donante puntual',
+    image: '/placeholder.webp?height=100&width=100',
+    quote:
+      'Después de donar, recibí un correo electrónico detallado sobre cómo mi donación había ayudado a un perro llamado Max a recibir tratamiento veterinario. ¡Increíble transparencia!',
+  },
+]
+
+// FAQs
+const faqs = [
+  {
+    question: '¿Cómo se utilizan mis donaciones?',
+    answer:
+      'Tus donaciones se destinan principalmente a alimentación, atención veterinaria, medicamentos, mantenimiento de refugios temporales y gastos de transporte para el rescate de animales. Publicamos informes trimestrales detallando el uso de los fondos en nuestra sección de transparencia.',
+  },
+  {
+    question: '¿Las donaciones son deducibles de impuestos?',
+    answer:
+      'Sí, AdoptaPet es una organización sin ánimo de lucro registrada oficialmente, por lo que tus donaciones pueden ser deducibles de impuestos según la legislación fiscal vigente. Te enviaremos un certificado de donación que podrás utilizar en tu declaración de la renta.',
+  },
+  {
+    question: '¿Puedo cancelar mi donación mensual en cualquier momento?',
+    answer:
+      'Por supuesto. Puedes cancelar tu donación mensual en cualquier momento desde tu perfil en nuestra web o contactando con nuestro equipo de atención al donante. No hay compromisos de permanencia ni penalizaciones por cancelación.',
+  },
+  {
+    question: '¿Qué tipo de donaciones en especie aceptáis?',
+    answer:
+      'Aceptamos alimentos para mascotas, mantas, camas, juguetes, medicamentos (con receta veterinaria), productos de limpieza y cualquier otro material que pueda ser útil para el cuidado de los animales. Contacta con nosotros antes de realizar la donación para coordinar la entrega.',
+  },
+  {
+    question: '¿Puedo elegir a qué mascota específica ayudar con mi donación?',
+    answer:
+      'Sí, ofrecemos la opción de apadrinar a una mascota específica. En este caso, tu donación se destinará principalmente a cubrir los gastos de esa mascota en particular. Recibirás actualizaciones periódicas sobre su estado y evolución.',
+  },
+]
+
+const openFaq = ref(null)
+
+const toggleFaq = (index) => {
+  if (openFaq.value === index) {
+    openFaq.value = null
+  } else {
+    openFaq.value = index
+  }
+}
+</script>
+
+<style scoped>
+/* Estilos específicos para la página de donaciones */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Animación para los acordeones de FAQ */
+.rotate-enter-active,
+.rotate-leave-active {
+  transition: transform 0.3s ease;
+}
+
+.rotate-enter-from,
+.rotate-leave-to {
+  transform: rotate(0deg);
+}
+</style>

@@ -1,0 +1,46 @@
+{
+  "name": "adopta-zulia-web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "analyze": "nuxt analyze",
+    "lint": "npm run lint:fix && npm run format",
+    "lint:fix": "eslint --fix ./",
+    "format": "prettier --write \"**/*.{html,vue,svelte,astro,js,jsx,cjs,mjs,ts,tsx,cts,mts,css,md,mdx,json}\" !public --ignore-path .gitignore"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.782.0",
+    "@aws-sdk/lib-storage": "^3.782.0",
+    "@headlessui/vue": "^1.7.23",
+    "@nuxt/eslint": "^1.3.0",
+    "@nuxt/fonts": "^0.11.1",
+    "@nuxt/icon": "^1.11.0",
+    "@nuxt/image": "^1.10.0",
+    "@nuxt/scripts": "^0.11.5",
+    "@nuxt/test-utils": "^3.17.2",
+    "@unhead/vue": "^2.0.5",
+    "date-fns": "^4.1.0",
+    "eslint": "^9.24.0",
+    "firebase": "^11.6.0",
+    "firebase-admin": "^13.2.0",
+    "lucide-vue-next": "^0.487.0",
+    "nuxt": "^3.16.2",
+    "nuxt-vuefire": "^1.0.5",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0",
+    "vuefire": "^3.2.1"
+  },
+  "devDependencies": {
+    "@iconify-json/logos": "^1.2.4",
+    "@nuxtjs/color-mode": "^3.5.2",
+    "@nuxtjs/tailwindcss": "^6.13.2",
+    "@pinia/nuxt": "^0.10.1",
+    "prettier": "^3.5.3",
+    "prettier-plugin-tailwindcss": "^0.6.11"
+  }
+}

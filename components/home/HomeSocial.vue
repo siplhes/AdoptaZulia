@@ -1,0 +1,41 @@
+<template>
+  <section class="bg-amber-50 py-12 md:py-16">
+    <div class="container mx-auto px-4">
+      <div class="mx-auto max-w-3xl text-center">
+        <h2 class="mb-4 text-3xl font-bold text-emerald-800 md:text-4xl">Mantente informado</h2>
+        <p class="mb-8 text-gray-600">
+          Siguenos en nuestras redes sociales para recibir actualizaciones sobre nuevas mascotas
+          disponibles, consejos de cuidado y eventos de adopción.
+        </p>
+        <div class="mx-auto inline-flex gap-2 space-x-3">
+          <NuxtLink
+            v-for="(social, index) in socialLinks"
+            :key="index"
+            :to="social.link"
+            target="_blank"
+            class="mx-3 rounded-lg bg-amber-600 p-2 text-[#fefffa]"
+          >
+            {{ social.name }}
+          </NuxtLink>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup>
+const socialLinks = [
+  {
+    name: 'Instagram',
+    link: 'https://instagram.com/adoptazulia',
+  },
+  {
+    name: 'Facebook',
+    link: 'https://facebook.com/adoptazulia',
+  },
+  {
+    name: 'TikTok',
+    link: 'https://tiktok.com/adoptazulia',
+  },
+]
+</script>
