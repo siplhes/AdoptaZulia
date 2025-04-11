@@ -1,7 +1,7 @@
 <template>
-  <section class="bg-emerald-600 py-12">
-    <div class="container mx-auto px-4">
-      <div class="mb-12 text-center">
+  <section class="pt-12 md:pt-16 bg-emerald-600">
+    <div class="py-6 container mx-auto px-4">
+      <div class="mb-12 text-center  pt-6">
         <h2 class="mb-3 text-3xl font-bold text-[#FEFFFA]">Historias de adopción</h2>
         <p class="mx-auto max-w-2xl text-lg text-emerald-50">
           Conoce las inspiradoras historias de mascotas que encontraron un hogar gracias a nuestra
@@ -13,7 +13,7 @@
       <div v-if="loading" class="flex justify-center py-12">
         <div
           class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-emerald-600 border-r-transparent align-[-0.125em]"
-      />
+        />
       </div>
 
       <!-- Error -->
@@ -42,6 +42,8 @@
         </NuxtLink>
       </div>
     </div>
+
+ 
   </section>
 </template>
 

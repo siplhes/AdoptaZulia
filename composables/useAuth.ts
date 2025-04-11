@@ -22,29 +22,22 @@ const userProfile = ref<UserProfile | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
 const isAdmin = ref(false)
+const needsProfileCompletion = ref(false)
 let unsubscribeAuth: (() => void) | null = null
 let isInitialized = false
 
 function initializeAuth() {
   if (isInitialized || !import.meta.client) return
-
   try {
     const authService = new AuthService()
-
     unsubscribeAuth = authService.onAuthStateChanged(async (currentUser) => {
       user.value = currentUser
-
       if (currentUser) {
-        console.log('Usuario autenticado:', currentUser.email)
         try {
           isAdmin.value =
             (await authService.isAdmin(currentUser.uid)) ||
             authService.isAdminEmail(currentUser.email || '')
-
-          console.log('¿Es admin?', isAdmin.value)
-
           const rtdbProfile = await authService.getUserProfile(currentUser.uid)
-
           userProfile.value = {
             uid: currentUser.uid,
             displayName: currentUser.displayName,
@@ -53,6 +46,7 @@ function initializeAuth() {
             isAdmin: isAdmin.value,
             ...rtdbProfile,
           }
+          needsProfileCompletion.value = !userProfile.value.userName
         } catch (err) {
           console.error('Error al cargar perfil completo:', err)
           userProfile.value = {
@@ -62,20 +56,19 @@ function initializeAuth() {
             photoURL: currentUser.photoURL,
             isAdmin: isAdmin.value,
           }
+          needsProfileCompletion.value = true
         }
       } else {
-        console.log('No hay usuario autenticado')
-        isAdmin.value = false
         userProfile.value = null
+        isAdmin.value = false
+        needsProfileCompletion.value = false
       }
     })
-
     isInitialized = true
-  } catch (error) {
-    console.error('Error al inicializar servicio de autenticación:', error)
+  } catch (err) {
+    console.error('Error al inicializar autenticación:', err)
   }
 }
-
 export function useAuth() {
   const nuxtApp = useNuxtApp()
   if (import.meta.client && !isInitialized) {
@@ -83,19 +76,13 @@ export function useAuth() {
       initializeAuth()
     }, 100)
   }
-
   const authService = new AuthService()
-
-  // Valor reactivo para verificar fácilmente si el usuario está autenticado
   const isAuthenticated = computed(() => !!user.value)
-
   async function register(email: string, password: string, displayName: string, userName: string) {
     loading.value = true
     error.value = null
-
     try {
       user.value = await authService.register(email, password, displayName, userName)
-      console.log('Usuario registrado correctamente')
       return true
     } catch (err: any) {
       console.error('Error al registrar usuario:', err)
@@ -105,21 +92,26 @@ export function useAuth() {
       loading.value = false
     }
   }
-
   async function login(email: string, password: string) {
     loading.value = true
     error.value = null
 
     try {
-      console.log('Intentando login con:', email)
       user.value = await authService.login(email, password)
-      console.log('Login exitoso, usuario:', user.value?.email)
-
       if (user.value) {
         isAdmin.value =
           (await authService.isAdmin(user.value.uid)) ||
           authService.isAdminEmail(user.value.email || '')
-        console.log('¿Es admin después de login?', isAdmin.value)
+        const rtdbProfile = await authService.getUserProfile(user.value.uid)
+        userProfile.value = {
+          uid: user.value.uid,
+          displayName: user.value.displayName,
+          email: user.value.email,
+          photoURL: user.value.photoURL,
+          isAdmin: isAdmin.value,
+          ...rtdbProfile,
+        }
+        needsProfileCompletion.value = !rtdbProfile?.userName
       }
 
       return true
@@ -135,18 +127,23 @@ export function useAuth() {
   async function loginWithGoogle() {
     loading.value = true
     error.value = null
-
     try {
       user.value = await authService.loginWithGoogle()
-      console.log('Login con Google exitoso')
-
       if (user.value) {
         isAdmin.value =
           (await authService.isAdmin(user.value.uid)) ||
           authService.isAdminEmail(user.value.email || '')
-        console.log('¿Es admin después de login con Google?', isAdmin.value)
+        const rtdbProfile = await authService.getUserProfile(user.value.uid)
+        userProfile.value = {
+          uid: user.value.uid,
+          displayName: user.value.displayName,
+          email: user.value.email,
+          photoURL: user.value.photoURL,
+          isAdmin: isAdmin.value,
+          ...rtdbProfile,
+        }
+        needsProfileCompletion.value = !rtdbProfile?.userName
       }
-
       return true
     } catch (err: any) {
       console.error('Error al iniciar sesión con Google:', err)
@@ -156,20 +153,26 @@ export function useAuth() {
       loading.value = false
     }
   }
-
   async function loginWithFacebook() {
     loading.value = true
     error.value = null
-
     try {
       user.value = await authService.loginWithFacebook()
-
       if (user.value) {
         isAdmin.value =
           (await authService.isAdmin(user.value.uid)) ||
           authService.isAdminEmail(user.value.email || '')
+        const rtdbProfile = await authService.getUserProfile(user.value.uid)
+        userProfile.value = {
+          uid: user.value.uid,
+          displayName: user.value.displayName,
+          email: user.value.email,
+          photoURL: user.value.photoURL,
+          isAdmin: isAdmin.value,
+          ...rtdbProfile,
+        }
+        needsProfileCompletion.value = !rtdbProfile?.userName
       }
-
       return true
     } catch (err: any) {
       console.error('Error al iniciar sesión con Facebook:', err)
@@ -179,16 +182,15 @@ export function useAuth() {
       loading.value = false
     }
   }
-
   async function logout() {
     loading.value = true
     error.value = null
-
     try {
       await authService.signOut()
       user.value = null
       userProfile.value = null
       isAdmin.value = false
+      needsProfileCompletion.value = false
       return true
     } catch (err: any) {
       console.error('Error al cerrar sesión:', err)
@@ -198,11 +200,9 @@ export function useAuth() {
       loading.value = false
     }
   }
-
   async function resetPassword(email: string) {
     loading.value = true
     error.value = null
-
     try {
       await authService.resetPassword(email)
       return true
@@ -214,7 +214,6 @@ export function useAuth() {
       loading.value = false
     }
   }
-
   async function updateProfile(
     displayName?: string,
     photoURL?: string,
@@ -224,11 +223,8 @@ export function useAuth() {
   ) {
     loading.value = true
     error.value = null
-
     try {
       await authService.updateUserProfile(displayName, photoURL, bio, phoneNumber, userName)
-
-      // Actualizar el perfil local
       if (userProfile.value) {
         userProfile.value = {
           ...userProfile.value,
@@ -239,7 +235,9 @@ export function useAuth() {
           userName: userName || userProfile.value.userName,
         }
       }
-
+      if (userName) {
+        needsProfileCompletion.value = false
+      }
       return true
     } catch (err: any) {
       console.error('Error al actualizar perfil:', err)
@@ -249,11 +247,9 @@ export function useAuth() {
       loading.value = false
     }
   }
-
   function isLoggedIn() {
     return !!user.value
   }
-
   function traducirErrorFirebase(errorCode: string): string {
     switch (errorCode) {
       case 'auth/email-already-in-use':
@@ -286,12 +282,9 @@ export function useAuth() {
         return 'Error de autenticación: ' + errorCode
     }
   }
-
-  // Método para buscar usuario por nombre de usuario
   async function getUserByUsername(username: string) {
     loading.value = true
     error.value = null
-
     try {
       return await authService.getUserByUsername(username)
     } catch (err: any) {
@@ -302,14 +295,14 @@ export function useAuth() {
       loading.value = false
     }
   }
-
   return {
     user,
     userProfile,
     loading,
     error,
     isAdmin,
-    isAuthenticated, // Añadimos el valor computed
+    isAuthenticated,
+    needsProfileCompletion,
     register,
     login,
     loginWithGoogle,

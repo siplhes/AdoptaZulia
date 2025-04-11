@@ -1,154 +1,257 @@
 <script setup lang="ts">
-//...
+import { ref, onMounted } from 'vue'
+import { PawPrintIcon, HeartIcon, UsersIcon } from 'lucide-vue-next'
+import { usePets } from '~/composables/usePets'
+import { useStats } from '~/composables/useStats'
+
+// Referencias para almacenar datos
+const recentPets = ref([])
+const siteStats = ref({
+  totalPets: 0,
+  totalAdoptions: 0,
+  totalUsers: 0
+})
+const currentYear = new Date().getFullYear()
+
+// Obtener mascotas recientes al montar el componente
+onMounted(async () => {
+  try {
+    // Obtener mascotas recientes
+    const { fetchAllPets } = usePets()
+    const allPets = await fetchAllPets()
+    // Ordenar por fecha de creación (más recientes primero) y tomar las 6 primeras
+    recentPets.value = allPets
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 6)
+
+    // Obtener estadísticas
+    const { fetchPublicStats, stats } = useStats()
+    await fetchPublicStats()
+    siteStats.value = {
+      totalPets: stats.value.totalPets,
+      totalAdoptions: stats.value.totalAdoptions,
+      totalUsers: stats.value.totalUsers
+    }
+  } catch (error) {
+    console.error('Error al cargar datos para el footer:', error)
+  }
+})
+
+function handleImageError(event) {
+  event.target.src = '/placeholder.webp?height=150&width=150'
+}
 </script>
 <template>
   <footer class="bg-emerald-700 pt-12 text-[#FEFFFA]">
-    <div class="container mx-auto px-8">
-      <div class="relative flex flex-wrap">
-        <div
-          class="-mx-4 -mt-4 flex flex-col flex-wrap items-center py-4 pl-4 pr-8 md:flex-col md:flex-nowrap lg:w-1/3 lg:items-start"
-        >
-          <NuxtLink class="-ml-6" to="/">
-            <div to="/" class="inline-flex items-center font-serif text-3xl">
-              <h6 class="inline-flex items-center font-serif text-3xl">Adopta Zulia</h6>
-            </div>
+    <div class="container mx-auto px-4 sm:px-8">
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+        <!-- Columna 1: Información de contacto -->
+        <div class="flex flex-col items-center lg:items-start">
+          <NuxtLink to="/" class="mb-4 inline-flex items-center text-3xl font-bold">
+            Adopta Zulia
           </NuxtLink>
-          <p class="mt-2 w-full text-center lg:text-left">
-            Dedicados a rescatar a los animales que mas nos necesitan
+          <p class="mb-6 text-center lg:text-left">
+            Dedicados a rescatar a los animales que más nos necesitan
           </p>
-          <div class="mt-6 inline-flex space-x-3">
-            <div class="flex flex-wrap space-x-4">
-              <NuxtLink
-                href="https://www.facebook.com/"
-                aria-label="facebook"
-                external
-                target="_blank"
-              >
-                <Icon name="logos:facebook" class="text-2xl" size="28px" />
-              </NuxtLink>
-              <NuxtLink href="https://twitter.com/" aria-label="twitter" external target="_blank">
-                <Icon name="logos:twitter" class="text-2xl" size="28px" />
-              </NuxtLink>
-              <NuxtLink href="https://discord.gg/" aria-label="discord" external target="_blank">
-                <Icon name="logos:discord-icon" class="text-2xl" size="28px" />
-              </NuxtLink>
-              <NuxtLink
-                href="https://www.youtube.com/"
-                aria-label="youtube"
-                external
-                target="_blank"
-              >
-                <Icon name="logos:youtube-icon" class="text-2xl" size="28px" />
-              </NuxtLink>
-            </div>
+          
+          <!-- Redes sociales -->
+          <div class="mb-6 flex flex-wrap gap-4">
+            <NuxtLink 
+              href="https://www.facebook.com/" 
+              aria-label="facebook" 
+              external 
+              target="_blank"
+              class="rounded-full bg-emerald-600 p-2 transition-colors hover:bg-emerald-500"
+            >
+              <Icon name="mdi:facebook" size="24px" />
+            </NuxtLink>
+            <NuxtLink 
+              href="https://twitter.com/" 
+              aria-label="twitter" 
+              external 
+              target="_blank"
+              class="rounded-full bg-emerald-600 p-2 transition-colors hover:bg-emerald-500"
+            >
+              <Icon name="mdi:twitter" size="24px" />
+            </NuxtLink>
+            <NuxtLink 
+              href="https://instagram.com/" 
+              aria-label="instagram" 
+              external 
+              target="_blank"
+              class="rounded-full bg-emerald-600 p-2 transition-colors hover:bg-emerald-500"
+            >
+              <Icon name="mdi:instagram" size="24px" />
+            </NuxtLink>
+            <NuxtLink 
+              href="https://www.youtube.com/" 
+              aria-label="youtube" 
+              external 
+              target="_blank"
+              class="rounded-full bg-emerald-600 p-2 transition-colors hover:bg-emerald-500"
+            >
+              <Icon name="mdi:youtube" size="24px" />
+            </NuxtLink>
+            <NuxtLink 
+              href="https://www.linkedin.com/" 
+              aria-label="linkedin" 
+              external 
+              target="_blank"
+              class="rounded-full bg-emerald-600 p-2 transition-colors hover:bg-emerald-500"
+            >
+              <Icon name="mdi:linkedin" size="24px" />
+            </NuxtLink>
           </div>
-          <div class="my-6 text-center">
-            <NuxtLink to="/">+1 234 567-890</NuxtLink>
-            <br />
-            <NuxtLink to="/">adoptazulia@gmail.com</NuxtLink>
+          
+          <!-- Información de contacto -->
+          <div class="text-center lg:text-left">
+            <p class="mb-2 flex items-center justify-center lg:justify-start">
+              <Icon name="mdi:phone" class="mr-2" size="20px" />
+              <NuxtLink to="https://wa.me/584146646526" target="_blank" >+58 414 664 6526</NuxtLink>
+            </p>
+            <p class="flex items-center justify-center lg:justify-start">
+              <Icon name="mdi:email" class="mr-2" size="20px" />
+              <a href="mailto:adoptazulia@gmail.com">adoptazulia@gmail.com</a>
+            </p>
           </div>
         </div>
-        <div
-          class="flex w-full flex-col items-center p-4 sm:w-1/2 md:w-1/3 md:flex-1 lg:items-start"
-        >
-          <h2 class="text-primary-600 dark:text-primary-200 text-xl font-bold">General</h2>
-          <ul class="text-center lg:mt-2 lg:text-left">
-            <li class="mb-4">
-              <NuxtLink to="/" class="hover:text-primary-600 dark:text-primary-200">FAQ</NuxtLink>
-            </li>
-            <li class="mb-4">
-              <NuxtLink to="/" class="hover:text-primary-600 dark:text-primary-200">News</NuxtLink>
-            </li>
-            <li class="mb-4">
-              <NuxtLink to="/" class="hover:text-primary-600 dark:text-primary-200">
-                Careers
+
+        <!-- Columna 2: Enlaces útiles -->
+        <div>
+          <h2 class="mb-4 text-xl font-bold">Enlaces útiles</h2>
+          <ul class="space-y-3">
+            <li>
+              <NuxtLink to="/mascotas" class="transition-colors hover:text-emerald-300">
+                Adopta una mascota
               </NuxtLink>
             </li>
-            <li class="mb-4">
-              <NuxtLink to="/" class="hover:text-primary-600 dark:text-primary-200">
-                Contact Us
+            <li>
+              <NuxtLink to="/publicar" class="transition-colors hover:text-emerald-300">
+                Publicar en adopción
+              </NuxtLink>
+            </li>
+            <li>
+              <NuxtLink to="/donaciones" class="transition-colors hover:text-emerald-300">
+                Haz una donación
+              </NuxtLink>
+            </li>
+            <li>
+              <NuxtLink to="/historias" class="transition-colors hover:text-emerald-300">
+                Historias de adopción
+              </NuxtLink>
+            </li>
+            <li>
+              <NuxtLink to="/nosotros" class="transition-colors hover:text-emerald-300">
+                Sobre nosotros
+              </NuxtLink>
+            </li>
+            <li>
+              <NuxtLink to="/contacto" class="transition-colors hover:text-emerald-300">
+                Contáctanos
               </NuxtLink>
             </li>
           </ul>
         </div>
-        <div
-          class="flex w-full flex-col items-center p-4 sm:w-1/2 md:w-1/3 md:flex-1 lg:items-start"
-        >
-          <h2 class="text-primary-600 dark:text-primary-200 text-xl font-bold">Enlaces</h2>
-          <ul class="text-center lg:mt-2 lg:text-left">
-            <li class="mb-4">
-              <NuxtLink to="/mascotas" class="hover:text-primary-600 dark:text-primary-200">
-                Adopta
-              </NuxtLink>
-            </li>
-            <li class="mb-4">
-              <NuxtLink to="/donaciones" class="hover:text-primary-600 dark:text-primary-200">
-                Dona
-              </NuxtLink>
-            </li>
-          </ul>
-        </div>
-        <div class="flex w-full flex-col items-center p-4 md:w-1/3">
-          <h2 class="text-primary-600 dark:text-primary-200 text-xl font-bold">Gallery</h2>
-          <div class="-mx-2 flex flex-wrap items-center lg:mt-2">
-            <div class="w-1/2 p-2 sm:w-4/12">
-              <div class="block overflow-hidden rounded-xl hover:opacity-75">
-                <NuxtImg
-                  src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?ixid=MnwyMDkyMnwwfDF8c2VhcmNofDF8fHBldHxlbnwwfHx8fDE2MzA0NjI1MjM&amp;ixlib=rb-1.2.1q=85&amp;fm=jpg&amp;crop=faces&amp;cs=srgb&amp;w=300&amp;h=250&amp;fit=crop"
-                  class="w-full"
-                />
+
+        <!-- Columna 3: Estadísticas -->
+        <div>
+          <h2 class="mb-6 text-xl font-bold">Nuestro impacto</h2>
+          <div class="space-y-6">
+            <div class="flex items-center">
+              <div class="mr-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-600">
+                <PawPrintIcon class="h-6 w-6" />
+              </div>
+              <div>
+                <p class="text-2xl font-bold">{{ siteStats.totalPets || 1240 }}</p>
+                <p class="text-sm text-emerald-200">Mascotas registradas</p>
               </div>
             </div>
-            <div class="w-1/2 p-2 sm:w-4/12">
-              <div class="block overflow-hidden rounded-xl hover:opacity-75">
-                <NuxtImg
-                  src="https://images.unsplash.com/photo-1491485880348-85d48a9e5312?ixid=MnwyMDkyMnwwfDF8c2VhcmNofDE1fHxjYXR8ZW58MHx8fHwxNjMwNDY3NzE4&amp;ixlib=rb-1.2.1q=85&amp;fm=jpg&amp;crop=faces&amp;cs=srgb&amp;w=300&amp;h=250&amp;fit=crop"
-                  class="w-full"
-                />
+            
+            <div class="flex items-center">
+              <div class="mr-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-600">
+                <HeartIcon class="h-6 w-6" />
+              </div>
+              <div>
+                <p class="text-2xl font-bold">{{ siteStats.totalAdoptions || 0 }}</p>
+                <p class="text-sm text-emerald-200">Adopciones exitosas</p>
               </div>
             </div>
-            <div class="w-1/2 p-2 sm:w-4/12">
-              <div class="block overflow-hidden rounded-xl hover:opacity-75">
-                <NuxtImg
-                  src="https://images.unsplash.com/photo-1591946614720-90a587da4a36?ixid=MnwyMDkyMnwwfDF8c2VhcmNofDIzfHxwZXR8ZW58MHx8fHwxNjMwNDYyNTIz&amp;ixlib=rb-1.2.1q=85&amp;fm=jpg&amp;crop=faces&amp;cs=srgb&amp;w=300&amp;h=250&amp;fit=crop"
-                  class="w-full"
-                />
+            
+            <div class="flex items-center">
+              <div class="mr-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-600">
+                <UsersIcon class="h-6 w-6" />
               </div>
-            </div>
-            <div class="w-1/2 p-2 sm:w-4/12">
-              <div class="block overflow-hidden rounded-xl hover:opacity-75">
-                <NuxtImg
-                  src="https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?ixid=MnwyMDkyMnwwfDF8c2VhcmNofDI3fHxjYXR8ZW58MHx8fHwxNjMwNDY3NzE4&amp;ixlib=rb-1.2.1q=85&amp;fm=jpg&amp;crop=faces&amp;cs=srgb&amp;w=300&amp;h=250&amp;fit=crop"
-                  class="w-full"
-                />
-              </div>
-            </div>
-            <div class="w-1/2 p-2 sm:w-4/12">
-              <div class="block overflow-hidden rounded-xl hover:opacity-75">
-                <NuxtImg
-                  src="https://images.unsplash.com/photo-1524511751214-b0a384dd9afe?ixid=MnwyMDkyMnwwfDF8c2VhcmNofDI4fHxwZXR8ZW58MHx8fHwxNjMwNDYyNTIz&amp;ixlib=rb-1.2.1q=85&amp;fm=jpg&amp;crop=faces&amp;cs=srgb&amp;w=300&amp;h=250&amp;fit=crop"
-                  class="w-full"
-                />
-              </div>
-            </div>
-            <div class="w-1/2 p-2 sm:w-4/12">
-              <div class="block overflow-hidden rounded-xl hover:opacity-75">
-                <NuxtImg
-                  src="https://images.unsplash.com/photo-1591561582301-7ce6588cc286?ixid=MnwyMDkyMnwwfDF8c2VhcmNofDMwfHxyYWJiaXR8ZW58MHx8fHwxNjMwNDY3NjUw&amp;ixlib=rb-1.2.1q=85&amp;fm=jpg&amp;crop=faces&amp;cs=srgb&amp;w=300&amp;h=250&amp;fit=crop"
-                  class="w-full"
-                />
+              <div>
+                <p class="text-2xl font-bold">{{ siteStats.totalUsers || 3500 }}</p>
+                <p class="text-sm text-emerald-200">Usuarios registrados</p>
               </div>
             </div>
           </div>
         </div>
-        <div class="flex flex-col sm:w-full md:items-center">
-          <hr class="mb-4 opacity-25" />
-          <p class="text-l p-4 sm:text-center">
-            &copy; 2025. Todos los derechos reservados - Adopta Zulia | Hecho con por Siplhes
+
+        <!-- Columna 4: Mascotas recientes -->
+        <div>
+          <h2 class="mb-4 text-xl font-bold">Mascotas recientes</h2>
+          <div class="grid grid-cols-3 gap-2">
+            <NuxtLink 
+              v-for="pet in recentPets" 
+              :key="pet.id" 
+              :to="`/mascotas/${pet.id}`"
+              class="block overflow-hidden rounded-lg transition-transform hover:scale-105"
+            >
+              <NuxtImg 
+                :src="pet.photos && pet.photos[0] ? pet.photos[0] : '/placeholder.webp'" 
+                :alt="pet.name" 
+                class="h-20 w-full object-cover"
+                @error="handleImageError"
+              />
+            </NuxtLink>
+            
+            <!-- Mostrar imágenes de placeholder si no hay suficientes mascotas -->
+            <NuxtLink 
+              v-for="index in Math.max(0, 6 - recentPets.length)" 
+              :key="`placeholder-${index}`" 
+              to="/mascotas"
+              class="block overflow-hidden rounded-lg transition-transform hover:scale-105"
+            >
+              <NuxtImg 
+                src="/placeholder.webp" 
+                alt="Adopta una mascota" 
+                class="h-20 w-full object-cover"
+              />
+            </NuxtLink>
+          </div>
+          <div class="mt-4 text-center">
+            <NuxtLink 
+              to="/mascotas" 
+              class="inline-block rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium transition-colors hover:bg-emerald-500"
+            >
+              Ver todas las mascotas
+            </NuxtLink>
+          </div>
+        </div>
+      </div>
+
+      <!-- Copyright y términos -->
+      <div class="mt-10 border-t border-emerald-600 py-6">
+        <div class="flex flex-col items-center justify-between gap-4 text-center md:flex-row md:text-left">
+          <p>
+            &copy; {{ currentYear }} Adopta Zulia. Todos los derechos reservados.
           </p>
+          <div class="flex gap-4">
+            <NuxtLink to="/" class="text-sm transition-colors hover:text-emerald-300">
+              Términos de uso
+            </NuxtLink>
+            <NuxtLink to="/" class="text-sm transition-colors hover:text-emerald-300">
+              Política de privacidad
+            </NuxtLink>
+          </div>
         </div>
       </div>
     </div>
   </footer>
 </template>
-<style scoped></style>
+
+<style scoped>
+/* Podemos agregar estilos específicos si es necesario */
+</style>

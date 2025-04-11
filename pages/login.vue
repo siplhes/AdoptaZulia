@@ -266,6 +266,7 @@ const {
   error: authError,
   loading: authLoading,
   isAdmin,
+  needsProfileCompletion,
 } = useAuth()
 
 // Estado para login normal
@@ -315,8 +316,13 @@ const handleLogin = async () => {
     // Esperar a que el estado de isAdmin se actualice
     await new Promise((resolve) => setTimeout(resolve, 300))
 
+    // Si necesita completar su perfil, redirigir a register-step-two
+    if (needsProfileCompletion.value) {
+      console.log('Usuario necesita completar perfil, redirigiendo a paso 2')
+      router.push('/register-step-two')
+    }
     // Si es admin, redirigimos al panel de administración
-    if (isAdmin.value) {
+    else if (isAdmin.value) {
       console.log('Usuario es admin, redirigiendo a panel admin')
       router.push('/admin')
     } else {
@@ -335,11 +341,16 @@ const handleLoginWithGoogle = async () => {
   if (success) {
     console.log('Login con Google exitoso')
 
-    // Esperar a que el estado de isAdmin se actualice
+    // Esperar a que el estado se actualice
     await new Promise((resolve) => setTimeout(resolve, 300))
 
+    // Si necesita completar su perfil, redirigir a register-step-two
+    if (needsProfileCompletion.value) {
+      console.log('Usuario de Google necesita completar perfil, redirigiendo a paso 2')
+      router.push('/register-step-two')
+    }
     // Si es admin, redirigimos al panel de administración
-    if (isAdmin.value) {
+    else if (isAdmin.value) {
       console.log('Usuario Google es admin, redirigiendo a panel admin')
       router.push('/admin')
     } else {
@@ -355,13 +366,20 @@ const handleLoginWithFacebook = async () => {
   const success = await loginWithFacebook()
 
   if (success) {
-    // Esperar a que el estado de isAdmin se actualice
+    // Esperar a que el estado se actualice
     await new Promise((resolve) => setTimeout(resolve, 300))
 
+    // Si necesita completar su perfil, redirigir a register-step-two
+    if (needsProfileCompletion.value) {
+      console.log('Usuario de Facebook necesita completar perfil, redirigiendo a paso 2')
+      router.push('/register-step-two')
+    }
     // Si es admin, redirigimos al panel de administración
-    if (isAdmin.value) {
+    else if (isAdmin.value) {
+      console.log('Usuario Facebook es admin, redirigiendo a panel admin')
       router.push('/admin')
     } else {
+      console.log('Usuario Facebook normal, redirigiendo a inicio')
       router.push('/')
     }
   }

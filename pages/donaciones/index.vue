@@ -3,8 +3,10 @@
     <!-- Hero Section -->
     <section class="relative overflow-hidden bg-emerald-700 text-white">
       <div class="absolute inset-0 z-0">
-        <img
-          src="/placeholder.webp?height=600&width=1600"
+        <NuxtImg
+          src="/placeholder.webp"
+          width="1600"
+          height="600"
           alt="Mascotas rescatadas"
           class="h-full w-full object-cover opacity-20"
         />
@@ -41,8 +43,8 @@
             >
               <PawPrintIcon class="h-10 w-10 text-emerald-600" />
             </div>
-            <h3 class="mb-2 text-3xl font-bold text-emerald-800">1,240</h3>
-            <p class="text-gray-600">Mascotas rescatadas</p>
+            <h3 class="mb-2 text-3xl font-bold text-emerald-800">{{ siteStats.totalPets || 1240 }}</h3>
+            <p class="text-gray-600">Mascotas registradas</p>
           </div>
 
           <div
@@ -53,7 +55,7 @@
             >
               <HomeIcon class="h-10 w-10 text-emerald-600" />
             </div>
-            <h3 class="mb-2 text-3xl font-bold text-emerald-800">985</h3>
+            <h3 class="mb-2 text-3xl font-bold text-emerald-800">{{ siteStats.totalAdoptions || 985 }}</h3>
             <p class="text-gray-600">Adopciones exitosas</p>
           </div>
 
@@ -71,73 +73,53 @@
         </div>
       </section>
 
-      <!-- Donation Options -->
       <section class="mb-16">
-        <h2 class="mb-4 text-center text-3xl font-bold text-emerald-800 md:text-4xl">
-          ¿Cómo puedes ayudar?
-        </h2>
-        <p class="mx-auto mb-12 max-w-3xl text-center text-gray-600">
-          Tu contribución, sin importar su tamaño, puede marcar una gran diferencia en la vida de
-          una mascota necesitada.
-        </p>
-
-        <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
-          <div
-            v-for="(option, index) in donationOptions"
-            :key="index"
-            class="overflow-hidden rounded-lg bg-white shadow-md transition-shadow hover:shadow-lg"
-          >
-            <div class="p-6">
-              <div class="mb-4 flex items-center">
-                <div class="mr-4 rounded-full bg-emerald-100 p-3">
-                  <component :is="option.icon" class="h-6 w-6 text-emerald-600" />
-                </div>
-                <h3 class="text-xl font-semibold text-emerald-800">
-                  {{ option.title }}
-                </h3>
-              </div>
-              <p class="mb-6 text-gray-600">{{ option.description }}</p>
-              <a
-                :href="option.link"
-                class="block w-full rounded-lg bg-emerald-600 py-2 text-center font-medium text-white transition-colors hover:bg-emerald-700"
-              >
-                {{ option.buttonText }}
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-      <section class="mb-16">
-
-
-        <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
-
+        <div class="grid grid-cols-1 gap-8 md:grid-cols-3 justify-center items-center">
           <!--Patreon-->
-          <NuxtLink to="https://patreon.com/AdoptaZulia">  
-            <div class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105">
-              <h1>Patreon</h1>
-          <NuxtImg src="https://www.patreon.com/donate_button.png" alt="Patreon" />
-          </div>
-        </NuxtLink>
+          <NuxtLink to="https://patreon.com/AdoptaZulia">
+            <div
+              class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105"
+            >
+              <h1 class="mb-4 text-xl font-semibold">Patreon</h1>
+                   <p class="mb-4 text-gray-600">Apadrina a AdoptaZulia y todas las mascotas que ayudamos.</p>
+              <NuxtImg src="/patreon.webp" alt="Patreon" class="mx-auto" />
+            </div>
+          </NuxtLink>
 
           <!--Ko-fi-->
           <NuxtLink to="https://ko-fi.com/adoptazulia">
-            <div class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105">
-              <h1>Ko-fi</h1>
-              <NuxtImg src="https://storage.ko-fi.com/cdn/kofi3.png" alt="Ko-fi" />
+            <div
+              class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105"
+            >
+              <h1 class="mb-4 text-xl font-semibold">Ko-fi</h1>
+                     <p class="mb-4 text-gray-600">Compranos un cafe, para poder seguir brindando la ayuda que tanto merecen.</p>
+              <NuxtImg src="/kofi.webp" alt="Ko-fi" class="mx-auto" />
             </div>
           </NuxtLink>
 
           <!--PayPal-->
-          <NuxtLink to="https://paypal.me/adoptazulia">
-            <div class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105">
-              <h1>PayPal</h1>
-              <NuxtImg src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="PayPal" />
-            </div>
-          </NuxtLink>
+          <div
+            class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105"
+          >
+            <h1 class="mb-4 text-xl font-semibold">PayPal</h1>
+            <p class="mb-4 text-gray-600">Realiza una donación segura mediante PayPal</p>
+            <div id="paypal-checkout" class="mx-auto max-w-xs"/>
+          </div>
+
+          <!--En Especie-->
+          <div
+            class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105"
+          >
+            <h1 class="mb-4 text-xl font-semibold">Donacion en especie</h1>
+            <p class="mb-4 text-gray-600">Realiza una donación de alimentos, medicinas o suministros para nuestras mascotas.</p>
+            <NuxtLink to="/contacto">
+              <div class="mx-auto max-w-xs">
+                <NuxtImg src="/placeholder.jpg" alt="En especie" class="mx-auto" />
+              </div>
+            </NuxtLink>
+          </div>
 
 
-        
         </div>
       </section>
 
@@ -204,7 +186,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import {
   PawPrintIcon,
   HomeIcon,
@@ -217,36 +199,16 @@ import {
   GiftIcon,
   CalendarIcon,
 } from 'lucide-vue-next'
+import { useStats } from '~/composables/useStats'
 
-// Donation options
-const donationOptions = [
-  {
-    title: 'Donación única',
-    description:
-      'Realiza una donación puntual del importe que desees para ayudar a nuestras mascotas.',
-    icon: HeartIcon,
-    link: '#donate',
-    buttonText: 'Donar ahora',
-  },
-  {
-    title: 'Donación mensual',
-    description:
-      'Conviértete en socio y ayuda de forma regular. Puedes cancelar en cualquier momento.',
-    icon: CalendarIcon,
-    link: '#monthly',
-    buttonText: 'Ser socio',
-  },
-  {
-    title: 'Donación en especie',
-    description: 'Dona alimentos, medicinas, mantas o cualquier otro material que pueda ser útil.',
-    icon: GiftIcon,
-    link: '/contacto',
-    buttonText: 'Más información',
-  },
-]
+// Estadísticas de impacto
+const siteStats = ref({
+  totalPets: 0,
+  totalAdoptions: 0,
+  totalUsers: 0
+})
 
 // One-time donation
-const donationAmounts = [10, 25, 50, 100]
 const selectedAmount = ref(25)
 const customAmount = ref('')
 const donorInfo = ref({
@@ -379,6 +341,7 @@ const faqs = [
 ]
 
 const openFaq = ref(null)
+const paypalButtonRendered = ref(false)
 
 const toggleFaq = (index) => {
   if (openFaq.value === index) {
@@ -387,6 +350,91 @@ const toggleFaq = (index) => {
     openFaq.value = index
   }
 }
+
+// Mejorado: Configuración del botón de PayPal
+onMounted(async () => {
+  // Cargar estadísticas
+  try {
+    const { fetchPublicStats, stats } = useStats()
+    await fetchPublicStats()
+    siteStats.value = {
+      totalPets: stats.value.totalPets,
+      totalAdoptions: stats.value.totalAdoptions,
+      totalUsers: stats.value.totalUsers
+    }
+  } catch (error) {
+    console.error('Error al cargar estadísticas:', error)
+  }
+
+  // Solo renderizar el botón si no se ha renderizado ya
+  if (!paypalButtonRendered.value) {
+    usePaypalButton({
+      style: {
+        layout: 'vertical',
+        color: 'gold',
+        shape: 'rect',
+        label: 'donate',
+      },
+      // Configurar el botón para procesar donaciones
+      createOrder: (data, actions) => {
+        return actions.order.create({
+          purchase_units: [
+            {
+              amount: {
+                value: finalAmount.value.toString(),
+                currency_code: 'USD',
+                breakdown: {
+                  item_total: {
+                    currency_code: 'USD',
+                    value: finalAmount.value.toString(),
+                  },
+                },
+              },
+              description: 'Donación para AdoptaZulia',
+              items: [
+                {
+                  name: 'Donación para mascotas',
+                  quantity: '1',
+                  unit_amount: {
+                    currency_code: 'USD',
+                    value: finalAmount.value.toString(),
+                  },
+                  category: 'DONATION',
+                },
+              ],
+            },
+          ],
+        })
+      },
+      // Manejar la aprobación del pago
+      onApprove: async (data, actions) => {
+        try {
+          const details = await actions.order.capture()
+          console.log('Donación completada exitosamente:', details)
+
+          // Mostrar mensaje de agradecimiento
+          alert(
+            `¡Gracias por tu donación de $${finalAmount.value}! Tu apoyo ayudará a nuestras mascotas.`
+          )
+        } catch (error) {
+          console.error('Error al procesar la donación:', error)
+          alert('Hubo un problema al procesar tu donación. Por favor, intenta nuevamente.')
+        }
+      },
+      // Manejar cancelaciones
+      onCancel: () => {
+        console.log('Donación cancelada por el usuario')
+      },
+      // Manejar errores
+      onError: (err) => {
+        console.error('Error en el proceso de PayPal:', err)
+        alert('Ocurrió un error durante el proceso de donación. Por favor, intenta más tarde.')
+      },
+    }).then(() => {
+      paypalButtonRendered.value = true
+    })
+  }
+})
 </script>
 
 <style scoped>

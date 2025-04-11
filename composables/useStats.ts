@@ -11,6 +11,7 @@ import {
 import { useFirebaseApp } from 'vuefire'
 import { addMonths, subMonths, subDays, subQuarters, startOfYear, format } from 'date-fns'
 import { es } from 'date-fns/locale'
+import { useAuth } from '~/composables/useAuth'
 
 // Interfaces para los datos de estadísticas
 export interface Stats {
@@ -67,6 +68,22 @@ export function useStats() {
 
   const loading = ref(false)
   const error = ref<string | null>(null)
+  
+  // Usamos el composable de autenticación para verificar permisos de administrador
+  const { isAdmin } = useAuth()
+
+  /**
+   * Verifica si el usuario actual tiene permisos de administrador
+   * @returns {boolean} true si es administrador, false en caso contrario
+   */
+  function checkAdminPermission(): boolean {
+    if (!isAdmin.value) {
+      error.value = 'No tienes permisos para acceder a esta información. Se requiere rol de administrador.'
+      console.error('Intento de acceso a estadísticas administrativas sin permisos')
+      return false
+    }
+    return true
+  }
 
   // Calcular máximo valor de tendencia para gráficos
   const maxAdoptionTrend = computed(() => {
@@ -74,8 +91,11 @@ export function useStats() {
     return Math.max(...adoptionTrends.value.map((item) => item.value))
   })
 
-  // Obtener estadísticas basadas en un período
-  async function fetchStats(period: string = 'month') {
+  /**
+   * Obtiene estadísticas básicas para usuarios públicos
+   * Esta función no requiere permisos de administrador
+   */
+  async function fetchPublicStats(): Promise<Stats> {
     loading.value = true
     error.value = null
 
@@ -83,16 +103,43 @@ export function useStats() {
       const firebaseApp = useFirebaseApp()
       const db = getDatabase(firebaseApp)
 
+      // Obtener solo estadísticas básicas
+      await fetchGeneralStats(db)
+      
+      return stats.value
+    } catch (err: any) {
+      console.error('Error al obtener estadísticas públicas:', err)
+      error.value = 'Error al cargar las estadísticas. Por favor, inténtalo de nuevo.'
+      return stats.value
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Obtener estadísticas basadas en un período
+  async function fetchStats(period: string = 'month'): Promise<Stats> {
+    loading.value = true
+    error.value = null
+
+    try {
+      // Si el usuario no es administrador, obtener solo estadísticas básicas
+      if (!isAdmin.value) {
+        return await fetchPublicStats()
+      }
+      
+      const firebaseApp = useFirebaseApp()
+      const db = getDatabase(firebaseApp)
+
       // 1. Estadísticas generales
       await fetchGeneralStats(db)
 
-      // 2. Tendencias de adopción
+      // 2. Tendencias de adopción (solo para administradores)
       await fetchAdoptionTrends(db, period)
 
-      // 3. Distribución de mascotas por tipo
+      // 3. Distribución de mascotas por tipo (solo para administradores)
       await fetchPetDistribution(db)
 
-      // 4. Estadísticas detalladas
+      // 4. Estadísticas detalladas (solo para administradores)
       generateDetailedStats()
 
       return stats.value
@@ -429,5 +476,6 @@ export function useStats() {
     detailedStats,
     maxAdoptionTrend,
     fetchStats,
+    fetchPublicStats
   }
 }

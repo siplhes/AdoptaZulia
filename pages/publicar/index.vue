@@ -223,6 +223,17 @@
                 />
                 <span class="ml-2 text-gray-700">Vacunado</span>
               </label>
+              
+              <div v-if="petData.vaccinated" class="mt-2">
+                <label for="vaccine-info" class="text-xs text-gray-500">Detalles de vacunación</label>
+                <input
+                  id="vaccine-info"
+                  v-model="petData.vaccineInfo"
+                  type="text"
+                  class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+                  placeholder="Tipo de vacunas recibidas"
+                />
+              </div>
             </div>
 
             <div>
@@ -234,6 +245,17 @@
                 />
                 <span class="ml-2 text-gray-700">Esterilizado</span>
               </label>
+              
+              <div v-if="petData.neutered" class="mt-2">
+                <label for="neuter-date" class="text-xs text-gray-500">Fecha aproximada</label>
+                <input
+                  id="neuter-date"
+                  v-model="petData.neuterDate"
+                  type="text"
+                  class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+                  placeholder="¿Cuándo fue esterilizado?"
+                />
+              </div>
             </div>
 
             <div>
@@ -245,6 +267,17 @@
                 />
                 <span class="ml-2 text-gray-700">Microchip</span>
               </label>
+              
+              <div v-if="petData.microchipped" class="mt-2">
+                <label for="chip-number" class="text-xs text-gray-500">Número de chip</label>
+                <input
+                  id="chip-number"
+                  v-model="petData.chipNumber"
+                  type="text"
+                  class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+                  placeholder="Número de identificación"
+                />
+              </div>
             </div>
           </div>
 
@@ -431,6 +464,56 @@
               />
             </div>
           </div>
+          
+          <!-- Información adicional de contacto -->
+          <div>
+            <label for="contact-notes" class="mb-1 block text-sm font-medium text-gray-700">
+              Información adicional de contacto
+            </label>
+            <textarea
+              id="contact-notes"
+              v-model="petData.contact.notes"
+              rows="3"
+              class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+              placeholder="Horarios de contacto, formas de contacto preferidas, etc."
+            />
+          </div>
+          
+          <!-- Preferencia de contacto -->
+          <div class="mt-4">
+            <label class="mb-1 block text-sm font-medium text-gray-700">
+              Método de contacto preferido
+            </label>
+            <div class="flex flex-wrap gap-4">
+              <label class="inline-flex items-center">
+                <input
+                  v-model="petData.contact.preferredMethod"
+                  type="radio"
+                  value="email"
+                  class="h-4 w-4 border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                />
+                <span class="ml-2 text-gray-700">Email</span>
+              </label>
+              <label class="inline-flex items-center">
+                <input
+                  v-model="petData.contact.preferredMethod"
+                  type="radio"
+                  value="phone"
+                  class="h-4 w-4 border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                />
+                <span class="ml-2 text-gray-700">Teléfono</span>
+              </label>
+              <label class="inline-flex items-center">
+                <input
+                  v-model="petData.contact.preferredMethod"
+                  type="radio"
+                  value="whatsapp"
+                  class="h-4 w-4 border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                />
+                <span class="ml-2 text-gray-700">WhatsApp</span>
+              </label>
+            </div>
+          </div>
         </div>
 
         <!-- Sección de adopción -->
@@ -466,6 +549,83 @@
               class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
               placeholder="Requisitos que debe cumplir el adoptante (opcional)"
             />
+          </div>
+          
+          <!-- Cuota de adopción -->
+          <div class="mb-4">
+            <label for="adoption-fee" class="mb-1 block text-sm font-medium text-gray-700">
+              Cuota de adopción (opcional)
+            </label>
+            <div class="flex items-center">
+              <span
+                class="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3 text-gray-500"
+              >
+                $
+              </span>
+              <input
+                id="adoption-fee"
+                v-model.number="petData.adoptionFee"
+                type="number"
+                min="0"
+                step="0.01"
+                class="w-full rounded-r-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+                placeholder="0.00"
+              />
+            </div>
+            <p class="mt-1 text-xs text-gray-500">
+              Si solicitas una cuota de adopción, especifica qué incluye (vacunas, castración, etc.).
+            </p>
+          </div>
+
+          <!-- Detalles de cuota de adopción -->
+          <div v-if="petData.adoptionFee > 0" class="mb-4">
+            <label for="fee-details" class="mb-1 block text-sm font-medium text-gray-700">
+              ¿Qué incluye la cuota de adopción?
+            </label>
+            <textarea
+              id="fee-details"
+              v-model="petData.feeDetails"
+              rows="2"
+              class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+              placeholder="Ej: Vacunas, esterilización, microchip, etc."
+            />
+          </div>
+          
+          <!-- Contrato de adopción -->
+          <div class="mb-4">
+            <label class="flex items-center">
+              <input
+                v-model="petData.requiresContract"
+                type="checkbox"
+                class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+              />
+              <span class="ml-2 text-gray-700">Requiere contrato de adopción</span>
+            </label>
+          </div>
+
+          <!-- Seguimiento post-adopción -->
+          <div class="mb-4">
+            <label class="flex items-center">
+              <input
+                v-model="petData.requiresFollowUp"
+                type="checkbox"
+                class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+              />
+              <span class="ml-2 text-gray-700">Requiere seguimiento post-adopción</span>
+            </label>
+
+            <div v-if="petData.requiresFollowUp" class="ml-6 mt-2">
+              <label for="follow-up-details" class="text-xs text-gray-500">
+                Detalles del seguimiento
+              </label>
+              <textarea
+                id="follow-up-details"
+                v-model="petData.followUpDetails"
+                rows="2"
+                class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+                placeholder="Frecuencia y tipo de seguimiento requerido"
+              />
+            </div>
           </div>
         </div>
 
@@ -563,18 +723,30 @@ const petData = reactive({
   location: '',
   description: '',
   urgent: false,
+  urgentReason: '', // Motivo de urgencia
+  urgentReasonDetails: '', // Detalles adicionales sobre la urgencia
   vaccinated: false,
+  vaccineInfo: '', // Detalles de vacunación
   neutered: false,
+  neuterDate: '', // Fecha de esterilización
   microchipped: false,
+  chipNumber: '', // Número de microchip
   healthStatus: 80,
   healthDescription: '',
+  medicalHistory: '', // Historial médico
   adoptionRequirements: '',
   adoptionFee: 0,
+  feeDetails: '', // Detalles de la cuota de adopción
+  requiresContract: false, // Contrato de adopción
+  requiresFollowUp: false, // Seguimiento post-adopción
+  followUpDetails: '', // Detalles del seguimiento post-adopción
   contact: {
     name: '',
     email: '',
     phone: '',
     type: '',
+    notes: '', // Información adicional de contacto
+    preferredMethod: 'email', // Método de contacto preferido (email por defecto)
   },
   image: '', // URL de la imagen principal
   photos: [], // URLs de fotos adicionales

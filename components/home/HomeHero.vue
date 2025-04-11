@@ -1,5 +1,5 @@
 <template>
-  <section class="relative overflow-hidden bg-emerald-800 text-white">
+  <section class="relative overflow-hidden bg-amber-800 text-white">
     <div class="absolute inset-0 z-0">
       <NuxtImg
         src="/img1.webp"
@@ -27,7 +27,7 @@
           </a>
           <a
             href="/publicar"
-            class="inline-flex items-center justify-center rounded-lg bg-amber-600 px-6 py-3 text-lg font-semibold text-white transition-colors hover:bg-amber-500"
+            class="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-6 py-3 text-lg font-semibold text-white transition-colors hover:bg-emerald-500"
           >
             <PlusIcon class="mr-2 h-5 w-5" />
             Dar en adopción

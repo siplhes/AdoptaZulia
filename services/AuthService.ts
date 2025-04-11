@@ -235,13 +235,19 @@ export class AuthService {
       const snapshot = await get(userRef)
       const existingData = snapshot.exists() ? snapshot.val() : {}
 
+      // Filtrar propiedades con valores undefined
+      const cleanUserData: Partial<UserData> = {}
+      for (const key in userData) {
+        if (userData[key] !== undefined) {
+          cleanUserData[key] = userData[key]
+        }
+      }
+
       // Combinar datos existentes con nuevos datos
       await set(userRef, {
         ...existingData,
-        ...userData,
+        ...cleanUserData,
       })
-
-      console.log('Datos de usuario guardados correctamente:', userId)
     } catch (error) {
       console.error('Error al guardar datos de usuario:', error)
       throw error
@@ -306,15 +312,20 @@ export class AuthService {
       photoURL: photoURL || user.photoURL,
     })
 
-    // Actualizar datos en RTDB
-    await this.saveUserData(user.uid, {
+    // Preparar objeto con datos a actualizar, evitando valores undefined
+    const userData: Partial<UserData> = {
       displayName: displayName || user.displayName || '',
       photoURL: photoURL || user.photoURL || '',
-      bio,
-      phoneNumber,
-      userName,
       updatedAt: Date.now(),
-    })
+    }
+
+    // Solo agregar propiedades si no son undefined
+    if (bio !== undefined) userData.bio = bio || '';
+    if (phoneNumber !== undefined) userData.phoneNumber = phoneNumber || '';
+    if (userName !== undefined) userData.userName = userName || '';
+
+    // Actualizar datos en RTDB
+    await this.saveUserData(user.uid, userData);
   }
 
   /**
@@ -348,8 +359,6 @@ export class AuthService {
 
       if (snapshot.exists()) {
         const users = snapshot.val()
-
-        // Buscar usuario por nombre de usuario
         for (const userId in users) {
           const userData = users[userId]
           if (
@@ -384,7 +393,6 @@ export class AuthService {
 
       // Si existe en la colección de admins, es administrador
       if (snapshot.exists() && snapshot.val() === true) {
-        console.log(`Usuario ${userId} encontrado en la colección de admins`)
         return true
       }
 
@@ -399,15 +407,10 @@ export class AuthService {
         if (userData && userData.email) {
           const userEmail = userData.email.toLowerCase()
           const isAdminByEmail = this.adminEmails.includes(userEmail)
-          console.log(
-            `Usuario ${userId} con email ${userEmail} es admin por email: ${isAdminByEmail}`
-          )
-
           // Si es admin por email pero no está en la colección, lo agregamos
           if (isAdminByEmail) {
             try {
               await set(adminRef, true)
-              console.log(`Usuario ${userId} agregado a la colección de admins`)
             } catch (error) {
               console.error('Error al agregar usuario a admins:', error)
             }

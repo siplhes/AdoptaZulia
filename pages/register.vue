@@ -237,14 +237,30 @@ const handleRegister = async () => {
 // Registrarse con Google
 const registerWithGoogle = async () => {
   if (await loginWithGoogle()) {
-    router.push('/')
+    // Esperar a que el estado se actualice
+    await new Promise((resolve) => setTimeout(resolve, 300))
+    
+    // Si necesita completar su perfil (no tiene userName)
+    if (needsProfileCompletion.value) {
+      router.push('/register-step-two')
+    } else {
+      router.push('/')
+    }
   }
 }
 
 // Registrarse con Facebook
 const registerWithFacebook = async () => {
   if (await loginWithFacebook()) {
-    router.push('/')
+    // Esperar a que el estado se actualice
+    await new Promise((resolve) => setTimeout(resolve, 300))
+    
+    // Si necesita completar su perfil (no tiene userName)
+    if (needsProfileCompletion.value) {
+      router.push('/register-step-two')
+    } else {
+      router.push('/')
+    }
   }
 }
 </script>

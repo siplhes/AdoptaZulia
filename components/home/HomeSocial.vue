@@ -7,15 +7,15 @@
           Siguenos en nuestras redes sociales para recibir actualizaciones sobre nuevas mascotas
           disponibles, consejos de cuidado y eventos de adopción.
         </p>
-        <div class="mx-auto inline-flex gap-2 space-x-3">
+        <div class="mx-auto inline-flex items-center justify-center gap-2 space-x-3">
           <NuxtLink
             v-for="(social, index) in socialLinks"
             :key="index"
             :to="social.link"
             target="_blank"
-            class="mx-3 rounded-lg bg-amber-600 p-2 text-[#fefffa]"
+            class="mx-3 rounded-lg bg-amber-600 p-2 text-[#fefffa] inline-flex items-center justify-center gap-3"
           >
-            {{ social.name }}
+              <Icon :name="social.iconName" class="text-2xl" size="28px" />  {{ social.name }}
           </NuxtLink>
         </div>
       </div>
@@ -27,15 +27,24 @@
 const socialLinks = [
   {
     name: 'Instagram',
-    link: 'https://instagram.com/adoptazulia',
+    link: 'https://instagram.com/adopta.zulia',
+    iconName: 'mdi:instagram',
   },
   {
     name: 'Facebook',
     link: 'https://facebook.com/adoptazulia',
+    iconName: 'ic:baseline-facebook',
   },
   {
-    name: 'TikTok',
-    link: 'https://tiktok.com/adoptazulia',
+    name: 'Twitter',
+    link: 'https://x.com/AdoptaZulia',
+    iconName: 'mdi:alpha-x-circle',
   },
+    {
+    name: 'WhatsApp',
+    link: 'https://wa.me/584246123456',
+    iconName: 'mdi:whatsapp',
+  },
+
 ]
 </script>

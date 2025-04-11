@@ -87,12 +87,20 @@
             <div class="mt-6 flex flex-col space-y-3">
               <button
                 class="flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-3 text-white hover:bg-emerald-700"
+                @click="contactWhatsapp"
+              >
+              <Icon name="mdi:whatsapp" class="mr-2 h-5 w-5" />
+                WhatsApp
+              </button>
+
+              
+             <button
+                class="flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-3 text-white hover:bg-emerald-700"
                 @click="contactOwner"
               >
                 <PhoneIcon class="mr-2 h-5 w-5" />
                 Contactar
               </button>
-
               <button
                 class="flex items-center justify-center rounded-lg border border-gray-300 px-4 py-3 hover:bg-gray-50"
                 :class="{
@@ -185,12 +193,32 @@
 
                 <div>
                   <p class="text-sm text-gray-500">Vacunado</p>
-                  <p class="font-medium">{{ pet.vaccinated ? 'Sí' : 'No' }}</p>
+                  <p class="font-medium">
+                    {{ pet.vaccinated ? 'Sí' : 'No' }}
+                    <span v-if="pet.vaccinated && pet.vaccineInfo" class="text-sm text-gray-500">
+                      ({{ pet.vaccineInfo }})
+                    </span>
+                  </p>
                 </div>
 
                 <div>
                   <p class="text-sm text-gray-500">Esterilizado</p>
-                  <p class="font-medium">{{ pet.neutered ? 'Sí' : 'No' }}</p>
+                  <p class="font-medium">
+                    {{ pet.neutered ? 'Sí' : 'No' }}
+                    <span v-if="pet.neutered && pet.neuterDate" class="text-sm text-gray-500">
+                      ({{ pet.neuterDate }})
+                    </span>
+                  </p>
+                </div>
+                
+                <div v-if="pet.microchipped">
+                  <p class="text-sm text-gray-500">Microchip</p>
+                  <p class="font-medium">
+                    Sí
+                    <span v-if="pet.chipNumber" class="text-sm text-gray-500">
+                      ({{ pet.chipNumber }})
+                    </span>
+                  </p>
                 </div>
               </div>
 
@@ -255,10 +283,29 @@
               </div>
 
               <!-- Requisitos para adopción -->
-              <div v-if="pet.adoptionRequirements" class="mb-6">
+              <div v-if="pet.adoptionRequirements || pet.requiresContract || pet.requiresFollowUp || (pet.adoptionFee && pet.adoptionFee > 0)" class="mb-6">
                 <h2 class="mb-2 text-xl font-semibold text-emerald-800">Requisitos para adoptar</h2>
                 <div class="rounded-lg border border-amber-100 bg-amber-50 p-4">
-                  <p class="text-gray-700">{{ pet.adoptionRequirements }}</p>
+                  <div v-if="pet.adoptionRequirements" class="mb-3">
+                    <p class="text-gray-700">{{ pet.adoptionRequirements }}</p>
+                  </div>
+
+                  <div v-if="pet.requiresContract || pet.requiresFollowUp" class="mb-3 space-y-2">
+                    <div v-if="pet.requiresContract" class="flex items-center">
+                      <CheckCircleIcon class="mr-2 h-5 w-5 text-emerald-600" />
+                      <span class="text-gray-700">Requiere contrato de adopción</span>
+                    </div>
+                    
+                    <div v-if="pet.requiresFollowUp" class="flex items-center">
+                      <CheckCircleIcon class="mr-2 h-5 w-5 text-emerald-600" />
+                      <span class="text-gray-700">
+                        Requiere seguimiento post-adopción
+                        <span v-if="pet.followUpDetails" class="text-sm text-gray-500">
+                          ({{ pet.followUpDetails }})
+                        </span>
+                      </span>
+                    </div>
+                  </div>
 
                   <div
                     v-if="pet.adoptionFee && pet.adoptionFee > 0"
@@ -266,9 +313,12 @@
                   >
                     <p class="text-gray-700">
                       <span class="font-medium">Tasa de adopción:</span>
-                      {{ pet.adoptionFee }}€
+                      ${{ pet.adoptionFee }}
                     </p>
-                    <p class="mt-1 text-xs text-gray-500">
+                    <p v-if="pet.feeDetails" class="mt-1 text-sm text-gray-700">
+                      {{ pet.feeDetails }}
+                    </p>
+                    <p v-else class="mt-1 text-xs text-gray-500">
                       Esta tasa ayuda a cubrir gastos veterinarios y de cuidado.
                     </p>
                   </div>
@@ -309,6 +359,20 @@
                     {{ pet.contact.email }}
                   </a>
                 </div>
+              </div>
+              
+              <!-- Método preferido de contacto -->
+              <div v-if="pet.contact.preferredMethod" class="mt-3">
+                <p class="text-sm text-gray-700">
+                  <span class="font-medium">Contacto preferido:</span>
+                  <span class="ml-1">{{ formatPreferredMethod(pet.contact.preferredMethod) }}</span>
+                </p>
+              </div>
+              
+              <!-- Notas adicionales de contacto -->
+              <div v-if="pet.contact.notes" class="mt-3">
+                <p class="text-sm font-medium text-gray-700">Notas adicionales:</p>
+                <p class="mt-1 text-sm text-gray-600">{{ pet.contact.notes }}</p>
               </div>
             </div>
           </div>
@@ -456,6 +520,31 @@ const contactOwner = () => {
   }
 }
 
+// Contactar al propietario via WhatsApp
+const contactWhatsapp = () => {
+  if (pet.value && pet.value.contact && pet.value.contact.phone) {
+    let phoneNumber = pet.value.contact.phone.toString().trim()
+    
+    // Eliminar el código de país si ya está presente
+    if (phoneNumber.startsWith('+58')) {
+      phoneNumber = phoneNumber.substring(3)
+    } else if (phoneNumber.startsWith('58')) {
+      phoneNumber = phoneNumber.substring(2)
+    }
+    
+    // Eliminar el 0 inicial si existe
+    if (phoneNumber.startsWith('0')) {
+      phoneNumber = phoneNumber.substring(1)
+    }
+    
+    // Asegurar que no hay espacios ni caracteres especiales
+    phoneNumber = phoneNumber.replace(/[^0-9]/g, '')
+    
+    // Abrir WhatsApp con el número procesado
+    window.open(`https://wa.me/58${phoneNumber}`)
+  }
+}
+
 // Compartir mascota
 const sharePet = async () => {
   if (navigator.share) {
@@ -573,5 +662,17 @@ const getHealthColor = (healthStatus) => {
   if (healthStatus >= 50) return 'bg-yellow-400'
   if (healthStatus >= 30) return 'bg-amber-500'
   return 'bg-red-500'
+}
+
+// Formatear método de contacto preferido
+const formatPreferredMethod = (method) => {
+  switch (method) {
+    case 'phone':
+      return 'Teléfono'
+    case 'email':
+      return 'Correo electrónico'
+    default:
+      return method
+  }
 }
 </script>

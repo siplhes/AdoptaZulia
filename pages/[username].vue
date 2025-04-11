@@ -5,7 +5,7 @@
       <div v-if="loading" class="flex justify-center py-12">
         <div
           class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-emerald-600 border-r-transparent align-[-0.125em]"
-        ></div>
+       />
       </div>
 
       <!-- Error -->
@@ -39,7 +39,7 @@
           <!-- Foto de perfil -->
           <div class="absolute -bottom-16 left-8">
             <div class="h-32 w-32 overflow-hidden rounded-full border-4 border-white bg-white">
-              <img
+              <NuxtImg
                 v-if="userProfile.photoURL"
                 :src="userProfile.photoURL"
                 :alt="userProfile.displayName"
@@ -109,13 +109,13 @@
             <button
               v-for="(tab, index) in tabs"
               :key="index"
-              @click="activeTab = tab.id"
               class="border-b-2 px-6 py-3 text-sm font-medium transition-colors"
               :class="
                 activeTab === tab.id
                   ? 'border-emerald-500 text-emerald-600'
                   : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
               "
+                 @click="activeTab = tab.id"
             >
               {{ tab.label }}
             </button>

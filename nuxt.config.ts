@@ -17,6 +17,7 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@nuxtjs/color-mode',
     'nuxt-vuefire',
+    'nuxt-paypal',
   ],
 
   // Variables de entorno públicas y privadas
@@ -25,6 +26,10 @@ export default defineNuxtConfig({
     awsSecretKey: process.env.AWS_SECRET_ACCESS_KEY,
     // Claves que se exponen al cliente
     public: {
+      paypal: {
+        clientId: process.env.PAYPAL_CLIENT_ID || 'test',
+        currency: 'USD',
+      },
       awsRegion: process.env.AWS_REGION || 'us-east-2',
       awsAccessKey: process.env.AWS_ACCESS_KEY_ID,
       awsS3BucketName: process.env.AWS_S3_BUCKET_NAME || 'nsfwclothesmaracaibo',
@@ -85,5 +90,11 @@ export default defineNuxtConfig({
 
   // Asegurarnos de que el plugin de firebase se cargue después de que nuxt-vuefire
   // haya inicializado Firebase
-  plugins: ['~/plugins/firebase.ts'],
+  plugins: ['~/plugins/firebase.ts', '~/plugins/paypal.ts'],
+
+  // PayPal configuration
+  paypal: {
+    clientId: process.env.PAYPAL_CLIENT_ID || 'test',
+    currency: 'USD',
+  },
 })

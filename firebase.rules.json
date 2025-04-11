@@ -1,0 +1,57 @@
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": false,
+    
+    "users": {
+      ".read": "auth != null",
+      "$uid": {
+        ".read": "auth != null",
+        ".write": "(auth != null && auth.uid == $uid) || root.child('admins').child(auth.uid).exists()"
+      }
+    },
+    
+    "pets": {
+      ".read": true,
+      ".write": "auth != null",
+      "$petId": {
+        ".write": "(auth != null && data.child('userId').val() == auth.uid) || root.child('admins').child(auth.uid).exists()"
+      }
+    },
+    
+    "admins": {
+      ".read": "auth != null && root.child('admins').child(auth.uid).exists()",
+      ".write": "auth != null && root.child('admins').child(auth.uid).exists()"
+    },
+    
+    "adoptions": {
+      ".read": "auth != null && root.child('admins').child(auth.uid).exists()",
+      ".write": "auth != null",
+      "$adoptionId": {
+        ".read": "auth != null && (data.child('userId').val() == auth.uid || root.child('admins').child(auth.uid).exists())",
+        ".write": "auth != null && (data.child('userId').val() == auth.uid || root.child('admins').child(auth.uid).exists())"
+      }
+    },
+    
+    "petComments": {
+      ".read": true,
+      ".write": "auth != null",
+      "$commentId": {
+        ".write": "(auth != null && data.child('userId').val() == auth.uid) || root.child('admins').child(auth.uid).exists()"
+      }
+    },
+    
+    "adoptionStories": {
+      ".read": true,
+      ".write": "auth != null",
+      "$storyId": {
+        ".write": "(auth != null && data.child('userId').val() == auth.uid) || root.child('admins').child(auth.uid).exists()"
+      }
+    },
+    
+    "statistics": {
+      ".read": "auth != null && root.child('admins').child(auth.uid).exists()",
+      ".write": "auth != null && root.child('admins').child(auth.uid).exists()"
+    }
+  }
+}

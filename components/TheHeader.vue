@@ -11,9 +11,10 @@
 
         <!-- Botón de hamburguesa para móvil -->
         <button
-          @click="isMenuOpen = !isMenuOpen"
+          type="button"
           class="inline-flex items-center justify-center rounded-md p-2 text-white lg:hidden"
           aria-expanded="false"
+            @click="isMenuOpen = !isMenuOpen"
         >
           <span class="sr-only">Abrir menú principal</span>
           <!-- Icono de menú -->
@@ -25,7 +26,7 @@
         <!-- Menú de navegación para escritorio -->
         <div class="hidden lg:ml-6 lg:flex lg:items-center lg:space-x-6">
           <NuxtLink
-            v-for="(link, index) in navigationLinks"
+            v-for="(link, index) in navigationLinksWithoutProfile"
             :key="index"
             :to="link.link"
             class="nav-link"
@@ -34,11 +35,80 @@
             {{ link.name }}
           </NuxtLink>
 
-          <NuxtLink v-if="!isAuthenticated" to="/login" class="nav-link">Iniciar sesión</NuxtLink>
+          <!-- Avatar del usuario (si está autenticado) -->
+          <div v-if="isAuthenticated" class="relative">
+            <button 
+              @click="toggleUserMenu" 
+              class="flex items-center space-x-2 focus:outline-none"
+              aria-haspopup="true"
+              aria-expanded="userMenuOpen"
+            >
+              <!-- Avatar del usuario -->
+              <div class="overflow-hidden h-9 w-9 rounded-full border-2 border-amber-300">
+                <img 
+                  v-if="user?.photoURL" 
+                  :src="user.photoURL" 
+                  :alt="user.displayName || 'Usuario'" 
+                  class="h-full w-full object-cover"
+                />
+                <div 
+                  v-else 
+                  class="flex h-full w-full items-center justify-center bg-emerald-100 text-emerald-700 font-bold"
+                >
+                  {{ getInitials(user.displayName || user.email || 'U') }}
+                </div>
+              </div>
+            </button>
 
-          <button v-else class="nav-link" aria-label="Cerrar sesión" @click="handleLogout">
-            Cerrar sesión
-          </button>
+            <!-- Menú desplegable del usuario -->
+            <div 
+              v-show="userMenuOpen"
+              class="absolute right-0 mt-2 w-48 rounded-md bg-white py-2 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+              role="menu"
+            >
+              <NuxtLink 
+                :to="`/${user.userName}`" 
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" 
+                role="menuitem"
+                @click="userMenuOpen = false"
+              >
+                Mi perfil
+              </NuxtLink>
+              
+              <NuxtLink 
+                to="/perfil/configuracion" 
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" 
+                role="menuitem"
+                @click="userMenuOpen = false"
+              >
+                Configuración
+              </NuxtLink>
+
+              <div v-if="isAdmin" class="border-t border-gray-100 my-1"></div>
+              
+              <NuxtLink 
+                v-if="isAdmin"
+                to="/admin" 
+                class="block px-4 py-2 text-sm text-emerald-700 hover:bg-gray-100" 
+                role="menuitem"
+                @click="userMenuOpen = false"
+              >
+                Panel de administración
+              </NuxtLink>
+
+              <div class="border-t border-gray-100 my-1"></div>
+              
+              <button 
+                class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100" 
+                role="menuitem"
+                @click="handleLogout"
+              >
+                Cerrar sesión
+              </button>
+            </div>
+          </div>
+
+          <NuxtLink v-if="!isAuthenticated" to="/login" class="nav-link">Iniciar sesión</NuxtLink>
         </div>
       </div>
     </header>
@@ -80,11 +150,18 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
+
+
+// Composición para obtener información del usuario
+const { user } = useAuth()
 
 // Estado para el menú móvil
 const isMenuOpen = ref(false)
+
+// Estado para el menú desplegable del usuario
+const userMenuOpen = ref(false)
 
 // Información de autenticación
 const { isAdmin, isAuthenticated, logout } = useAuth()
@@ -110,6 +187,7 @@ const baseLinks = [
 
 // Function to handle logout
 const handleLogout = async () => {
+  userMenuOpen.value = false
   await logout()
 }
 
@@ -119,9 +197,60 @@ const handleLogoutMobile = async () => {
   await logout()
 }
 
-// Computed property for navigation links
+// Función para mostrar/ocultar el menú del usuario
+const toggleUserMenu = () => {
+  userMenuOpen.value = !userMenuOpen.value
+}
+
+// Función para obtener las iniciales del nombre completo
+const getInitials = (name) => {
+  if (!name) return 'U'
+  return name
+    .split(' ')
+    .map(part => part.charAt(0))
+    .join('')
+    .toUpperCase()
+    .substring(0, 2)
+}
+
+// Cerrar el menú de usuario cuando se hace clic fuera de él
+const closeUserMenuOnClickOutside = (event) => {
+  const userMenu = document.querySelector('[role="menu"]')
+  const userButton = document.querySelector('[aria-haspopup="true"]')
+  
+  if (userMenuOpen.value && userMenu && userButton && 
+      !userMenu.contains(event.target) && 
+      !userButton.contains(event.target)) {
+    userMenuOpen.value = false
+  }
+}
+
+// Añadir y eliminar event listeners
+onMounted(() => {
+  document.addEventListener('click', closeUserMenuOnClickOutside)
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && userMenuOpen.value) {
+      userMenuOpen.value = false
+    }
+  })
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', closeUserMenuOnClickOutside)
+})
+
+// Computed property for all navigation links
 const navigationLinks = computed(() => {
   const links = [...baseLinks]
+
+  // Añadir enlace de perfil si el usuario está autenticado
+  if (isAuthenticated.value) {
+    links.push({
+      name: user.value.userName,
+      link:  user.value.userName,
+      alt: 'Perfil de usuario',
+    })
+  } 
 
   // Añadir enlace de admin si el usuario es administrador
   if (isAdmin.value) {
@@ -133,6 +262,11 @@ const navigationLinks = computed(() => {
   }
 
   return links
+})
+
+// Computed property for links without profile (used in desktop view with avatar)
+const navigationLinksWithoutProfile = computed(() => {
+  return baseLinks
 })
 </script>
 

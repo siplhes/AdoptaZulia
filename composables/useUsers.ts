@@ -18,11 +18,28 @@ import {
   type UserCredential,
 } from 'firebase/auth'
 import type { UserProfile, UserData } from '~/models/User'
+import { useAuth } from '~/composables/useAuth'
 
 export function useUsers() {
   const users = ref<UserProfile[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
+  
+  // Usamos el composable de autenticación para verificar permisos de administrador
+  const { isAdmin } = useAuth()
+
+  /**
+   * Verifica si el usuario actual tiene permisos de administrador
+   * @returns {boolean} true si es administrador, false en caso contrario
+   */
+  function checkAdminPermission(): boolean {
+    if (!isAdmin.value) {
+      error.value = 'No tienes permisos para realizar esta operación. Se requiere rol de administrador.'
+      console.error('Intento de acceso a funcionalidad administrativa sin permisos')
+      return false
+    }
+    return true
+  }
 
   /**
    * Obtiene todos los usuarios registrados
@@ -32,6 +49,11 @@ export function useUsers() {
     error.value = null
 
     try {
+      // Verificar permisos de administrador
+      if (!checkAdminPermission()) {
+        return []
+      }
+
       const firebaseApp = useFirebaseApp()
       const db = getDatabase(firebaseApp)
       const usersRef = dbRef(db, 'users')
@@ -110,6 +132,11 @@ export function useUsers() {
     error.value = null
 
     try {
+      // Verificar permisos de administrador
+      if (!checkAdminPermission()) {
+        return null
+      }
+
       const firebaseApp = useFirebaseApp()
       const auth = getAuth(firebaseApp)
       const db = getDatabase(firebaseApp)
@@ -194,6 +221,11 @@ export function useUsers() {
     error.value = null
 
     try {
+      // Verificar permisos de administrador
+      if (!checkAdminPermission()) {
+        return false
+      }
+
       const firebaseApp = useFirebaseApp()
       const db = getDatabase(firebaseApp)
       const userRef = dbRef(db, `users/${userId}`)
@@ -238,6 +270,11 @@ export function useUsers() {
     userId: string,
     status: 'active' | 'inactive' | 'suspended'
   ): Promise<boolean> {
+    // Verificar permisos de administrador antes de continuar
+    if (!checkAdminPermission()) {
+      return false
+    }
+    
     return updateUser(userId, { status })
   }
 
@@ -251,6 +288,11 @@ export function useUsers() {
     error.value = null
 
     try {
+      // Verificar permisos de administrador
+      if (!checkAdminPermission()) {
+        return false
+      }
+
       const firebaseApp = useFirebaseApp()
       const db = getDatabase(firebaseApp)
       const userRef = dbRef(db, `users/${userId}`)
