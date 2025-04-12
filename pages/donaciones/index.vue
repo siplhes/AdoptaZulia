@@ -336,7 +336,6 @@ onMounted(async () => {
       onApprove: async (data, actions) => {
         try {
           const details = await actions.order.capture()
-          console.log('Donación completada exitosamente:', details)
 
           // Mostrar mensaje de agradecimiento
           alert(
@@ -349,7 +348,6 @@ onMounted(async () => {
       },
       // Manejar cancelaciones
       onCancel: () => {
-        console.log('Donación cancelada por el usuario')
       },
       // Manejar errores
       onError: (err) => {

@@ -517,7 +517,6 @@ const resetFilters = () => {
 
 const toggleFavorite = (petId) => {
   // Implementación real requeriría estado y posiblemente una API
-  console.log(`Toggled favorite for pet ${petId}`)
 }
 
 const prevPage = () => {

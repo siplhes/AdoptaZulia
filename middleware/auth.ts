@@ -7,7 +7,6 @@ export default defineNuxtRouteMiddleware((to, from) => {
   
   // Si el usuario no está autenticado, redirigir al login
   if (!isAuthenticated.value) {
-    console.log('Redirigiendo: Usuario no autenticado intentando acceder a ruta protegida')
     return navigateTo(`/login?redirect=${to.fullPath}`)
   }
 })

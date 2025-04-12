@@ -5,7 +5,26 @@
         ¿Qué tipo de mascota buscas?
       </h2>
 
-      <div class="grid grid-cols-2 gap-6 md:grid-cols-4">
+      <!-- Estado de carga -->
+      <div v-if="loading" class="flex justify-center py-12">
+        <div
+          class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-emerald-600 border-r-transparent align-[-0.125em]"
+        />
+      </div>
+
+      <!-- Mensaje de error -->
+      <div v-else-if="error" class="py-8 text-center">
+        <p class="text-red-500">{{ error }}</p>
+        <button 
+          class="mt-4 rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700"
+          @click="loadCategories"
+          >
+          Intentar de nuevo
+        </button>
+      </div>
+
+      <!-- Grid de categorías -->
+      <div v-else class="grid grid-cols-2 gap-6 md:grid-cols-4">
         <a
           v-for="(category, index) in petCategories"
           :key="index"
@@ -41,6 +60,8 @@ import { DogIcon, CatIcon, RabbitIcon, BirdIcon } from 'lucide-vue-next'
 import { usePets } from '~/composables/usePets'
 
 const { fetchTotalPetsByCategory } = usePets()
+const loading = ref(true)
+const error = ref(null)
 
 // Define las categorías de mascotas con conteo inicial de 0
 const petCategories = ref([
@@ -74,15 +95,49 @@ const petCategories = ref([
   },
 ])
 
-// Cargar contadores para cada categoría
-onMounted(async () => {
+// Función para cargar las categorías
+const loadCategories = async () => {
+  loading.value = true
+  error.value = null
+  
   try {
-    for (const category of petCategories.value) {
-      const pets = await fetchTotalPetsByCategory(category.type)
-      category.count = pets ? pets.length : 0
-    }
+
+    // Usar Promise.all para cargar todas las categorías en paralelo
+    const requests = petCategories.value.map(async (category) => {
+      try {
+        const pets = await fetchTotalPetsByCategory(category.type)
+        return {
+          type: category.type,
+          count: pets ? pets.length : 0
+        }
+      } catch (e) {
+        console.error(`Error al cargar la categoría ${category.type}:`, e)
+        return {
+          type: category.type,
+          count: 0
+        }
+      }
+    })
+    
+    const results = await Promise.all(requests)
+  
+    // Actualizar los contadores de cada categoría
+    results.forEach(result => {
+      const category = petCategories.value.find(c => c.type === result.type)
+      if (category) {
+        category.count = result.count
+      }
+    })
   } catch (err) {
     console.error('Error al cargar categorías de mascotas:', err)
+    error.value = 'Error al cargar las categorías. Por favor, recarga la página.'
+  } finally {
+    loading.value = false
   }
+}
+
+// Cargar categorías al montar el componente
+onMounted(async () => {
+  await loadCategories()
 })
 </script>

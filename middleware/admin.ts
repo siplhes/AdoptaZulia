@@ -23,6 +23,4 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     return navigateTo('/')
   }
 
-  // Si el usuario es administrador, permitir el acceso
-  console.log('Acceso de administrador permitido para:', userProfile.value?.email)
 })

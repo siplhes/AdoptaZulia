@@ -5,26 +5,15 @@ import { defineNuxtPlugin, useRuntimeConfig } from '#app'
 import { useFirebaseApp } from 'vuefire'
 
 export default defineNuxtPlugin((nuxtApp) => {
-  const logger = {
-    log: (message: string) => console.log(`[Firebase Plugin] ${message}`),
-    error: (message: string, error?: any) =>
-      console.error(`[Firebase Plugin] ${message}`, error || ''),
-  }
-
-  logger.log('Iniciando plugin de Firebase')
-
   try {
     let firebaseApp
     try {
       firebaseApp = useFirebaseApp()
-      logger.log('Usando instancia de Firebase ya existente de VueFire')
     } catch (error) {
       const apps = getApps()
       if (apps.length > 0) {
         firebaseApp = getApp()
-        logger.log('Usando instancia existente de Firebase')
       } else {
-        logger.log('No hay instancia de Firebase, configurando una nueva')
         const config = useRuntimeConfig()
 
         const firebaseConfig = {
@@ -37,18 +26,12 @@ export default defineNuxtPlugin((nuxtApp) => {
           measurementId: config.public.firebase?.measurementId,
           databaseURL: config.public.firebase?.databaseURL,
         }
-
-        logger.log('Inicializando nueva instancia de Firebase')
         firebaseApp = initializeApp(firebaseConfig)
       }
     }
 
     const auth = getAuth(firebaseApp)
     const database = getDatabase(firebaseApp)
-
-    logger.log('Firebase inicializado correctamente')
-
-
     return {
 
       provide: {
@@ -77,7 +60,6 @@ export default defineNuxtPlugin((nuxtApp) => {
       },
     }
   } catch (error) {
-    logger.error('Error al configurar Firebase:', error)
     return {}
   }
 })

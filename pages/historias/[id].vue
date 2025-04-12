@@ -287,7 +287,6 @@ const deleteStoryHandler = async () => {
 // Abrir galería de imágenes
 const openGallery = (index) => {
   // Aquí podríamos implementar un visor de imágenes
-  console.log('Abrir imagen', index)
 }
 
 // Cargar la historia al montar el componente

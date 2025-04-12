@@ -14,14 +14,45 @@
         </a>
       </div>
 
-      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <!-- Estado de carga -->
+      <div v-if="loading" class="flex justify-center py-16">
+        <div
+          class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-amber-100 border-r-transparent align-[-0.125em]"
+        />
+      </div>
+
+      <!-- Mensaje de error -->
+      <div v-else-if="error" class="py-12 text-center">
+        <div class="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-amber-100">
+          <AlertCircleIcon class="h-12 w-12 text-amber-500" />
+        </div>
+        <h3 class="mb-2 text-xl font-semibold text-amber-100">{{ error }}</h3>
+        <button 
+          class="mt-4 rounded-lg bg-amber-500 px-4 py-2 text-white hover:bg-amber-600"
+        @click="loadFeaturedPets"
+          >
+          Intentar de nuevo
+        </button>
+      </div>
+
+      <!-- Sin mascotas destacadas -->
+      <div v-else-if="featuredPets.length === 0" class="py-12 text-center">
+        <div class="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-amber-100">
+          <AlertCircleIcon class="h-12 w-12 text-amber-500" />
+        </div>
+        <h3 class="mb-2 text-xl font-semibold text-amber-100">No hay mascotas destacadas disponibles</h3>
+        <p class="text-amber-100">Intenta más tarde o explora todas nuestras mascotas en adopción</p>
+      </div>
+
+      <!-- Grid de mascotas -->
+      <div v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <div
           v-for="(pet, index) in featuredPets"
           :key="index"
           class="overflow-hidden rounded-lg bg-white shadow-md transition-shadow hover:shadow-lg"
         >
           <div class="relative">
-            <img :src="pet.image" :alt="pet.name" class="h-64 w-full object-cover" >
+            <NuxtImg :src="pet.image" :alt="pet.name" class="h-64 w-full object-cover" />
             <div class="absolute right-4 top-4 flex space-x-2">
               <span class="rounded-full bg-amber-100 px-3 py-1 text-xs text-amber-800">
                 {{ pet.type }}
@@ -86,7 +117,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import {
   ArrowRightIcon,
   AlertCircleIcon,
@@ -98,20 +129,53 @@ import { usePets } from '~/composables/usePets'
 
 const { fetchFeaturedPets } = usePets()
 const featuredPets = ref([])
+const loading = ref(true)
+const error = ref(null)
 
 // Toggle favorite
 const toggleFavorite = (petId) => {
-  // Implementación real requeriría estado y posiblemente una API
-  console.log(`Toggled favorite for pet ${petId}`)
+  // Obtener favoritos actuales del localStorage
+  try {
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
+    const index = favorites.indexOf(petId)
+    
+    // Toggle favorito
+    if (index === -1) {
+      favorites.push(petId)
+    } else {
+      favorites.splice(index, 1)
+    }
+    
+    // Guardar de vuelta en localStorage
+    localStorage.setItem('favorites', JSON.stringify(favorites))
+  } catch (err) {
+    console.error('Error al manejar favoritos:', err)
+  }
 }
 
-// Cargar mascotas destacadas
-onMounted(async () => {
+// Función para cargar mascotas destacadas
+const loadFeaturedPets = async () => {
+  loading.value = true
+  error.value = null
+  
   try {
     const featured = await fetchFeaturedPets(3)
-    featuredPets.value = featured
+    
+    if (featured && featured.length > 0) {
+      featuredPets.value = featured
+    } else {
+      console.warn('No se encontraron mascotas destacadas')
+    }
   } catch (err) {
     console.error('Error al cargar mascotas destacadas:', err)
+    error.value = 'Error al cargar mascotas destacadas'
+  } finally {
+    loading.value = false
   }
+}
+
+// Cargar mascotas destacadas al montar el componente
+onMounted(async () => {
+  await loadFeaturedPets()
 })
 </script>
