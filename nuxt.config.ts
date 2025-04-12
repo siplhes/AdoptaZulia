@@ -3,7 +3,7 @@ import { defineNuxtConfig } from 'nuxt/config'
 
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
-  devtools: { enabled: true },
+  devtools: { enabled: false },
   ssr: false,
 
   modules: [
@@ -30,21 +30,20 @@ export default defineNuxtConfig({
         clientId: process.env.PAYPAL_CLIENT_ID || 'test',
         currency: 'USD',
       },
-      awsRegion: process.env.AWS_REGION || 'us-east-2',
+      awsRegion: process.env.AWS_REGION,
       awsAccessKey: process.env.AWS_ACCESS_KEY_ID,
-      awsS3BucketName: process.env.AWS_S3_BUCKET_NAME || 'nsfwclothesmaracaibo',
-      baseUrl: process.env.BASE_URL || 'http://localhost:3000',
+      awsS3BucketName: process.env.AWS_S3_BUCKET_NAME,
+      baseUrl: process.env.BASE_URL,
       // Configuración de Firebase para que esté disponible en runtime config
       firebase: {
-        apiKey: process.env.FIREBASE_API_KEY || 'AIzaSyBp6uTcTIyfiupWWK8j3Pv4z-NNSxuTFUU',
-        authDomain: process.env.FIREBASE_AUTH_DOMAIN || 'adopta-zulia.firebaseapp.com',
-        projectId: process.env.FIREBASE_PROJECT_ID || 'adopta-zulia',
-        appId: process.env.FIREBASE_APP_ID || '1:325688912375:web:0bcbc3bd0ce1244578a6f2',
-        storageBucket: process.env.FIREBASE_STORAGE_BUCKET || 'adopta-zulia.appspot.com',
-        messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || '325688912375',
-        measurementId: process.env.FIREBASE_MEASUREMENT_ID || 'G-XG09Q05X45',
-        databaseURL:
-          process.env.FIREBASE_DATABASE_URL || 'https://adopta-zulia-default-rtdb.firebaseio.com/',
+        apiKey: process.env.FIREBASE_API_KEY,
+        authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        appId: process.env.FIREBASE_APP_ID,
+        storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+        messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+        measurementId: process.env.FIREBASE_MEASUREMENT_ID,
+        databaseURL: process.env.FIREBASE_DATABASE_URL,
       },
     },
   },
@@ -55,23 +54,40 @@ export default defineNuxtConfig({
       modularAuth: true, // Soporte modular
     },
     config: {
-      apiKey: process.env.FIREBASE_API_KEY || 'AIzaSyBp6uTcTIyfiupWWK8j3Pv4z-NNSxuTFUU',
-      authDomain: process.env.FIREBASE_AUTH_DOMAIN || 'adopta-zulia.firebaseapp.com',
-      projectId: process.env.FIREBASE_PROJECT_ID || 'adopta-zulia',
-      appId: process.env.FIREBASE_APP_ID || '1:325688912375:web:0bcbc3bd0ce1244578a6f2',
-      storageBucket: process.env.FIREBASE_STORAGE_BUCKET || 'adopta-zulia.appspot.com',
-      messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || '325688912375',
-      measurementId: process.env.FIREBASE_MEASUREMENT_ID || 'G-XG09Q05X45',
-      databaseURL:
-        process.env.FIREBASE_DATABASE_URL || 'https://adopta-zulia-default-rtdb.firebaseio.com/',
+      apiKey: process.env.FIREBASE_API_KEY,
+      authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      appId: process.env.FIREBASE_APP_ID,
+      storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+      measurementId: process.env.FIREBASE_MEASUREMENT_ID,
+      databaseURL: process.env.FIREBASE_DATABASE_URL,
     },
-    // Opciones adicionales para servicios de Firebase
-    admin: {
-      serviceAccount: false, // No estamos usando Firebase Admin en el lado servidor
-    },
+    // IMPORTANTE: Desactivamos la inicialización automática de Firebase Admin
+    // ya que lo estamos manejando manualmente a través de nuestro plugin de Nitro
+    admin: false,
     appCheck: {
       provider: 'reCaptcha', // Si usamos reCaptcha para AppCheck
       debug: process.env.NODE_ENV !== 'production',
+    },
+  },
+
+  plugins: ['~/plugins/firebase.ts', '~/plugins/paypal.ts'],
+
+  paypal: {
+    clientId: process.env.PAYPAL_CLIENT_ID || 'test',
+    currency: 'USD',
+
+  },
+
+  app: {
+    head: {
+      title: 'Adopta Zulia',
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      ],
+      link: [{ rel: 'icon', type: 'image/png', href: '/favicon.png' }],
     },
   },
 
@@ -86,15 +102,5 @@ export default defineNuxtConfig({
       xxl: 1536,
       '2xl': 1536,
     },
-  },
-
-  // Asegurarnos de que el plugin de firebase se cargue después de que nuxt-vuefire
-  // haya inicializado Firebase
-  plugins: ['~/plugins/firebase.ts', '~/plugins/paypal.ts'],
-
-  // PayPal configuration
-  paypal: {
-    clientId: process.env.PAYPAL_CLIENT_ID || 'test',
-    currency: 'USD',
   },
 })

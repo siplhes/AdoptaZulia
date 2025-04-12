@@ -18,9 +18,9 @@
         >
           <span class="sr-only">Abrir menú principal</span>
           <!-- Icono de menú -->
-          <Icon name="heroicons:bars-3" v-if="!isMenuOpen" class="h-6 w-6" />
+          <Icon  v-if="!isMenuOpen"  name="heroicons:bars-3"  class="h-6 w-6"/>
           <!-- Icono de cerrar -->
-          <Icon name="heroicons:x-mark" v-else class="h-6 w-6" />
+          <Icon v-else name="heroicons:x-mark"  class="h-6 w-6" />
         </button>
 
         <!-- Menú de navegación para escritorio -->
@@ -38,14 +38,15 @@
           <!-- Avatar del usuario (si está autenticado) -->
           <div v-if="isAuthenticated" class="relative">
             <button 
-              @click="toggleUserMenu" 
+             
               class="flex items-center space-x-2 focus:outline-none"
               aria-haspopup="true"
               aria-expanded="userMenuOpen"
+               @click="toggleUserMenu" 
             >
               <!-- Avatar del usuario -->
               <div class="overflow-hidden h-9 w-9 rounded-full border-2 border-amber-300">
-                <img 
+                <NuxtImg 
                   v-if="user?.photoURL" 
                   :src="user.photoURL" 
                   :alt="user.displayName || 'Usuario'" 
@@ -67,12 +68,12 @@
               role="menu"
             >
               <NuxtLink 
-                :to="`/${user.userName}`" 
+                :to="profileRoute" 
                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" 
                 role="menuitem"
                 @click="userMenuOpen = false"
               >
-                Mi perfil
+                {{user.userName || user.displayName || user.email}}
               </NuxtLink>
               
               <NuxtLink 
@@ -84,7 +85,7 @@
                 Configuración
               </NuxtLink>
 
-              <div v-if="isAdmin" class="border-t border-gray-100 my-1"></div>
+              <div v-if="isAdmin" class="border-t border-gray-100 my-1"/>
               
               <NuxtLink 
                 v-if="isAdmin"
@@ -96,7 +97,7 @@
                 Panel de administración
               </NuxtLink>
 
-              <div class="border-t border-gray-100 my-1"></div>
+              <div class="border-t border-gray-100 my-1"/>
               
               <button 
                 class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100" 
@@ -151,20 +152,10 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useAuth } from '~/composables/useAuth'
-
-
-// Composición para obtener información del usuario
-const { user } = useAuth()
-
-// Estado para el menú móvil
 const isMenuOpen = ref(false)
-
-// Estado para el menú desplegable del usuario
 const userMenuOpen = ref(false)
 
-// Información de autenticación
-const { isAdmin, isAuthenticated, logout } = useAuth()
+const { isAdmin, isAuthenticated, logout, user, userProfile } = useAuth()
 
 // Enlaces en el menu de la cabecera
 const baseLinks = [
@@ -213,6 +204,18 @@ const getInitials = (name) => {
     .substring(0, 2)
 }
 
+// Computed para obtener el nombre de usuario o el correo
+const userName = computed(() => {
+  if (!user.value) return 'Usuario'
+  return user.value.displayName || user.value.userName || user.value.email?.split('@')[0] || 'Usuario'
+})
+
+// Computed para obtener la ruta del perfil
+const profileRoute = computed(() => {
+  if (!isAuthenticated.value) return '/perfil'
+  return userProfile.value?.userName ? `/${userProfile.value.userName}` : '/perfil'
+})
+
 // Cerrar el menú de usuario cuando se hace clic fuera de él
 const closeUserMenuOnClickOutside = (event) => {
   const userMenu = document.querySelector('[role="menu"]')
@@ -246,8 +249,8 @@ const navigationLinks = computed(() => {
   // Añadir enlace de perfil si el usuario está autenticado
   if (isAuthenticated.value) {
     links.push({
-      name: user.value.userName,
-      link:  user.value.userName,
+      name: userName.value,
+      link: profileRoute.value,
       alt: 'Perfil de usuario',
     })
   } 

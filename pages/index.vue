@@ -19,6 +19,18 @@ import HomeHowItWorks from '~/components/home/HomeHowItWorks.vue'
 import HomeAdoptionStories from '~/components/home/HomeAdoptionStories.vue'
 import HomeDonation from '~/components/home/HomeDonation.vue'
 import HomeSocial from '~/components/home/HomeSocial.vue'
+
+onMounted(() => {
+  useHead({
+    title: 'Inicio | Adopta Zulia',
+    meta: [
+      {
+        name: 'description',
+        content: 'Descubre mascotas en adopción, historias inspiradoras y cómo puedes ayudar.',
+      },
+    ],
+  })
+})
 </script>
 
 <style scoped>

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { ref, computed } from 'vue'
 import type { UserInfo } from 'firebase/auth'
 import { AuthService } from '~/services/AuthService'
@@ -5,16 +7,18 @@ import { useNuxtApp } from '#app'
 import type { UserProfile, UserData } from '~/models/User'
 
 type User = UserInfo & {
-  uid: string
-  email: string | null
-  emailVerified: boolean
-  isAnonymous: boolean
+  uid: string | any
+  email: string | any
+  userName?: string | any
+  displayName: string | any
+  emailVerified: boolean | any
+  isAnonymous: boolean | any
   metadata?: {
-    creationTime?: string
-    lastSignInTime?: string
+    creationTime?: string | any
+    lastSignInTime?: string | any
   }
   providerData: UserInfo[]
-  refreshToken: string
+  refreshToken: string | any
 }
 
 const user = ref<User | null>(null)
@@ -41,6 +45,7 @@ function initializeAuth() {
           userProfile.value = {
             uid: currentUser.uid,
             displayName: currentUser.displayName,
+            userName: rtdbProfile?.userName,
             email: currentUser.email,
             photoURL: currentUser.photoURL,
             isAdmin: isAdmin.value,
@@ -52,6 +57,7 @@ function initializeAuth() {
           userProfile.value = {
             uid: currentUser.uid,
             displayName: currentUser.displayName,
+            userName: '',
             email: currentUser.email,
             photoURL: currentUser.photoURL,
             isAdmin: isAdmin.value,
@@ -128,7 +134,8 @@ export function useAuth() {
     loading.value = true
     error.value = null
     try {
-      user.value = await authService.loginWithGoogle()
+      const authUser = await authService.loginWithGoogle()
+      user.value = authUser as User
       if (user.value) {
         isAdmin.value =
           (await authService.isAdmin(user.value.uid)) ||
@@ -136,11 +143,11 @@ export function useAuth() {
         const rtdbProfile = await authService.getUserProfile(user.value.uid)
         userProfile.value = {
           uid: user.value.uid,
-          displayName: user.value.displayName,
+          displayName: user.value.displayName || '',
           email: user.value.email,
-          photoURL: user.value.photoURL,
+          photoURL: user.value.photoURL || null,
           isAdmin: isAdmin.value,
-          ...rtdbProfile,
+          ...(rtdbProfile || {}),
         }
         needsProfileCompletion.value = !rtdbProfile?.userName
       }
@@ -153,11 +160,13 @@ export function useAuth() {
       loading.value = false
     }
   }
+  
   async function loginWithFacebook() {
     loading.value = true
     error.value = null
     try {
-      user.value = await authService.loginWithFacebook()
+      const authUser = await authService.loginWithFacebook()
+      user.value = authUser as User
       if (user.value) {
         isAdmin.value =
           (await authService.isAdmin(user.value.uid)) ||
@@ -165,11 +174,11 @@ export function useAuth() {
         const rtdbProfile = await authService.getUserProfile(user.value.uid)
         userProfile.value = {
           uid: user.value.uid,
-          displayName: user.value.displayName,
+          displayName: user.value.displayName || '',
           email: user.value.email,
-          photoURL: user.value.photoURL,
+          photoURL: user.value.photoURL || null,
           isAdmin: isAdmin.value,
-          ...rtdbProfile,
+          ...(rtdbProfile || {}),
         }
         needsProfileCompletion.value = !rtdbProfile?.userName
       }
@@ -286,7 +295,20 @@ export function useAuth() {
     loading.value = true
     error.value = null
     try {
-      return await authService.getUserByUsername(username)
+      const userData = await authService.getUserByUsername(username)
+      
+      if (userData) {
+        // Asegurarnos de que todos los campos requeridos estén presentes
+        return {
+          ...userData,
+          uid: userData.uid || '', 
+          displayName: userData.displayName || '',
+          email: userData.email || null,
+          photoURL: userData.photoURL || null,
+          userName: userData.userName || username
+        }
+      }
+      return null
     } catch (err: any) {
       console.error('Error al buscar usuario por nombre de usuario:', err)
       error.value = 'Error al buscar usuario'
@@ -295,6 +317,49 @@ export function useAuth() {
       loading.value = false
     }
   }
+
+
+  /**
+   * Retrieves complete data for the currently authenticated user
+   * Includes both auth profile data and any additional user data from the database
+   * @returns {Promise<UserData | null>} Complete user data or null if not authenticated
+   */
+  async function getCurrentUserData(): Promise<UserData | null> {
+    loading.value = true
+    error.value = null
+    
+    try {
+      if (!user.value) return null
+      
+      // Get user data from database
+      const userData = await authService.getUserById(user.value.uid)
+      
+      if (!userData) return null
+      
+      // Combine auth profile with database data
+      return {
+        ...userData,
+        uid: user.value.uid,
+        email: user.value.email || userData.email || null,
+        displayName: user.value.displayName || userData.displayName || '',
+        photoURL: user.value.photoURL || userData.photoURL || null,
+        isAdmin: isAdmin.value,
+        userName: userData.userName || userProfile.value?.userName || '',
+        // Asegurarse de que todos los campos opcionales estén definidos
+        bio: userData.bio || userProfile.value?.bio || '',
+        phoneNumber: userData.phoneNumber || userProfile.value?.phoneNumber || '',
+        createdAt: userData.createdAt || userProfile.value?.createdAt || '',
+      }
+    } catch (err: any) {
+      console.error('Error al obtener datos completos del usuario:', err)
+      error.value = 'Error al recuperar información del usuario'
+      return null
+    } finally {
+      loading.value = false
+    }
+  }
+
+
   return {
     user,
     userProfile,
@@ -312,5 +377,6 @@ export function useAuth() {
     updateProfile,
     isLoggedIn,
     getUserByUsername,
+    getCurrentUserData
   }
 }

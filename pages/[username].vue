@@ -246,11 +246,22 @@ onMounted(async () => {
 
     userProfile.value = profile
 
-    // Cargar mascotas publicadas por el usuario
-    userPets.value = await fetchUserPets(profile.uid)
+    // Asegurarnos de que userProfile tenga un uid, generalmente viene como uid o como parte del objeto
+    if (!userProfile.value.uid && userProfile.value.id) {
+      userProfile.value.uid = userProfile.value.id
+    }
 
-    // Cargar historias de adopción del usuario
-    userStories.value = await fetchUserStories(profile.uid)
+    // Cargar mascotas publicadas por el usuario
+    if (userProfile.value.uid) {
+      userPets.value = await fetchUserPets(userProfile.value.uid)
+      
+      // Cargar historias de adopción del usuario
+      userStories.value = await fetchUserStories(userProfile.value.uid)
+    } else {
+      console.error('No se pudo obtener el uid del usuario')
+      error.value = 'Error al cargar el perfil de usuario'
+      return
+    }
 
     // Si es el propio perfil, cargar favoritos
     if (isOwnProfile.value) {

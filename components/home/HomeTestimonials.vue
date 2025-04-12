@@ -16,7 +16,7 @@
               :src="testimonial.image"
               :alt="testimonial.name"
               class="mr-4 h-16 w-16 rounded-full object-cover"
-            />
+            >
             <div>
               <h4 class="text-lg font-semibold text-emerald-800">
                 {{ testimonial.name }}
@@ -35,7 +35,7 @@
               :src="testimonial.petImage"
               :alt="testimonial.petName"
               class="mr-3 h-12 w-12 rounded-full object-cover"
-            />
+            >
             <div>
               <p class="text-sm text-gray-600">Adoptó a</p>
               <p class="font-medium text-emerald-700">

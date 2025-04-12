@@ -366,9 +366,10 @@ export class AuthService {
             userData.userName &&
             userData.userName.toLowerCase() === username.toLowerCase()
           ) {
+            // Incluir el ID del usuario en el objeto de retorno
             return {
               ...userData,
-              uid: userId, // Asegurarse de que el uid esté incluido
+              uid: userId, // Aseguramos que el uid esté incluido
             }
           }
         }

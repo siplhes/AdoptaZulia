@@ -23,36 +23,36 @@
       <!-- Filtros -->
       <div class="mb-8 flex flex-wrap justify-center gap-4">
         <button
-          @click="activeFilter = 'all'"
           class="rounded-full px-4 py-2 text-sm font-medium"
           :class="
             activeFilter === 'all'
               ? 'bg-emerald-100 text-emerald-800'
               : 'bg-white text-gray-700 hover:bg-gray-50'
           "
+          @click="activeFilter = 'all'"
         >
           Todas las historias
         </button>
         <button
-          @click="activeFilter = 'featured'"
           class="rounded-full px-4 py-2 text-sm font-medium"
           :class="
             activeFilter === 'featured'
               ? 'bg-emerald-100 text-emerald-800'
               : 'bg-white text-gray-700 hover:bg-gray-50'
           "
+          @click="activeFilter = 'featured'"
         >
           Destacadas
         </button>
         <button
           v-if="isAuthenticated"
-          @click="activeFilter = 'mine'"
           class="rounded-full px-4 py-2 text-sm font-medium"
           :class="
             activeFilter === 'mine'
               ? 'bg-emerald-100 text-emerald-800'
               : 'bg-white text-gray-700 hover:bg-gray-50'
           "
+          @click="activeFilter = 'mine'"
         >
           Mis historias
         </button>
@@ -62,7 +62,7 @@
       <div v-if="loading" class="flex justify-center py-12">
         <div
           class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-emerald-600 border-r-transparent align-[-0.125em]"
-        ></div>
+        />
       </div>
 
       <!-- Error -->
@@ -102,29 +102,29 @@
       <div v-if="displayedStories.length > 0" class="mt-12 flex justify-center">
         <div class="flex space-x-2">
           <button
-            @click="currentPage--"
             :disabled="currentPage === 1"
             class="rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+            @click="currentPage--"
           >
             <Icon name="heroicons:chevron-left" size="20px" />
           </button>
           <button
             v-for="page in totalPages"
             :key="page"
-            @click="currentPage = page"
             class="rounded-md border px-4 py-2"
             :class="
               currentPage === page
                 ? 'border-emerald-500 bg-emerald-50 text-emerald-700'
                 : 'border-gray-300 bg-white text-gray-700'
             "
+            @click="currentPage = page"
           >
             {{ page }}
           </button>
           <button
-            @click="currentPage++"
             :disabled="currentPage === totalPages"
             class="rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+            @click="currentPage++"
           >
             <Icon name="heroicons:chevron-right" size="20px" />
           </button>

@@ -35,30 +35,25 @@ useHead({
     {
       src: 'https://storage.ko-fi.com/cdn/scripts/overlay-widget.js',
       body: true,
-    },
-    {
-      innerHTML: `
-        kofiWidgetOverlay.draw('adoptazulia', {
-          'type': 'floating-chat',
-          'floating-chat.donateButton.text': 'Support Us',
-          'floating-chat.donateButton.background-color': '#00b9fe',
-          'floating-chat.donateButton.text-color': '#fff'
-        });
-      `,
-      body: true,
+      defer: true,
     }
   ]
 })
 
 onMounted(() => {
-  // Alternative implementation if the script approach above doesn't work
-  if (typeof window !== 'undefined' && window.kofiWidgetOverlay) {
-    window.kofiWidgetOverlay.draw('adoptazulia', {
-      'type': 'floating-chat',
-      'floating-chat.donateButton.text': 'Support Us',
-      'floating-chat.donateButton.background-color': '#00b9fe',
-      'floating-chat.donateButton.text-color': '#fff'
-    });
-  }
+  const loadKofiWidget = () => {
+    if (typeof window !== 'undefined' && window.kofiWidgetOverlay) {
+      window.kofiWidgetOverlay.draw('adoptazulia', {
+        'type': 'floating-chat',
+        'floating-chat.donateButton.text': 'Ayudanos',
+        'floating-chat.donateButton.background-color': '#fefffa',
+        'floating-chat.donateButton.text-color': '#121212'
+      });
+    } else {
+      setTimeout(loadKofiWidget, 500);
+    }
+  };
+  
+  setTimeout(loadKofiWidget, 1000);
 })
 </script>

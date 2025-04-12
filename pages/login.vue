@@ -34,7 +34,7 @@
                   autocomplete="email"
                   required
                   class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 sm:text-sm"
-                />
+                >
               </div>
             </div>
 
@@ -126,7 +126,7 @@
                 autocomplete="email"
                 required
                 class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 sm:text-sm"
-              />
+              >
             </div>
           </div>
 
@@ -140,7 +140,7 @@
                 autocomplete="current-password"
                 required
                 class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 sm:text-sm"
-              />
+              >
             </div>
           </div>
 
@@ -151,7 +151,7 @@
                 v-model="rememberMe"
                 type="checkbox"
                 class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-              />
+              >
               <label for="remember-me" class="ml-2 block text-sm text-gray-900">Recordarme</label>
             </div>
 

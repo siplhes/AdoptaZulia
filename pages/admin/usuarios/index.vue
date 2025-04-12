@@ -29,7 +29,7 @@
               placeholder="Buscar por nombre, email..."
               class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
               @input="applyFilters"
-            />
+            >
           </div>
 
           <div class="w-40">
@@ -154,7 +154,7 @@
                         :src="user.photoURL"
                         alt="Foto de perfil"
                         class="h-full w-full object-cover"
-                      />
+                      >
                     </div>
                     <div
                       v-else
@@ -324,7 +324,7 @@
                 type="text"
                 class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
                 placeholder="Nombre completo"
-              />
+              >
             </div>
 
             <div>
@@ -335,7 +335,7 @@
                 class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
                 placeholder="correo@example.com"
                 :disabled="!!selectedUser"
-              />
+              >
             </div>
 
             <div v-if="!selectedUser">
@@ -345,7 +345,7 @@
                 type="password"
                 class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
                 placeholder="Contraseña"
-              />
+              >
             </div>
 
             <div>
@@ -380,7 +380,7 @@
                 type="tel"
                 class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
                 placeholder="Número de teléfono"
-              />
+              >
             </div>
 
             <div>

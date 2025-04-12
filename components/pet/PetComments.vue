@@ -15,9 +15,9 @@
               v-for="star in 5"
               :key="star"
               type="button"
-              @click="newRating = star"
               class="text-2xl focus:outline-none"
               :class="star <= newRating ? 'text-amber-400' : 'text-gray-300'"
+              @click="newRating = star"
             >
               ★
             </button>
@@ -32,24 +32,24 @@
           rows="3"
           class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
           placeholder="Comparte tu experiencia o impresión sobre esta mascota..."
-        ></textarea>
+        />
       </div>
 
       <!-- Botones de acción -->
       <div class="flex justify-end">
         <button
           type="button"
-          @click="clearForm"
           class="mr-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
           :disabled="loading"
+          @click="clearForm"
         >
           Cancelar
         </button>
         <button
           type="button"
-          @click="submitComment"
           class="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-70"
           :disabled="!canSubmit || loading"
+          @click="submitComment"
         >
           <span v-if="loading">
             <svg
@@ -65,12 +65,12 @@
                 r="10"
                 stroke="currentColor"
                 stroke-width="4"
-              ></circle>
+              />
               <path
                 class="opacity-75"
                 fill="currentColor"
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
+              />
             </svg>
             Enviando...
           </span>
@@ -98,7 +98,7 @@
       <div v-if="loading && !comments.length" class="py-8 text-center">
         <div
           class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-emerald-600 border-r-transparent align-[-0.125em]"
-        ></div>
+        />
         <p class="mt-2 text-gray-500">Cargando comentarios...</p>
       </div>
 
@@ -128,7 +128,7 @@
                   v-if="comment.user?.photoURL"
                   class="h-10 w-10 rounded-full bg-cover bg-center"
                   :style="`background-image: url(${comment.user.photoURL})`"
-                ></div>
+                />
                 <div
                   v-else
                   class="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100"
@@ -149,15 +149,15 @@
                   <!-- Acciones si es el propietario del comentario -->
                   <div v-if="user?.uid === comment.userId" class="ml-auto flex space-x-2">
                     <button
-                      @click="editComment(comment)"
                       class="text-gray-400 hover:text-emerald-600"
+                      @click="editComment(comment)"
                     >
                       <span class="sr-only">Editar</span>
                       <Icon name="heroicons:pencil-square" size="16px" />
                     </button>
                     <button
-                      @click="confirmDelete(comment.id)"
                       class="text-gray-400 hover:text-red-600"
+                      @click="confirmDelete(comment.id)"
                     >
                       <span class="sr-only">Eliminar</span>
                       <Icon name="heroicons:trash" size="16px" />
@@ -204,14 +204,14 @@
         </p>
         <div class="flex justify-end space-x-3">
           <button
-            @click="showDeleteConfirm = false"
             class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+            @click="showDeleteConfirm = false"
           >
             Cancelar
           </button>
           <button
-            @click="deleteSelectedComment"
             class="rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700"
+            @click="deleteSelectedComment"
           >
             Eliminar
           </button>

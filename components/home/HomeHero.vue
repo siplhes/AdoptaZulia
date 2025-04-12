@@ -2,9 +2,9 @@
   <section class="relative overflow-hidden bg-amber-800 text-white">
     <div class="absolute inset-0 z-0">
       <NuxtImg
-        src="/img1.webp"
+        src="/img2.webp"
         alt="Perros y gatos felices"
-        class="h-full w-full object-cover opacity-20"
+        class="h-full w-full object-cover   opacity-20"
       />
     </div>
     <div class="container relative z-10 mx-auto px-4 py-16 md:py-24">
@@ -12,7 +12,7 @@
         <h1 class="mb-6 text-4xl font-bold md:text-5xl lg:text-6xl">
           Encuentra tu compañero perfecto
         </h1>
-        <p class="mb-8 text-xl text-emerald-100 md:text-2xl">
+        <p class="mb-8 text-xl text-amber-100 md:text-2xl">
           Miles de mascotas están esperando un hogar.
           <strong>¡Adopta!</strong>
           no compres y cambia una vida para siempre.

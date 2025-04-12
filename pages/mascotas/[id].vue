@@ -47,7 +47,7 @@
                 :alt="pet.name"
                 class="h-64 w-full rounded-lg object-cover lg:h-96"
                 @error="handleImageError"
-              />
+              >
             </div>
 
             <!-- Miniaturas de fotos -->
@@ -64,7 +64,7 @@
                   :alt="`Foto ${index + 1} de ${pet.name}`"
                   class="h-full w-full object-cover"
                   @error="handleImageError"
-                />
+                >
               </div>
             </div>
 
@@ -390,7 +390,7 @@
 
       <!-- Sistema de comentarios -->
       <div v-if="pet" class="mt-12">
-        <PetComments :petId="petId" />
+        <PetComments :pet-id="petId" />
       </div>
     </div>
   </div>
@@ -486,6 +486,94 @@ onMounted(async () => {
     // Cargar mascotas similares
     similarPets.value = await fetchSimilarPets(petData, 4)
   }
+  // Establecer el título de la página
+  useHead({
+  title: pet.value ? `Adopta a ${pet.value.name} | Adopta Zulia` : 'Mascota no encontrada',
+  meta: [
+    {
+      name: 'description',
+      content: pet.value
+        ? `Conoce a ${pet.value.name}, una mascota en adopción. ${pet.value.description}`
+        : 'Mascota no encontrada',
+    },
+    {
+      property: 'og:title',
+      content: pet.value ? `Adopta a ${pet.value.name}` : 'Mascota no encontrada',
+    },
+    {
+      property: 'og:description',
+      content: pet.value
+        ? `Conoce a ${pet.value.name}, una mascota en adopción. ${pet.value.description}`
+        : 'Mascota no encontrada',
+    },
+    {
+      property: 'og:image',
+      content: pet.value ? pet.value.image : '/placeholder.webp?height=300&width=400',
+    },
+    {
+      property: 'og:url',
+      content: window.location.href,
+    },
+    {
+      property: 'og:type',
+      content: 'website',
+    },
+    {
+      property: 'og:site_name',
+      content: 'Adopta un amigo',
+    },
+    {
+      property: 'twitter:card',
+      content: 'summary_large_image',
+    },
+    {
+      property: 'twitter:title',
+      content: pet.value ? `Adopta a ${pet.value.name}` : 'Mascota no encontrada',
+    },
+    {
+      property: 'twitter:description',
+      content: pet.value
+        ? `Conoce a ${pet.value.name}, una mascota en adopción. ${pet.value.description}`
+        : 'Mascota no encontrada',
+    },
+    {
+      property: 'twitter:image',
+      content: pet.value ? pet.value.image : '/placeholder.webp?height=300&width=400',
+    },
+    {
+      property: 'twitter:url',
+      content: window.location.href,
+    },
+    {
+      property: 'twitter:site',
+      content: '@adoptazulia',
+    },
+    {
+      property: 'twitter:creator',
+      content: '@adoptazulia',
+    },
+    {
+      property: 'twitter:image:alt',
+      content: pet.value ? `Adopta a ${pet.value.name}` : 'Mascota no encontrada',
+    },
+    {
+      property: 'twitter:image:width',
+      content: '1200',
+    },
+    {
+      property: 'twitter:image:height',
+      content: '630',
+    },
+    {
+      property: 'twitter:label1',
+      content: 'Adopción',
+    },
+    {
+      property: 'twitter:data1',
+      content: pet.value ? `Adopta a ${pet.value.name}` : 'Mascota no encontrada',
+    },
+  ],
+})
 })
 
 // Volver atrás
@@ -675,4 +763,6 @@ const formatPreferredMethod = (method) => {
       return method
   }
 }
+
+
 </script>

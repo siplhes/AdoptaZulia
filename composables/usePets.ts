@@ -256,6 +256,32 @@ export function usePets() {
   }
 
   /**
+   * Obtiene mascotas por sus IDs
+   */
+  async function fetchPetsByIds(petIds: string[]): Promise<Pet[]> {
+    loading.value = true
+    error.value = null
+
+    try {
+      if (!petIds || petIds.length === 0) {
+        return []
+      }
+      
+      const petPromises = petIds.map(id => petService.getPetById(id))
+      const petsResults = await Promise.all(petPromises)
+      
+      // Filtrar los resultados nulos (mascotas no encontradas)
+      return petsResults.filter(pet => pet !== null) as Pet[]
+    } catch (err: any) {
+      console.error('Error al obtener mascotas por IDs:', err)
+      error.value = 'Error al obtener las mascotas favoritas'
+      return []
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
    * Obtiene historias de adopción exitosas
    */
   async function fetchAdoptionStories(limit: number = 3): Promise<any[]> {
@@ -315,6 +341,7 @@ export function usePets() {
     error,
     fetchAllPets,
     fetchPetById,
+    fetchPetsByIds,
     createPet,
     updatePet,
     deletePet,

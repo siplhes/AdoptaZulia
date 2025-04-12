@@ -16,7 +16,7 @@
       <div v-if="loading" class="flex justify-center py-12">
         <div
           class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-emerald-600 border-r-transparent align-[-0.125em]"
-        ></div>
+        />
       </div>
 
       <!-- Error -->
@@ -51,7 +51,7 @@
             v-if="story.images && story.images.length > 0"
             class="h-60 w-full overflow-hidden sm:h-80 md:h-96"
           >
-            <img :src="story.images[0]" :alt="story.title" class="h-full w-full object-cover" />
+            <img :src="story.images[0]" :alt="story.title" class="h-full w-full object-cover" >
           </div>
 
           <!-- Badge de destacado -->
@@ -78,7 +78,7 @@
                       :src="story.user.photoURL"
                       :alt="story.user.displayName"
                       class="h-full w-full object-cover"
-                    />
+                    >
                     <div
                       v-else
                       class="flex h-full w-full items-center justify-center bg-emerald-100"
@@ -104,7 +104,7 @@
                       :src="story.pet.image"
                       :alt="story.pet.name"
                       class="h-full w-full object-cover"
-                    />
+                    >
                     <div
                       v-else
                       class="flex h-full w-full items-center justify-center bg-emerald-100"
@@ -123,7 +123,7 @@
             </div>
 
             <!-- Separador -->
-            <div class="my-6 border-t border-gray-200"></div>
+            <div class="my-6 border-t border-gray-200"/>
 
             <!-- Contenido principal -->
             <div class="prose prose-emerald lg:prose-lg max-w-none">
@@ -144,7 +144,7 @@
                     :src="image"
                     :alt="`Imagen ${index + 1}`"
                     class="h-full w-full object-cover"
-                  />
+                  >
                 </div>
               </div>
             </div>
@@ -152,13 +152,13 @@
             <!-- Acciones -->
             <div class="mt-8 flex items-center justify-between">
               <button
-                @click="handleLike"
                 class="flex items-center gap-2 rounded-md border px-4 py-2"
                 :class="
                   hasLiked
                     ? 'border-pink-300 bg-pink-50 text-pink-700'
                     : 'border-gray-300 text-gray-700 hover:bg-gray-50'
                 "
+                @click="handleLike"
               >
                 <Icon
                   :name="hasLiked ? 'mdi:heart' : 'mdi:heart-outline'"
@@ -170,8 +170,8 @@
 
               <div class="flex gap-2">
                 <button
-                  @click="shareStory"
                   class="flex items-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50"
+                  @click="shareStory"
                 >
                   <Icon name="heroicons:share" size="20px" />
                   <span>Compartir</span>
@@ -179,8 +179,8 @@
 
                 <button
                   v-if="isOwner"
-                  @click="deleteStory"
                   class="flex items-center gap-2 rounded-md border border-red-300 px-4 py-2 text-red-700 hover:bg-red-50"
+                  @click="deleteStory"
                 >
                   <Icon name="heroicons:trash" size="20px" />
                   <span>Eliminar</span>

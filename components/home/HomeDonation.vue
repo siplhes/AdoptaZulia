@@ -39,7 +39,7 @@
             </a>
           </div>
           <div class="relative hidden lg:block">
-            <img src="/img1.webp" alt="Perro rescatado" class="h-full w-full object-cover" />
+            <img src="/img1.webp" alt="Perro rescatado" class="h-full w-full object-cover" >
           </div>
         </div>
       </div>

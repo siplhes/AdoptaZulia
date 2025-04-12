@@ -64,7 +64,7 @@
                 type="text"
                 required
                 class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-              />
+              >
             </div>
 
             <!-- Tipo de mascota -->
@@ -96,7 +96,7 @@
                 v-model="petData.breed"
                 type="text"
                 class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-              />
+              >
             </div>
 
             <!-- Género -->
@@ -110,7 +110,7 @@
                     value="macho"
                     class="h-4 w-4 border-gray-300 text-emerald-600 focus:ring-emerald-500"
                     required
-                  />
+                  >
                   <span class="ml-2 text-gray-700">Macho</span>
                 </label>
                 <label class="inline-flex items-center">
@@ -119,7 +119,7 @@
                     type="radio"
                     value="hembra"
                     class="h-4 w-4 border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                  />
+                  >
                   <span class="ml-2 text-gray-700">Hembra</span>
                 </label>
               </div>
@@ -137,7 +137,7 @@
                 required
                 class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
                 placeholder="Por ejemplo: 2 años, 6 meses..."
-              />
+              >
             </div>
 
             <!-- Rango de edad -->
@@ -190,7 +190,7 @@
                 required
                 class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
                 placeholder="Ciudad o municipio"
-              />
+              >
             </div>
           </div>
 
@@ -220,7 +220,7 @@
                   v-model="petData.vaccinated"
                   type="checkbox"
                   class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                />
+                >
                 <span class="ml-2 text-gray-700">Vacunado</span>
               </label>
               
@@ -232,7 +232,7 @@
                   type="text"
                   class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
                   placeholder="Tipo de vacunas recibidas"
-                />
+                >
               </div>
             </div>
 
@@ -242,7 +242,7 @@
                   v-model="petData.neutered"
                   type="checkbox"
                   class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                />
+                >
                 <span class="ml-2 text-gray-700">Esterilizado</span>
               </label>
               
@@ -254,7 +254,7 @@
                   type="text"
                   class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
                   placeholder="¿Cuándo fue esterilizado?"
-                />
+                >
               </div>
             </div>
 
@@ -264,7 +264,7 @@
                   v-model="petData.microchipped"
                   type="checkbox"
                   class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                />
+                >
                 <span class="ml-2 text-gray-700">Microchip</span>
               </label>
               
@@ -276,7 +276,7 @@
                   type="text"
                   class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
                   placeholder="Número de identificación"
-                />
+                >
               </div>
             </div>
           </div>
@@ -293,7 +293,7 @@
               max="100"
               step="10"
               class="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200"
-            />
+            >
             <div class="mt-1 flex justify-between text-xs text-gray-500">
               <span>Necesita cuidados</span>
               <span>Excelente</span>
@@ -329,7 +329,7 @@
                 class="mr-4 flex h-24 w-24 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-gray-300"
                 :class="{ 'border-solid border-emerald-500': mainImagePreview }"
               >
-                <img
+                <NuxtImg
                   v-if="mainImagePreview"
                   :src="mainImagePreview"
                   alt="Vista previa"
@@ -344,7 +344,7 @@
                   accept="image/*"
                   class="hidden"
                   @change="handleMainImageChange"
-                />
+                >
                 <button
                   type="button"
                   class="rounded-md bg-gray-100 px-4 py-2 text-gray-700 hover:bg-gray-200"
@@ -368,7 +368,7 @@
                 :key="index"
                 class="relative h-24 w-24 overflow-hidden rounded-lg border-2 border-solid border-emerald-500"
               >
-                <img :src="preview" alt="Vista previa" class="h-full w-full object-cover" />
+                <NuxtImg :src="preview" alt="Vista previa" class="h-full w-full object-cover" />
                 <button
                   type="button"
                   class="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white"
@@ -391,7 +391,7 @@
                 multiple
                 class="hidden"
                 @change="handleAdditionalImagesChange"
-              />
+              >
             </div>
             <p class="mt-1 text-xs text-gray-500">Puedes añadir hasta 5 fotos adicionales</p>
           </div>
@@ -415,7 +415,7 @@
                 type="text"
                 required
                 class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-              />
+              >
             </div>
 
             <!-- Tipo de contacto -->
@@ -447,7 +447,7 @@
                 type="email"
                 required
                 class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-              />
+              >
             </div>
 
             <!-- Teléfono de contacto -->
@@ -461,7 +461,7 @@
                 type="tel"
                 required
                 class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-              />
+              >
             </div>
           </div>
           
@@ -491,7 +491,7 @@
                   type="radio"
                   value="email"
                   class="h-4 w-4 border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                />
+                >
                 <span class="ml-2 text-gray-700">Email</span>
               </label>
               <label class="inline-flex items-center">
@@ -500,7 +500,7 @@
                   type="radio"
                   value="phone"
                   class="h-4 w-4 border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                />
+                >
                 <span class="ml-2 text-gray-700">Teléfono</span>
               </label>
               <label class="inline-flex items-center">
@@ -509,7 +509,7 @@
                   type="radio"
                   value="whatsapp"
                   class="h-4 w-4 border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                />
+                >
                 <span class="ml-2 text-gray-700">WhatsApp</span>
               </label>
             </div>
@@ -529,7 +529,7 @@
                 v-model="petData.urgent"
                 type="checkbox"
                 class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-              />
+              >
               <span class="ml-2 font-medium text-gray-700">Adopción urgente</span>
             </label>
             <p v-if="petData.urgent" class="ml-6 mt-1 text-xs text-gray-500">
@@ -570,7 +570,7 @@
                 step="0.01"
                 class="w-full rounded-r-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
                 placeholder="0.00"
-              />
+              >
             </div>
             <p class="mt-1 text-xs text-gray-500">
               Si solicitas una cuota de adopción, especifica qué incluye (vacunas, castración, etc.).
@@ -598,7 +598,7 @@
                 v-model="petData.requiresContract"
                 type="checkbox"
                 class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-              />
+              >
               <span class="ml-2 text-gray-700">Requiere contrato de adopción</span>
             </label>
           </div>
@@ -610,7 +610,7 @@
                 v-model="petData.requiresFollowUp"
                 type="checkbox"
                 class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-              />
+              >
               <span class="ml-2 text-gray-700">Requiere seguimiento post-adopción</span>
             </label>
 
@@ -692,6 +692,11 @@ import { useAuth } from '~/composables/useAuth'
 import { usePets } from '~/composables/usePets'
 import { useS3 } from '~/composables/useS3'
 
+// Definir middleware de autenticación para esta página
+definePageMeta({
+  middleware: ['auth']
+})
+
 // Router
 const router = useRouter()
 
@@ -762,6 +767,18 @@ onMounted(() => {
     petData.contact.email = user.value.email || ''
     petData.userId = user.value.uid
   }
+
+  useHead({
+    title: 'Publicar Mascota en Adopción | Adopta Zulia',
+    meta: [
+      {
+        name: 'description',
+        content: 'Publica una mascota en adopción y encuentra un hogar para ella.'
+      }
+    ]
+  })
+
+  loading.value = false;
 })
 
 // Manejo de la imagen principal

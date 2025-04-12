@@ -239,10 +239,10 @@ function handleImageError(event) {
             &copy; {{ currentYear }} Adopta Zulia. Todos los derechos reservados.
           </p>
           <div class="flex gap-4">
-            <NuxtLink to="/" class="text-sm transition-colors hover:text-emerald-300">
+            <NuxtLink to="/terminos" class="text-sm transition-colors hover:text-emerald-300">
               Términos de uso
             </NuxtLink>
-            <NuxtLink to="/" class="text-sm transition-colors hover:text-emerald-300">
+            <NuxtLink to="/privacidad" class="text-sm transition-colors hover:text-emerald-300">
               Política de privacidad
             </NuxtLink>
           </div>

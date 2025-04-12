@@ -60,9 +60,13 @@
           <div class="rounded-lg bg-white p-6 shadow-md">
             <div class="flex flex-col items-center text-center">
               <div class="relative mb-4">
-                <img
-                  :src="userProfile?.photoURL || '/placeholder.webp?height=120&width=120'"
-                  alt="Foto de perfil"
+                <NuxtImg
+                  :src="userProfile?.photoURL || '/placeholder.webp'"
+                  width="120"
+                  height="120"
+                  :alt="userProfile?.displayName || 'Usuario'"
+                  :title="userProfile?.displayName || 'Usuario'"
+      
                   class="h-24 w-24 rounded-full object-cover shadow-md"
                 />
                 <button
@@ -76,6 +80,7 @@
                 {{ userProfile?.displayName || 'Usuario' }}
               </h2>
               <p class="text-sm text-gray-500">{{ userProfile?.email }}</p>
+              <p><NuxtLink :to="userUserName">@{{ userUserName}}</NuxtLink></p>
 
               <div class="mt-4 w-full border-t border-gray-200 pt-4">
                 <div class="mb-3 flex items-center">
@@ -118,7 +123,7 @@
                   type="text"
                   class="block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
                   placeholder="Tu nombre completo"
-                />
+                >
               </div>
 
               <div class="mb-4">
@@ -131,7 +136,7 @@
                   type="tel"
                   class="block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
                   placeholder="Tu número de teléfono"
-                />
+                >
               </div>
 
               <div class="mb-6">
@@ -219,6 +224,11 @@ import { useAuth } from '~/composables/useAuth'
 const router = useRouter()
 const { userProfile, error, loading, isLoggedIn, updateProfile, logout, resetPassword } = useAuth()
 
+const userUserName = computed(() => {
+  return userProfile.value?.userName || 'Usuario'
+})
+
+ 
 // Estado local
 const formData = ref({
   displayName: '',

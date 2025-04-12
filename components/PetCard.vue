@@ -52,7 +52,7 @@
         <span>{{ formatAge(pet.age) }}</span>
       </div>
 
-      <hr class="my-3 border-gray-100" />
+      <hr class="my-3 border-gray-100" >
 
       <div class="mb-3 flex flex-wrap gap-2">
         <span

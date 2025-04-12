@@ -2,7 +2,7 @@
   <div class="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
     <div class="w-full max-w-md space-y-8">
       <div>
-        <img class="mx-auto h-16 w-auto" src="/logo.svg" alt="Adopta Zulia" />
+        <img class="mx-auto h-16 w-auto" src="/logo.svg" alt="Adopta Zulia" >
         <h2 class="mt-6 text-center text-3xl font-bold tracking-tight text-emerald-800">
           Completa tu perfil
         </h2>
@@ -36,7 +36,7 @@
                   :src="photoPreview"
                   alt="Avatar preview"
                   class="h-full w-full object-cover"
-                />
+                >
                 <div
                   v-else
                   class="flex h-full w-full items-center justify-center text-gray-400"
@@ -48,8 +48,8 @@
               <div class="flex items-center space-x-4">
                 <button
                   type="button"
-                  @click="triggerFileInput"
                   class="inline-flex items-center rounded-md border border-emerald-600 bg-white px-4 py-2 text-sm font-medium text-emerald-600 shadow-sm hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                  @click="triggerFileInput"
                 >
                   <UploadIcon class="-ml-1 mr-2 h-5 w-5" />
                   Subir foto
@@ -57,8 +57,8 @@
                 <button
                   v-if="photoPreview"
                   type="button"
-                  @click="removePhoto"
                   class="inline-flex items-center rounded-md border border-red-600 bg-white px-4 py-2 text-sm font-medium text-red-600 shadow-sm hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  @click="removePhoto"
                 >
                   <Trash2Icon class="-ml-1 mr-2 h-5 w-5" />
                   Eliminar
@@ -71,7 +71,7 @@
                 accept="image/*"
                 class="hidden"
                 @change="onFileSelected"
-              />
+              >
 
               <p v-if="photoError" class="text-sm text-red-600">{{ photoError }}</p>
             </div>
@@ -91,7 +91,7 @@
                 required
                 class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 sm:text-sm"
                 placeholder="username"
-              />
+              >
             </div>
             <p class="mt-1 text-xs text-gray-500">
               Este nombre será visible para otros usuarios.

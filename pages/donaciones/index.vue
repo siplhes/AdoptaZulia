@@ -4,7 +4,7 @@
     <section class="relative overflow-hidden bg-emerald-700 text-white">
       <div class="absolute inset-0 z-0">
         <NuxtImg
-          src="/placeholder.webp"
+          src="/img4.webp"
           width="1600"
           height="600"
           alt="Mascotas rescatadas"
@@ -34,7 +34,7 @@
     <div class="container mx-auto px-4 py-12">
       <!-- Impact Stats -->
       <section class="mb-16">
-        <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
+        <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
           <div
             class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105"
           >
@@ -55,26 +55,23 @@
             >
               <HomeIcon class="h-10 w-10 text-emerald-600" />
             </div>
-            <h3 class="mb-2 text-3xl font-bold text-emerald-800">{{ siteStats.totalAdoptions || 985 }}</h3>
+            <h3 class="mb-2 text-3xl font-bold text-emerald-800">{{ siteStats.totalAdoptions || "Aun no hay" }}</h3>
             <p class="text-gray-600">Adopciones exitosas</p>
-          </div>
-
-          <div
-            class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105"
-          >
-            <div
-              class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100"
-            >
-              <HeartIcon class="h-10 w-10 text-emerald-600" />
-            </div>
-            <h3 class="mb-2 text-3xl font-bold text-emerald-800">$125,000</h3>
-            <p class="text-gray-600">Donaciones recibidas</p>
           </div>
         </div>
       </section>
 
       <section class="mb-16">
         <div class="grid grid-cols-1 gap-8 md:grid-cols-3 justify-center items-center">
+
+                  <!--PayPal-->
+          <div
+            class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105"
+          >
+            <h1 class="mb-4 text-xl font-semibold">PayPal</h1>
+            <p class="mb-4 text-gray-600">Realiza una donación segura mediante PayPal</p>
+            <div id="paypal-checkout" class="mx-auto max-w-xs"/>
+          </div>
           <!--Patreon-->
           <NuxtLink to="https://patreon.com/AdoptaZulia">
             <div
@@ -97,14 +94,7 @@
             </div>
           </NuxtLink>
 
-          <!--PayPal-->
-          <div
-            class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105"
-          >
-            <h1 class="mb-4 text-xl font-semibold">PayPal</h1>
-            <p class="mb-4 text-gray-600">Realiza una donación segura mediante PayPal</p>
-            <div id="paypal-checkout" class="mx-auto max-w-xs"/>
-          </div>
+  
 
           <!--En Especie-->
           <div
@@ -112,9 +102,12 @@
           >
             <h1 class="mb-4 text-xl font-semibold">Donacion en especie</h1>
             <p class="mb-4 text-gray-600">Realiza una donación de alimentos, medicinas o suministros para nuestras mascotas.</p>
-            <NuxtLink to="/contacto">
-              <div class="mx-auto max-w-xs">
-                <NuxtImg src="/placeholder.jpg" alt="En especie" class="mx-auto" />
+            <NuxtLink to="/donaciones/especie">
+              <div class="mx-auto bg-amber-600 text-amber-50 p-2 hover:bg-amber-700 rounded-xl max-w-xs items-center flex justify-center">
+               
+                <span class="ml-2">       Mas detalles</span>
+       
+                <ChevronDownIcon class="h-5 w-5 text-amber-50 transition-transform" />
               </div>
             </NuxtLink>
           </div>
@@ -225,73 +218,6 @@ const finalAmount = computed(() => {
   return selectedAmount.value
 })
 
-const selectAmount = (amount) => {
-  selectedAmount.value = amount
-  customAmount.value = ''
-}
-
-const processDonation = (method) => {
-  // Aquí iría la lógica para procesar el pago
-  console.log(`Procesando donación de ${finalAmount.value}$ mediante ${method}`)
-  console.log('Información del donante:', donorInfo.value)
-
-  // En una implementación real, aquí se redigiría a la pasarela de pago
-  alert(
-    `Gracias por tu donación de ${finalAmount.value}$. En una implementación real, serías redirigido a la pasarela de pago.`
-  )
-}
-
-// Monthly plans
-const monthlyPlans = [
-  {
-    title: 'Plan Básico',
-    amount: 10,
-    description: 'Ayuda básica para nuestras mascotas',
-    benefits: [
-      'Alimentación para 1 mascota al mes',
-      'Boletín mensual de noticias',
-      'Certificado de donación',
-    ],
-    recommended: false,
-  },
-  {
-    title: 'Plan Protector',
-    amount: 25,
-    description: 'Ayuda integral para nuestras mascotas',
-    benefits: [
-      'Alimentación para 3 mascotas al mes',
-      'Tratamientos veterinarios básicos',
-      'Boletín mensual de noticias',
-      'Certificado de donación',
-      'Mención en nuestra web',
-    ],
-    recommended: true,
-  },
-  {
-    title: 'Plan Guardian',
-    amount: 50,
-    description: 'Ayuda completa para nuestras mascotas',
-    benefits: [
-      'Alimentación para 6 mascotas al mes',
-      'Tratamientos veterinarios completos',
-      'Boletín mensual de noticias',
-      'Certificado de donación',
-      'Mención en nuestra web',
-      'Visitas exclusivas al refugio',
-    ],
-    recommended: false,
-  },
-]
-
-const selectMonthlyPlan = (plan) => {
-  // Aquí iría la lógica para seleccionar un plan mensual
-  console.log(`Plan seleccionado: ${plan.title} - ${plan.amount}$/mes`)
-
-  // En una implementación real, aquí se redigiría a un formulario de suscripción
-  alert(
-    `Has seleccionado el plan ${plan.title} por ${plan.amount}$/mes. En una implementación real, serías redirigido a un formulario de suscripción.`
-  )
-}
 
 // Testimonials
 const testimonials = [
@@ -434,6 +360,17 @@ onMounted(async () => {
       paypalButtonRendered.value = true
     })
   }
+  useHead({
+    title: 'Donaciones - Adopta Zulia',
+    meta: [
+      {
+        name: 'description',
+        content:
+          'Conviértete en un héroe para nuestras mascotas. Descubre cómo puedes ayudar con donaciones únicas o mensuales.',
+      },
+    ],
+
+  })
 })
 </script>
 

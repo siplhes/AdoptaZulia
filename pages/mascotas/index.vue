@@ -4,8 +4,10 @@
       <!-- Hero Section -->
       <div class="relative mb-8 overflow-hidden rounded-xl bg-emerald-700 p-6 text-white md:p-10">
         <div class="absolute inset-0 z-0">
-          <img
-            src="/img2.webp?height=400&width=1200"
+          <NuxtImg
+            src="/img3.webp"
+            height="400"
+            width="1200"
             alt="Mascotas en adopción"
             class="h-full w-full object-cover opacity-20"
           />
@@ -26,7 +28,7 @@
                 type="text"
                 placeholder="Buscar por nombre, raza, ubicación..."
                 class="w-full text-gray-800 focus:outline-none"
-              />
+              >
             </div>
             <button
               class="mt-2 rounded-md bg-emerald-600 px-6 py-2 text-white transition-colors hover:bg-emerald-700 md:mt-0"
@@ -75,7 +77,7 @@
                     type="checkbox"
                     :value="type.value"
                     class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                  />
+                  >
                   <span class="ml-2 text-gray-700">{{ type.label }}</span>
                 </label>
               </div>
@@ -91,7 +93,7 @@
                     type="checkbox"
                     :value="age.value"
                     class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                  />
+                  >
                   <span class="ml-2 text-gray-700">{{ age.label }}</span>
                 </label>
               </div>
@@ -107,7 +109,7 @@
                     type="checkbox"
                     :value="size.value"
                     class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                  />
+                  >
                   <span class="ml-2 text-gray-700">{{ size.label }}</span>
                 </label>
               </div>
@@ -123,7 +125,7 @@
                     type="radio"
                     :value="gender.value"
                     class="h-4 w-4 border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                  />
+                  >
                   <span class="ml-2 text-gray-700">{{ gender.label }}</span>
                 </label>
               </div>
@@ -138,7 +140,7 @@
                     v-model="filters.vaccinated"
                     type="checkbox"
                     class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                  />
+                  >
                   <span class="ml-2 text-gray-700">Vacunado</span>
                 </label>
                 <label class="flex items-center">
@@ -146,7 +148,7 @@
                     v-model="filters.neutered"
                     type="checkbox"
                     class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                  />
+                  >
                   <span class="ml-2 text-gray-700">Esterilizado</span>
                 </label>
                 <label class="flex items-center">
@@ -154,7 +156,7 @@
                     v-model="filters.urgent"
                     type="checkbox"
                     class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                  />
+                  >
                   <span class="ml-2 text-gray-700">Casos urgentes</span>
                 </label>
               </div>
@@ -220,7 +222,7 @@
               class="overflow-hidden rounded-lg bg-white shadow-md transition-shadow hover:shadow-lg"
             >
               <div class="relative">
-                <img :src="pet.image" :alt="pet.name" class="h-64 w-full object-cover" />
+                <NuxtImg :src="pet.image" :alt="pet.name" class="h-64 w-full object-cover" />
                 <div class="absolute right-4 top-4 flex space-x-2">
                   <span class="rounded-full bg-amber-100 px-3 py-1 text-xs text-amber-800">
                     {{ pet.type }}
@@ -582,6 +584,16 @@ onMounted(async () => {
   if (queryParams.buscar) {
     searchQuery.value = queryParams.buscar
   }
+
+  useHead({
+    title: 'Mascotas en adopción | Adopta Zulia',
+    meta: [
+      {
+        name: 'description',
+        content: 'Encuentra tu compañero perfecto entre nuestras mascotas en adopción.',
+      },
+    ],
+  })
 })
 </script>
 

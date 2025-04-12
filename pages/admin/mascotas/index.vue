@@ -35,7 +35,7 @@
               placeholder="Buscar por nombre, ubicación..."
               class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
               @input="applyFilters"
-            />
+            >
           </div>
 
           <div class="w-40">
@@ -180,7 +180,7 @@
                       :alt="pet.name"
                       class="h-14 w-14 rounded-full object-cover"
                       @error="handleImageError"
-                    />
+                    >
                   </div>
                   <div class="ml-4">
                     <div class="flex items-center">
@@ -323,7 +323,7 @@
                 :alt="petToDelete?.name"
                 class="h-14 w-14 rounded-full object-cover"
                 @error="handleImageError"
-              />
+              >
             </div>
             <div>
               <p class="text-sm text-gray-500">

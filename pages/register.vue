@@ -32,7 +32,7 @@
                 autocomplete="name"
                 required
                 class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 sm:text-sm"
-              />
+              >
             </div>
           </div>
 
@@ -48,7 +48,7 @@
                 autocomplete="username"
                 required
                 class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 sm:text-sm"
-              />
+              >
               <p class="mt-1 text-xs text-gray-500">Este nombre será visible para otros usuarios</p>
             </div>
           </div>
@@ -65,7 +65,7 @@
                 autocomplete="email"
                 required
                 class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 sm:text-sm"
-              />
+              >
             </div>
           </div>
 
@@ -80,7 +80,7 @@
                 required
                 minlength="6"
                 class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 sm:text-sm"
-              />
+              >
               <p class="mt-1 text-xs text-gray-500">
                 La contraseña debe tener al menos 6 caracteres
               </p>
@@ -100,7 +100,7 @@
                 required
                 minlength="6"
                 class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 sm:text-sm"
-              />
+              >
             </div>
             <p v-if="passwordsDoNotMatch" class="mt-1 text-xs text-red-500">
               Las contraseñas no coinciden
@@ -114,7 +114,7 @@
               type="checkbox"
               required
               class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-            />
+            >
             <label for="terms" class="ml-2 block text-sm text-gray-900">
               Acepto los
               <a href="#" class="text-emerald-600 hover:text-emerald-500">términos y condiciones</a>

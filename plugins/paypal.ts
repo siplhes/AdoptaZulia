@@ -12,6 +12,8 @@ export default defineNuxtPlugin(async (nuxtApp) => {
       clientId: config.clientId,
       currency: config.currency || 'USD',
       intent: 'capture',
+      enableFunding: 'card,credit,venmo,mercadopago',
+      locale: 'es_ES',
       // Puedes agregar más opciones aquí según sea necesario
       // https://developer.paypal.com/sdk/js/configuration/
     })

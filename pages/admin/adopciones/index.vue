@@ -29,7 +29,7 @@
               placeholder="Buscar por mascota o usuario..."
               class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
               @input="applyFilters"
-            />
+            >
           </div>
 
           <div class="w-40">
@@ -128,7 +128,7 @@
                         :src="adoption.pet.imageUrl"
                         alt="Imagen de mascota"
                         class="h-full w-full object-cover"
-                      />
+                      >
                       <div v-else class="flex h-full w-full items-center justify-center">
                         <PawPrintIcon class="h-5 w-5 text-gray-400" />
                       </div>
@@ -283,7 +283,7 @@
                     :src="selectedAdoption.pet.imageUrl"
                     alt="Imagen de mascota"
                     class="h-full w-full object-cover"
-                  />
+                  >
                   <div v-else class="flex h-full w-full items-center justify-center">
                     <PawPrintIcon class="h-8 w-8 text-gray-400" />
                   </div>
@@ -398,7 +398,7 @@
               v-model="adminNotes"
               class="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
               placeholder="Añadir notas administrativas..."
-            />
+            >
 
             <button
               class="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"

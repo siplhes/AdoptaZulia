@@ -6,7 +6,7 @@
         :src="story.images[0]"
         :alt="story.title"
         class="h-full w-full transform object-cover transition-transform duration-300 hover:scale-105"
-      />
+      >
     </div>
 
     <!-- Información de la mascota adoptada -->
@@ -17,7 +17,7 @@
           :src="story.pet.image"
           :alt="story.pet.name"
           class="h-full w-full object-cover"
-        />
+        >
         <div v-else class="flex h-full w-full items-center justify-center bg-emerald-100">
           <Icon name="ph:paw-print" class="text-emerald-500" size="20px" />
         </div>
@@ -45,7 +45,7 @@
               :src="story.user.photoURL"
               :alt="story.user.displayName"
               class="h-full w-full object-cover"
-            />
+            >
             <div v-else class="flex h-full w-full items-center justify-center bg-emerald-100">
               <span class="text-xs font-semibold text-emerald-600">
                 {{ story.user?.displayName?.charAt(0).toUpperCase() || 'U' }}
@@ -60,12 +60,12 @@
         <!-- Contador de likes -->
         <div class="flex items-center text-gray-500">
           <button
-            @click="handleLike"
             class="flex items-center space-x-1 text-gray-500 hover:text-emerald-600"
             :class="{ 'text-emerald-600': hasLiked }"
+            @click="handleLike"
           >
             <Icon name="mdi:heart" size="20px" />
-            <span>{{ story.likes || 0 }}</span>
+            <span>{{ totalLikes }}</span>
           </button>
         </div>
       </div>
@@ -85,7 +85,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useAdoptionStories } from '~/composables/useAdoptionStories'
 import { useAuth } from '~/composables/useAuth'
 
@@ -99,6 +99,10 @@ const props = defineProps({
 const { likeStory } = useAdoptionStories()
 const { isAuthenticated } = useAuth()
 const hasLiked = ref(false)
+const additionalLikes = ref(0)
+
+// Computed property para mostrar el recuento de likes actualizado
+const totalLikes = computed(() => (props.story.likes || 0) + additionalLikes.value)
 
 const handleLike = async () => {
   if (!isAuthenticated.value) {
@@ -111,7 +115,7 @@ const handleLike = async () => {
   try {
     await likeStory(props.story.id)
     hasLiked.value = true
-    props.story.likes++ // Actualiza la UI inmediatamente
+    additionalLikes.value++ // Actualiza el contador local en lugar de mutar el prop
   } catch (error) {
     console.error('Error al dar like:', error)
   }
