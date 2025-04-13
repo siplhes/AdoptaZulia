@@ -12,11 +12,11 @@
           class="rounded-lg bg-white p-6 shadow-md"
         >
           <div class="mb-4 flex items-center">
-            <img
+            <NuxtImg
               :src="testimonial.image"
               :alt="testimonial.name"
               class="mr-4 h-16 w-16 rounded-full object-cover"
-            >
+            />
             <div>
               <h4 class="text-lg font-semibold text-emerald-800">
                 {{ testimonial.name }}
@@ -31,11 +31,11 @@
             <p class="italic text-gray-700">{{ testimonial.quote }}</p>
           </div>
           <div class="flex items-center">
-            <img
+            <NuxtImg
               :src="testimonial.petImage"
               :alt="testimonial.petName"
               class="mr-3 h-12 w-12 rounded-full object-cover"
-            >
+            />
             <div>
               <p class="text-sm text-gray-600">Adoptó a</p>
               <p class="font-medium text-emerald-700">

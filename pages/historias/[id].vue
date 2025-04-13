@@ -51,7 +51,7 @@
             v-if="story.images && story.images.length > 0"
             class="h-60 w-full overflow-hidden sm:h-80 md:h-96"
           >
-            <img :src="story.images[0]" :alt="story.title" class="h-full w-full object-cover" >
+            <NuxtImg :src="story.images[0]" :alt="story.title" class="h-full w-full object-cover" sizes="sm:100vw md:100vw lg:100vw" placeholder />
           </div>
 
           <!-- Badge de destacado -->
@@ -73,12 +73,14 @@
                 <!-- Autor -->
                 <div class="flex items-center">
                   <div class="mr-3 h-10 w-10 overflow-hidden rounded-full">
-                    <img
+                    <NuxtImg
                       v-if="story.user?.photoURL"
                       :src="story.user.photoURL"
                       :alt="story.user.displayName"
                       class="h-full w-full object-cover"
-                    >
+                      sizes="40px"
+                      placeholder
+                    />
                     <div
                       v-else
                       class="flex h-full w-full items-center justify-center bg-emerald-100"
@@ -99,12 +101,14 @@
                 <!-- Mascota -->
                 <div v-if="story.pet" class="flex items-center">
                   <div class="mr-3 h-10 w-10 overflow-hidden rounded-full">
-                    <img
+                    <NuxtImg
                       v-if="story.pet.image"
                       :src="story.pet.image"
                       :alt="story.pet.name"
                       class="h-full w-full object-cover"
-                    >
+                      sizes="40px"
+                      placeholder
+                    />
                     <div
                       v-else
                       class="flex h-full w-full items-center justify-center bg-emerald-100"
@@ -140,11 +144,13 @@
                   class="aspect-square cursor-pointer overflow-hidden rounded-lg"
                   @click="openGallery(index + 1)"
                 >
-                  <img
+                  <NuxtImg
                     :src="image"
                     :alt="`Imagen ${index + 1}`"
                     class="h-full w-full object-cover"
-                  >
+                    sizes="sm:50vw md:33vw lg:25vw"
+                    placeholder
+                  />
                 </div>
               </div>
             </div>

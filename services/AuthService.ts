@@ -17,6 +17,7 @@ import {
 import { getDatabase, ref, set, get, update } from 'firebase/database'
 import { initializeApp, getApps, getApp } from 'firebase/app'
 import { useFirebaseApp } from 'vuefire'
+import { useRuntimeConfig } from '#app'
 import type { UserData } from '~/models/User'
 
 // Definimos el tipo User basado en la estructura de Firebase
@@ -34,7 +35,24 @@ type User = UserInfo & {
 }
 
 export class AuthService {
-  private adminEmails = ['admin@adoptazulia.com', 'soporte@adoptazulia.com', 'admin@example.com']
+  private adminEmails: string[] = []
+
+  constructor() {
+    // Load admin emails from runtime config when the service is instantiated
+    try {
+      const config = useRuntimeConfig()
+      if (config.public.adminEmails) {
+        this.adminEmails = config.public.adminEmails.split(',').map((email: string) => email.trim().toLowerCase())
+      } else {
+        // Fallback to default admin emails if not configured
+        this.adminEmails = ['admin@adoptazulia.com', 'soporte@adoptazulia.com'] 
+      }
+    } catch (error) {
+      console.error('Error loading admin emails from config:', error)
+      // Fallback to default admin emails
+      this.adminEmails = ['admin@adoptazulia.com', 'soporte@adoptazulia.com']
+    }
+  }
 
   /**
    * Obtiene la instancia de Firebase Auth

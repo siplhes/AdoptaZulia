@@ -15,6 +15,8 @@
         class="h-full w-full object-cover"
         @error="onImageError"
         loading="lazy"
+        sizes="sm:100vw md:50vw lg:33vw xl:25vw"
+        placeholder
       />
 
       <button

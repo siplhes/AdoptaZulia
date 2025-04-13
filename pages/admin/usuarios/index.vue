@@ -150,11 +150,11 @@
                       v-if="user.photoURL"
                       class="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full"
                     >
-                      <img
+                      <NuxtImg
                         :src="user.photoURL"
                         alt="Foto de perfil"
                         class="h-full w-full object-cover"
-                      >
+                      />
                     </div>
                     <div
                       v-else

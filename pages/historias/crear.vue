@@ -159,11 +159,11 @@
                 :key="index"
                 class="relative h-32 w-32 overflow-hidden rounded-lg border border-gray-200"
               >
-                <img
+                <NuxtImg
                   :src="image"
                   class="h-full w-full object-cover"
                   :alt="`Vista previa ${index + 1}`"
-                >
+                />
                 <button
                   type="button"
                   class="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-white"

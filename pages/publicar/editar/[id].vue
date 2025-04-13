@@ -439,12 +439,12 @@
               Foto principal actual
             </label>
             <div class="relative mb-4 inline-block">
-              <img
+              <NuxtImg
                 :src="petData.image"
                 alt="Imagen principal"
                 class="h-48 w-48 rounded-lg border-2 border-gray-200 object-cover"
                 @error="handleImageError"
-              >
+              />
               <div class="mt-2 text-sm text-gray-500">
                 Mantén la imagen actual o sube una nueva abajo
               </div>
@@ -461,12 +461,12 @@
                 class="mr-4 flex h-32 w-32 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-gray-300"
                 :class="{ 'border-solid border-emerald-500': mainImagePreview }"
               >
-                <img
+                <NuxtImg
                   v-if="mainImagePreview"
                   :src="mainImagePreview"
                   alt="Vista previa"
                   class="h-full w-full object-cover"
-                >
+                />
                 <PlusIcon v-else class="h-8 w-8 text-gray-300" />
               </div>
               <div>
@@ -503,12 +503,12 @@
                 :key="'current-' + index"
                 class="relative h-32 w-32 overflow-hidden rounded-lg border-2 border-gray-200"
               >
-                <img
+                <NuxtImg
                   :src="photo"
                   alt="Foto adicional"
                   class="h-full w-full object-cover"
                   @error="handleImageError"
-                >
+                />
                 <button
                   type="button"
                   class="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white hover:bg-red-600"
@@ -535,7 +535,7 @@
                 :key="'new-' + index"
                 class="relative h-32 w-32 overflow-hidden rounded-lg border-2 border-solid border-emerald-500"
               >
-                <img :src="preview" alt="Vista previa" class="h-full w-full object-cover" >
+                <NuxtImg :src="preview" alt="Vista previa" class="h-full w-full object-cover" />
                 <button
                   type="button"
                   class="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white hover:bg-red-600"
@@ -959,22 +959,22 @@
           <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <div class="flex flex-col md:flex-row">
               <div class="mb-4 md:mb-0 md:mr-6 md:w-1/3">
-                <img
+                <NuxtImg
                   :src="mainImagePreview || petData.image"
                   alt="Foto principal"
                   class="h-64 w-full rounded-lg object-cover shadow-sm"
                   @error="handleImageError"
-                >
+                />
 
                 <div class="mt-2 flex flex-wrap gap-2">
-                  <img
+                  <NuxtImg
                     v-for="(photo, index) in previewPhotos.slice(0, 4)"
                     :key="index"
                     :src="photo"
                     alt="Foto adicional"
                     class="h-16 w-16 rounded-md object-cover"
                     @error="handleImageError"
-                  >
+                  />
                 </div>
               </div>
 

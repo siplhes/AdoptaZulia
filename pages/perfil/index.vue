@@ -66,8 +66,10 @@
                   height="120"
                   :alt="userProfile?.displayName || 'Usuario'"
                   :title="userProfile?.displayName || 'Usuario'"
-      loading="lazy"
+                  loading="lazy"
                   class="h-24 w-24 rounded-full object-cover shadow-md"
+                  sizes="96px"
+                  placeholder
                 />
                 <button
                   class="absolute bottom-0 right-0 rounded-full bg-emerald-600 p-1 text-white shadow-md hover:bg-emerald-700"

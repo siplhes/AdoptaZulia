@@ -1,15 +1,11 @@
 <template>
   <section class="bg-emerald-600">
-    <!-- Versión para escritorio -->
     <header class="mx-auto max-w-4xl px-6 py-2 lg:py-2">
       <div class="flex flex-wrap items-center justify-between">
-        <!-- Logo y título -->
         <NuxtLink to="/" class="flex items-center">
-          <NuxtPicture src="/logo.svg" class="h-12 w-12 text-[#fefffa] lg:h-16 lg:w-16" loading="lazy" />
+          <NuxtPicture src="/logo.svg" class="h-12 w-12 text-[#fefffa] lg:h-16 lg:w-16" loading="lazy" sizes="sm:48px md:48px lg:64px" alt="Adopta Zulia isotipo" placeholder />
           <h1 id="webTitle" class="ml-2">Adopta Zulia</h1>
         </NuxtLink>
-
-        <!-- Botón de hamburguesa para móvil -->
         <button
           type="button"
           class="inline-flex items-center justify-center rounded-md p-2 text-white lg:hidden"
@@ -17,13 +13,9 @@
             @click="isMenuOpen = !isMenuOpen"
         >
           <span class="sr-only">Abrir menú principal</span>
-          <!-- Icono de menú -->
           <Icon  v-if="!isMenuOpen"  name="heroicons:bars-3"  class="h-6 w-6"/>
-          <!-- Icono de cerrar -->
           <Icon v-else name="heroicons:x-mark"  class="h-6 w-6" />
         </button>
-
-        <!-- Menú de navegación para escritorio -->
         <div class="hidden lg:ml-6 lg:flex lg:items-center lg:space-x-6">
           <NuxtLink
             v-for="(link, index) in navigationLinksWithoutProfile"
@@ -34,24 +26,22 @@
           >
             {{ link.name }}
           </NuxtLink>
-
-          <!-- Avatar del usuario (si está autenticado) -->
           <div v-if="isAuthenticated" class="relative">
             <button 
-             
               class="flex items-center space-x-2 focus:outline-none"
               aria-haspopup="true"
               aria-expanded="userMenuOpen"
                @click="toggleUserMenu" 
             >
-              <!-- Avatar del usuario -->
               <div class="overflow-hidden h-9 w-9 rounded-full border-2 border-amber-300">
                 <NuxtImg 
                   v-if="user?.photoURL" 
                   :src="user.photoURL" 
                   :alt="user.displayName || 'Usuario'" 
                   class="h-full w-full object-cover"
-                loading="lazy"
+                  loading="lazy"
+                  sizes="36px"
+                  placeholder
                 />
                 <div 
                   v-else 
@@ -61,8 +51,6 @@
                 </div>
               </div>
             </button>
-
-            <!-- Menú desplegable del usuario -->
             <div 
               v-show="userMenuOpen"
               class="absolute right-0 mt-2 w-48 rounded-md bg-white py-2 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50"

@@ -1,6 +1,5 @@
 <template>
   <section class="min-h-100 w-full bg-white">
-    <!-- Sección de cabecera -->
     <div class="mx-auto max-w-6xl py-12 px-4 sm:px-6 lg:px-8">
       <h1 class="text-4xl font-bold text-emerald-600 mb-6 text-center">Nosotros</h1>
       <p class="text-lg text-gray-700 text-center max-w-3xl mx-auto mb-8">
@@ -11,8 +10,6 @@
         <img src="/img4.webp" alt="Mascotas de AdoptaZulia" class="rounded-lg shadow-lg w-full max-w-2xl">
       </div>
     </div>
-
-    <!-- Misión y Visión -->
     <div class="bg-gray-50 py-16">
       <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div class="grid md:grid-cols-2 gap-12">
@@ -34,28 +31,17 @@
         </div>
       </div>
     </div>
-
-    <!-- Historia -->
     <div class="py-16 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
       <h2 class="text-3xl font-bold text-emerald-600 mb-8 text-center">Nuestra Historia</h2>
       <div class="bg-white p-8 rounded-lg shadow-md">
         <p class="text-gray-700 mb-4">
-          AdoptaZulia nació en 2023 como respuesta a la creciente población de animales abandonados en el estado Zulia. 
-          Un grupo de amantes de los animales decidió unir fuerzas para crear una plataforma digital que facilitara 
-          el proceso de adopción y brindara mayor visibilidad a las mascotas en busca de un hogar.
-        </p>
-        <p class="text-gray-700 mb-4">
-          Desde entonces, hemos logrado conectar a cientos de mascotas con familias amorosas, reduciendo el abandono 
-          animal y promoviendo la adopción responsable como alternativa a la compra de mascotas.
-        </p>
-        <p class="text-gray-700">
-          Nuestro compromiso se extiende más allá de la adopción. Trabajamos en programas educativos, jornadas 
-          de esterilización y campañas de concientización para mejorar la calidad de vida de los animales en nuestra región.
+          AdoptaZulia nació en 2025 como respuesta a la creciente población de animales abandonados en el estado Zulia
+          Luego de tratar de poner en adopcion a unos gatitos que necesitaban un hogar nos dimos cuenta de lo anticuado
+          que estabamos en el proceso de adopción aca en el pais, por lo que decidimos crear una plataforma que facilitara la conexión entre
+          los animales necesitados y las familias dispuestas a brindarles un hogar.
         </p>
       </div>
     </div>
-
-    <!-- Nuestros Valores -->
     <div class="bg-gray-50 py-16">
       <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <h2 class="text-3xl font-bold text-emerald-600 mb-8 text-center">Nuestros Valores</h2>
@@ -84,8 +70,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Equipo -->
     <div class="py-16 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
       <h2 class="text-3xl font-bold text-emerald-600 mb-8 text-center">Nuestro Equipo</h2>
       <p class="text-lg text-gray-700 text-center max-w-3xl mx-auto mb-12">
@@ -93,11 +77,11 @@
         por el bienestar animal.
       </p>
       <div class="grid md:grid-cols-4 gap-6">
-        <div class="bg-white p-6 rounded-lg shadow-md text-center">
+        <div class="bg-white p-6 rounded-lg shadow-md text-center mx-auto">
           <div class="h-24 w-24 rounded-full bg-gray-200 mx-auto mb-4 overflow-hidden">
             <img src="/placeholder.webp" alt="Voluntario" class="w-full h-full object-cover">
           </div>
-          <h3 class="text-xl font-semibold text-emerald-600">María Rodríguez</h3>
+          <h3 class="text-xl font-semibold text-emerald-600">Lismar Molaya</h3>
           <p class="text-gray-600">Fundadora</p>
         </div>
         <div class="bg-white p-6 rounded-lg shadow-md text-center">
@@ -111,20 +95,12 @@
           <div class="h-24 w-24 rounded-full bg-gray-200 mx-auto mb-4 overflow-hidden">
             <img src="/placeholder.webp" alt="Voluntario" class="w-full h-full object-cover">
           </div>
-          <h3 class="text-xl font-semibold text-emerald-600">Laura Gómez</h3>
-          <p class="text-gray-600">Veterinaria</p>
+          <h3 class="text-xl font-semibold text-emerald-600">Suokhe</h3>
+          <p class="text-gray-600">Desarrollador web</p>
         </div>
-        <div class="bg-white p-6 rounded-lg shadow-md text-center">
-          <div class="h-24 w-24 rounded-full bg-gray-200 mx-auto mb-4 overflow-hidden">
-            <img src="/placeholder.webp" alt="Voluntario" class="w-full h-full object-cover">
-          </div>
-          <h3 class="text-xl font-semibold text-emerald-600">Miguel Díaz</h3>
-          <p class="text-gray-600">Gestor Digital</p>
-        </div>
+
       </div>
     </div>
-
-    <!-- Contáctanos -->
     <div class="bg-gray-50 py-16">
       <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 text-center">
         <h2 class="text-3xl font-bold text-emerald-600 mb-6">¿Quieres unirte a nuestra causa?</h2>
@@ -137,10 +113,8 @@
         </a>
       </div>
     </div>
-
-    <!-- Wave divider -->
     <div>
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" class="fill-emerald-600">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" class="fill-emerald-700">
         <path
           d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"
         />

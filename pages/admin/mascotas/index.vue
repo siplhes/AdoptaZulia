@@ -175,12 +175,12 @@
               <td class="whitespace-nowrap px-6 py-4">
                 <div class="flex items-center">
                   <div class="h-14 w-14 flex-shrink-0">
-                    <img
+                    <NuxtImg
                       :src="pet.image"
                       :alt="pet.name"
                       class="h-14 w-14 rounded-full object-cover"
                       @error="handleImageError"
-                    >
+                    />
                   </div>
                   <div class="ml-4">
                     <div class="flex items-center">
@@ -318,12 +318,12 @@
           </div>
           <div class="flex items-center space-x-4">
             <div class="flex-shrink-0">
-              <img
+              <NuxtImg
                 :src="petToDelete?.image"
                 :alt="petToDelete?.name"
                 class="h-14 w-14 rounded-full object-cover"
                 @error="handleImageError"
-              >
+              />
             </div>
             <div>
               <p class="text-sm text-gray-500">

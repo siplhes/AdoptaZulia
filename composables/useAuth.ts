@@ -30,6 +30,33 @@ const needsProfileCompletion = ref(false)
 let unsubscribeAuth: (() => void) | null = null
 let isInitialized = false
 
+// Validate inputs for security
+function validateEmail(email: string): boolean {
+  if (!email || typeof email !== 'string') return false
+  // Basic email validation regex
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return emailRegex.test(email)
+}
+
+function validatePassword(password: string): boolean {
+  if (!password || typeof password !== 'string') return false
+  // Password should be at least 6 characters
+  return password.length >= 6
+}
+
+function validateDisplayName(name: string): boolean {
+  if (!name || typeof name !== 'string') return false
+  // Prevent scripts and HTML injection
+  return !/<[^>]*>/.test(name) && name.length >= 2 && name.length <= 50
+}
+
+function validateUserName(username: string): boolean {
+  if (!username || typeof username !== 'string') return false
+  // Allow only letters, numbers, underscores, and hyphens
+  const usernameRegex = /^[a-zA-Z0-9_-]{2,30}$/
+  return usernameRegex.test(username)
+}
+
 function initializeAuth() {
   if (isInitialized || !import.meta.client) return
   try {
@@ -75,6 +102,7 @@ function initializeAuth() {
     console.error('Error al inicializar autenticación:', err)
   }
 }
+
 export function useAuth() {
   const nuxtApp = useNuxtApp()
   if (import.meta.client && !isInitialized) {
@@ -84,10 +112,33 @@ export function useAuth() {
   }
   const authService = new AuthService()
   const isAuthenticated = computed(() => !!user.value)
+  
   async function register(email: string, password: string, displayName: string, userName: string) {
     loading.value = true
     error.value = null
+    
     try {
+      // Input validation for security
+      if (!validateEmail(email)) {
+        error.value = 'El formato del correo electrónico no es válido'
+        return false
+      }
+      
+      if (!validatePassword(password)) {
+        error.value = 'La contraseña debe tener al menos 6 caracteres'
+        return false
+      }
+      
+      if (!validateDisplayName(displayName)) {
+        error.value = 'El nombre debe tener entre 2 y 50 caracteres y no puede contener HTML'
+        return false
+      }
+      
+      if (!validateUserName(userName)) {
+        error.value = 'El nombre de usuario debe contener solo letras, números, guiones bajos o guiones y tener entre 2 y 30 caracteres'
+        return false
+      }
+      
       user.value = await authService.register(email, password, displayName, userName)
       return true
     } catch (err: any) {
@@ -98,6 +149,7 @@ export function useAuth() {
       loading.value = false
     }
   }
+
   async function login(email: string, password: string) {
     loading.value = true
     error.value = null

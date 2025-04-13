@@ -2,7 +2,7 @@
   <div class="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
     <div class="w-full max-w-md space-y-8">
       <div>
-        <img class="mx-auto h-16 w-auto" src="/logo.svg" alt="Adopta Zulia" >
+        <NuxtPicture class="mx-auto h-16 w-auto" src="/logo.svg" alt="Adopta Zulia" sizes="64px" placeholder />
         <h2 class="mt-6 text-center text-3xl font-bold tracking-tight text-emerald-800">
           Completa tu perfil
         </h2>
@@ -31,12 +31,14 @@
               <div
                 class="relative h-32 w-32 overflow-hidden rounded-full border-2 border-gray-200 bg-gray-100"
               >
-                <img
+                <NuxtImg
                   v-if="photoPreview"
                   :src="photoPreview"
                   alt="Avatar preview"
                   class="h-full w-full object-cover"
-                >
+                  sizes="128px"
+                  placeholder
+                />
                 <div
                   v-else
                   class="flex h-full w-full items-center justify-center text-gray-400"

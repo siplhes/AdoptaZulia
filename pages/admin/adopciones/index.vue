@@ -123,12 +123,12 @@
                 <td class="whitespace-nowrap px-6 py-4">
                   <div class="flex items-center">
                     <div class="h-10 w-10 flex-shrink-0 overflow-hidden rounded-md bg-gray-100">
-                      <img
+                      <NuxtImg
                         v-if="adoption.pet?.imageUrl"
                         :src="adoption.pet.imageUrl"
                         alt="Imagen de mascota"
                         class="h-full w-full object-cover"
-                      >
+                      />
                       <div v-else class="flex h-full w-full items-center justify-center">
                         <PawPrintIcon class="h-5 w-5 text-gray-400" />
                       </div>
@@ -278,12 +278,12 @@
               <h4 class="text-md font-medium text-gray-900">Información de la mascota</h4>
               <div class="flex items-center">
                 <div class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md bg-gray-100">
-                  <img
+                  <NuxtImg
                     v-if="selectedAdoption.pet?.imageUrl"
                     :src="selectedAdoption.pet.imageUrl"
                     alt="Imagen de mascota"
                     class="h-full w-full object-cover"
-                  >
+                  />
                   <div v-else class="flex h-full w-full items-center justify-center">
                     <PawPrintIcon class="h-8 w-8 text-gray-400" />
                   </div>

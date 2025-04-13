@@ -42,12 +42,14 @@
           <div class="p-4 lg:col-span-1 lg:p-6">
             <div class="mb-4">
               <!-- Foto principal -->
-              <img
+              <NuxtImg
                 :src="currentPhoto || pet.image"
                 :alt="pet.name"
                 class="h-64 w-full rounded-lg object-cover lg:h-96"
                 @error="handleImageError"
-              >
+                sizes="sm:100vw md:80vw lg:33vw"
+                placeholder
+              />
             </div>
 
             <!-- Miniaturas de fotos -->
@@ -59,12 +61,14 @@
                 :class="{ 'ring-2 ring-emerald-500': currentPhoto === photo }"
                 @click="currentPhoto = photo"
               >
-                <img
+                <NuxtImg
                   :src="photo"
                   :alt="`Foto ${index + 1} de ${pet.name}`"
                   class="h-full w-full object-cover"
                   @error="handleImageError"
-                >
+                  sizes="sm:25vw md:25vw lg:8vw"
+                  placeholder
+                />
               </div>
             </div>
 

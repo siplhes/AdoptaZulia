@@ -2,22 +2,22 @@
   <div class="overflow-hidden rounded-lg bg-white shadow-sm">
     <!-- Imagen de la historia si existe -->
     <div v-if="story.images && story.images.length > 0" class="h-48 w-full overflow-hidden">
-      <img
+      <NuxtImg
         :src="story.images[0]"
         :alt="story.title"
         class="h-full w-full transform object-cover transition-transform duration-300 hover:scale-105"
-      >
+      />
     </div>
 
     <!-- Información de la mascota adoptada -->
     <div v-if="story.pet" class="flex items-center bg-emerald-50 p-3">
       <div class="mr-3 h-12 w-12 overflow-hidden rounded-full">
-        <img
+        <NuxtImg
           v-if="story.pet.image"
           :src="story.pet.image"
           :alt="story.pet.name"
           class="h-full w-full object-cover"
-        >
+        />
         <div v-else class="flex h-full w-full items-center justify-center bg-emerald-100">
           <Icon name="ph:paw-print" class="text-emerald-500" size="20px" />
         </div>
@@ -40,12 +40,12 @@
       <div class="mt-4 flex items-center justify-between">
         <div class="flex items-center">
           <div class="mr-2 h-8 w-8 overflow-hidden rounded-full">
-            <img
+            <NuxtImg
               v-if="story.user?.photoURL"
               :src="story.user.photoURL"
               :alt="story.user.displayName"
               class="h-full w-full object-cover"
-            >
+            />
             <div v-else class="flex h-full w-full items-center justify-center bg-emerald-100">
               <span class="text-xs font-semibold text-emerald-600">
                 {{ story.user?.displayName?.charAt(0).toUpperCase() || 'U' }}

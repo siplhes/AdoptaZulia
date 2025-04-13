@@ -24,3 +24,12 @@ logs
 !.env.example
 .github
 pages/nosotros/index.vue
+
+# Firebase service account keys
+*firebase*.json
+*firebase*-service-account*.json
+*-service-account*.json
+*service-account*.json
+CW1hZvYcYm8CG9jWnEejyrWgtgby51P7UVdz1Mg2CWe5SGs.json
+# Exception for Firebase rules which should be tracked
+!firebase.rules.json

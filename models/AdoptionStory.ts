@@ -1,6 +1,3 @@
-/**
- * Interface que define la estructura de una historia de adopción
- */
 export interface AdoptionStory {
   id?: string
   title: string
@@ -14,8 +11,6 @@ export interface AdoptionStory {
   featured?: boolean
   approved?: boolean
   tags?: string[]
-
-  // Relaciones (datos enriquecidos)
   pet?: {
     id: string
     name: string

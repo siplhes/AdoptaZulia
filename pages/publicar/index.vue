@@ -335,6 +335,8 @@
                   alt="Vista previa"
                   class="h-full w-full object-cover"
                   loading="lazy"
+                  sizes="96px"
+                  placeholder
                 />
                 <PlusIcon v-else class="h-8 w-8 text-gray-300" />
               </div>
@@ -369,7 +371,14 @@
                 :key="index"
                 class="relative h-24 w-24 overflow-hidden rounded-lg border-2 border-solid border-emerald-500"
               >
-                <NuxtImg :src="preview" alt="Vista previa" class="h-full w-full object-cover"  loading="lazy"/>
+                <NuxtImg 
+                  :src="preview" 
+                  alt="Vista previa" 
+                  class="h-full w-full object-cover"  
+                  loading="lazy"
+                  sizes="96px"
+                  placeholder
+                />
                 <button
                   type="button"
                   class="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white"

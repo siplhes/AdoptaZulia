@@ -18,6 +18,7 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode',
     'nuxt-vuefire',
     'nuxt-paypal',
+    'nuxt-booster'
   ],
 
   // Variables de entorno públicas y privadas
@@ -45,6 +46,8 @@ export default defineNuxtConfig({
         measurementId: process.env.FIREBASE_MEASUREMENT_ID,
         databaseURL: process.env.FIREBASE_DATABASE_URL,
       },
+      // Admin emails configuration
+      adminEmails: process.env.ADMIN_EMAILS,
     },
   },
 
@@ -77,7 +80,27 @@ export default defineNuxtConfig({
   paypal: {
     clientId: process.env.PAYPAL_CLIENT_ID || 'test',
     currency: 'USD',
+  },
 
+  nitro: {
+    compressPublicAssets: true, // Habilita la compresión Gzip/Brotli
+  },
+
+  tailwindcss: {
+    exposeConfig: true, // Permite personalizar Tailwind
+    config: {
+      purge: ['./components/**/*.{vue,js}', './pages/**/*.vue', './layouts/**/*.vue'], // Elimina CSS no utilizado
+    },
+  },
+
+  build: {
+    optimization: {
+      splitChunks: {
+        layouts: true,
+        pages: true,
+        commons: true,
+      },
+    },
   },
 
   app: {
@@ -102,5 +125,44 @@ export default defineNuxtConfig({
       xxl: 1536,
       '2xl': 1536,
     },
+    domains: ['example.com'], // Agrega dominios permitidos para imágenes externas
+    presets: {
+      default: {
+        modifiers: {
+          format: 'webp', // Convierte imágenes a WebP
+          quality: 75, // Reduce el tamaño manteniendo calidad
+        },
+      },
+    },
   },
+
+  booster: {
+    detection: {
+      performance: true,
+      browserSupport: true
+    },
+  },
+  performanceMetrics: {
+    device: {
+      hardwareConcurrency: { min: 2, max: 48 },
+      deviceMemory: { min: 2 }
+    },
+    timing: {
+      fcp: 800,
+      dcl: 1200
+    }
+  },
+  image: {
+    screens: {
+      default: 320,
+      xxs: 480,
+      xs: 576,
+      sm: 768,
+      md: 996,
+      lg: 1200,
+      xl: 1367,
+      xxl: 1600,
+      '4k': 1921
+    },
+  }
 })
