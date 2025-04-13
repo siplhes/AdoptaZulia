@@ -52,7 +52,7 @@
           class="overflow-hidden rounded-lg bg-white shadow-md transition-shadow hover:shadow-lg"
         >
           <div class="relative">
-            <NuxtImg :src="pet.image" :alt="pet.name" class="h-64 w-full object-cover" />
+            <NuxtImg :src="pet.image" :alt="pet.name" class="h-64 w-full object-cover"  loading="lazy"/>
             <div class="absolute right-4 top-4 flex space-x-2">
               <span class="rounded-full bg-amber-100 px-3 py-1 text-xs text-amber-800">
                 {{ pet.type }}

@@ -14,6 +14,7 @@
         :alt="pet.name"
         class="h-full w-full object-cover"
         @error="onImageError"
+        loading="lazy"
       />
 
       <button

@@ -50,6 +50,7 @@
                   :src="photoPreview || profileData.photoURL"
                   alt="Foto de perfil"
                   class="h-full w-full object-cover"
+                  loading="lazy"
                 />
                 <div v-else class="flex h-full w-full items-center justify-center bg-emerald-100">
                   <span class="text-3xl font-bold text-emerald-600">

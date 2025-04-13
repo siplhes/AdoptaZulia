@@ -10,6 +10,7 @@
             width="1200"
             alt="Mascotas en adopción"
             class="h-full w-full object-cover opacity-20"
+            loading="lazy"
           />
         </div>
         <div class="relative z-10 max-w-3xl">
@@ -54,120 +55,137 @@
               </button>
             </div>
 
-            <!-- Location Filter -->
-            <div class="mb-6">
-              <h3 class="mb-3 font-medium text-gray-900">Ubicación</h3>
-              <select
-                v-model="filters.location"
-                class="w-full rounded-md border-gray-300 bg-amber-50 p-2 text-amber-950 shadow-sm focus:border-emerald-500 focus:ring focus:ring-emerald-200 focus:ring-opacity-50"
-              >
-                <option value="">Todas las ubicaciones</option>
-                <option v-for="location in locations" :key="location" :value="location">
-                  {{ location }}
-                </option>
-              </select>
-            </div>
-            <!-- Type Filter -->
-            <div class="mb-6">
-              <h3 class="mb-3 font-medium text-gray-900">Tipo de mascota</h3>
-              <div class="space-y-2">
-                <label v-for="type in petTypes" :key="type.value" class="flex items-center">
-                  <input
-                    v-model="filters.types"
-                    type="checkbox"
-                    :value="type.value"
-                    class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                  >
-                  <span class="ml-2 text-gray-700">{{ type.label }}</span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Age Filter -->
-            <div class="mb-6">
-              <h3 class="mb-3 font-medium text-gray-900">Edad</h3>
-              <div class="space-y-2">
-                <label v-for="age in ageRanges" :key="age.value" class="flex items-center">
-                  <input
-                    v-model="filters.ages"
-                    type="checkbox"
-                    :value="age.value"
-                    class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                  >
-                  <span class="ml-2 text-gray-700">{{ age.label }}</span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Size Filter -->
-            <div class="mb-6">
-              <h3 class="mb-3 font-medium text-gray-900">Tamaño</h3>
-              <div class="space-y-2">
-                <label v-for="size in sizes" :key="size.value" class="flex items-center">
-                  <input
-                    v-model="filters.sizes"
-                    type="checkbox"
-                    :value="size.value"
-                    class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                  >
-                  <span class="ml-2 text-gray-700">{{ size.label }}</span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Gender Filter -->
-            <div class="mb-6">
-              <h3 class="mb-3 font-medium text-gray-900">Género</h3>
-              <div class="space-y-2">
-                <label v-for="gender in genders" :key="gender.value" class="flex items-center">
-                  <input
-                    v-model="filters.gender"
-                    type="radio"
-                    :value="gender.value"
-                    class="h-4 w-4 border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                  >
-                  <span class="ml-2 text-gray-700">{{ gender.label }}</span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Additional Filters -->
-            <div class="mb-6">
-              <h3 class="mb-3 font-medium text-gray-900">Características</h3>
-              <div class="space-y-2">
-                <label class="flex items-center">
-                  <input
-                    v-model="filters.vaccinated"
-                    type="checkbox"
-                    class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                  >
-                  <span class="ml-2 text-gray-700">Vacunado</span>
-                </label>
-                <label class="flex items-center">
-                  <input
-                    v-model="filters.neutered"
-                    type="checkbox"
-                    class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                  >
-                  <span class="ml-2 text-gray-700">Esterilizado</span>
-                </label>
-                <label class="flex items-center">
-                  <input
-                    v-model="filters.urgent"
-                    type="checkbox"
-                    class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                  >
-                  <span class="ml-2 text-gray-700">Casos urgentes</span>
-                </label>
-              </div>
-            </div>
-
+            <!-- Botón desplegable para filtros en móviles -->
             <button
-              class="w-full rounded-md bg-emerald-600 py-2 text-white transition-colors hover:bg-emerald-700"
-              @click="applyFilters"
+              class="mb-6 flex items-center justify-between w-full rounded-md bg-emerald-600 px-4 py-2 text-white transition-colors hover:bg-emerald-700 lg:hidden"
+              @click="showFilters = !showFilters"
             >
-              Aplicar filtros
+              <span class="flex items-center">
+                <FilterIcon class="mr-2 h-5 w-5" />
+                {{ showFilters ? 'Ocultar filtros' : 'Mostrar filtros' }}
+              </span>
+              <ChevronDownIcon 
+                class="h-5 w-5 transition-transform duration-200" 
+                :class="{'transform rotate-180': showFilters}"
+              />
             </button>
+
+            <div v-show="showFilters || !isMobile" class="space-y-6">
+              <!-- Location Filter -->
+              <div class="mb-6">
+                <h3 class="mb-3 font-medium text-gray-900">Ubicación</h3>
+                <select
+                  v-model="filters.location"
+                  class="w-full rounded-md border-gray-300 bg-amber-50 p-2 text-amber-950 shadow-sm focus:border-emerald-500 focus:ring focus:ring-emerald-200 focus:ring-opacity-50"
+                >
+                  <option value="">Todas las ubicaciones</option>
+                  <option v-for="location in locations" :key="location" :value="location">
+                    {{ location }}
+                  </option>
+                </select>
+              </div>
+              <!-- Type Filter -->
+              <div class="mb-6">
+                <h3 class="mb-3 font-medium text-gray-900">Tipo de mascota</h3>
+                <div class="space-y-2">
+                  <label v-for="type in petTypes" :key="type.value" class="flex items-center">
+                    <input
+                      v-model="filters.types"
+                      type="checkbox"
+                      :value="type.value"
+                      class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                    >
+                    <span class="ml-2 text-gray-700">{{ type.label }}</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Age Filter -->
+              <div class="mb-6">
+                <h3 class="mb-3 font-medium text-gray-900">Edad</h3>
+                <div class="space-y-2">
+                  <label v-for="age in ageRanges" :key="age.value" class="flex items-center">
+                    <input
+                      v-model="filters.ages"
+                      type="checkbox"
+                      :value="age.value"
+                      class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                    >
+                    <span class="ml-2 text-gray-700">{{ age.label }}</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Size Filter -->
+              <div class="mb-6">
+                <h3 class="mb-3 font-medium text-gray-900">Tamaño</h3>
+                <div class="space-y-2">
+                  <label v-for="size in sizes" :key="size.value" class="flex items-center">
+                    <input
+                      v-model="filters.sizes"
+                      type="checkbox"
+                      :value="size.value"
+                      class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                    >
+                    <span class="ml-2 text-gray-700">{{ size.label }}</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Gender Filter -->
+              <div class="mb-6">
+                <h3 class="mb-3 font-medium text-gray-900">Género</h3>
+                <div class="space-y-2">
+                  <label v-for="gender in genders" :key="gender.value" class="flex items-center">
+                    <input
+                      v-model="filters.gender"
+                      type="radio"
+                      :value="gender.value"
+                      class="h-4 w-4 border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                    >
+                    <span class="ml-2 text-gray-700">{{ gender.label }}</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Additional Filters -->
+              <div class="mb-6">
+                <h3 class="mb-3 font-medium text-gray-900">Características</h3>
+                <div class="space-y-2">
+                  <label class="flex items-center">
+                    <input
+                      v-model="filters.vaccinated"
+                      type="checkbox"
+                      class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                    >
+                    <span class="ml-2 text-gray-700">Vacunado</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input
+                      v-model="filters.neutered"
+                      type="checkbox"
+                      class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                    >
+                    <span class="ml-2 text-gray-700">Esterilizado</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input
+                      v-model="filters.urgent"
+                      type="checkbox"
+                      class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                    >
+                    <span class="ml-2 text-gray-700">Casos urgentes</span>
+                  </label>
+                </div>
+              </div>
+
+              <button
+                class="w-full rounded-md bg-emerald-600 py-2 text-white transition-colors hover:bg-emerald-700"
+                @click="applyFilters"
+              >
+                Aplicar filtros
+              </button>
+            </div>
           </div>
         </div>
 
@@ -222,7 +240,7 @@
               class="overflow-hidden rounded-lg bg-white shadow-md transition-shadow hover:shadow-lg"
             >
               <div class="relative">
-                <NuxtImg :src="pet.image" :alt="pet.name" class="h-64 w-full object-cover" />
+                <NuxtImg :src="pet.image" :alt="pet.name" class="h-64 w-full object-cover"  loading="lazy"/>
                 <div class="absolute right-4 top-4 flex space-x-2">
                   <span class="rounded-full bg-amber-100 px-3 py-1 text-xs text-amber-800">
                     {{ pet.type }}
@@ -336,7 +354,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import {
   SearchIcon,
@@ -346,6 +364,8 @@ import {
   RulerIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  FilterIcon, // Agregar icono de filtro
+  ChevronDownIcon, // Agregar icono de despliegue
 } from 'lucide-vue-next'
 import { usePets } from '~/composables/usePets'
 
@@ -364,6 +384,37 @@ const filters = ref({
   neutered: false,
   urgent: false,
   location: '',
+})
+
+// Estado para controlar la visibilidad de los filtros
+const showFilters = ref(false)
+
+// Detectar si es dispositivo móvil
+const isMobile = ref(false)
+
+// Comprobar el tamaño de la ventana para determinar si es móvil
+const checkIfMobile = () => {
+  isMobile.value = window.innerWidth < 1024 // 1024px es el breakpoint de lg en Tailwind
+}
+
+// Actualizar la variable isMobile cuando cambia el tamaño de la ventana
+onMounted(() => {
+  if (process.client) {
+    checkIfMobile()
+    window.addEventListener('resize', checkIfMobile)
+  }
+})
+
+// Eliminamos el listener cuando se desmonta el componente
+watch(() => route.fullPath, () => {
+  showFilters.value = false
+})
+
+// Limpiar el evento al desmontar el componente
+onBeforeUnmount(() => {
+  if (process.client) {
+    window.removeEventListener('resize', checkIfMobile)
+  }
 })
 
 // Sorting

@@ -1,12 +1,12 @@
 <template>
   <section class="bg-emerald-600">
     <!-- Versión para escritorio -->
-    <header class="mx-auto max-w-4xl px-6 py-4 lg:py-6">
+    <header class="mx-auto max-w-4xl px-6 py-2 lg:py-2">
       <div class="flex flex-wrap items-center justify-between">
         <!-- Logo y título -->
         <NuxtLink to="/" class="flex items-center">
-          <NuxtPicture src="/logo.svg" class="h-12 w-12 text-[#fefffa] lg:h-16 lg:w-16" />
-          <span id="webTitle" class="ml-2">Adopta Zulia</span>
+          <NuxtPicture src="/logo.svg" class="h-12 w-12 text-[#fefffa] lg:h-16 lg:w-16" loading="lazy" />
+          <h1 id="webTitle" class="ml-2">Adopta Zulia</h1>
         </NuxtLink>
 
         <!-- Botón de hamburguesa para móvil -->
@@ -51,6 +51,7 @@
                   :src="user.photoURL" 
                   :alt="user.displayName || 'Usuario'" 
                   class="h-full w-full object-cover"
+                loading="lazy"
                 />
                 <div 
                   v-else 
@@ -291,7 +292,7 @@ const navigationLinksWithoutProfile = computed(() => {
 .nav-link {
   border-radius: 0.5rem;
   padding: 0.5rem 0.75rem;
-  font-size: 1rem;
+  font-size: 1.25rem;
   font-weight: 500;
   color: #fefffa;
   transition-property: all;

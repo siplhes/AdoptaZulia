@@ -8,6 +8,7 @@
           width="1600"
           height="600"
           alt="Mascotas rescatadas"
+          loading="lazy"
           class="h-full w-full object-cover opacity-20"
         />
       </div>
@@ -63,7 +64,20 @@
 
       <section class="mb-16">
         <div class="grid grid-cols-1 gap-8 md:grid-cols-3 justify-center items-center">
-
+       <!--En Especie-->
+          <div
+            class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105"
+          >
+            <h1 class="mb-4 text-xl font-semibold">Donacion en especie</h1>
+            <p class="mb-4 text-gray-600">Realiza una donación de alimentos, medicinas o suministros para nuestras mascotas y para los refugios del estado.</p>
+            <NuxtLink to="/donaciones/especie" class="p-6">
+              <div class="mx-auto bg-emerald-600 text-[#fefffa] p-4 hover:bg-emerald-700 rounded-xl max-w-xs items-center flex justify-center">
+                <span class="ml-2"> Mas detalles</span>
+       
+                <ChevronDownIcon class="h-5 w-5 text-amber-50 transition-transform" />
+              </div>
+            </NuxtLink>
+          </div>
                   <!--PayPal-->
           <div
             class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105"
@@ -79,7 +93,7 @@
             >
               <h1 class="mb-4 text-xl font-semibold">Patreon</h1>
                    <p class="mb-4 text-gray-600">Apadrina a AdoptaZulia y todas las mascotas que ayudamos.</p>
-              <NuxtImg src="/patreon.webp" alt="Patreon" class="mx-auto" />
+              <NuxtImg src="/patreon.webp" alt="Patreon" class="mx-auto" loading="lazy"/>
             </div>
           </NuxtLink>
 
@@ -90,27 +104,13 @@
             >
               <h1 class="mb-4 text-xl font-semibold">Ko-fi</h1>
                      <p class="mb-4 text-gray-600">Compranos un cafe, para poder seguir brindando la ayuda que tanto merecen.</p>
-              <NuxtImg src="/kofi.webp" alt="Ko-fi" class="mx-auto" />
+              <NuxtImg src="/kofi.webp" alt="Ko-fi" class="mx-auto" loading="lazy"/>
             </div>
           </NuxtLink>
 
   
 
-          <!--En Especie-->
-          <div
-            class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105"
-          >
-            <h1 class="mb-4 text-xl font-semibold">Donacion en especie</h1>
-            <p class="mb-4 text-gray-600">Realiza una donación de alimentos, medicinas o suministros para nuestras mascotas.</p>
-            <NuxtLink to="/donaciones/especie">
-              <div class="mx-auto bg-amber-600 text-amber-50 p-2 hover:bg-amber-700 rounded-xl max-w-xs items-center flex justify-center">
-               
-                <span class="ml-2">       Mas detalles</span>
-       
-                <ChevronDownIcon class="h-5 w-5 text-amber-50 transition-transform" />
-              </div>
-            </NuxtLink>
-          </div>
+   
 
 
         </div>

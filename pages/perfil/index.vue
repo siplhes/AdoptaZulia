@@ -66,7 +66,7 @@
                   height="120"
                   :alt="userProfile?.displayName || 'Usuario'"
                   :title="userProfile?.displayName || 'Usuario'"
-      
+      loading="lazy"
                   class="h-24 w-24 rounded-full object-cover shadow-md"
                 />
                 <button

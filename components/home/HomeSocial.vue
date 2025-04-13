@@ -13,7 +13,7 @@
             :key="index"
             :to="social.link"
             target="_blank"
-            class="mx-3 rounded-lg bg-amber-600 p-2 text-[#fefffa] inline-flex items-center justify-center gap-3"
+            class="mx-3 text-lg rounded-lg bg-amber-600 p-4 text-[#fefffa] inline-flex items-center justify-center gap-3"
           >
               <Icon :name="social.iconName" class="text-2xl" size="28px" />  {{ social.name }}
           </NuxtLink>
@@ -32,7 +32,7 @@ const socialLinks = [
   },
   {
     name: 'Facebook',
-    link: 'https://facebook.com/adoptazulia',
+    link: 'https://www.facebook.com/profile.php?id=61574778734797',
     iconName: 'ic:baseline-facebook',
   },
   {
@@ -42,7 +42,7 @@ const socialLinks = [
   },
     {
     name: 'WhatsApp',
-    link: 'https://wa.me/584246123456',
+    link: 'https://wa.me/584146646526',
     iconName: 'mdi:whatsapp',
   },
 

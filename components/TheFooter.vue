@@ -57,49 +57,40 @@ function handleImageError(event) {
           <!-- Redes sociales -->
           <div class="mb-6 flex flex-wrap gap-4">
             <NuxtLink 
-              href="https://www.facebook.com/" 
+              href="https://www.facebook.com/profile.php?id=61574778734797" 
               aria-label="facebook" 
               external 
               target="_blank"
-              class="rounded-full bg-emerald-600 p-2 transition-colors hover:bg-emerald-500"
+              class="rounded-full bg-emerald-600 p-2 transition-colors hover:bg-emerald-500 flex items-center justify-center"
             >
               <Icon name="mdi:facebook" size="24px" />
             </NuxtLink>
             <NuxtLink 
-              href="https://twitter.com/" 
+              href="https://x.com/AdoptaZulia" 
               aria-label="twitter" 
               external 
               target="_blank"
-              class="rounded-full bg-emerald-600 p-2 transition-colors hover:bg-emerald-500"
-            >
+              class="rounded-full bg-emerald-600 p-2 transition-colors hover:bg-emerald-500 flex items-center justify-center"
+             >
               <Icon name="mdi:twitter" size="24px" />
             </NuxtLink>
             <NuxtLink 
-              href="https://instagram.com/" 
+              href="https://instagram.com/adopta.zulia" 
               aria-label="instagram" 
               external 
               target="_blank"
-              class="rounded-full bg-emerald-600 p-2 transition-colors hover:bg-emerald-500"
-            >
+               class="rounded-full bg-emerald-600 p-2 transition-colors hover:bg-emerald-500 flex items-center justify-center"
+             >
               <Icon name="mdi:instagram" size="24px" />
             </NuxtLink>
-            <NuxtLink 
-              href="https://www.youtube.com/" 
-              aria-label="youtube" 
+                      <NuxtLink 
+              href="https://wa.me/584146646526" 
+              aria-label="instagram" 
               external 
               target="_blank"
-              class="rounded-full bg-emerald-600 p-2 transition-colors hover:bg-emerald-500"
-            >
-              <Icon name="mdi:youtube" size="24px" />
-            </NuxtLink>
-            <NuxtLink 
-              href="https://www.linkedin.com/" 
-              aria-label="linkedin" 
-              external 
-              target="_blank"
-              class="rounded-full bg-emerald-600 p-2 transition-colors hover:bg-emerald-500"
-            >
-              <Icon name="mdi:linkedin" size="24px" />
+               class="rounded-full bg-emerald-600 p-2 transition-colors hover:bg-emerald-500 flex items-center justify-center"
+             >
+              <Icon name="mdi:whatsapp" size="24px" />
             </NuxtLink>
           </div>
           
@@ -143,11 +134,6 @@ function handleImageError(event) {
             <li>
               <NuxtLink to="/nosotros" class="transition-colors hover:text-emerald-300">
                 Sobre nosotros
-              </NuxtLink>
-            </li>
-            <li>
-              <NuxtLink to="/contacto" class="transition-colors hover:text-emerald-300">
-                Contáctanos
               </NuxtLink>
             </li>
           </ul>
@@ -204,6 +190,7 @@ function handleImageError(event) {
                 :alt="pet.name" 
                 class="h-20 w-full object-cover"
                 @error="handleImageError"
+                loading="lazy"
               />
             </NuxtLink>
             
@@ -218,6 +205,7 @@ function handleImageError(event) {
                 src="/placeholder.webp" 
                 alt="Adopta una mascota" 
                 class="h-20 w-full object-cover"
+                loading="lazy"
               />
             </NuxtLink>
           </div>

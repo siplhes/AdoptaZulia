@@ -5,6 +5,7 @@
         src="/img2.webp"
         alt="Perros y gatos felices"
         class="h-full w-full object-cover   opacity-20"
+        loading="lazy"
       />
     </div>
     <div class="container relative z-10 mx-auto px-4 py-16 md:py-24">
@@ -13,7 +14,7 @@
           Encuentra tu compañero perfecto
         </h1>
         <p class="mb-8 text-xl text-amber-100 md:text-2xl">
-          Miles de mascotas están esperando un hogar.
+          En el estado Zulia, hay miles de mascotas están esperando un hogar.
           <strong>¡Adopta!</strong>
           no compres y cambia una vida para siempre.
         </p>
