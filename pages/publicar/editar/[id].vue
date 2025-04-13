@@ -1331,10 +1331,17 @@ const uploadNewImages = async () => {
     const fileExtension = mainImageFile.value.name.split('.').pop()
     const mainImageName = `main_${timestamp}.${fileExtension}`
 
+    // Subir imagen principal con optimización
     results.mainImageUrl = await uploadFile(
       mainImageFile.value,
       `pets/${userId}/${petId}`,
-      mainImageName
+      mainImageName,
+      {
+        // Opciones de optimización personalizadas para la imagen principal (mejor calidad)
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1200,
+        quality: 0.85
+      }
     )
   }
 
@@ -1344,7 +1351,18 @@ const uploadNewImages = async () => {
       const file = additionalImageFiles.value[i]
       const fileName = `additional_${timestamp}_${i}.${file.name.split('.').pop()}`
 
-      const url = await uploadFile(file, `pets/${userId}/${petId}`, fileName)
+      // Subir imagen adicional con optimización
+      const url = await uploadFile(
+        file, 
+        `pets/${userId}/${petId}`, 
+        fileName,
+        {
+          // Las imágenes adicionales pueden tener menor calidad para ahorrar espacio
+          maxSizeMB: 0.8,
+          maxWidthOrHeight: 1000,
+          quality: 0.8
+        }
+      )
       results.additionalImageUrls.push(url)
     }
   }

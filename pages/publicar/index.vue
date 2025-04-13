@@ -897,8 +897,19 @@ const uploadImages = async () => {
   const fileExtension = mainImageFile.value.name.split('.').pop()
   const mainImageName = `main.${fileExtension}`
 
-  // Subir la imagen principal a S3
-  const mainImageUrl = await uploadFile(mainImageFile.value, `pets/${userId}`, mainImageName)
+  // Subir la imagen principal a S3 con optimización
+  // La optimización está habilitada por defecto en el composable useS3
+  const mainImageUrl = await uploadFile(
+    mainImageFile.value, 
+    `pets/${userId}`, 
+    mainImageName,
+    {
+      // Opciones de optimización personalizadas para la imagen principal (mejor calidad)
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1200,
+      quality: 0.85
+    }
+  )
 
   // Subir imágenes adicionales
   const additionalImageUrls = []
@@ -906,7 +917,18 @@ const uploadImages = async () => {
     const file = additionalImageFiles.value[i]
     const fileName = `additional_${i}.${file.name.split('.').pop()}`
 
-    const url = await uploadFile(file, `pets/${userId}`, fileName)
+    // Subir imagen adicional con optimización
+    const url = await uploadFile(
+      file, 
+      `pets/${userId}`, 
+      fileName,
+      {
+        // Las imágenes adicionales pueden tener menor calidad para ahorrar espacio
+        maxSizeMB: 0.8,
+        maxWidthOrHeight: 1000,
+        quality: 0.8
+      }
+    )
     additionalImageUrls.push(url)
   }
 
