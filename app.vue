@@ -27,8 +27,8 @@ useHead({
   link: [
     {
       rel: 'icon',
-      type: 'image/png',
-      href: '/favicon.png',
+      type: 'image/svg+xml',
+      href: '/favicon.svg',
     },
   ],
   script: [
@@ -40,6 +40,7 @@ useHead({
   ]
 })
 
+/*
 onMounted(() => {
   const loadKofiWidget = () => {
     if (typeof window !== 'undefined' && window.kofiWidgetOverlay) {
@@ -56,4 +57,5 @@ onMounted(() => {
   
   setTimeout(loadKofiWidget, 1000);
 })
+*/
 </script>
