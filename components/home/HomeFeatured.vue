@@ -99,7 +99,7 @@ const loadFeaturedPets = async () => {
   error.value = null
   
   try {
-    const featured = await fetchFeaturedPets(3)
+    const featured = await fetchFeaturedPets(4)
     
     if (featured && featured.length > 0) {
       featuredPets.value = featured
