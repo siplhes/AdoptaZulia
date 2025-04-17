@@ -42,7 +42,7 @@
           <div class="mr-2 h-8 w-8 overflow-hidden rounded-full">
             <NuxtImg
               v-if="story.user?.photoURL"
-              :src="story.user.photoURL"
+              :src="story.user?.photoURL"
               :alt="story.user.displayName"
               class="h-full w-full object-cover"
             />

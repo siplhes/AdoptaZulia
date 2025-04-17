@@ -254,8 +254,17 @@
                   <span class="rounded-full bg-amber-100 px-3 py-1 text-xs text-amber-800">
                     {{ pet.type }}
                   </span>
+                  <!-- Mostrar etiqueta de adoptado en lugar de urgente si está adoptada -->
                   <span
-                    v-if="pet.urgent"
+                    v-if="pet.status === 'adopted'"
+                    class="flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs text-blue-800"
+                  >
+                    <Icon name="heroicons:check-circle" class="mr-1 h-3 w-3" />
+                    Adoptado
+                  </span>
+                  <!-- Mostrar etiqueta de urgente solo si no está adoptada -->
+                  <span
+                    v-else-if="pet.urgent"
                     class="flex items-center rounded-full bg-red-100 px-3 py-1 text-xs text-red-800"
                   >
                     <AlertCircleIcon class="mr-1 h-3 w-3" />
@@ -304,9 +313,14 @@
 
                 <a
                   :href="`/mascotas/${pet.id}`"
-                  class="block w-full rounded-lg bg-emerald-600 py-2 text-center font-medium text-white transition-colors hover:bg-emerald-700"
+                  class="block w-full rounded-lg py-2 text-center font-medium transition-colors"
+                  :class="[
+                    pet.status === 'adopted'
+                      ? 'bg-gray-400 text-white cursor-default'
+                      : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                  ]"
                 >
-                  Ver detalles
+                  {{ pet.status === 'adopted' ? 'Mascota adoptada' : 'Ver detalles' }}
                 </a>
               </div>
             </div>
@@ -408,7 +422,7 @@ const checkIfMobile = () => {
 
 // Actualizar la variable isMobile cuando cambia el tamaño de la ventana
 onMounted(() => {
-  if (process.client) {
+  if (import.meta.client) {
     checkIfMobile()
     window.addEventListener('resize', checkIfMobile)
   }
@@ -421,7 +435,7 @@ watch(() => route.fullPath, () => {
 
 // Limpiar el evento al desmontar el componente
 onBeforeUnmount(() => {
-  if (process.client) {
+  if (import.meta.client) {
     window.removeEventListener('resize', checkIfMobile)
   }
 })

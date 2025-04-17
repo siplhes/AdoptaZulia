@@ -71,7 +71,6 @@ export default defineNuxtConfig({
     admin: false,
     appCheck: {
       provider: 'reCaptcha', // Si usamos reCaptcha para AppCheck
-      debug: process.env.NODE_ENV !== 'production',
     },
   },
 
@@ -83,13 +82,13 @@ export default defineNuxtConfig({
   },
 
   nitro: {
-    compressPublicAssets: true, // Habilita la compresión Gzip/Brotli
+    compressPublicAssets: true,
   },
 
   tailwindcss: {
-    exposeConfig: true, // Permite personalizar Tailwind
+    exposeConfig: true,
     config: {
-      purge: ['./components/**/*.{vue,js}', './pages/**/*.vue', './layouts/**/*.vue'], // Elimina CSS no utilizado
+      purge: ['./components/**/*.{vue,js}', './pages/**/*.vue', './layouts/**/*.vue'],
     },
   },
 
@@ -125,12 +124,12 @@ export default defineNuxtConfig({
       xxl: 1536,
       '2xl': 1536,
     },
-    domains: ['example.com'], // Agrega dominios permitidos para imágenes externas
+    domains: ['example.com'],
     presets: {
       default: {
         modifiers: {
-          format: 'webp', // Convierte imágenes a WebP
-          quality: 75, // Reduce el tamaño manteniendo calidad
+          format: 'webp', 
+          quality: 75,
         },
       },
     },

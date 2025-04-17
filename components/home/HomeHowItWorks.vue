@@ -15,7 +15,7 @@
             <div
               class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-amber-600"
             >
-              <component :is="step.icon" class="h-12 w-12 text-amber-50" />
+              <Icon :name="step.icon" class="h-12 w-12 text-amber-50" />
             </div>
             <div
               v-if="index < howItWorks.length - 1"
@@ -33,24 +33,22 @@
 </template>
 
 <script setup>
-import { SearchIcon, HeartIcon, HomeIcon } from 'lucide-vue-next'
-
 // How it works steps
 const howItWorks = [
   {
-    icon: SearchIcon,
+    icon: 'mdi:magnify',
     title: 'Busca',
     description:
       'Explora nuestra base de datos de mascotas disponibles para adopción y filtra según tus preferencias.',
   },
   {
-    icon: HeartIcon,
+    icon: 'mdi:heart',
     title: 'Conecta',
     description:
       'Contacta con el refugio o propietario y programa una visita para conocer a tu posible mascota.',
   },
   {
-    icon: HomeIcon,
+    icon: 'mdi:home',
     title: 'Adopta',
     description:
       'Completa el proceso de adopción y dale a una mascota un hogar lleno de amor para siempre.',

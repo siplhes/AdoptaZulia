@@ -87,7 +87,7 @@
           <div class="rounded-md bg-green-50 p-4">
             <div class="flex">
               <div class="flex-shrink-0">
-                <CheckCircleIcon class="h-5 w-5 text-green-400" />
+                <Icon name="mdi:check-circle" class="h-5 w-5 text-green-400" />
               </div>
               <div class="ml-3">
                 <h3 class="text-sm font-medium text-green-800">Correo enviado</h3>
@@ -251,7 +251,6 @@
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '~/composables/useAuth'
-import { CheckCircleIcon } from 'lucide-vue-next'
 
 definePageMeta({
   layout: 'auth',

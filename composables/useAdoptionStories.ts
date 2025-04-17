@@ -80,6 +80,7 @@ export function useAdoptionStories() {
 
   /**
    * Obtiene las historias de adopción destacadas
+   * Si no hay suficientes historias destacadas, se completan con las más recientes
    */
   async function fetchFeaturedStories(limit: number = 3): Promise<AdoptionStory[]> {
     loading.value = true
@@ -94,37 +95,51 @@ export function useAdoptionStories() {
       const snapshot = await get(storiesRef)
 
       if (snapshot.exists()) {
-        const storiesData: AdoptionStory[] = []
+        const featuredStoriesData: AdoptionStory[] = []
+        const regularStoriesData: AdoptionStory[] = []
         const rawData = snapshot.val()
 
-        // Convertimos los datos en un array y añadimos el ID
+        // Clasificamos las historias en destacadas y regulares
         for (const [id, data] of Object.entries(rawData)) {
           const storyData = data as any
+          const storyObj = {
+            id,
+            petId: storyData.petId,
+            userId: storyData.userId,
+            title: storyData.title || '',
+            content: storyData.content || '',
+            images: storyData.images || [],
+            featured: storyData.featured || false,
+            likes: storyData.likes || 0,
+            createdAt: storyData.createdAt || Date.now(),
+            updatedAt: storyData.updatedAt || storyData.createdAt || Date.now(),
+          }
+          
           if (storyData.featured) {
-            storiesData.push({
-              id,
-              petId: storyData.petId,
-              userId: storyData.userId,
-              title: storyData.title || '',
-              content: storyData.content || '',
-              images: storyData.images || [],
-              featured: true,
-              likes: storyData.likes || 0,
-              createdAt: storyData.createdAt || Date.now(),
-              updatedAt: storyData.updatedAt || storyData.createdAt || Date.now(),
-            })
+            featuredStoriesData.push(storyObj)
+          } else {
+            regularStoriesData.push(storyObj)
           }
         }
 
+        // Ordenamos ambas listas por fecha (más recientes primero)
+        featuredStoriesData.sort((a, b) => b.createdAt - a.createdAt)
+        regularStoriesData.sort((a, b) => b.createdAt - a.createdAt)
+
+        // Si no hay suficientes historias destacadas, añadimos las más recientes
+        let resultStories = [...featuredStoriesData]
+        if (resultStories.length < limit) {
+          resultStories = [...resultStories, ...regularStoriesData.slice(0, limit - resultStories.length)]
+        } else {
+          // Si hay más destacadas que el límite, tomamos solo las más recientes
+          resultStories = resultStories.slice(0, limit)
+        }
+
         // Enriquecemos los datos con información de mascotas y usuarios
-        await enrichStoriesData(storiesData)
+        await enrichStoriesData(resultStories)
 
-        // Ordenamos por fecha de creación (más recientes primero) y limitamos
-        storiesData.sort((a, b) => b.createdAt - a.createdAt)
-        const limitedStories = storiesData.slice(0, limit)
-
-        featuredStories.value = limitedStories
-        return limitedStories
+        featuredStories.value = resultStories
+        return resultStories
       } else {
         featuredStories.value = []
         return []

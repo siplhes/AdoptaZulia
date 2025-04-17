@@ -26,7 +26,7 @@
           </div>
           <div class="mb-4">
             <div class="mb-2 flex text-amber-400">
-              <StarIcon v-for="i in 5" :key="i" class="h-5 w-5" />
+              <Icon v-for="i in 5" :key="i" name="mdi:star" class="h-5 w-5" />
             </div>
             <p class="italic text-gray-700">{{ testimonial.quote }}</p>
           </div>
@@ -51,7 +51,6 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { StarIcon } from 'lucide-vue-next'
 import { usePets } from '~/composables/usePets'
 
 const { fetchAdoptionStories } = usePets()

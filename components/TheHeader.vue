@@ -26,7 +26,10 @@
           >
             {{ link.name }}
           </NuxtLink>
-          <div v-if="isAuthenticated" class="relative">
+          <div v-if="isAuthenticated" class="relative flex items-center">
+            <!-- Componente de notificaciones -->
+            <NotificationsPanel class="mr-4" />
+            
             <button 
               class="flex items-center space-x-2 focus:outline-none"
               aria-haspopup="true"
@@ -53,7 +56,7 @@
             </button>
             <div 
               v-show="userMenuOpen"
-              class="absolute right-0 mt-2 w-48 rounded-md bg-white py-2 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+              class="absolute right-0 top-12 mt-2 w-48 rounded-md bg-white py-2 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
               role="menu"
             >
               <NuxtLink 
@@ -62,7 +65,22 @@
                 role="menuitem"
                 @click="userMenuOpen = false"
               >
-                {{user.userName || user.displayName || user.email}}
+                <span class="flex items-center">
+                  <Icon name="heroicons:user" class="mr-2 h-4 w-4" />
+                  Mi perfil
+                </span>
+              </NuxtLink>
+              
+              <NuxtLink 
+                to="/mis-publicaciones" 
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" 
+                role="menuitem"
+                @click="userMenuOpen = false"
+              >
+                <span class="flex items-center">
+                  <Icon name="heroicons:photo" class="mr-2 h-4 w-4" />
+                  Mis publicaciones
+                </span>
               </NuxtLink>
               
               <NuxtLink 
@@ -71,7 +89,10 @@
                 role="menuitem"
                 @click="userMenuOpen = false"
               >
-                Configuración
+                <span class="flex items-center">
+                  <Icon name="heroicons:cog-6-tooth" class="mr-2 h-4 w-4" />
+                  Configuración
+                </span>
               </NuxtLink>
 
               <div v-if="isAdmin" class="border-t border-gray-100 my-1"/>
@@ -83,7 +104,10 @@
                 role="menuitem"
                 @click="userMenuOpen = false"
               >
-                Panel de administración
+                <span class="flex items-center">
+                  <Icon name="heroicons:shield-check" class="mr-2 h-4 w-4" />
+                  Panel de administración
+                </span>
               </NuxtLink>
 
               <div class="border-t border-gray-100 my-1"/>
@@ -93,7 +117,10 @@
                 role="menuitem"
                 @click="handleLogout"
               >
-                Cerrar sesión
+                <span class="flex items-center">
+                  <Icon name="heroicons:arrow-right-on-rectangle" class="mr-2 h-4 w-4" />
+                  Cerrar sesión
+                </span>
               </button>
             </div>
           </div>

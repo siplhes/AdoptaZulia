@@ -230,12 +230,14 @@ import { useAuth } from '~/composables/useAuth'
 import { useAdoptionStories } from '~/composables/useAdoptionStories'
 import { usePets } from '~/composables/usePets'
 import { useS3 } from '~/composables/useS3'
+import { useFirebaseApp } from 'vuefire'
+import { getDatabase, ref as dbRef, query, orderByChild, equalTo, get } from 'firebase/database'
 
 // Router y composables
 const router = useRouter()
 const { user, isAuthenticated } = useAuth()
-const { createAdoptionStory } = useAdoptionStories()
-const { fetchUserAdoptedPets, fetchUserPets } = usePets()
+const { createStory } = useAdoptionStories()
+const { fetchUserPets } = usePets()
 const { uploadImage } = useS3()
 
 // Redireccionar si no está autenticado
@@ -274,14 +276,58 @@ const checkUserAdoptions = async () => {
   isCheckingAdoptions.value = true
 
   try {
-    // Obtener mascotas adoptadas por el usuario
-    const pets = await fetchUserAdoptedPets(user.value.uid)
-    adoptedPets.value = pets || []
+    const firebaseApp = useFirebaseApp()
+    const db = getDatabase(firebaseApp)
+    const adoptionsRef = dbRef(db, 'adoptions')
 
-    // Verificar si tiene adopciones
-    hasAdoptions.value = pets && pets.length > 0
+    // Buscar adopciones completadas del usuario
+    const adoptionsQuery = query(
+      adoptionsRef,
+      orderByChild('userId'),
+      equalTo(user.value.uid)
+    )
+
+    const snapshot = await get(adoptionsQuery)
+    const completedAdoptions = []
+
+    if (snapshot.exists()) {
+      snapshot.forEach((childSnapshot) => {
+        const adoption = childSnapshot.val()
+        if (adoption.status === 'completed') {
+          completedAdoptions.push({
+            id: childSnapshot.key,
+            ...adoption
+          })
+        }
+      })
+    }
+
+    // Obtener los detalles de las mascotas adoptadas
+    if (completedAdoptions.length > 0) {
+      const pets = []
+      for (const adoption of completedAdoptions) {
+        const petRef = dbRef(db, `pets/${adoption.petId}`)
+        const petSnapshot = await get(petRef)
+        if (petSnapshot.exists()) {
+          const petData = petSnapshot.val()
+          pets.push({
+            id: adoption.petId,
+            adoptionId: adoption.id,
+            ...petData
+          })
+        }
+      }
+      adoptedPets.value = pets
+    } else {
+      adoptedPets.value = []
+    }
+
+    // Actualizar el estado de adopciones
+    hasAdoptions.value = adoptedPets.value.length > 0
+
   } catch (err) {
     console.error('Error al verificar adopciones del usuario:', err)
+    error.value = 'Error al verificar tus adopciones'
   } finally {
     isCheckingAdoptions.value = false
   }
@@ -384,13 +430,13 @@ const submitStory = async () => {
     }
 
     // Crear historia
-    const storyId = await createAdoptionStory({
+    const storyId = await createStory({
       title: storyData.value.title,
       content: storyData.value.content,
       userId: user.value.uid,
       petId: storyData.value.petId || null,
       images: imageUrls,
-      createdAt: new Date().toISOString(),
+      createdAt: Date.now(),
     })
 
     // Redirigir a la historia creada

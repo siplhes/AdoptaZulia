@@ -53,7 +53,7 @@
           class="flex flex-col items-center rounded-lg bg-white p-6 shadow-md transition-transform hover:scale-105"
         >
           <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-            <PawPrintIcon class="h-8 w-8 text-emerald-600" />
+            <Icon name="mdi:paw" class="h-8 w-8 text-emerald-600" />
           </div>
           <h3 class="mb-2 text-xl font-semibold text-emerald-800">Gestionar Mascotas</h3>
           <p class="text-center text-sm text-gray-600">
@@ -66,7 +66,7 @@
           class="flex flex-col items-center rounded-lg bg-white p-6 shadow-md transition-transform hover:scale-105"
         >
           <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
-            <UsersIcon class="h-8 w-8 text-blue-600" />
+            <Icon name="mdi:account-group" class="h-8 w-8 text-blue-600" />
           </div>
           <h3 class="mb-2 text-xl font-semibold text-emerald-800">Gestionar Usuarios</h3>
           <p class="text-center text-sm text-gray-600">
@@ -79,7 +79,7 @@
           class="flex flex-col items-center rounded-lg bg-white p-6 shadow-md transition-transform hover:scale-105"
         >
           <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100">
-            <HeartHandshakeIcon class="h-8 w-8 text-amber-600" />
+            <Icon name="mdi:handshake" class="h-8 w-8 text-amber-600" />
           </div>
           <h3 class="mb-2 text-xl font-semibold text-emerald-800">Adopciones</h3>
           <p class="text-center text-sm text-gray-600">
@@ -92,7 +92,7 @@
           class="flex flex-col items-center rounded-lg bg-white p-6 shadow-md transition-transform hover:scale-105"
         >
           <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-100">
-            <BarChartIcon class="h-8 w-8 text-purple-600" />
+            <Icon name="mdi:chart-bar" class="h-8 w-8 text-purple-600" />
           </div>
           <h3 class="mb-2 text-xl font-semibold text-emerald-800">Estadísticas</h3>
           <p class="text-center text-sm text-gray-600">
@@ -106,7 +106,6 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { PawPrintIcon, UsersIcon, HeartHandshakeIcon, BarChartIcon } from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
 import { useStats } from '~/composables/useStats'
 

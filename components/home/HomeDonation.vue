@@ -14,19 +14,19 @@
             <div class="mb-8 space-y-4">
               <div class="flex items-center">
                 <div class="mr-4 rounded-full bg-emerald-600 p-2">
-                  <HeartIcon class="h-6 w-6 text-white" />
+                  <Icon name="mdi:heart" class="h-6 w-6 text-white" />
                 </div>
                 <p class="text-white">Financiamos tratamientos veterinarios</p>
               </div>
               <div class="flex items-center">
                 <div class="mr-4 rounded-full bg-emerald-600 p-2">
-                  <HomeIcon class="h-6 w-6 text-white" />
+                  <Icon name="mdi:home" class="h-6 w-6 text-white" />
                 </div>
                 <p class="text-white">Mantenemos refugios temporales</p>
               </div>
               <div class="flex items-center">
                 <div class="mr-4 rounded-full bg-emerald-600 p-2">
-                  <TruckIcon class="h-6 w-6 text-white" />
+                  <Icon name="mdi:truck" class="h-6 w-6 text-white" />
                 </div>
                 <p class="text-white">Transportamos animales rescatados</p>
               </div>
@@ -53,5 +53,5 @@
 </template>
 
 <script setup>
-import { HeartIcon, HomeIcon, TruckIcon } from 'lucide-vue-next'
+// No es necesario importar nada para usar el componente Icon de Nuxt
 </script>

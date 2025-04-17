@@ -2,8 +2,8 @@
  * Interface que define la estructura de datos de una mascota
  */
 export interface Pet {
-  id?: string
-  name: string
+  id?: string | any
+  name: string | any
   type: string
   typeValue: string
   breed: string
@@ -16,7 +16,7 @@ export interface Pet {
   description: string
   urgent: boolean
   image: string
-  photos?: string[]
+  photos?: string[] | any
   healthStatus: number
   healthDescription?: string
   vaccinated: boolean

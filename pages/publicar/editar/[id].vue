@@ -467,7 +467,7 @@
                   alt="Vista previa"
                   class="h-full w-full object-cover"
                 />
-                <PlusIcon v-else class="h-8 w-8 text-gray-300" />
+                <Icon v-else name="mdi:plus" class="h-8 w-8 text-gray-300" />
               </div>
               <div>
                 <input
@@ -554,7 +554,7 @@
                 class="flex h-32 w-32 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 hover:border-emerald-300"
                 @click="$refs.additionalImagesInput.click()"
               >
-                <PlusIcon class="h-8 w-8 text-gray-300" />
+                <Icon name="mdi:plus" class="h-8 w-8 text-gray-300" />
               </div>
 
               <input
@@ -913,8 +913,8 @@
               class="rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-2 text-emerald-700 hover:bg-emerald-100"
               @click="previewMode = !previewMode"
             >
-              <EyeIcon v-if="!previewMode" class="mr-1 inline-block h-4 w-4" />
-              <EyeOffIcon v-else class="mr-1 inline-block h-4 w-4" />
+              <Icon v-if="!previewMode" name="mdi:eye" class="mr-1 inline-block h-4 w-4" />
+              <Icon v-else name="mdi:eye-off" class="mr-1 inline-block h-4 w-4" />
               {{ previewMode ? 'Ocultar vista previa' : 'Vista previa' }}
             </button>
 
@@ -1056,16 +1056,26 @@
         </div>
       </form>
     </div>
+
+    <!-- Modal para mensajes -->
+    <ModalAlert
+      :show="showModal"
+      :type="modalType"
+      :title="modalTitle"
+      :message="modalMessage"
+      :confirm-button-text="modalConfirmText"
+      @confirm="closeModal"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { PlusIcon, EyeIcon, EyeOffIcon } from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
 import { usePets } from '~/composables/usePets'
 import { useS3 } from '~/composables/useS3'
+import ModalAlert from '~/components/common/ModalAlert.vue'
 
 // Router y route
 const route = useRoute()
@@ -1092,6 +1102,32 @@ const mainImagePreview = ref('')
 const mainImageFile = ref(null)
 const additionalImagePreviews = ref([])
 const additionalImageFiles = ref([])
+
+// Estados para el modal
+const showModal = ref(false)
+const modalType = ref('info')
+const modalTitle = ref('')
+const modalMessage = ref('')
+const modalConfirmText = ref('Aceptar')
+const modalCallback = ref(null)
+
+// Cerrar el modal
+const closeModal = () => {
+  showModal.value = false
+  if (modalCallback.value) {
+    modalCallback.value()
+    modalCallback.value = null
+  }
+}
+
+// Mostrar alerta en el modal
+const showModalAlert = (type, title, message, confirmText = 'Aceptar') => {
+  modalType.value = type
+  modalTitle.value = title
+  modalMessage.value = message
+  modalConfirmText.value = confirmText
+  showModal.value = true
+}
 
 // Datos de la mascota
 const petData = reactive({
@@ -1204,13 +1240,13 @@ const handleMainImageChange = (event) => {
 
   // Validación de tamaño (max 5MB)
   if (file.size > 5 * 1024 * 1024) {
-    alert('La imagen es demasiado grande. El tamaño máximo es 5MB.')
+    showModalAlert('error', 'Imagen demasiado grande', 'La imagen es demasiado grande. El tamaño máximo es 5MB.')
     return
   }
 
   // Validación de tipo (solo imágenes)
   if (!file.type.startsWith('image/')) {
-    alert('Solo se permiten archivos de imagen.')
+    showModalAlert('error', 'Tipo de archivo no válido', 'Solo se permiten archivos de imagen.')
     return
   }
 
@@ -1232,7 +1268,7 @@ const handleAdditionalImagesChange = (event) => {
   const remainingSlots = 5 - currentAdditionalPhotos - additionalImagePreviews.value.length
 
   if (remainingSlots <= 0) {
-    alert('Ya has alcanzado el límite de 5 fotos adicionales.')
+    showModalAlert('warning', 'Límite de imágenes alcanzado', 'Ya has alcanzado el límite de 5 fotos adicionales.')
     return
   }
 
@@ -1241,13 +1277,13 @@ const handleAdditionalImagesChange = (event) => {
   filesToProcess.forEach((file) => {
     // Validación de tamaño (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert(`La imagen ${file.name} es demasiado grande. El tamaño máximo es 5MB.`)
+      showModalAlert('error', 'Imagen demasiado grande', `La imagen ${file.name} es demasiado grande. El tamaño máximo es 5MB.`)
       return
     }
 
     // Validación de tipo (solo imágenes)
     if (!file.type.startsWith('image/')) {
-      alert(`El archivo ${file.name} no es una imagen.`)
+      showModalAlert('error', 'Tipo de archivo no válido', `El archivo ${file.name} no es una imagen.`)
       return
     }
 

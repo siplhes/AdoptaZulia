@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { PawPrintIcon, HeartIcon, UsersIcon } from 'lucide-vue-next'
 import { usePets } from '~/composables/usePets'
 import { useStats } from '~/composables/useStats'
 
@@ -37,7 +36,7 @@ onMounted(async () => {
   }
 })
 
-function handleImageError(event) {
+function handleImageError(event:any) {
   event.target.src = '/placeholder.webp?height=150&width=150'
 }
 </script>
@@ -145,7 +144,7 @@ function handleImageError(event) {
           <div class="space-y-6">
             <div class="flex items-center">
               <div class="mr-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-600">
-                <PawPrintIcon class="h-6 w-6" />
+                <Icon name="mdi:paw" class="h-6 w-6" />
               </div>
               <div>
                 <p class="text-2xl font-bold">{{ siteStats.totalPets || 1240 }}</p>
@@ -155,7 +154,7 @@ function handleImageError(event) {
             
             <div class="flex items-center">
               <div class="mr-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-600">
-                <HeartIcon class="h-6 w-6" />
+                <Icon name="mdi:heart" class="h-6 w-6" />
               </div>
               <div>
                 <p class="text-2xl font-bold">{{ siteStats.totalAdoptions || 0 }}</p>
@@ -165,7 +164,7 @@ function handleImageError(event) {
             
             <div class="flex items-center">
               <div class="mr-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-600">
-                <UsersIcon class="h-6 w-6" />
+                <Icon name="mdi:account-group" class="h-6 w-6" />
               </div>
               <div>
                 <p class="text-2xl font-bold">{{ siteStats.totalUsers || 3500 }}</p>
@@ -189,8 +188,8 @@ function handleImageError(event) {
                 :src="pet.photos && pet.photos[0] ? pet.photos[0] : '/placeholder.webp'" 
                 :alt="pet.name" 
                 class="h-20 w-full object-cover"
-                @error="handleImageError"
                 loading="lazy"
+                @error="handleImageError"
               />
             </NuxtLink>
             

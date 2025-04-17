@@ -34,7 +34,7 @@
           <div
             class="group-hover:bg-amber-60 mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-amber-50 shadow-md transition-colors"
           >
-            <component :is="category.icon" class="h-12 w-12 text-emerald-600" />
+            <Icon :name="category.icon" class="h-12 w-12 text-emerald-600" />
           </div>
           <h3 class="mb-2 text-xl font-semibold text-[#FEFFFA]">
             {{ category.name }}
@@ -55,10 +55,6 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { DogIcon, CatIcon, RabbitIcon, BirdIcon } from 'lucide-vue-next'
-import { usePets } from '~/composables/usePets'
-
 const { fetchTotalPetsByCategory } = usePets()
 const loading = ref(true)
 const error = ref(null)
@@ -68,28 +64,28 @@ const petCategories = ref([
   {
     name: 'Perros',
     type: 'perro',
-    icon: DogIcon,
+    icon: 'mdi:dog',
     count: 0,
     link: '/mascotas?tipo=perro',
   },
   {
     name: 'Gatos',
     type: 'gato',
-    icon: CatIcon,
+    icon: 'mdi:cat',
     count: 0,
     link: '/mascotas?tipo=gato',
   },
   {
     name: 'Conejos',
     type: 'conejo',
-    icon: RabbitIcon,
+    icon: 'mdi:rabbit',
     count: 0,
     link: '/mascotas?tipo=conejo',
   },
   {
     name: 'Aves',
     type: 'ave',
-    icon: BirdIcon,
+    icon: 'mdi:bird',
     count: 0,
     link: '/mascotas?tipo=ave',
   },

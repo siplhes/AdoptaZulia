@@ -15,7 +15,7 @@
         <div v-if="error" class="rounded-md bg-red-50 p-4">
           <div class="flex items-center">
             <div class="flex-shrink-0">
-              <XCircleIcon class="h-5 w-5 text-red-500" />
+              <Icon name="mdi:close-circle" class="h-5 w-5 text-red-500" />
             </div>
             <div class="ml-3">
               <p class="text-sm text-red-700">{{ error }}</p>
@@ -43,7 +43,7 @@
                   v-else
                   class="flex h-full w-full items-center justify-center text-gray-400"
                 >
-                  <UserIcon class="h-16 w-16" />
+                  <Icon name="mdi:account" class="h-16 w-16" />
                 </div>
               </div>
 
@@ -53,7 +53,7 @@
                   class="inline-flex items-center rounded-md border border-emerald-600 bg-white px-4 py-2 text-sm font-medium text-emerald-600 shadow-sm hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
                   @click="triggerFileInput"
                 >
-                  <UploadIcon class="-ml-1 mr-2 h-5 w-5" />
+                  <Icon name="mdi:upload" class="-ml-1 mr-2 h-5 w-5" />
                   Subir foto
                 </button>
                 <button
@@ -62,7 +62,7 @@
                   class="inline-flex items-center rounded-md border border-red-600 bg-white px-4 py-2 text-sm font-medium text-red-600 shadow-sm hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                   @click="removePhoto"
                 >
-                  <Trash2Icon class="-ml-1 mr-2 h-5 w-5" />
+                  <Icon name="mdi:trash-can" class="-ml-1 mr-2 h-5 w-5" />
                   Eliminar
                 </button>
               </div>
@@ -108,7 +108,7 @@
               class="group relative flex w-full justify-center rounded-md border border-transparent bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
             >
               <span v-if="loading" class="absolute inset-y-0 left-0 flex items-center pl-3">
-                <LoaderIcon class="h-5 w-5 animate-spin text-emerald-400" />
+                <Icon name="mdi:loading" class="h-5 w-5 animate-spin text-emerald-400" />
               </span>
               Completar perfil
             </button>
@@ -120,18 +120,6 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useAuth } from '~/composables/useAuth'
-import { useS3 } from '~/composables/useS3'
-import {
-  UserIcon,
-  XCircleIcon,
-  UploadIcon,
-  Trash2Icon,
-  LoaderIcon,
-} from 'lucide-vue-next'
-
 definePageMeta({
   layout: 'auth',
 })

@@ -23,14 +23,14 @@
             href="/mascotas"
             class="inline-flex items-center justify-center rounded-lg bg-white px-6 py-3 text-lg font-semibold text-emerald-700 transition-colors hover:bg-emerald-50"
           >
-            <SearchIcon class="mr-2 h-5 w-5" />
+            <Icon name="mdi:magnify" class="mr-2 h-5 w-5" />
             Buscar mascotas
           </a>
           <a
             href="/publicar"
             class="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-6 py-3 text-lg font-semibold text-white transition-colors hover:bg-emerald-500"
           >
-            <PlusIcon class="mr-2 h-5 w-5" />
+            <Icon name="mdi:plus" class="mr-2 h-5 w-5" />
             Dar en adopción
           </a>
         </div>
@@ -49,5 +49,5 @@
 </template>
 
 <script setup>
-import { SearchIcon, PlusIcon } from 'lucide-vue-next'
+
 </script>

@@ -8,7 +8,7 @@
 
       <!-- Estado de usuario no autenticado -->
       <div
-        v-if="!isLoggedIn"
+        v-if="!isAuthenticated"
         class="mb-8 rounded-lg border border-amber-200 bg-amber-50 p-6 shadow-md"
       >
         <div class="flex flex-col items-center justify-between sm:flex-row">
@@ -338,7 +338,7 @@
                   sizes="96px"
                   placeholder
                 />
-                <PlusIcon v-else class="h-8 w-8 text-gray-300" />
+                <Icon v-else name="mdi:plus" class="h-8 w-8 text-gray-300" />
               </div>
               <div>
                 <input
@@ -391,7 +391,7 @@
                 class="flex h-24 w-24 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300"
                 @click="$refs.additionalImagesInput.click()"
               >
-                <PlusIcon class="h-8 w-8 text-gray-300" />
+                <Icon name="mdi:plus" class="h-8 w-8 text-gray-300" />
               </div>
 
               <input
@@ -692,26 +692,32 @@
         </div>
       </form>
     </div>
+    
+    <!-- Modal para mensajes -->
+    <ModalAlert
+      :show="showModal"
+      :type="modalType"
+      :title="modalTitle"
+      :message="modalMessage"
+      :confirm-button-text="modalConfirmText"
+      @confirm="closeModal"
+    />
   </div>
 </template>
 
 <script setup>
 import { useRouter } from 'vue-router'
-import { PlusIcon } from 'lucide-vue-next'
+import { ref, reactive, onMounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 import { usePets } from '~/composables/usePets'
 import { useS3 } from '~/composables/useS3'
-
-// Definir middleware de autenticación para esta página
-definePageMeta({
-  middleware: ['auth']
-})
+import ModalAlert from '~/components/common/ModalAlert.vue'
 
 // Router
 const router = useRouter()
 
 // Composables
-const { user, isLoggedIn } = useAuth()
+const { user, isAuthenticated } = useAuth()
 const { createPet, loading, error } = usePets()
 
 // Referencias para el input de archivos
@@ -798,13 +804,13 @@ const handleMainImageChange = (event) => {
 
   // Validación de tamaño (max 5MB)
   if (file.size > 5 * 1024 * 1024) {
-    alert('La imagen es demasiado grande. El tamaño máximo es 5MB.')
+    showModalAlert('error', 'Imagen demasiado grande', 'La imagen es demasiado grande. El tamaño máximo es 5MB.')
     return
   }
 
   // Validación de tipo (solo imágenes)
   if (!file.type.startsWith('image/')) {
-    alert('Solo se permiten archivos de imagen.')
+    showModalAlert('error', 'Tipo de archivo no válido', 'Solo se permiten archivos de imagen.')
     return
   }
 
@@ -828,13 +834,13 @@ const handleAdditionalImagesChange = (event) => {
   filesToProcess.forEach((file) => {
     // Validación de tamaño (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert(`La imagen ${file.name} es demasiado grande. El tamaño máximo es 5MB.`)
+      showModalAlert('error', 'Imagen demasiado grande', `La imagen ${file.name} es demasiado grande. El tamaño máximo es 5MB.`)
       return
     }
 
     // Validación de tipo (solo imágenes)
     if (!file.type.startsWith('image/')) {
-      alert(`El archivo ${file.name} no es una imagen.`)
+      showModalAlert('error', 'Tipo de archivo no válido', `El archivo ${file.name} no es una imagen.`)
       return
     }
 
@@ -951,7 +957,7 @@ const uploadImages = async () => {
 // Guardar como borrador (a implementar)
 const saveAsDraft = async () => {
   // Esta función se implementará más adelante
-  alert('Función no implementada todavía')
+  showModalAlert('info', 'Función no disponible', 'Esta función no está implementada todavía')
 }
 
 // Enviar formulario
@@ -959,7 +965,7 @@ const submitForm = async () => {
   try {
     // Validar imagen principal
     if (!mainImageFile.value) {
-      alert('Debes subir al menos una imagen principal')
+      showModalAlert('warning', 'Imagen requerida', 'Debes subir al menos una imagen principal')
       return
     }
 
@@ -981,13 +987,40 @@ const submitForm = async () => {
     const petId = await createPet(petToSave)
 
     // Mostrar mensaje de éxito
-    alert('Mascota publicada correctamente')
-
-    // Redirigir a la página de detalle de la mascota
-    router.push(`/mascotas/${petId}`)
+    showModalAlert('success', '¡Publicación exitosa!', 'Mascota publicada correctamente', 'Ver mascota')
+    
+    // Establecer un callback para redirigir después de cerrar el modal
+    modalCallback.value = () => router.push(`/mascotas/${petId}`)
   } catch (err) {
     console.error('Error al publicar mascota:', err)
     error.value = 'Error al publicar la mascota. Por favor, inténtalo de nuevo.'
+    showModalAlert('error', 'Error', 'Error al publicar la mascota. Por favor, inténtalo de nuevo.')
   }
+}
+
+// Estados para el modal
+const showModal = ref(false)
+const modalType = ref('info')
+const modalTitle = ref('')
+const modalMessage = ref('')
+const modalConfirmText = ref('Aceptar')
+const modalCallback = ref(null)
+
+// Cerrar el modal
+const closeModal = () => {
+  showModal.value = false
+  if (modalCallback.value) {
+    modalCallback.value()
+    modalCallback.value = null
+  }
+}
+
+// Mostrar alerta en el modal
+const showModalAlert = (type, title, message, confirmText = 'Aceptar') => {
+  modalType.value = type
+  modalTitle.value = title
+  modalMessage.value = message
+  modalConfirmText.value = confirmText
+  showModal.value = true
 }
 </script>

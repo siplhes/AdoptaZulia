@@ -2,7 +2,7 @@
   <div class="mt-4 rounded-md border-l-4 border-red-500 bg-red-50 p-4">
     <div class="flex">
       <div class="flex-shrink-0">
-        <ShieldAlertIcon class="h-5 w-5 text-red-600" aria-hidden="true" />
+        <Icon name="mdi:shield-alert" class="h-5 w-5 text-red-600" aria-hidden="true" />
       </div>
       <div class="ml-3">
         <h3 class="text-sm font-medium text-red-800">
@@ -27,8 +27,6 @@
 </template>
 
 <script setup>
-import { ShieldAlertIcon } from 'lucide-vue-next'
-
 defineProps({
   title: {
     type: String,

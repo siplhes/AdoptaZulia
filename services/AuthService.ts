@@ -20,7 +20,6 @@ import { useFirebaseApp } from 'vuefire'
 import { useRuntimeConfig } from '#app'
 import type { UserData } from '~/models/User'
 
-// Definimos el tipo User basado en la estructura de Firebase
 type User = UserInfo & {
   uid: string
   email: string
@@ -38,33 +37,25 @@ export class AuthService {
   private adminEmails: string[] = []
 
   constructor() {
-    // Load admin emails from runtime config when the service is instantiated
     try {
       const config = useRuntimeConfig()
       if (config.public.adminEmails) {
         this.adminEmails = config.public.adminEmails.split(',').map((email: string) => email.trim().toLowerCase())
       } else {
-        // Fallback to default admin emails if not configured
         this.adminEmails = ['admin@adoptazulia.com', 'soporte@adoptazulia.com'] 
       }
     } catch (error) {
       console.error('Error loading admin emails from config:', error)
-      // Fallback to default admin emails
       this.adminEmails = ['admin@adoptazulia.com', 'soporte@adoptazulia.com']
     }
   }
 
-  /**
-   * Obtiene la instancia de Firebase Auth
-   */
   private getAuthInstance() {
-    // Usar vuefire para obtener la aplicación Firebase inicializada
     try {
       const firebaseApp = useFirebaseApp()
       return getAuth(firebaseApp)
     } catch (error) {
       console.error('Error obteniendo la instancia de Auth:', error)
-      // Fallback: intentar obtener la app directamente
       const firebaseApp = getApps().length > 0 ? getApp() : null
       if (!firebaseApp) {
         throw new Error('Firebase no está inicializado')
@@ -72,17 +63,12 @@ export class AuthService {
       return getAuth(firebaseApp)
     }
   }
-
-  /**
-   * Obtiene la instancia de Firebase Database
-   */
   private getDatabaseInstance() {
     try {
       const firebaseApp = useFirebaseApp()
       return getDatabase(firebaseApp)
     } catch (error) {
       console.error('Error obteniendo la instancia de Database:', error)
-      // Fallback: intentar obtener la app directamente
       const firebaseApp = getApps().length > 0 ? getApp() : null
       if (!firebaseApp) {
         throw new Error('Firebase no está inicializado')
@@ -90,10 +76,6 @@ export class AuthService {
       return getDatabase(firebaseApp)
     }
   }
-
-  /**
-   * Registra un nuevo usuario con email y contraseña
-   */
   async register(
     email: string,
     password: string,
@@ -103,19 +85,13 @@ export class AuthService {
     const auth = this.getAuthInstance()
 
     try {
-      // Establecer persistencia para que la sesión se mantenga entre recargas
       await setPersistence(auth, browserLocalPersistence)
-
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
-
-      // Actualizar el nombre de usuario
       if (auth.currentUser) {
         await updateProfile(auth.currentUser, {
           displayName,
         })
       }
-
-      // Guardar datos de usuario en RTDB
       await this.saveUserData(userCredential.user.uid, {
         userName,
         displayName,
@@ -124,17 +100,12 @@ export class AuthService {
         createdAt: Date.now(),
         lastLogin: Date.now(),
       })
-
       return userCredential.user
     } catch (error) {
       console.error('Error registrando usuario:', error)
       throw error
     }
   }
-
-  /**
-   * Inicia sesión con email y contraseña
-   */
   async login(email: string, password: string): Promise<User> {
     const auth = this.getAuthInstance()
 

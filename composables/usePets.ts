@@ -100,6 +100,39 @@ export function usePets() {
   }
 
   /**
+   * Actualiza el estado de una mascota (disponible, adoptada, perdida, etc.)
+   */
+  async function updatePetStatus(
+    petId: string, 
+    status: 'available' | 'adopted' | 'lost' | 'found', 
+    adoptedBy?: string
+  ): Promise<boolean> {
+    loading.value = true
+    error.value = null
+
+    try {
+      const updates: Partial<Pet> = { status }
+      
+      // Si se proporciona adoptedBy, añadirlo a las actualizaciones
+      if (status === 'adopted' && adoptedBy) {
+        updates.adoptedBy = adoptedBy
+        updates.adoptionDate = new Date().toISOString()
+      }
+      
+      // Actualizar la mascota usando la función existente
+      const success = await updatePet(petId, updates)
+      
+      return success
+    } catch (err: any) {
+      console.error(`Error al actualizar el estado de la mascota ${petId}:`, err)
+      error.value = 'Error al actualizar el estado de la mascota'
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
    * Elimina una mascota
    */
   async function deletePet(id: string): Promise<boolean> {
@@ -221,31 +254,37 @@ export function usePets() {
   }
 
   /**
-   * Obtiene las mascotas destacadas (urgentes y más antiguas)
+   * Obtiene las mascotas destacadas (urgentes primero, luego las más recientes)
    */
   async function fetchFeaturedPets(limit: number = 3): Promise<Pet[]> {
     loading.value = true
     error.value = null
 
     try {
-      // Obtener todas las mascotas
+      // Obtener todas las mascotas disponibles
       const allPets = await petService.getAllPets()
+      const availablePets = allPets.filter(pet => pet.status === 'available' || !pet.status)
 
-      // Filtrar por urgentes primero, luego por fecha de creación (más antiguas)
-      const urgentPets = allPets
-        .filter((pet) => pet.urgent && pet.status === 'available')
-        .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+      // Separar mascotas urgentes y no urgentes
+      const urgentPets = availablePets
+        .filter(pet => pet.urgent)
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) // Más recientes primero
 
-      // Si no hay suficientes urgentes, completar con otras mascotas ordenadas por fecha
-      if (urgentPets.length < limit) {
-        const nonUrgentPets = allPets
-          .filter((pet) => !pet.urgent && pet.status === 'available')
-          .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+      const nonUrgentPets = availablePets
+        .filter(pet => !pet.urgent)
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) // Más recientes primero
 
-        return [...urgentPets, ...nonUrgentPets].slice(0, limit)
+      // Combinar ambos arrays: primero las urgentes, luego completar con no urgentes hasta el límite
+      let result = [...urgentPets]
+      
+      if (result.length < limit) {
+        result = [...result, ...nonUrgentPets.slice(0, limit - result.length)]
+      } else {
+        // Si hay más urgentes que el límite, mostrar solo las más recientes
+        result = result.slice(0, limit)
       }
 
-      return urgentPets.slice(0, limit)
+      return result
     } catch (err: any) {
       console.error('Error al obtener mascotas destacadas:', err)
       error.value = 'Error al obtener las mascotas destacadas'
@@ -344,6 +383,7 @@ export function usePets() {
     fetchPetsByIds,
     createPet,
     updatePet,
+    updatePetStatus,
     deletePet,
     searchPets,
     filterPets,

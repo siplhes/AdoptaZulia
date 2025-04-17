@@ -292,7 +292,7 @@ const {
   error: authError,
   isAuthenticated,
 } = useAuth()
-const { uploadImage } = useS3()
+const { uploadFile } = useS3() // Corregido: desestructurar uploadFile en lugar de uploadImage
 
 // Estado local
 const loading = ref(false)
@@ -409,7 +409,7 @@ const saveChanges = async () => {
 
     // Si hay una nueva foto, subirla primero
     if (photoFile.value) {
-      photoURL = await uploadImage(photoFile.value, 'profile-photos')
+      photoURL = await uploadFile(photoFile.value, 'profile-photos', `profile_${Date.now()}.jpg`)
     }
 
     // Actualizar perfil

@@ -1,163 +1,260 @@
 <template>
   <div
-    class="overflow-hidden rounded-lg bg-white shadow-md transition-shadow duration-300 hover:shadow-lg"
+    class="overflow-hidden rounded-lg bg-white shadow-md transition-all duration-300 hover:shadow-lg relative pet-card"
+    :class="{
+      'border-2 border-emerald-500': hasActiveAdoptionRequest,
+      'hover:scale-102 transform': variant === 'B', // Add subtle scaling effect for variant B
+      'opacity-85': pet.status === 'adopted', // Reducir ligeramente la opacidad para mascotas adoptadas
+    }"
   >
+    <!-- Badge de urgente con mejor contraste para accesibilidad -->
     <div
-      v-if="pet.urgent"
-      class="absolute right-2 top-2 rounded-full bg-red-500 px-2 py-1 text-xs font-bold text-white"
+      v-if="pet.urgent && pet.status !== 'adopted'"
+      class="absolute right-2 top-2 z-10 rounded-full bg-red-600 px-2 py-1 text-xs font-bold text-white"
+      role="status"
+      aria-live="polite"
     >
-      URGENTE
+      {{ variant === "A" ? "URGENTE" : "¡NECESITA HOGAR YA!" }}
     </div>
-    <div class="relative h-48">
+
+    <!-- Badge de adoptado mejorado -->
+    <div
+      v-if="pet.status === 'adopted'"
+      class="absolute inset-0 bg-black bg-opacity-60 z-10 flex items-center justify-center transition-opacity duration-300"
+    >
+      <div
+        class="bg-white px-4 py-3 rounded-md font-bold text-emerald-700 transform transition-transform duration-300 flex flex-col items-center"
+      >
+        <span class="text-xl">ADOPTADO</span>
+        <span class="text-xs mt-1">¡Ya encontró un hogar!</span>
+      </div>
+    </div>
+
+    <!-- Contenedor de imagen con carga progresiva -->
+    <div class="relative h-[24rem] overflow-hidden">
+      <div
+        v-if="imageLoading"
+        class="absolute inset-0 flex items-center justify-center bg-gray-100"
+      >
+        <div
+          class="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"
+        />
+      </div>
+
       <NuxtImg
-        :src="pet.image || '/placeholder.png'"
+        :src="pet.image || '/placeholder.webp'"
         :alt="pet.name"
-        class="h-full w-full object-cover"
-        @error="onImageError"
+        class="h-full w-full object-cover transition-transform duration-300"
+        :class="{
+          'hover:scale-105': variant === 'A',
+          'hover:scale-110': variant === 'B',
+        }"
         loading="lazy"
         sizes="sm:100vw md:50vw lg:33vw xl:25vw"
         placeholder
+        :quality="70"
+        format="webp"
+        @error="onImageError"
+        @load="imageLoading = false"
       />
 
+      <!-- Botón de favorito con feedback táctil -->
       <button
         type="button"
-        class="absolute left-2 top-2 rounded-full bg-white p-1 shadow-md transition-colors hover:bg-amber-50"
+        class="absolute left-2 top-2 rounded-full bg-white p-1.5 shadow-md transition-colors hover:bg-amber-50 active:scale-95 z-10"
         :class="{ 'text-red-500': isFavorite, 'text-gray-400': !isFavorite }"
+        aria-label="Agregar a favoritos"
+        :aria-pressed="isFavorite"
         @click.stop="toggleFavorite"
       >
-        <HeartIcon class="h-5 w-5" />
+        <Icon
+          :name="isFavorite ? 'heroicons:heart-solid' : 'heroicons:heart'"
+          class="h-5 w-5"
+        />
       </button>
+
+      <!-- Tiempo desde publicación con mejor visibilidad -->
+      <div
+        v-if="timeAgo"
+        class="absolute bottom-0 right-0 bg-black bg-opacity-70 text-white text-xs px-2 py-1"
+      >
+        {{ timeAgo }}
+      </div>
     </div>
+
+    <!-- Contenido principal optimizado -->
     <div class="p-4">
       <div class="flex items-start justify-between">
-        <h3 class="mb-1 text-lg font-semibold text-emerald-800">
+        <h3
+          class="mb-1 text-lg font-semibold text-emerald-800 truncate"
+          :title="pet.name"
+        >
           {{ pet.name }}
         </h3>
         <span
           :class="[
             'rounded-full px-2 py-1 text-xs font-medium',
-            pet.gender === 'macho' ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800',
+            pet.gender === 'macho'
+              ? 'bg-blue-100 text-blue-800'
+              : 'bg-pink-100 text-pink-800',
           ]"
+          role="status"
         >
-          {{ pet.gender === 'macho' ? 'Macho' : 'Hembra' }}
+          {{ pet.gender === "macho" ? "Macho" : "Hembra" }}
         </span>
       </div>
 
-      <p class="mb-3 text-sm text-gray-600">{{ pet.breed }}</p>
+      <p class="mb-3 text-sm text-gray-600 truncate" :title="pet.breed">
+        {{ pet.breed || "Raza desconocida" }}
+      </p>
 
       <div class="mb-2 flex items-center gap-2 text-sm text-gray-500">
-        <MapPinIcon class="h-4 w-4" />
-        <span>{{ pet.location }}</span>
+        <Icon name="heroicons:map-pin" class="h-4 w-4 flex-shrink-0" />
+        <span class="truncate" :title="pet.location">{{
+          pet.location || "Ubicación desconocida"
+        }}</span>
       </div>
 
       <div class="flex items-center gap-2 text-sm text-gray-500">
-        <ClockIcon class="h-4 w-4" />
+        <Icon name="heroicons:clock" class="h-4 w-4 flex-shrink-0" />
         <span>{{ formatAge(pet.age) }}</span>
       </div>
 
       <hr class="my-3 border-gray-100" >
 
-      <div class="mb-3 flex flex-wrap gap-2">
-        <span
+      <!-- Indicadores de características -->
+      <div class="mb-4 flex flex-wrap gap-2">
+        <div
           v-if="pet.vaccinated"
-          class="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs text-green-800"
+          class="flex items-center rounded bg-green-50 px-2 py-1 text-xs font-medium text-green-700"
         >
-          <CheckCircleIcon class="mr-1 h-3 w-3" />
-          Vacunado
-        </span>
-
-        <span
+          <Icon name="heroicons:check" class="mr-1 h-3 w-3" />
+          Vacunas
+        </div>
+        <div
           v-if="pet.neutered"
-          class="inline-flex items-center rounded-full bg-purple-100 px-2 py-1 text-xs text-purple-800"
+          class="flex items-center rounded bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700"
         >
-          <ScissorsIcon class="mr-1 h-3 w-3" />
-          Esterilizado
-        </span>
-
-        <span
-          class="inline-flex items-center rounded-full bg-amber-100 px-2 py-1 text-xs text-amber-800"
+          <Icon name="heroicons:check" class="mr-1 h-3 w-3" />
+          {{ pet.gender === "macho" ? "Castrado" : "Esterilizada" }}
+        </div>
+        <div
+          v-if="pet.size"
+          class="flex items-center rounded bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700"
         >
-          <RulerIcon class="mr-1 h-3 w-3" />
-          {{ formatSize(pet.size) }}
-        </span>
+          <Icon name="heroicons:ruler" class="mr-1 h-3 w-3" />
+          {{
+            pet.size === "small"
+              ? "Pequeño"
+              : pet.size === "medium"
+              ? "Mediano"
+              : "Grande"
+          }}
+        </div>
       </div>
 
+      <!-- Botón CTA con diseño variable según test A/B -->
       <NuxtLink
-        :to="`/pet/${pet.id}`"
-        class="block w-full rounded-md bg-emerald-600 py-2 text-center text-white transition-colors hover:bg-emerald-700"
+        :to="`/mascotas/${pet.id}`"
+        class="mt-2 block w-full rounded-md py-2 text-center text-sm font-medium shadow transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
+        :class="[
+          pet.status === 'adopted'
+            ? 'bg-gray-400 text-white cursor-default'
+            : variant === 'A'
+            ? 'bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-500'
+            : 'bg-amber-500 text-white hover:bg-amber-600 focus:ring-amber-400',
+        ]"
+        @click="recordClick"
       >
-        Ver más
+        {{
+          pet.status === "adopted"
+            ? "Mascota adoptada"
+            : variant === "A"
+            ? "Ver detalles"
+            : "¡Conóceme!"
+        }}
       </NuxtLink>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue'
-import {
-  HeartIcon,
-  MapPinIcon,
-  ClockIcon,
-  CheckCircleIcon,
-  ScissorsIcon,
-  RulerIcon,
-} from 'lucide-vue-next'
+<script setup lang="ts">
+import { ref, computed, onMounted } from "vue";
+import type { Pet } from "~/models/Pet";
+import { formatDistanceToNow } from "date-fns";
+import { es } from "date-fns/locale";
 
-// Props
-const props = defineProps({
-  pet: {
-    type: Object(),
-    required: true,
-  },
-})
+const { getTestVariant, recordImpression, recordClick } = useABTesting();
+const variant = computed(() => getTestVariant("petCardLayout"));
 
-// Estado para favoritos
-const isFavorite = ref(false)
+const props = defineProps<{
+  pet: Pet;
+  isFavorite?: boolean;
+  hasActiveAdoptionRequest?: boolean;
+}>();
 
-// Comprobar si la mascota está en favoritos al montar el componente
-onMounted(() => {
-  const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
-  isFavorite.value = favorites.includes(props.pet.id)
-})
+const imageLoading = ref(true);
+const timeAgo = computed(() => {
+  if (!props.pet.createdAt) return null;
+  return formatDistanceToNow(new Date(props.pet.createdAt), {
+    addSuffix: true,
+    locale: es,
+  });
+});
 
-// Alternar estado de favorito
-const toggleFavorite = (event) => {
-  event.stopPropagation() // Evitar navegación cuando se hace clic en el corazón
-  isFavorite.value = !isFavorite.value
+const emit = defineEmits(["toggleFavorite"]);
 
-  // Guardar estado en localStorage
-  const favorites = JSON.parse(localStorage.getItem('favorites') || '[]')
-  if (isFavorite.value) {
-    if (!favorites.includes(props.pet.id)) {
-      favorites.push(props.pet.id)
-    }
+function toggleFavorite(e: Event) {
+  e.stopPropagation();
+  emit("toggleFavorite", props.pet.id);
+}
+
+function onImageError() {
+  imageLoading.value = false;
+}
+
+function formatAge(age: string | number) {
+  if (!age) return "Edad desconocida";
+
+  // Handle string values like "1 mes"
+  if (typeof age === "string") {
+    return age;
+  }
+
+  // Handle numeric values (months)
+  const ageInMonths = age;
+
+  if (ageInMonths < 1) {
+    return "Menos de 1 mes";
+  } else if (ageInMonths < 12) {
+    return `${ageInMonths} ${ageInMonths === 1 ? "mes" : "meses"}`;
   } else {
-    const index = favorites.indexOf(props.pet.id)
-    if (index !== -1) {
-      favorites.splice(index, 1)
+    const years = Math.floor(ageInMonths / 12);
+    const months = ageInMonths % 12;
+
+    let result = `${years} ${years === 1 ? "año" : "años"}`;
+    if (months > 0) {
+      result += ` y ${months} ${months === 1 ? "mes" : "meses"}`;
     }
-  }
-  localStorage.setItem('favorites', JSON.stringify(favorites))
-}
 
-const onImageError = (event) => {
-  event.target.src = '/placeholder.webp'
-}
-
-const formatAge = (age) => {
-  return age || 'Edad desconocida'
-}
-
-const formatSize = (size) => {
-  switch (size) {
-    case 'pequeño':
-      return 'Pequeño'
-    case 'mediano':
-      return 'Mediano'
-    case 'grande':
-      return 'Grande'
-    default:
-      return 'Desconocido'
+    return result;
   }
 }
+
+onMounted(() => {
+  // Record impression for A/B testing when the component mounts
+  recordImpression("petCardLayout");
+});
 </script>
+
+<style scoped>
+.pet-card {
+  will-change: transform, box-shadow;
+  backface-visibility: hidden;
+}
+
+/* Add subtle animation for variant B */
+:deep(.variant-b) .pet-card:hover {
+  transform: translateY(-5px);
+}
+</style>
