@@ -107,31 +107,31 @@ function handleImageError(event:any) {
         </div>
 
         <!-- Columna 2: Enlaces útiles -->
-        <div>
-          <h2 class="mb-4 text-xl font-bold">Enlaces útiles</h2>
-          <ul class="space-y-3">
+        <div class="mx-auto flex flex-col items-center lg:items-start">
+          <h2 class="mb-4 text-xl font-bold mx-auto">Enlaces útiles</h2>
+          <ul class="space-y-3 text-center lg:text-left">
             <li>
-              <NuxtLink to="/mascotas" class="transition-colors hover:text-emerald-300">
+              <NuxtLink to="/mascotas" class="transition-colors hover:text-emerald-300 text-center">
                 Adopta una mascota
               </NuxtLink>
             </li>
             <li>
-              <NuxtLink to="/publicar" class="transition-colors hover:text-emerald-300">
+              <NuxtLink to="/publicar" class="transition-colors hover:text-emerald-300 text-center">
                 Publicar en adopción
               </NuxtLink>
             </li>
             <li>
-              <NuxtLink to="/donaciones" class="transition-colors hover:text-emerald-300">
+              <NuxtLink to="/donaciones" class="transition-colors hover:text-emerald-300 text-center">
                 Haz una donación
               </NuxtLink>
             </li>
             <li>
-              <NuxtLink to="/historias" class="transition-colors hover:text-emerald-300">
+              <NuxtLink to="/historias" class="transition-colors hover:text-emerald-300 text-center">
                 Historias de adopción
               </NuxtLink>
             </li>
             <li>
-              <NuxtLink to="/nosotros" class="transition-colors hover:text-emerald-300">
+              <NuxtLink to="/nosotros" class="transition-colors hover:text-emerald-300 text-center">
                 Sobre nosotros
               </NuxtLink>
             </li>
@@ -139,8 +139,8 @@ function handleImageError(event:any) {
         </div>
 
         <!-- Columna 3: Estadísticas -->
-        <div>
-          <h2 class="mb-6 text-xl font-bold">Nuestro impacto</h2>
+        <div class="mx-auto flex flex-col items-center lg:items-start">
+          <h2 class="mb-6 text-xl font-bold text-center ">Nuestro impacto</h2>
           <div class="space-y-6">
             <div class="flex items-center">
               <div class="mr-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-600">

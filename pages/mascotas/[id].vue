@@ -92,7 +92,7 @@
               </div>
             </div>
             <!-- Estado de urgente si aplica -->
-            <div v-if="!pet.status === 'adopted'">
+            <div v-if="pet.status !== 'adopted'">
               <div
                 v-if="pet.urgent"
                 class="mt-4 rounded border-l-4 border-red-500 bg-red-100 p-3"
@@ -207,8 +207,8 @@
 
                 <button
                 class="flex items-center justify-center rounded-full border border-emerald-300 bg-emerald-50 p-3 text-emerald-700 hover:bg-emerald-100"
-                @click="generateShareImage"
                 :disabled="generatingImage"
+                @click="generateShareImage"
                 >
                 <Icon :name="generatingImage ? 'heroicons:arrow-path' : 'heroicons:photo'" class="h-6 w-6" :class="{ 'animate-spin': generatingImage }" />
                 </button>
@@ -320,8 +320,8 @@
 
                 <button
                 class="flex items-center justify-center gap-2 rounded-md border border-emerald-300 bg-emerald-50 px-4 py-2 text-emerald-700 hover:bg-emerald-100"
-                @click="generateShareImage"
                 :disabled="generatingImage"
+                @click="generateShareImage"
                 >
                 <Icon :name="generatingImage ? 'heroicons:arrow-path' : 'heroicons:photo'" class="h-5 w-5" :class="{ 'animate-spin': generatingImage }" />
                 <span>{{ generatingImage ? 'Generando...' : 'Generar imagen' }}</span>

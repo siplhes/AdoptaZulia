@@ -3,7 +3,6 @@
     class="overflow-hidden rounded-lg bg-white shadow-md transition-all duration-300 hover:shadow-lg relative pet-card"
     :class="{
       'border-2 border-emerald-500': hasActiveAdoptionRequest,
-      'hover:scale-102 transform': variant === 'B', // Add subtle scaling effect for variant B
       'opacity-85': pet.status === 'adopted', // Reducir ligeramente la opacidad para mascotas adoptadas
     }"
   >
@@ -14,7 +13,7 @@
       role="status"
       aria-live="polite"
     >
-      {{ variant === "A" ? "URGENTE" : "¡NECESITA HOGAR YA!" }}
+      URGENTE
     </div>
 
     <!-- Badge de adoptado mejorado -->
@@ -45,10 +44,6 @@
         :src="pet.image || '/placeholder.webp'"
         :alt="pet.name"
         class="h-full w-full object-cover transition-transform duration-300"
-        :class="{
-          'hover:scale-105': variant === 'A',
-          'hover:scale-110': variant === 'B',
-        }"
         loading="lazy"
         sizes="sm:100vw md:50vw lg:33vw xl:25vw"
         placeholder
@@ -110,21 +105,11 @@
         </span>
       </div>
 
-      <p class="mb-3 text-sm text-gray-600 truncate" :title="pet.breed">
-        {{ pet.breed || "Raza desconocida" }}
-      </p>
 
-      <div class="mb-2 flex items-center gap-2 text-sm text-gray-500">
-        <Icon name="heroicons:map-pin" class="h-4 w-4 flex-shrink-0" />
-        <span class="truncate" :title="pet.location">{{
-          pet.location || "Ubicación desconocida"
-        }}</span>
-      </div>
+                <p class="mb-4 text-gray-600">
+                  {{ pet.breed }} • {{ pet.age }} • {{ pet.location }}
+                </p>
 
-      <div class="flex items-center gap-2 text-sm text-gray-500">
-        <Icon name="heroicons:clock" class="h-4 w-4 flex-shrink-0" />
-        <span>{{ formatAge(pet.age) }}</span>
-      </div>
 
       <hr class="my-3 border-gray-100" >
 
@@ -150,34 +135,30 @@
         >
           <Icon name="mdi:ruler" class="mr-1 h-3 w-3" />
           {{
-            pet.size === "small"
+            pet.size === "Pequeño"
               ? "Pequeño"
-              : pet.size === "medium"
+              : pet.size === "Mediano"
               ? "Mediano"
               : "Grande"
           }}
         </div>
       </div>
 
-      <!-- Botón CTA con diseño variable según test A/B -->
+      <!-- Botón CTA sin variante -->
       <NuxtLink
         :to="`/mascotas/${pet.id}`"
         class="mt-2 block w-full rounded-md py-2 text-center text-sm font-medium shadow transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
         :class="[
           pet.status === 'adopted'
             ? 'bg-gray-400 text-white cursor-default'
-            : variant === 'A'
-            ? 'bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-500'
-            : 'bg-amber-500 text-white hover:bg-amber-600 focus:ring-amber-400',
+            : 'bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-500',
         ]"
         @click="recordClick"
       >
         {{
           pet.status === "adopted"
             ? "Mascota adoptada"
-            : variant === "A"
-            ? "Ver detalles"
-            : "¡Conóceme!"
+            : `Conóce a ${pet.name}`
         }}
       </NuxtLink>
     </div>
@@ -190,8 +171,7 @@ import type { Pet } from "~/models/Pet";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 
-const { getTestVariant, recordImpression, recordClick } = useABTesting();
-const variant = computed(() => getTestVariant("petCardLayout"));
+const { recordImpression, recordClick } = useABTesting();
 
 const props = defineProps<{
   pet: Pet;
@@ -257,10 +237,5 @@ onMounted(() => {
 .pet-card {
   will-change: transform, box-shadow;
   backface-visibility: hidden;
-}
-
-/* Add subtle animation for variant B */
-:deep(.variant-b) .pet-card:hover {
-  transform: translateY(-5px);
 }
 </style>

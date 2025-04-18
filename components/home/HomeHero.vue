@@ -2,10 +2,16 @@
   <section class="relative overflow-hidden bg-amber-800 text-white">
     <div class="absolute inset-0 z-0">
       <NuxtImg
-        src="/img2.webp"
+        :src="imgSrc"
+        :sizes="imgSizes"
         alt="Perros y gatos felices"
-        class="h-full w-full object-cover   opacity-20"
+        class="h-full w-full object-cover opacity-20"
         loading="lazy"
+        :quality="imgQuality"
+        format="webp"
+        :placeholder="true"
+        :width="imgWidth"
+        :height="imgHeight"
       />
     </div>
     <div class="container relative z-10 mx-auto px-4 py-16 md:py-24">
@@ -49,5 +55,20 @@
 </template>
 
 <script setup>
+import { useWindowSize } from '@vueuse/core'
+import { computed } from 'vue'
 
+const { width } = useWindowSize()
+
+const imgSrc = '/img2.webp'
+const imgSizes = computed(() =>
+  width.value < 640
+    ? '100vw'
+    : width.value < 1024
+      ? '50vw'
+      : '33vw'
+)
+const imgQuality = computed(() => (width.value < 640 ? 40 : 70))
+const imgWidth = computed(() => (width.value < 640 ? 600 : 1440))
+const imgHeight = computed(() => (width.value < 640 ? 400 : 600))
 </script>

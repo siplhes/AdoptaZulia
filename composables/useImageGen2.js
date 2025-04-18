@@ -21,7 +21,6 @@ export function useImageGen2() {
     try {
       // Configuración predeterminada
       const backgroundColor = options.backgroundColor || '#f5f5f4'
-      const textColor = options.textColor || '#047857'
       const frameImageUrl = options.frameImageUrl || '/frame.png'
       const logoUrl = options.logoUrl || '/logo.svg'
       const downloadFilename = options.downloadFilename || `adopta-a-${petName.toLowerCase().replace(/\s+/g, '-')}.png`
@@ -63,7 +62,7 @@ export function useImageGen2() {
       }
 
       // Cargar imágenes necesarias
-      const [frameImage, logoImage, petImage] = await Promise.all([
+      const [frameImage, petImage] = await Promise.all([
         loadImage(frameImageUrl),
         loadImage(logoUrl),
         loadImage(petImageUrl)

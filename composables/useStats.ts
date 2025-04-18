@@ -133,7 +133,6 @@ export function useStats() {
         }
         
         try {
-          // Solo guardamos si somos admin (para evitar intentos de escritura sin permisos)
           if (isAdmin.value) {
             await set(publicStatsRef, publicStats)
           }
@@ -196,7 +195,9 @@ export function useStats() {
           },
           adoptionSuccess: stats.value.adoptionSuccess
         }
-        await set(publicStatsRef, publicStats)
+        if (isAdmin.value) {
+          await set(publicStatsRef, publicStats)
+        }
       } catch (writeErr) {
         console.warn('No se pudieron actualizar las estadísticas públicas:', writeErr)
         // Continuamos aunque no podamos guardarlas

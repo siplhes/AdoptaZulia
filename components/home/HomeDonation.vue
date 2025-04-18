@@ -31,9 +31,12 @@
                 <p class="text-white">Transportamos animales rescatados</p>
               </div>
             </div>
-            <div class="mt-8 p-4 rounded-lg bg-white text-emerald-800 font-semibold text-lg shadow">
-              Para donar vía Paypal escribe a: <span class="underline">donaciones@adoptazulia.com</span>
-            </div>
+            <NuxtLink  to="/donaciones"  class="flex flex-inline justify-center items-center mt-8 p-4 rounded-lg bg-white text-emerald-800 font-semibold text-lg shadow">
+     
+                <Icon name="mdi:heart" class="mr-2 h-6 w-6" />
+                Dona ahora
+              </NuxtLink>
+
           </div>
           <div class="relative hidden lg:block">
             <NuxtImg 

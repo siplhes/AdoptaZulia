@@ -236,7 +236,7 @@
           </div>
 
           <!-- Pets Grid -->
-          <div v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div v-else class="grid grid-cols-2 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <div
               v-for="pet in filteredPets"
               :key="pet.id"
@@ -252,25 +252,27 @@
                   placeholder
                 />
                 <div class="absolute right-4 top-4 flex space-x-2">
-                  <span class="rounded-full bg-amber-100 px-3 py-1 text-xs text-amber-800">
-                    {{ pet.type }}
-                  </span>
-                  <!-- Mostrar etiqueta de adoptado en lugar de urgente si está adoptada -->
-                  <span
+                  <!-- Badge de urgente con mejor contraste para accesibilidad -->
+                  <div
+                    v-if="pet.urgent && pet.status !== 'adopted'"
+                    class="absolute right-2 top-2 z-10 rounded-full bg-red-600 px-2 py-1 text-xs font-bold text-white"
+                    role="status"
+                    aria-live="polite"
+                  >
+                    URGENTE
+                  </div>
+                  <!-- Badge de adoptado mejorado -->
+                  <div
                     v-if="pet.status === 'adopted'"
-                    class="flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs text-blue-800"
+                    class="absolute inset-0 bg-black bg-opacity-60 z-10 flex items-center justify-center transition-opacity duration-300"
                   >
-                    <Icon name="heroicons:check-circle" class="mr-1 h-3 w-3" />
-                    Adoptado
-                  </span>
-                  <!-- Mostrar etiqueta de urgente solo si no está adoptada -->
-                  <span
-                    v-else-if="pet.urgent"
-                    class="flex items-center rounded-full bg-red-100 px-3 py-1 text-xs text-red-800"
-                  >
-                    <Icon name="heroicons:exclamation-circle" class="mr-1 h-3 w-3" />
-                    Urgente
-                  </span>
+                    <div
+                      class="bg-white px-4 py-3 rounded-md font-bold text-emerald-700 transform transition-transform duration-300 flex flex-col items-center"
+                    >
+                      <span class="text-xl">ADOPTADO</span>
+                      <span class="text-xs mt-1">¡Ya encontró un hogar!</span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -282,7 +284,6 @@
                   <Icon
                     name="heroicons:heart"
                     class="h-6 w-6 cursor-pointer text-gray-400 transition-colors hover:text-red-500"
-                    @click="toggleFavorite(pet.id)"
                   />
                 </div>
 
@@ -322,7 +323,7 @@
                       : 'bg-emerald-600 text-white hover:bg-emerald-700'
                   ]"
                 >
-                  {{ pet.status === 'adopted' ? 'Mascota adoptada' : 'Ver detalles' }}
+                  {{ pet.status === 'adopted' ? 'Mascota adoptada' : `Conoce a ${pet.name}` }}
                 </a>
               </div>
             </div>
@@ -383,11 +384,9 @@ import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { usePets } from '~/composables/usePets'
 
-// Composables
 const route = useRoute()
-const { fetchAllPets, filterPets, searchPets, loading, error, pets } = usePets()
+const { fetchAllPets } = usePets()
 
-// Search and filters
 const searchQuery = ref('')
 const filters = ref({
   types: [],
@@ -400,18 +399,13 @@ const filters = ref({
   location: '',
 })
 
-// Estado para controlar la visibilidad de los filtros
 const showFilters = ref(false)
-
-// Detectar si es dispositivo móvil
 const isMobile = ref(false)
 
-// Comprobar el tamaño de la ventana para determinar si es móvil
 const checkIfMobile = () => {
-  isMobile.value = window.innerWidth < 1024 // 1024px es el breakpoint de lg en Tailwind
+  isMobile.value = window.innerWidth < 1024
 }
 
-// Actualizar la variable isMobile cuando cambia el tamaño de la ventana
 onMounted(() => {
   if (import.meta.client) {
     checkIfMobile()
@@ -419,26 +413,20 @@ onMounted(() => {
   }
 })
 
-// Eliminamos el listener cuando se desmonta el componente
 watch(() => route.fullPath, () => {
   showFilters.value = false
 })
 
-// Limpiar el evento al desmontar el componente
 onBeforeUnmount(() => {
   if (import.meta.client) {
     window.removeEventListener('resize', checkIfMobile)
   }
 })
 
-// Sorting
 const sortBy = ref('recent')
-
-// Pagination
 const currentPage = ref(1)
 const itemsPerPage = 9
 
-// Filter options
 const petTypes = [
   { value: 'perro', label: 'Perros' },
   { value: 'gato', label: 'Gatos' },
@@ -468,15 +456,12 @@ const genders = [
 
 const locations = ['Maracaibo', 'San Francisco', 'Cabimas', 'Machiques', 'Lara', 'Falcon']
 
-// Estado para datos filtrados
 const allPets = ref([])
 const isLoading = ref(false)
 
-// Filtered pets
 const filteredPets = computed(() => {
   let result = [...allPets.value]
 
-  // Apply search query
   if (searchQuery.value) {
     const query = searchQuery.value.toLowerCase()
     result = result.filter(
@@ -488,47 +473,38 @@ const filteredPets = computed(() => {
     )
   }
 
-  // Apply type filter
   if (filters.value.types.length > 0) {
     result = result.filter((pet) => filters.value.types.includes(pet.typeValue))
   }
 
-  // Apply age filter
   if (filters.value.ages.length > 0) {
     result = result.filter((pet) => filters.value.ages.includes(pet.ageValue))
   }
 
-  // Apply size filter
   if (filters.value.sizes.length > 0) {
     result = result.filter((pet) => filters.value.sizes.includes(pet.sizeValue))
   }
 
-  // Apply gender filter
   if (filters.value.gender) {
     result = result.filter((pet) => pet.gender === filters.value.gender)
   }
 
-  // Apply vaccinated filter
   if (filters.value.vaccinated) {
     result = result.filter((pet) => pet.vaccinated)
   }
 
-  // Apply neutered filter
   if (filters.value.neutered) {
     result = result.filter((pet) => pet.neutered)
   }
 
-  // Apply urgent filter
   if (filters.value.urgent) {
     result = result.filter((pet) => pet.urgent)
   }
 
-  // Apply location filter
   if (filters.value.location) {
     result = result.filter((pet) => pet.location === filters.value.location)
   }
 
-  // Apply sorting
   switch (sortBy.value) {
     case 'recent':
       result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
@@ -544,22 +520,61 @@ const filteredPets = computed(() => {
       break
   }
 
-  return result
+  // Pagination
+  const startIndex = (currentPage.value - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  return result.slice(startIndex, endIndex)
 })
 
-// Pagination
-/*
-const paginatedPets = computed(() => {
-  const startIndex = (currentPage.value - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  return filteredPets.value.slice(startIndex, endIndex);
-});
-*/
 const totalPages = computed(() => {
-  return Math.ceil(filteredPets.value.length / itemsPerPage)
+  let result = [...allPets.value]
+
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
+    result = result.filter(
+      (pet) =>
+        pet.name.toLowerCase().includes(query) ||
+        pet.breed.toLowerCase().includes(query) ||
+        pet.location.toLowerCase().includes(query) ||
+        (pet.description && pet.description.toLowerCase().includes(query))
+    )
+  }
+
+  if (filters.value.types.length > 0) {
+    result = result.filter((pet) => filters.value.types.includes(pet.typeValue))
+  }
+
+  if (filters.value.ages.length > 0) {
+    result = result.filter((pet) => filters.value.ages.includes(pet.ageValue))
+  }
+
+  if (filters.value.sizes.length > 0) {
+    result = result.filter((pet) => filters.value.sizes.includes(pet.sizeValue))
+  }
+
+  if (filters.value.gender) {
+    result = result.filter((pet) => pet.gender === filters.value.gender)
+  }
+
+  if (filters.value.vaccinated) {
+    result = result.filter((pet) => pet.vaccinated)
+  }
+
+  if (filters.value.neutered) {
+    result = result.filter((pet) => pet.neutered)
+  }
+
+  if (filters.value.urgent) {
+    result = result.filter((pet) => pet.urgent)
+  }
+
+  if (filters.value.location) {
+    result = result.filter((pet) => pet.location === filters.value.location)
+  }
+
+  return Math.ceil(result.length / itemsPerPage)
 })
 
-// Methods
 const applyFilters = () => {
   currentPage.value = 1
 }
@@ -578,10 +593,6 @@ const resetFilters = () => {
   }
   sortBy.value = 'recent'
   currentPage.value = 1
-}
-
-const toggleFavorite = (petId) => {
-  // Implementación real requeriría estado y posiblemente una API
 }
 
 const prevPage = () => {
@@ -603,11 +614,9 @@ const goToPage = (page) => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-// Cargar mascotas al montar el componente y aplicar filtros
 const loadPets = async () => {
   isLoading.value = true
   try {
-    // Obtener todas las mascotas de Firebase
     const petsData = await fetchAllPets()
     allPets.value = petsData
   } catch (err) {
@@ -617,12 +626,9 @@ const loadPets = async () => {
   }
 }
 
-// Initialize from URL params if any
 onMounted(async () => {
-  // Cargar todas las mascotas
   await loadPets()
 
-  // Procesar parámetros de URL si existen
   const queryParams = route.query
 
   if (queryParams.tipo) {
@@ -662,7 +668,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* Estilos específicos para la página de mascotas */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s;

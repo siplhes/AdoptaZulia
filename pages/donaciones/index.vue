@@ -14,10 +14,12 @@
       </div>
       <div class="container relative z-10 mx-auto px-4 py-16 md:py-24">
         <div class="max-w-3xl">
-          <h1 class="mb-6 text-4xl font-bold md:text-5xl">Tu donación puede salvar vidas</h1>
+          <h1 class="mb-6 text-4xl font-bold md:text-5xl">
+            Tu donación puede salvar vidas
+          </h1>
           <p class="mb-8 text-xl text-emerald-100 md:text-2xl">
-            Ayúdanos a continuar nuestra misión de rescatar y encontrar hogares para mascotas
-            abandonadas.
+            Ayúdanos a continuar nuestra misión de rescatar y encontrar hogares para
+            mascotas abandonadas.
           </p>
         </div>
       </div>
@@ -44,7 +46,9 @@
             >
               <Icon name="mdi:paw" class="h-10 w-10 text-emerald-600" />
             </div>
-            <h3 class="mb-2 text-3xl font-bold text-emerald-800">{{ siteStats.totalPets || 1240 }}</h3>
+            <h3 class="mb-2 text-3xl font-bold text-emerald-800">
+              {{ siteStats.totalPets || 1240 }}
+            </h3>
             <p class="text-gray-600">Mascotas registradas</p>
           </div>
 
@@ -56,7 +60,9 @@
             >
               <Icon name="mdi:home" class="h-10 w-10 text-emerald-600" />
             </div>
-            <h3 class="mb-2 text-3xl font-bold text-emerald-800">{{ siteStats.totalAdoptions || "Aun no hay" }}</h3>
+            <h3 class="mb-2 text-3xl font-bold text-emerald-800">
+              {{ siteStats.totalAdoptions || "Aun no hay" }}
+            </h3>
             <p class="text-gray-600">Adopciones exitosas</p>
           </div>
         </div>
@@ -64,27 +70,49 @@
 
       <section class="mb-16">
         <div class="grid grid-cols-1 gap-8 md:grid-cols-3 justify-center items-center">
-       <!--En Especie-->
+          <!--En Especie-->
           <div
             class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105"
           >
             <h1 class="mb-4 text-xl font-semibold">Donacion en especie</h1>
-            <p class="mb-4 text-gray-600">Realiza una donación de alimentos, medicinas o suministros para nuestras mascotas y para los refugios del estado.</p>
+            <p class="mb-4 text-gray-600">
+              Realiza una donación de alimentos, medicinas o suministros para nuestras
+              mascotas y para los refugios del estado.
+            </p>
             <NuxtLink to="/donaciones/especie" class="p-6">
-              <div class="mx-auto bg-emerald-600 text-[#fefffa] p-4 hover:bg-emerald-700 rounded-xl max-w-xs items-center flex justify-center">
+              <div
+                class="mx-auto bg-emerald-600 text-[#fefffa] p-4 hover:bg-emerald-700 rounded-xl max-w-xs items-center flex justify-center"
+              >
                 <span class="ml-2"> Mas detalles</span>
-       
-                <Icon name="mdi:chevron-down" class="h-5 w-5 text-amber-50 transition-transform" />
+
+                <Icon
+                  name="mdi:chevron-down"
+                  class="h-5 w-5 text-amber-50 transition-transform"
+                />
               </div>
             </NuxtLink>
           </div>
-                  <!--PayPal-->
+          <!--PayPal-->
           <div
             class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105"
           >
             <h1 class="mb-4 text-xl font-semibold">PayPal</h1>
-            <p class="mb-4 text-gray-600">Realiza una donación segura mediante PayPal</p>
-            <div id="paypal-checkout" class="mx-auto max-w-xs"/>
+            <p class="mb-4 text-gray-600">
+              Realiza una donación segura mediante PayPal, cualquier monto es una ayuda
+              para todos los animales que los necesitan
+            </p>
+
+            <NuxtLink
+              to=" https://paypal.me/adoptazulia?country.x=VE&locale.x=en_US"
+              target="_blank"
+              class="mx-auto bg-emerald-600 text-[#fefffa] p-4 hover:bg-emerald-700 rounded-xl max-w-xs items-center flex justify-center"
+            >
+              <span class="ml-2">Donar via PayPal</span>
+              <Icon
+                name="mdi:chevron-down"
+                class="h-5 w-5 text-amber-50 transition-transform"
+              />
+            </NuxtLink>
           </div>
           <!--Patreon-->
           <NuxtLink to="https://patreon.com/AdoptaZulia">
@@ -92,8 +120,10 @@
               class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105"
             >
               <h1 class="mb-4 text-xl font-semibold">Patreon</h1>
-                   <p class="mb-4 text-gray-600">Apadrina a AdoptaZulia y todas las mascotas que ayudamos.</p>
-              <NuxtImg src="/patreon.webp" alt="Patreon" class="mx-auto" loading="lazy"/>
+              <p class="mb-4 text-gray-600">
+                Apadrina a AdoptaZulia y todas las mascotas que ayudamos.
+              </p>
+              <NuxtImg src="/patreon.webp" alt="Patreon" class="mx-auto" loading="lazy" />
             </div>
           </NuxtLink>
 
@@ -103,16 +133,12 @@
               class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105"
             >
               <h1 class="mb-4 text-xl font-semibold">Ko-fi</h1>
-                     <p class="mb-4 text-gray-600">Compranos un cafe, para poder seguir brindando la ayuda que tanto merecen.</p>
-              <NuxtImg src="/kofi.webp" alt="Ko-fi" class="mx-auto" loading="lazy"/>
+              <p class="mb-4 text-gray-600">
+                Compranos un cafe, para poder seguir brindando la ayuda que tanto merecen.
+              </p>
+              <NuxtImg src="/kofi.webp" alt="Ko-fi" class="mx-auto" loading="lazy" />
             </div>
           </NuxtLink>
-
-  
-
-   
-
-
         </div>
       </section>
 
@@ -142,7 +168,10 @@
                 :class="{ 'rotate-180 transform': openFaq === index }"
               />
             </button>
-            <div v-show="openFaq === index" class="border-t border-gray-200 bg-gray-50 p-4">
+            <div
+              v-show="openFaq === index"
+              class="border-t border-gray-200 bg-gray-50 p-4"
+            >
               <p class="text-gray-700">{{ faq.answer }}</p>
             </div>
           </div>
@@ -152,10 +181,12 @@
       <!-- CTA Section -->
       <section class="overflow-hidden rounded-2xl bg-emerald-700">
         <div class="p-8 text-center md:p-12">
-          <h2 class="mb-4 text-3xl font-bold text-white md:text-4xl">Cada donación cuenta</h2>
+          <h2 class="mb-4 text-3xl font-bold text-white md:text-4xl">
+            Cada donación cuenta
+          </h2>
           <p class="mx-auto mb-8 max-w-3xl text-emerald-100">
-            Juntos podemos hacer la diferencia en la vida de miles de mascotas abandonadas. Tu apoyo
-            es fundamental para continuar nuestra labor.
+            Juntos podemos hacer la diferencia en la vida de miles de mascotas
+            abandonadas. Tu apoyo es fundamental para continuar nuestra labor.
           </p>
           <div class="flex flex-col justify-center gap-4 sm:flex-row">
             <a
@@ -180,115 +211,114 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useStats } from '~/composables/useStats'
+import { ref, computed, onMounted } from "vue";
+import { useStats } from "~/composables/useStats";
 
 // Estadísticas de impacto
 const siteStats = ref({
   totalPets: 0,
   totalAdoptions: 0,
-  totalUsers: 0
-})
+  totalUsers: 0,
+});
 
 // One-time donation
-const selectedAmount = ref(25)
-const customAmount = ref('')
+const selectedAmount = ref(25);
+const customAmount = ref("");
 const donorInfo = ref({
-  name: '',
-  email: '',
-  message: '',
+  name: "",
+  email: "",
+  message: "",
   anonymous: false,
-})
+});
 
 const finalAmount = computed(() => {
   if (customAmount.value) {
-    return parseFloat(customAmount.value)
+    return parseFloat(customAmount.value);
   }
-  return selectedAmount.value
-})
-
+  return selectedAmount.value;
+});
 
 // Testimonials
 const testimonials = [
   {
-    name: 'Carlos Rodríguez',
-    type: 'Donante mensual',
-    image: '/placeholder.webp?height=100&width=100',
+    name: "Carlos Rodríguez",
+    type: "Donante mensual",
+    image: "/placeholder.webp?height=100&width=100",
     quote:
-      'Me encanta saber que mi contribución mensual ayuda a tantas mascotas necesitadas. El equipo de AdoptaPet siempre me mantiene informado sobre cómo se utilizan mis donaciones.',
+      "Me encanta saber que mi contribución mensual ayuda a tantas mascotas necesitadas. El equipo de AdoptaPet siempre me mantiene informado sobre cómo se utilizan mis donaciones.",
   },
   {
-    name: 'Laura Martínez',
-    type: 'Donante puntual',
-    image: '/placeholder.webp?height=100&width=100',
+    name: "Laura Martínez",
+    type: "Donante puntual",
+    image: "/placeholder.webp?height=100&width=100",
     quote:
-      'Después de donar, recibí un correo electrónico detallado sobre cómo mi donación había ayudado a un perro llamado Max a recibir tratamiento veterinario. ¡Increíble transparencia!',
+      "Después de donar, recibí un correo electrónico detallado sobre cómo mi donación había ayudado a un perro llamado Max a recibir tratamiento veterinario. ¡Increíble transparencia!",
   },
-]
+];
 
 // FAQs
 const faqs = [
   {
-    question: '¿Cómo se utilizan mis donaciones?',
+    question: "¿Cómo se utilizan mis donaciones?",
     answer:
-      'Tus donaciones se destinan principalmente a alimentación, atención veterinaria, medicamentos, mantenimiento de refugios temporales y gastos de transporte para el rescate de animales. Publicamos informes trimestrales detallando el uso de los fondos en nuestra sección de transparencia.',
+      "Tus donaciones se destinan principalmente a alimentación, atención veterinaria, medicamentos, mantenimiento de refugios temporales y gastos de transporte para el rescate de animales. Publicamos informes trimestrales detallando el uso de los fondos en nuestra sección de transparencia.",
   },
   {
-    question: '¿Las donaciones son deducibles de impuestos?',
+    question: "¿Las donaciones son deducibles de impuestos?",
     answer:
-      'Sí, AdoptaPet es una organización sin ánimo de lucro registrada oficialmente, por lo que tus donaciones pueden ser deducibles de impuestos según la legislación fiscal vigente. Te enviaremos un certificado de donación que podrás utilizar en tu declaración de la renta.',
+      "Sí, AdoptaPet es una organización sin ánimo de lucro registrada oficialmente, por lo que tus donaciones pueden ser deducibles de impuestos según la legislación fiscal vigente. Te enviaremos un certificado de donación que podrás utilizar en tu declaración de la renta.",
   },
   {
-    question: '¿Puedo cancelar mi donación mensual en cualquier momento?',
+    question: "¿Puedo cancelar mi donación mensual en cualquier momento?",
     answer:
-      'Por supuesto. Puedes cancelar tu donación mensual en cualquier momento desde tu perfil en nuestra web o contactando con nuestro equipo de atención al donante. No hay compromisos de permanencia ni penalizaciones por cancelación.',
+      "Por supuesto. Puedes cancelar tu donación mensual en cualquier momento desde tu perfil en nuestra web o contactando con nuestro equipo de atención al donante. No hay compromisos de permanencia ni penalizaciones por cancelación.",
   },
   {
-    question: '¿Qué tipo de donaciones en especie aceptáis?',
+    question: "¿Qué tipo de donaciones en especie aceptáis?",
     answer:
-      'Aceptamos alimentos para mascotas, mantas, camas, juguetes, medicamentos (con receta veterinaria), productos de limpieza y cualquier otro material que pueda ser útil para el cuidado de los animales. Contacta con nosotros antes de realizar la donación para coordinar la entrega.',
+      "Aceptamos alimentos para mascotas, mantas, camas, juguetes, medicamentos (con receta veterinaria), productos de limpieza y cualquier otro material que pueda ser útil para el cuidado de los animales. Contacta con nosotros antes de realizar la donación para coordinar la entrega.",
   },
   {
-    question: '¿Puedo elegir a qué mascota específica ayudar con mi donación?',
+    question: "¿Puedo elegir a qué mascota específica ayudar con mi donación?",
     answer:
-      'Sí, ofrecemos la opción de apadrinar a una mascota específica. En este caso, tu donación se destinará principalmente a cubrir los gastos de esa mascota en particular. Recibirás actualizaciones periódicas sobre su estado y evolución.',
+      "Sí, ofrecemos la opción de apadrinar a una mascota específica. En este caso, tu donación se destinará principalmente a cubrir los gastos de esa mascota en particular. Recibirás actualizaciones periódicas sobre su estado y evolución.",
   },
-]
+];
 
-const openFaq = ref(null)
-const paypalButtonRendered = ref(false)
+const openFaq = ref(null);
+const paypalButtonRendered = ref(false);
 
 const toggleFaq = (index) => {
   if (openFaq.value === index) {
-    openFaq.value = null
+    openFaq.value = null;
   } else {
-    openFaq.value = index
+    openFaq.value = index;
   }
-}
+};
 
 // Mejorado: Configuración del botón de PayPal
 onMounted(async () => {
   // Cargar estadísticas
   try {
-    const { fetchPublicStats, stats } = useStats()
-    await fetchPublicStats()
+    const { fetchPublicStats, stats } = useStats();
+    await fetchPublicStats();
     siteStats.value = {
       totalPets: stats.value.totalPets,
       totalAdoptions: stats.value.totalAdoptions,
-      totalUsers: stats.value.totalUsers
-    }
+      totalUsers: stats.value.totalUsers,
+    };
   } catch (error) {
-    console.error('Error al cargar estadísticas:', error)
+    console.error("Error al cargar estadísticas:", error);
   }
 
   // Solo renderizar el botón si no se ha renderizado ya
   if (!paypalButtonRendered.value) {
     usePaypalButton({
       style: {
-        layout: 'vertical',
-        color: 'gold',
-        shape: 'rect',
-        label: 'donate',
+        layout: "vertical",
+        color: "gold",
+        shape: "rect",
+        label: "donate",
       },
       // Configurar el botón para procesar donaciones
       createOrder: (data, actions) => {
@@ -297,68 +327,70 @@ onMounted(async () => {
             {
               amount: {
                 value: finalAmount.value.toString(),
-                currency_code: 'USD',
+                currency_code: "USD",
                 breakdown: {
                   item_total: {
-                    currency_code: 'USD',
+                    currency_code: "USD",
                     value: finalAmount.value.toString(),
                   },
                 },
               },
-              description: 'Donación para AdoptaZulia',
+              description: "Donación para AdoptaZulia",
               items: [
                 {
-                  name: 'Donación para mascotas',
-                  quantity: '1',
+                  name: "Donación para mascotas",
+                  quantity: "1",
                   unit_amount: {
-                    currency_code: 'USD',
+                    currency_code: "USD",
                     value: finalAmount.value.toString(),
                   },
-                  category: 'DONATION',
+                  category: "DONATION",
                 },
               ],
             },
           ],
-        })
+        });
       },
       // Manejar la aprobación del pago
       onApprove: async (data, actions) => {
         try {
-          const details = await actions.order.capture()
+          const details = await actions.order.capture();
 
           // Mostrar mensaje de agradecimiento
           alert(
             `¡Gracias por tu donación de $${finalAmount.value}! Tu apoyo ayudará a nuestras mascotas.`
-          )
+          );
         } catch (error) {
-          console.error('Error al procesar la donación:', error)
-          alert('Hubo un problema al procesar tu donación. Por favor, intenta nuevamente.')
+          console.error("Error al procesar la donación:", error);
+          alert(
+            "Hubo un problema al procesar tu donación. Por favor, intenta nuevamente."
+          );
         }
       },
       // Manejar cancelaciones
-      onCancel: () => {
-      },
+      onCancel: () => {},
       // Manejar errores
       onError: (err) => {
-        console.error('Error en el proceso de PayPal:', err)
-        alert('Ocurrió un error durante el proceso de donación. Por favor, intenta más tarde.')
+        console.error("Error en el proceso de PayPal:", err);
+        alert(
+          "Ocurrió un error durante el proceso de donación. Por favor, intenta más tarde."
+        );
       },
     }).then(() => {
-      paypalButtonRendered.value = true
-    })
+      paypalButtonRendered.value = true;
+    });
   }
   useHead({
-    title: 'Donaciones - Adopta Zulia',
+    title: "Donaciones - Adopta Zulia",
     meta: [
       {
-        name: 'description',
+        name: "description",
         content:
-          'Conviértete en un héroe para nuestras mascotas. Descubre cómo puedes ayudar con donaciones únicas o mensuales.',
+          "Conviértete en un héroe para nuestras mascotas. Descubre cómo puedes ayudar con donaciones únicas o mensuales.",
       },
     ],
-
-  })
-})
+  });
+});
 </script>
 
 <style scoped>
