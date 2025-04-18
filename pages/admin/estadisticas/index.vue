@@ -19,7 +19,7 @@
       <!-- Error de carga -->
       <div v-if="error" class="mb-8 rounded-lg border border-red-200 bg-red-50 p-6 shadow-md">
         <div class="flex items-center">
-          <AlertCircleIcon class="mr-3 h-5 w-5 text-red-500" />
+          <Icon name="mdi:alert-circle" class="mr-3 h-5 w-5 text-red-500" />
           <h3 class="text-lg font-medium text-red-800">{{ error }}</h3>
         </div>
       </div>
@@ -62,7 +62,7 @@
               <div
                 class="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100"
               >
-                <PawPrintIcon class="h-4 w-4 text-emerald-600" />
+                <Icon name="mdi:paw" class="h-4 w-4 text-emerald-600" />
               </div>
               <h3 class="text-lg font-medium text-gray-900">Mascotas</h3>
             </div>
@@ -85,7 +85,7 @@
           <div class="rounded-lg bg-white p-6 shadow-md">
             <div class="mb-2 flex items-center">
               <div class="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-amber-100">
-                <HeartHandshakeIcon class="h-4 w-4 text-amber-600" />
+                <Icon name="heroicons:heart" class="h-4 w-4 text-amber-600" />
               </div>
               <h3 class="text-lg font-medium text-gray-900">Adopciones</h3>
             </div>
@@ -108,7 +108,7 @@
           <div class="rounded-lg bg-white p-6 shadow-md">
             <div class="mb-2 flex items-center">
               <div class="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
-                <UsersIcon class="h-4 w-4 text-blue-600" />
+                <Icon name="heroicons:users" class="h-4 w-4 text-blue-600" />
               </div>
               <h3 class="text-lg font-medium text-gray-900">Usuarios</h3>
             </div>
@@ -131,7 +131,7 @@
           <div class="rounded-lg bg-white p-6 shadow-md">
             <div class="mb-2 flex items-center">
               <div class="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-purple-100">
-                <BellRingIcon class="h-4 w-4 text-purple-600" />
+                <Icon name="heroicons:bell-alert" class="h-4 w-4 text-purple-600" />
               </div>
               <h3 class="text-lg font-medium text-gray-900">Solicitudes</h3>
             </div>
@@ -411,13 +411,6 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import {
-  PawPrintIcon,
-  UsersIcon,
-  HeartHandshakeIcon,
-  BellRingIcon,
-  AlertCircleIcon,
-} from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
 import { useStats } from '~/composables/useStats'
 

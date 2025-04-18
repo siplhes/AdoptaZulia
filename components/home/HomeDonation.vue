@@ -31,12 +31,9 @@
                 <p class="text-white">Transportamos animales rescatados</p>
               </div>
             </div>
-            <NuxtLink
-              to="/donaciones"
-              class="inline-block rounded-lg bg-white px-6 py-3 text-lg font-semibold text-emerald-700 transition-colors hover:bg-emerald-50"
-            >
-              Hacer una donación
-            </NuxtLink>
+            <div class="mt-8 p-4 rounded-lg bg-white text-emerald-800 font-semibold text-lg shadow">
+              Para donar vía Paypal escribe a: <span class="underline">donaciones@adoptazulia.com</span>
+            </div>
           </div>
           <div class="relative hidden lg:block">
             <NuxtImg 

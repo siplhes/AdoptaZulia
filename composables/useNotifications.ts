@@ -1,4 +1,4 @@
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useAuth } from './useAuth'
 import { getDatabase, ref as dbRef, onValue, update, get, push, remove, set } from 'firebase/database'
 import { useFirebaseApp } from 'vuefire'
@@ -140,12 +140,6 @@ export function useNotifications() {
     }
   }, { immediate: true })
   
-  onMounted(() => {
-    if (isAuthenticated.value) {
-      listenToNotifications()
-    }
-  })
-  
   return {
     notifications,
     unreadCount,
@@ -154,6 +148,7 @@ export function useNotifications() {
     markAsRead,
     markAllAsRead,
     deleteNotification,
-    createNotification
+    createNotification,
+    listenToNotifications
   }
 }

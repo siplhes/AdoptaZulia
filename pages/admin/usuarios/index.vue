@@ -67,14 +67,14 @@
             class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
             @click="resetFilters"
           >
-            <RefreshCwIcon class="mr-2 h-4 w-4" />
+            <Icon name="heroicons:arrow-path" class="mr-2 h-4 w-4" />
             Restablecer
           </button>
           <button
             class="inline-flex items-center rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
             @click="openCreateUserModal"
           >
-            <PlusIcon class="mr-2 h-4 w-4" />
+            <Icon name="heroicons:plus" class="mr-2 h-4 w-4" />
             Añadir usuario
           </button>
         </div>
@@ -91,7 +91,7 @@
         <div v-else-if="error" class="rounded-md bg-red-50 p-4">
           <div class="flex">
             <div class="flex-shrink-0">
-              <AlertCircleIcon class="h-5 w-5 text-red-400" />
+              <Icon name="heroicons:exclamation-circle" class="h-5 w-5 text-red-400" />
             </div>
             <div class="ml-3">
               <h3 class="text-sm font-medium text-red-800">Error al cargar los usuarios</h3>
@@ -280,7 +280,7 @@
                     ]"
                     @click="prevPage"
                   >
-                    <ChevronLeftIcon class="h-5 w-5" />
+                    <Icon name="heroicons:chevron-left" class="h-5 w-5" />
                   </button>
                   <button
                     :disabled="currentPage === totalPages"
@@ -292,7 +292,7 @@
                     ]"
                     @click="nextPage"
                   >
-                    <ChevronRightIcon class="h-5 w-5" />
+                    <Icon name="heroicons:chevron-right" class="h-5 w-5" />
                   </button>
                 </nav>
               </div>
@@ -312,7 +312,7 @@
               {{ selectedUser ? 'Editar usuario' : 'Añadir usuario' }}
             </h3>
             <button class="text-gray-400 hover:text-gray-500" @click="closeEditModal">
-              <XIcon class="h-5 w-5" />
+              <Icon name="heroicons:x-mark" class="h-5 w-5" />
             </button>
           </div>
 
@@ -421,7 +421,7 @@
             <div
               class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100"
             >
-              <AlertTriangleIcon class="h-6 w-6 text-red-600" />
+              <Icon name="heroicons:exclamation-triangle" class="h-6 w-6 text-red-600" />
             </div>
             <h3 class="text-lg font-medium text-gray-900">{{ confirmationTitle }}</h3>
             <p class="mt-2 text-sm text-gray-500">{{ confirmationMessage }}</p>
@@ -456,15 +456,6 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import {
-  AlertCircleIcon,
-  AlertTriangleIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  PlusIcon,
-  RefreshCwIcon,
-  XIcon,
-} from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
 import { useUsers } from '~/composables/useUsers'
 

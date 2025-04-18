@@ -53,7 +53,7 @@
             class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
             @click="resetFilters"
           >
-            <RefreshCwIcon class="mr-2 h-4 w-4" />
+            <Icon name="heroicons:arrow-path" class="mr-2 h-4 w-4" />
             Restablecer
           </button>
         </div>
@@ -70,7 +70,7 @@
         <div v-else-if="error" class="rounded-md bg-red-50 p-4">
           <div class="flex">
             <div class="flex-shrink-0">
-              <AlertCircleIcon class="h-5 w-5 text-red-400" />
+              <Icon name="heroicons:exclamation-circle" class="h-5 w-5 text-red-400" />
             </div>
             <div class="ml-3">
               <h3 class="text-sm font-medium text-red-800">Error al cargar las adopciones</h3>
@@ -130,7 +130,7 @@
                         class="h-full w-full object-cover"
                       />
                       <div v-else class="flex h-full w-full items-center justify-center">
-                        <PawPrintIcon class="h-5 w-5 text-gray-400" />
+                        <Icon name="mdi:paw" class="h-5 w-5 text-gray-400" />
                       </div>
                     </div>
                     <div class="ml-4">
@@ -238,7 +238,7 @@
                     ]"
                     @click="prevPage"
                   >
-                    <ChevronLeftIcon class="h-5 w-5" />
+                    <Icon name="heroicons:chevron-left" class="h-5 w-5" />
                   </button>
                   <button
                     :disabled="currentPage === totalPages"
@@ -250,7 +250,7 @@
                     ]"
                     @click="nextPage"
                   >
-                    <ChevronRightIcon class="h-5 w-5" />
+                    <Icon name="heroicons:chevron-right" class="h-5 w-5" />
                   </button>
                 </nav>
               </div>
@@ -268,7 +268,7 @@
           <div class="mb-4 flex items-center justify-between">
             <h3 class="text-lg font-medium text-gray-900">Detalles de la solicitud</h3>
             <button class="text-gray-400 hover:text-gray-500" @click="selectedAdoption = null">
-              <XIcon class="h-5 w-5" />
+              <Icon name="heroicons:x-mark" class="h-5 w-5" />
             </button>
           </div>
 
@@ -285,7 +285,7 @@
                     class="h-full w-full object-cover"
                   />
                   <div v-else class="flex h-full w-full items-center justify-center">
-                    <PawPrintIcon class="h-8 w-8 text-gray-400" />
+                    <Icon name="mdi:paw" class="h-8 w-8 text-gray-400" />
                   </div>
                 </div>
                 <div class="ml-4">
@@ -422,14 +422,6 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import {
-  AlertCircleIcon,
-  RefreshCwIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  PawPrintIcon,
-  XIcon,
-} from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
 import { useAdoptions } from '~/composables/useAdoptions'
 

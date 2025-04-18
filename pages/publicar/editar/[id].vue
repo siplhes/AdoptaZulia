@@ -1443,14 +1443,15 @@ const updateForm = async () => {
     // Actualizar la mascota en la base de datos
     await updatePet(petId, updates)
 
-    // Mostrar mensaje de éxito
-    alert('Mascota actualizada correctamente')
-
-    // Redirigir a la página de detalle de la mascota
-    router.push(`/mascotas/${petId}`)
+    // Mostrar mensaje de éxito con el modal en lugar de alert
+    showModalAlert('success', '¡Actualización exitosa!', 'Mascota actualizada correctamente', 'Ver mascota')
+    
+    // Establecer un callback para redirigir después de cerrar el modal
+    modalCallback.value = () => router.push(`/mascotas/${petId}`)
   } catch (err) {
     console.error('Error al actualizar mascota:', err)
     error.value = 'Error al actualizar la mascota. Por favor, inténtalo de nuevo.'
+    showModalAlert('error', 'Error', 'Error al actualizar la mascota. Por favor, inténtalo de nuevo.')
   }
 }
 </script>

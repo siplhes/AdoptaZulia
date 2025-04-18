@@ -143,7 +143,7 @@
                     class="inline-flex items-center justify-center rounded-md bg-red-600 px-4 py-2 font-medium text-white hover:bg-red-700"
                     @click="cancelAdoption"
                   >
-                    <XIcon class="mr-2 h-4 w-4" />
+                    <Icon name="mdi:close" class="mr-2 h-4 w-4" />
                     Cancelar solicitud
                   </button>
                 </div>
@@ -155,7 +155,7 @@
                     class="inline-flex items-center justify-center rounded-md bg-emerald-600 px-4 py-2 font-medium text-white hover:bg-emerald-700"
                     @click="updateStatus('completed')"
                   >
-                    <CheckCircleIcon class="mr-2 h-4 w-4" />
+                    <Icon name="mdi:check-circle" class="mr-2 h-4 w-4" />
                     Completar adopción
                   </button>
                   
@@ -173,7 +173,7 @@
                     class="inline-flex items-center justify-center rounded-md bg-red-600 px-4 py-2 font-medium text-white hover:bg-red-700"
                     @click="cancelAdoption"
                   >
-                    <XIcon class="mr-2 h-4 w-4" />
+                    <Icon name="mdi:close" class="mr-2 h-4 w-4" />
                     Cancelar solicitud
                   </button>
                 </div>
@@ -188,7 +188,7 @@
                     to="/mascotas"
                     class="inline-flex items-center justify-center rounded-md bg-emerald-600 px-4 py-2 font-medium text-white hover:bg-emerald-700"
                   >
-                    <SearchIcon class="mr-2 h-4 w-4" />
+                    <Icon name="mdi:magnify" class="mr-2 h-4 w-4" />
                     Explorar más mascotas
                   </NuxtLink>
                 </div>
@@ -197,7 +197,7 @@
               <template v-else-if="adoption.status === 'completed'">
                 <div class="rounded-lg border border-green-100 bg-green-50 p-4">
                   <p class="text-sm text-green-800">
-                    <Icon name="heroicons:check-circle" class="inline-block mr-1 h-4 w-4 text-green-600" />
+                    <Icon name="mdi:check-circle" class="inline-block mr-1 h-4 w-4 text-green-600" />
                     ¡Felicidades! Esta adopción ha sido completada exitosamente.
                   </p>
                   
@@ -206,7 +206,7 @@
                       :to="`/certificados/${adoption.id}`"
                       class="inline-flex items-center justify-center rounded-md bg-amber-600 px-4 py-2 font-medium text-white hover:bg-amber-700"
                     >
-                      <Icon name="heroicons:document-text" class="mr-2 h-4 w-4" />
+                      <Icon name="mdi:file-document" class="mr-2 h-4 w-4" />
                       Ver certificado de adopción
                     </NuxtLink>
                     
@@ -215,7 +215,7 @@
                       :to="`/historias/crear?petId=${adoption.petId}&adoptionId=${adoption.id}`"
                       class="inline-flex items-center justify-center rounded-md border border-emerald-600 px-4 py-2 font-medium text-emerald-600 hover:bg-emerald-50"
                     >
-                      <Icon name="heroicons:pencil-square" class="mr-2 h-4 w-4" />
+                      <Icon name="mdi:pencil" class="mr-2 h-4 w-4" />
                       Compartir historia de adopción
                     </NuxtLink>
                   </div>
@@ -239,7 +239,7 @@
               <h2 class="mb-3 text-lg font-semibold text-gray-800">Información del solicitante</h2>
               <div class="space-y-2">
                 <div class="flex items-start">
-                  <UserIcon class="mr-2 mt-1 h-5 w-5 text-gray-400" />
+                  <Icon name="mdi:account" class="mr-2 mt-1 h-5 w-5 text-gray-400" />
                   <div>
                     <p class="font-medium text-gray-900">{{ adoption.user?.name || 'No disponible' }}</p>
                     <p v-if="isOwner || isAdmin" class="text-sm text-gray-500">{{ adoption.user?.email || 'Email no disponible' }}</p>
@@ -247,7 +247,7 @@
                 </div>
                 
                 <div v-if="(isOwner || isAdmin) && adoption.status === 'approved'" class="flex items-start">
-                  <PhoneIcon class="mr-2 mt-1 h-5 w-5 text-gray-400" />
+                  <Icon name="mdi:phone" class="mr-2 mt-1 h-5 w-5 text-gray-400" />
                   <div>
                     <p class="font-medium text-gray-900">{{ adoption.user?.phone || 'No disponible' }}</p>
                   </div>
@@ -260,14 +260,14 @@
               <h2 class="mb-3 text-lg font-semibold text-gray-800">Datos de contacto del propietario</h2>
               <div v-if="petOwner" class="space-y-2">
                 <div class="flex items-start">
-                  <UserIcon class="mr-2 mt-1 h-5 w-5 text-gray-400" />
+                  <Icon name="mdi:account" class="mr-2 mt-1 h-5 w-5 text-gray-400" />
                   <div>
                     <p class="font-medium text-gray-900">{{ petOwner.displayName || 'No disponible' }}</p>
                   </div>
                 </div>
                 
                 <div class="flex items-start">
-                  <MailIcon class="mr-2 mt-1 h-5 w-5 text-gray-400" />
+                  <Icon name="mdi:email" class="mr-2 mt-1 h-5 w-5 text-gray-400" />
                   <div>
                     <a :href="`mailto:${petOwner.email}`" class="font-medium text-emerald-600 hover:text-emerald-700">
                       {{ petOwner.email || 'No disponible' }}
@@ -276,7 +276,7 @@
                 </div>
                 
                 <div class="flex items-start">
-                  <PhoneIcon class="mr-2 mt-1 h-5 w-5 text-gray-400" />
+                  <Icon name="mdi:phone" class="mr-2 mt-1 h-5 w-5 text-gray-400" />
                   <div>
                     <a :href="`tel:${petOwner.phoneNumber}`" class="font-medium text-emerald-600 hover:text-emerald-700">
                       {{ petOwner.phoneNumber || 'No disponible' }}
@@ -299,7 +299,7 @@
                     class="inline-flex items-center rounded-md border border-emerald-600 px-3 py-2 text-sm font-medium text-emerald-600 hover:bg-emerald-50"
                     @click="contactEmail(petOwner.email)"
                   >
-                    <MailIcon class="mr-2 h-4 w-4" />
+                    <Icon name="mdi:email" class="mr-2 h-4 w-4" />
                     Enviar correo
                   </button>
                 </div>
@@ -323,7 +323,7 @@
                   class="inline-flex items-center rounded-md bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-700"
                   @click="saveNotes"
                 >
-                  <SaveIcon class="mr-2 h-4 w-4" />
+                  <Icon name="mdi:content-save" class="mr-2 h-4 w-4" />
                   Guardar notas
                 </button>
               </div>
@@ -335,7 +335,7 @@
               <div class="space-y-3">
                 <div class="flex items-start">
                   <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200">
-                    <PencilIcon class="h-4 w-4 text-gray-500" />
+                    <Icon name="mdi:pencil" class="h-4 w-4 text-gray-500" />
                   </div>
                   <div class="ml-3">
                     <p class="text-sm text-gray-600">
@@ -353,16 +353,19 @@
                       'bg-green-100': adoption.status === 'completed'
                     }"
                   >
-                    <CheckIcon 
-                      v-if="adoption.status === 'approved' || adoption.status === 'completed'" 
-                      class="h-4 w-4" 
-                      :class="{
-                        'text-blue-500': adoption.status === 'approved',
-                        'text-green-500': adoption.status === 'completed'
-                      }"
+                    <Icon 
+                      v-if="adoption.status === 'approved'" 
+                      name="mdi:check" 
+                      class="h-4 w-4 text-blue-500" 
                     />
-                    <XIcon 
+                    <Icon 
+                      v-if="adoption.status === 'completed'" 
+                      name="mdi:check-circle" 
+                      class="h-4 w-4 text-green-500" 
+                    />
+                    <Icon 
                       v-if="adoption.status === 'rejected'" 
+                      name="mdi:close" 
                       class="h-4 w-4 text-red-500" 
                     />
                   </div>
@@ -390,20 +393,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import {
-  ArrowLeftIcon,
-  UserIcon,
-  PhoneIcon,
-  MailIcon,
-  CheckIcon,
-  XIcon,
-  CheckCircleIcon,
-  AlertTriangleIcon,
-  PawPrintIcon,
-  SaveIcon,
-  PencilIcon,
-  SearchIcon
-} from 'lucide-vue-next'
 import { useAuth } from '~/composables/useAuth'
 import { useAdoptions } from '~/composables/useAdoptions'
 import { getDatabase, ref as dbRef, get, update } from 'firebase/database'

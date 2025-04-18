@@ -1,6 +1,7 @@
 import { initializeApp, getApps, getApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { getDatabase } from 'firebase/database'
+import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 import { defineNuxtPlugin, useRuntimeConfig } from '#app'
 import { useFirebaseApp } from 'vuefire'
 
@@ -27,6 +28,13 @@ export default defineNuxtPlugin((nuxtApp) => {
           databaseURL: config.public.firebase?.databaseURL,
         }
         firebaseApp = initializeApp(firebaseConfig)
+
+        if (typeof window !== 'undefined') {
+          initializeAppCheck(firebaseApp, {
+            provider: new ReCaptchaV3Provider(config.public.recaptchaSiteKey),
+            isTokenAutoRefreshEnabled: true,
+          });
+        }
       }
     }
 

@@ -17,7 +17,6 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@nuxtjs/color-mode',
     'nuxt-vuefire',
-    'nuxt-paypal',
     'nuxt-booster'
   ],
 
@@ -27,10 +26,7 @@ export default defineNuxtConfig({
     awsSecretKey: process.env.AWS_SECRET_ACCESS_KEY,
     // Claves que se exponen al cliente
     public: {
-      paypal: {
-        clientId: process.env.PAYPAL_CLIENT_ID || 'test',
-        currency: 'USD',
-      },
+      recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
       awsRegion: process.env.AWS_REGION,
       awsAccessKey: process.env.AWS_ACCESS_KEY_ID,
       awsS3BucketName: process.env.AWS_S3_BUCKET_NAME,
@@ -65,21 +61,14 @@ export default defineNuxtConfig({
       messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
       measurementId: process.env.FIREBASE_MEASUREMENT_ID,
       databaseURL: process.env.FIREBASE_DATABASE_URL,
+
     },
     // IMPORTANTE: Desactivamos la inicialización automática de Firebase Admin
     // ya que lo estamos manejando manualmente a través de nuestro plugin de Nitro
     admin: false,
-    appCheck: {
-      provider: 'reCaptcha', // Si usamos reCaptcha para AppCheck
-    },
   },
 
-  plugins: ['~/plugins/firebase.ts', '~/plugins/paypal.ts'],
-
-  paypal: {
-    clientId: process.env.PAYPAL_CLIENT_ID || 'test',
-    currency: 'USD',
-  },
+  plugins: ['~/plugins/firebase.ts'],
 
   nitro: {
     compressPublicAssets: true,
@@ -114,25 +103,16 @@ export default defineNuxtConfig({
   },
 
   image: {
-    inject: true,
-    screens: {
-      xs: 320,
-      sm: 640,
-      md: 768,
-      lg: 1024,
-      xl: 1280,
-      xxl: 1536,
-      '2xl': 1536,
-    },
-    domains: ['example.com'],
-    presets: {
-      default: {
-        modifiers: {
-          format: 'webp', 
-          quality: 75,
-        },
-      },
-    },
+    domains: [
+      'nsfwclothesmaracaibo.s3.us-east-2.amazonaws.com'
+    ],
+    ipx: {
+      remote: {
+        domains: [
+          'nsfwclothesmaracaibo.s3.us-east-2.amazonaws.com'
+        ]
+      }
+    }
   },
 
   booster: {
@@ -150,18 +130,5 @@ export default defineNuxtConfig({
       fcp: 800,
       dcl: 1200
     }
-  },
-  image: {
-    screens: {
-      default: 320,
-      xxs: 480,
-      xs: 576,
-      sm: 768,
-      md: 996,
-      lg: 1200,
-      xl: 1367,
-      xxl: 1600,
-      '4k': 1921
-    },
   }
 })

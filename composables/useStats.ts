@@ -7,6 +7,7 @@ import {
   orderByChild,
   startAt,
   endAt,
+  set,
 } from 'firebase/database'
 import { useFirebaseApp } from 'vuefire'
 import { addMonths, subMonths, subDays, subQuarters, startOfYear, format } from 'date-fns'
@@ -103,8 +104,45 @@ export function useStats() {
       const firebaseApp = useFirebaseApp()
       const db = getDatabase(firebaseApp)
 
-      // Obtener solo estadísticas básicas
-      await fetchGeneralStats(db)
+      // Primero intentamos obtener estadísticas públicas ya almacenadas
+      const publicStatsRef = dbRef(db, 'statistics/public')
+      const publicStatsSnapshot = await get(publicStatsRef)
+      
+      if (publicStatsSnapshot.exists()) {
+        // Si ya existen estadísticas públicas, las usamos
+        stats.value = publicStatsSnapshot.val()
+      } else {
+        // Si no existen, obtenemos estadísticas básicas
+        await fetchGeneralStats(db)
+        
+        // Guardamos las estadísticas en la ubicación pública para futuras consultas
+        // Solo almacenamos los datos que queremos sean públicos
+        const publicStats = {
+          totalPets: stats.value.totalPets,
+          totalAdoptions: stats.value.totalAdoptions,
+          totalUsers: stats.value.totalUsers,
+          urgentPets: stats.value.urgentPets,
+          // Omitimos datos sensibles como pendingRequests, requestDistribution, etc.
+          pendingRequests: 0,
+          requestDistribution: {
+            pending: 0,
+            approved: 0,
+            rejected: 0,
+          },
+          adoptionSuccess: stats.value.adoptionSuccess
+        }
+        
+        try {
+          // Solo guardamos si somos admin (para evitar intentos de escritura sin permisos)
+          if (isAdmin.value) {
+            await set(publicStatsRef, publicStats)
+          }
+          stats.value = publicStats
+        } catch (writeErr) {
+          console.warn('No se pudieron guardar las estadísticas públicas:', writeErr)
+          // Continuamos aunque no podamos guardarlas
+        }
+      }
       
       return stats.value
     } catch (err: any) {
@@ -122,7 +160,7 @@ export function useStats() {
     error.value = null
 
     try {
-      // Si el usuario no es administrador, obtener solo estadísticas básicas
+      // Si el usuario no es administrador, obtener solo estadísticas públicas
       if (!isAdmin.value) {
         return await fetchPublicStats()
       }
@@ -141,6 +179,28 @@ export function useStats() {
 
       // 4. Estadísticas detalladas (solo para administradores)
       generateDetailedStats()
+
+      // 5. Actualizar las estadísticas públicas con las más recientes
+      try {
+        const publicStatsRef = dbRef(db, 'statistics/public')
+        const publicStats = {
+          totalPets: stats.value.totalPets,
+          totalAdoptions: stats.value.totalAdoptions,
+          totalUsers: stats.value.totalUsers,
+          urgentPets: stats.value.urgentPets,
+          pendingRequests: 0,
+          requestDistribution: {
+            pending: 0,
+            approved: 0,
+            rejected: 0,
+          },
+          adoptionSuccess: stats.value.adoptionSuccess
+        }
+        await set(publicStatsRef, publicStats)
+      } catch (writeErr) {
+        console.warn('No se pudieron actualizar las estadísticas públicas:', writeErr)
+        // Continuamos aunque no podamos guardarlas
+      }
 
       return stats.value
     } catch (err: any) {

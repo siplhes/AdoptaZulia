@@ -61,16 +61,20 @@
       <!-- Botón de favorito con feedback táctil -->
       <button
         type="button"
-        class="absolute left-2 top-2 rounded-full bg-white p-1.5 shadow-md transition-colors hover:bg-amber-50 active:scale-95 z-10"
+        class="absolute flex justify-center items-center left-2 top-2 rounded-full bg-white p-1.5 shadow-md transition-colors hover:bg-amber-50 active:scale-95 z-10"
         :class="{ 'text-red-500': isFavorite, 'text-gray-400': !isFavorite }"
-        aria-label="Agregar a favoritos"
+        :aria-label="`Agregar ${pet.name} a favoritos`"
         :aria-pressed="isFavorite"
         @click.stop="toggleFavorite"
-      >
+      
+      > 
         <Icon
           :name="isFavorite ? 'heroicons:heart-solid' : 'heroicons:heart'"
-          class="h-5 w-5"
+          class="h-7 w-7"
+        aria-label="Agregar a favoritos"
+        data-balloon-pos="up"
         />
+
       </button>
 
       <!-- Tiempo desde publicación con mejor visibilidad -->
@@ -88,6 +92,8 @@
         <h3
           class="mb-1 text-lg font-semibold text-emerald-800 truncate"
           :title="pet.name"
+          :aria-label="`Nombre de la mascota: ${pet.name}`"
+          data-balloon-pos="up"
         >
           {{ pet.name }}
         </h3>
@@ -142,7 +148,7 @@
           v-if="pet.size"
           class="flex items-center rounded bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700"
         >
-          <Icon name="heroicons:ruler" class="mr-1 h-3 w-3" />
+          <Icon name="mdi:ruler" class="mr-1 h-3 w-3" />
           {{
             pet.size === "small"
               ? "Pequeño"

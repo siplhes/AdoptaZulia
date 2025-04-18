@@ -30,6 +30,10 @@ useHead({
       type: 'image/svg+xml',
       href: '/favicon.svg',
     },
+    {
+      rel: 'stylesheet',
+      href: 'https://unpkg.com/balloon-css/balloon.min.css',
+    }
   ],
   script: [
     {

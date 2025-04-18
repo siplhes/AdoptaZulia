@@ -25,7 +25,7 @@
           <!-- Search Bar -->
           <div class="flex flex-col rounded-lg bg-white p-2 md:flex-row">
             <div class="flex flex-grow items-center px-3 py-2">
-              <SearchIcon class="mr-2 h-5 w-5 text-gray-400" />
+              <Icon name="heroicons:magnifying-glass" class="mr-2 h-5 w-5 text-gray-400" />
               <input
                 v-model="searchQuery"
                 type="text"
@@ -63,10 +63,11 @@
               @click="showFilters = !showFilters"
             >
               <span class="flex items-center">
-                <FilterIcon class="mr-2 h-5 w-5" />
+                <Icon name="heroicons:funnel" class="mr-2 h-5 w-5" />
                 {{ showFilters ? 'Ocultar filtros' : 'Mostrar filtros' }}
               </span>
-              <ChevronDownIcon 
+              <Icon 
+                name="heroicons:chevron-down" 
                 class="h-5 w-5 transition-transform duration-200" 
                 :class="{'transform rotate-180': showFilters}"
               />
@@ -219,7 +220,7 @@
             <div
               class="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-amber-100"
             >
-              <SearchIcon class="h-12 w-12 text-amber-500" />
+              <Icon name="heroicons:magnifying-glass" class="h-12 w-12 text-amber-500" />
             </div>
             <h3 class="mb-2 text-xl font-semibold text-gray-800">No se encontraron resultados</h3>
             <p class="mb-6 text-gray-600">
@@ -267,7 +268,7 @@
                     v-else-if="pet.urgent"
                     class="flex items-center rounded-full bg-red-100 px-3 py-1 text-xs text-red-800"
                   >
-                    <AlertCircleIcon class="mr-1 h-3 w-3" />
+                    <Icon name="heroicons:exclamation-circle" class="mr-1 h-3 w-3" />
                     Urgente
                   </span>
                 </div>
@@ -278,7 +279,8 @@
                   <h3 class="text-xl font-semibold text-emerald-800">
                     {{ pet.name }}
                   </h3>
-                  <HeartIcon
+                  <Icon
+                    name="heroicons:heart"
                     class="h-6 w-6 cursor-pointer text-gray-400 transition-colors hover:text-red-500"
                     @click="toggleFavorite(pet.id)"
                   />
@@ -293,20 +295,20 @@
                     v-if="pet.vaccinated"
                     class="flex items-center rounded-full bg-green-100 px-2 py-1 text-xs text-green-800"
                   >
-                    <CheckCircleIcon class="mr-1 h-3 w-3" />
+                    <Icon name="heroicons:check-circle" class="mr-1 h-3 w-3" />
                     Vacunado
                   </span>
                   <span
                     v-if="pet.neutered"
                     class="flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs text-blue-800"
                   >
-                    <CheckCircleIcon class="mr-1 h-3 w-3" />
+                    <Icon name="heroicons:check-circle" class="mr-1 h-3 w-3" />
                     Esterilizado
                   </span>
                   <span
                     class="flex items-center rounded-full bg-purple-100 px-2 py-1 text-xs text-purple-800"
                   >
-                    <RulerIcon class="mr-1 h-3 w-3" />
+                    <Icon name="heroicons:square-2-stack" class="mr-1 h-3 w-3" />
                     {{ pet.size }}
                   </span>
                 </div>
@@ -339,7 +341,7 @@
                 ]"
                 @click="prevPage"
               >
-                <ChevronLeftIcon class="h-5 w-5" />
+                <Icon name="heroicons:chevron-left" class="h-5 w-5" />
               </button>
 
               <button
@@ -366,7 +368,7 @@
                 ]"
                 @click="nextPage"
               >
-                <ChevronRightIcon class="h-5 w-5" />
+                <Icon name="heroicons:chevron-right" class="h-5 w-5" />
               </button>
             </nav>
           </div>
@@ -379,17 +381,6 @@
 <script setup>
 import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
-import {
-  SearchIcon,
-  AlertCircleIcon,
-  HeartIcon,
-  CheckCircleIcon,
-  RulerIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  FilterIcon, // Agregar icono de filtro
-  ChevronDownIcon, // Agregar icono de despliegue
-} from 'lucide-vue-next'
 import { usePets } from '~/composables/usePets'
 
 // Composables

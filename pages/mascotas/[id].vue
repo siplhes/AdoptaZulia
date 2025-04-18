@@ -6,7 +6,7 @@
         class="mb-6 inline-flex items-center text-emerald-600 hover:text-emerald-700"
         @click="goBack"
       >
-        <ArrowLeftIcon class="mr-1 h-4 w-4" />
+        <Icon name="heroicons:arrow-left" class="mr-1 h-4 w-4" />
         <span>Volver a mascotas</span>
       </button>
 
@@ -17,7 +17,7 @@
       <div v-else-if="error" class="mb-6 border-l-4 border-red-500 bg-red-50 p-4">
         <div class="flex">
           <div class="flex-shrink-0">
-            <AlertTriangleIcon class="h-5 w-5 text-red-500" />
+            <Icon name="heroicons:exclamation-triangle" class="h-5 w-5 text-red-500" />
           </div>
           <div class="ml-3">
             <p class="text-sm text-red-700">{{ error }}</p>
@@ -28,7 +28,7 @@
       <div v-else-if="!pet" class="mb-6 border-l-4 border-yellow-500 bg-yellow-50 p-4">
         <div class="flex">
           <div class="flex-shrink-0">
-            <AlertTriangleIcon class="h-5 w-5 text-yellow-500" />
+            <Icon name="heroicons:exclamation-triangle" class="h-5 w-5 text-yellow-500" />
           </div>
           <div class="ml-3">
             <p class="text-sm text-yellow-700">No se ha encontrado la mascota</p>
@@ -99,7 +99,7 @@
               >
                 <div class="flex">
                   <div class="flex-shrink-0">
-                    <AlertCircleIcon class="h-5 w-5 text-red-500" />
+                    <Icon name="heroicons:exclamation-circle" class="h-5 w-5 text-red-500" />
                   </div>
                   <div class="ml-3">
                     <p class="text-sm font-medium text-red-700">Adopción urgente</p>
@@ -111,111 +111,223 @@
               </div>
             </div>
             <!-- Botones de acción -->
-            <div class="mt-6 flex flex-wrap gap-3">
+            <div class="mt-6">
+              <!-- Versión móvil (botones con íconos) -->
+              <div class="flex flex-wrap gap-2 lg:hidden">
               <!-- Botones para usuarios no propietarios -->
-              <div v-if="!isOwner" class="flex w-full flex-wrap gap-3">
-                <!-- Solicitar adopción (no mostrar si ya aplicó o si la mascota está adoptada) -->
+              <div v-if="!isOwner" class="flex flex-wrap gap-2">
                 <button
-                  v-if="canAdopt && !hasApplied && pet.status !== 'adopted'"
-                  class="flex flex-1 items-center justify-center rounded-lg bg-emerald-600 px-4 py-3 text-white hover:bg-emerald-700"
-                  @click="openAdoptionModal"
-                >
-                  <HeartIcon class="mr-2 h-5 w-5" />
-                  <span>Solicitar adopción</span>
+                v-if="canAdopt && !hasApplied && pet.status !== 'adopted'"
+                class="flex items-center justify-center rounded-full bg-emerald-600 p-2 text-white hover:bg-emerald-700"
+                @click="openAdoptionModal"
+                >Adoptar a {{ pet.name }}
+                <Icon name="heroicons:heart" class="h-6 w-6" />
                 </button>
 
-                <!-- Ver mi solicitud -->
                 <button
-                  v-if="hasApplied"
-                  class="flex flex-1 items-center justify-center rounded-lg bg-blue-600 px-4 py-3 text-white hover:bg-blue-700"
-                  @click="viewUserAdoption"
+                v-if="hasApplied"
+                class="flex items-center justify-center rounded-full bg-blue-600 p-3 text-white hover:bg-blue-700"
+                @click="viewUserAdoption"
                 >
-                  <Icon name="heroicons:document-text" class="mr-2 h-5 w-5" />
-                  <span>Ver mi solicitud</span>
+                <Icon name="heroicons:document-text" class="h-6 w-6" />
                 </button>
 
-                <!-- Contactar (solo visible si la solicitud fue aprobada) -->
                 <button
-                  v-if="adoptionStatus === 'approved'"
-                  class="flex flex-1 items-center justify-center rounded-lg bg-amber-600 px-4 py-3 text-white hover:bg-amber-700"
-                  @click="contactOwner"
+                v-if="adoptionStatus === 'approved'"
+                class="flex items-center justify-center rounded-full bg-amber-600 p-3 text-white hover:bg-amber-700"
+                @click="contactOwner"
                 >
-                  <PhoneIcon class="mr-2 h-5 w-5" />
-                  <span>Llamar</span>
+                <Icon name="heroicons:phone" class="h-6 w-6" />
                 </button>
 
-                <!-- WhatsApp (solo visible si la solicitud fue aprobada) -->
                 <button
-                  v-if="adoptionStatus === 'approved'"
-                  class="flex flex-1 items-center justify-center rounded-lg bg-green-600 px-4 py-3 text-white hover:bg-green-700"
-                  @click="contactWhatsapp"
+                v-if="adoptionStatus === 'approved'"
+                class="flex items-center justify-center rounded-full bg-green-600 p-3 text-white hover:bg-green-700"
+                @click="contactWhatsapp"
                 >
-                  <Icon name="heroicons:chat-bubble-left-right" class="mr-2 h-5 w-5" />
-                  <span>WhatsApp</span>
+                <Icon name="heroicons:chat-bubble-left-right" class="h-6 w-6" />
                 </button>
               </div>
 
               <!-- Botones para propietarios -->
-              <div v-if="isOwner" class="flex w-full flex-wrap gap-3">
-                <!-- Botón para ver solicitudes de adopción -->
+              <div v-if="isOwner" class="flex flex-wrap gap-2">
                 <button
-                  class="flex flex-1 items-center justify-center rounded-lg bg-blue-600 px-4 py-3 text-white hover:bg-blue-700"
-                  @click="viewAdoptionRequests"
+                class="flex items-center justify-center rounded-full bg-blue-600 p-3 text-white hover:bg-blue-700"
+                @click="viewAdoptionRequests"
                 >
-                  <Icon name="heroicons:document-text" class="mr-2 h-5 w-5" />
-                  <span>Solicitudes ({{ ownerAdoptionCount }})</span>
+                <Icon name="heroicons:document-text" class="h-6 w-6" />
                 </button>
 
-                <!-- Enlace a Mis publicaciones -->
                 <NuxtLink
-                  to="/mis-publicaciones"
-                  class="flex flex-1 items-center justify-center rounded-lg bg-purple-600 px-4 py-3 text-white hover:bg-purple-700"
+                to="/mis-publicaciones"
+                class="flex items-center justify-center rounded-full bg-purple-600 p-3 text-white hover:bg-purple-700"
                 >
-                  <Icon name="heroicons:photo" class="mr-2 h-5 w-5" />
-                  <span>Publicaciones</span>
+                <Icon name="heroicons:photo" class="h-6 w-6" />
                 </NuxtLink>
 
-                <!-- Botón editar mascota -->
                 <button
-                  class="flex flex-1 items-center justify-center rounded-lg bg-amber-600 px-4 py-3 text-white hover:bg-amber-700"
-                  @click="editPet"
+                class="flex items-center justify-center rounded-full bg-amber-600 p-3 text-white hover:bg-amber-700"
+                @click="editPet"
                 >
-                  <EditIcon class="mr-2 h-5 w-5" />
-                  <span>Editar</span>
+                <Icon name="heroicons:pencil-square" class="h-6 w-6" />
                 </button>
 
-                <!-- Botón eliminar mascota -->
                 <button
-                  class="flex flex-1 items-center justify-center rounded-lg bg-red-600 px-4 py-3 text-white hover:bg-red-700"
-                  @click="deletePet"
+                class="flex items-center justify-center rounded-full bg-red-600 p-3 text-white hover:bg-red-700"
+                @click="deletePet"
                 >
-                  <TrashIcon class="mr-2 h-5 w-5" />
-                  <span>Eliminar</span>
+                <Icon name="heroicons:trash" class="h-6 w-6" />
                 </button>
               </div>
-              <button
-                class="flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-700 hover:bg-gray-50"
+
+              <!-- Botones comunes -->
+              <div class="flex flex-wrap gap-2">
+                <button
+                class="flex items-center justify-center rounded-full border border-gray-300 bg-white p-3 text-gray-700 hover:bg-gray-50"
                 @click="sharePet"
-              >
-                <ShareIcon class="mr-2 h-5 w-5" />
-                <span>Compartir</span>
-              </button>
-              <button
-                class="flex items-center justify-center rounded-lg border px-4 py-3"
+                >
+                <Icon name="heroicons:share" class="h-6 w-6" />
+                </button>
+
+                <button
+                class="flex items-center justify-center rounded-full border p-3"
                 :class="[
                   isFavorite
-                    ? 'border-red-300 bg-red-50 text-red-700 hover:bg-red-100'
-                    : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
+                  ? 'border-red-300 bg-red-50 text-red-700 hover:bg-red-100'
+                  : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
                 ]"
                 @click="toggleFavorite"
-              >
+                >
                 <Icon
-                  :name="isFavorite ? 'heroicons:heart' : 'heroicons:heart-outline'"
-                  class="mr-2 h-5 w-5"
+                  :name="isFavorite ? 'heroicons:heart' : 'mdi:heart-outline'"
+                  class="h-6 w-6"
                   :class="{ 'text-red-500': isFavorite }"
                 />
-                <span>{{ isFavorite ? "Guardado" : "Guardar" }}</span>
-              </button>
+                </button>
+
+                <button
+                class="flex items-center justify-center rounded-full border border-emerald-300 bg-emerald-50 p-3 text-emerald-700 hover:bg-emerald-100"
+                @click="generateShareImage"
+                :disabled="generatingImage"
+                >
+                <Icon :name="generatingImage ? 'heroicons:arrow-path' : 'heroicons:photo'" class="h-6 w-6" :class="{ 'animate-spin': generatingImage }" />
+                </button>
+              </div>
+              </div>
+
+              <!-- Versión desktop (botones con texto) -->
+              <div class="hidden space-y-2 lg:block">
+              <!-- Botones para usuarios no propietarios -->
+              <div v-if="!isOwner" class="flex flex-wrap gap-2">
+                <button
+                v-if="canAdopt && !hasApplied && pet.status !== 'adopted'"
+                class="flex items-center justify-center gap-2 rounded-md bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700"
+                @click="openAdoptionModal"
+                >
+                <Icon name="heroicons:heart" class="h-5 w-5" />
+                <span>Solicitar adopción</span>
+                </button>
+
+                <button
+                v-if="hasApplied"
+                class="flex items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                @click="viewUserAdoption"
+                >
+                <Icon name="heroicons:document-text" class="h-5 w-5" />
+                <span>Ver mi solicitud</span>
+                </button>
+
+                <button
+                v-if="adoptionStatus === 'approved'"
+                class="flex items-center justify-center gap-2 rounded-md bg-amber-600 px-4 py-2 text-white hover:bg-amber-700"
+                @click="contactOwner"
+                >
+                <Icon name="heroicons:phone" class="h-5 w-5" />
+                <span>Llamar</span>
+                </button>
+
+                <button
+                v-if="adoptionStatus === 'approved'"
+                class="flex items-center justify-center gap-2 rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+                @click="contactWhatsapp"
+                >
+                <Icon name="heroicons:chat-bubble-left-right" class="h-5 w-5" />
+                <span>WhatsApp</span>
+                </button>
+              </div>
+
+              <!-- Botones para propietarios -->
+              <div v-if="isOwner" class="flex flex-wrap gap-2">
+                <button
+                class="flex items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+                @click="viewAdoptionRequests"
+                >
+                <Icon name="heroicons:document-text" class="h-5 w-5" />
+                <span>Ver solicitudes</span>
+                </button>
+
+                <NuxtLink
+                to="/mis-publicaciones"
+                class="flex items-center justify-center gap-2 rounded-md bg-purple-600 px-4 py-2 text-white hover:bg-purple-700"
+                >
+                <Icon name="heroicons:photo" class="h-5 w-5" />
+                <span>Mis publicaciones</span>
+                </NuxtLink>
+
+                <button
+                class="flex items-center justify-center gap-2 rounded-md bg-amber-600 px-4 py-2 text-white hover:bg-amber-700"
+                @click="editPet"
+                >
+                <Icon name="heroicons:pencil-square" class="h-5 w-5" />
+                <span>Editar</span>
+                </button>
+
+                <button
+                class="flex items-center justify-center gap-2 rounded-md bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+                @click="deletePet"
+                >
+                <Icon name="heroicons:trash" class="h-5 w-5" />
+                <span>Eliminar</span>
+                </button>
+              </div>
+
+              <!-- Botones comunes -->
+              <div class="mt-2 flex flex-wrap gap-2">
+                <button
+                class="flex items-center justify-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50"
+                @click="sharePet"
+                >
+                <Icon name="heroicons:share" class="h-5 w-5" />
+                <span>Compartir</span>
+                </button>
+
+                <button
+                class="flex items-center justify-center gap-2 rounded-md border px-4 py-2"
+                :class="[
+                  isFavorite
+                  ? 'border-red-300 bg-red-50 text-red-700 hover:bg-red-100'
+                  : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
+                ]"
+                @click="toggleFavorite"
+                >
+                <Icon
+                  :name="isFavorite ? 'heroicons:heart' : 'mdi:heart-outline'"
+                  class="h-5 w-5"
+                  :class="{ 'text-red-500': isFavorite }"
+                />
+                <span>{{ isFavorite ? 'En favoritos' : 'Añadir a favoritos' }}</span>
+                </button>
+
+                <button
+                class="flex items-center justify-center gap-2 rounded-md border border-emerald-300 bg-emerald-50 px-4 py-2 text-emerald-700 hover:bg-emerald-100"
+                @click="generateShareImage"
+                :disabled="generatingImage"
+                >
+                <Icon :name="generatingImage ? 'heroicons:arrow-path' : 'heroicons:photo'" class="h-5 w-5" :class="{ 'animate-spin': generatingImage }" />
+                <span>{{ generatingImage ? 'Generando...' : 'Generar imagen' }}</span>
+                </button>
+              </div>
+              </div>
             </div>
           </div>
           <div class="border-gray-100 p-4 lg:col-span-2 lg:border-l lg:p-6">
@@ -284,10 +396,10 @@
                 </span>
               </div>
               <div class="mb-4 flex items-center text-gray-500">
-                <MapPinIcon class="mr-1 h-4 w-4" />
+                <Icon name="heroicons:map-pin" class="mr-1 h-4 w-4" />
                 <span class="text-sm">{{ pet.location }}</span>
                 <span class="mx-2">•</span>
-                <CalendarIcon class="mr-1 h-4 w-4" />
+                <Icon name="heroicons:calendar" class="mr-1 h-4 w-4" />
                 <span class="text-sm">Publicado {{ formatDate(pet.createdAt) }}</span>
               </div>
 
@@ -389,7 +501,7 @@
                     :key="index"
                     class="flex items-center"
                   >
-                    <CheckCircleIcon class="mr-2 h-5 w-5 text-green-500" />
+                    <Icon name="heroicons:check-circle" class="mr-2 h-5 w-5 text-green-500" />
                     <span>{{ vaccine.name }}</span>
                     <span v-if="vaccine.date" class="ml-2 text-sm text-gray-500">
                       ({{ formatShortDate(vaccine.date) }})
@@ -448,12 +560,12 @@
                     class="mb-3 space-y-2"
                   >
                     <div v-if="pet.requiresContract" class="flex items-center">
-                      <CheckCircleIcon class="mr-2 h-5 w-5 text-emerald-600" />
+                      <Icon name="heroicons:check-circle" class="mr-2 h-5 w-5 text-emerald-600" />
                       <span class="text-gray-700">Requiere contrato de adopción</span>
                     </div>
 
                     <div v-if="pet.requiresFollowUp" class="flex items-center">
-                      <CheckCircleIcon class="mr-2 h-5 w-5 text-emerald-600" />
+                      <Icon name="heroicons:check-circle" class="mr-2 h-5 w-5 text-emerald-600" />
                       <span class="text-gray-700">
                         Requiere seguimiento post-adopción
                         <span v-if="pet.followUpDetails" class="text-sm text-gray-500">
@@ -492,7 +604,7 @@
                   Información de contacto
                 </h2>
                 <div class="flex items-start">
-                  <UserIcon class="mr-3 h-5 w-5 text-gray-400" />
+                  <Icon name="heroicons:user" class="mr-3 h-5 w-5 text-gray-400" />
                   <div>
                     <p class="font-medium">{{ pet.contact.name }}</p>
                     <p class="text-sm text-gray-500">
@@ -503,7 +615,7 @@
 
                 <div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                   <div class="flex items-center">
-                    <PhoneIcon class="mr-3 h-5 w-5 text-gray-400" />
+                    <Icon name="heroicons:phone" class="mr-3 h-5 w-5 text-gray-400" />
                     <a
                       :href="`tel:${pet.contact.phone}`"
                       class="text-emerald-600 hover:text-emerald-800"
@@ -513,7 +625,7 @@
                   </div>
 
                   <div class="flex items-center">
-                    <MailIcon class="mr-3 h-5 w-5 text-gray-400" />
+                    <Icon name="heroicons:envelope" class="mr-3 h-5 w-5 text-gray-400" />
                     <a
                       :href="`mailto:${pet.contact.email}`"
                       class="text-emerald-600 hover:text-emerald-800"
@@ -636,7 +748,7 @@
                   Enviando...
                 </span>
                 <span v-else>
-                  <HeartIcon class="mr-2 h-4 w-4" />
+                  <Icon name="heroicons:heart" class="mr-2 h-4 w-4" />
                   Enviar solicitud
                 </span>
               </button>
@@ -671,24 +783,10 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import {
-  HeartIcon,
-  MapPinIcon,
-  PhoneIcon,
-  MailIcon,
-  ShareIcon,
-  ArrowLeftIcon,
-  CalendarIcon,
-  CheckCircleIcon,
-  AlertCircleIcon,
-  AlertTriangleIcon,
-  UserIcon,
-  TrashIcon,
-  EditIcon,
-} from "lucide-vue-next";
 import { usePets } from "~/composables/usePets";
 import { useAuth } from "~/composables/useAuth";
 import { useAdoptions } from "~/composables/useAdoptions";
+import { useImageGen2 } from "~/composables/useImageGen2";
 import {
   getDatabase,
   ref as dbRef,
@@ -736,6 +834,9 @@ const submittingAdoption = ref(false);
 
 // Estado para solicitudes de adopción del propietario
 const ownerAdoptionCount = ref(0);
+
+// Estado para generar imagen compartible
+const generatingImage = ref(false);
 
 // Verificar si el usuario actual es el propietario de la mascota
 const isOwner = computed(() => {
@@ -1119,6 +1220,41 @@ const sharePet = async () => {
     // Fallback para navegadores que no soportan Web Share API
     navigator.clipboard.writeText(window.location.href);
     alert("¡Enlace copiado al portapapeles!");
+  }
+};
+
+// Generar imagen compartible con la implementación alternativa
+const generateShareImage = async () => {
+  if (!pet.value) return;
+  
+  generatingImage.value = true;
+  
+  try {
+    const { generatePetImage } = useImageGen2();
+    
+    // Obtener la imagen actual (la que se muestra o la principal)
+    const imageUrl = currentPhoto.value || pet.value.image;
+    
+    // Generar la imagen con el nuevo método
+    await generatePetImage(
+      pet.value.name, 
+      imageUrl, 
+      petId,
+      {
+        // Colores personalizados según la paleta de la aplicación
+        backgroundColor: '#f5f5f4', // fondo amber-50
+        textColor: '#047857',      // texto emerald-800
+        frameColor: '#d9f99d',     // borde lime-200
+        downloadFilename: `adopta-a-${pet.value.name.toLowerCase().replace(/\s+/g, '-')}.png`
+      }
+    );
+    
+    // No es necesario mostrar alerta, ya que la imagen se descarga automáticamente
+  } catch (error) {
+    console.error("Error generando la imagen compartible:", error);
+    alert("Error al generar la imagen. Por favor, intenta de nuevo.");
+  } finally {
+    generatingImage.value = false;
   }
 };
 

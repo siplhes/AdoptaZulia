@@ -875,6 +875,9 @@ const updateTypeLabel = () => {
     case 'conejo':
       petData.type = 'Conejo'
       break
+    case 'tortuga':
+      petData.type = 'Conejo'
+      break
     case 'otro':
       petData.type = 'Otro'
       break

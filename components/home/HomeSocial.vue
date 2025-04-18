@@ -7,7 +7,7 @@
           Siguenos en nuestras redes sociales para recibir actualizaciones sobre nuevas mascotas
           disponibles, consejos de cuidado y eventos de adopción.
         </p>
-        <div class="mx-auto inline-flex items-center justify-center gap-2 space-x-3">
+        <div class="grid grid-cols-2 w-full md:grid-cols-4 items-center justify-center gap-3">
           <NuxtLink
             v-for="(social, index) in socialLinks"
             :key="index"

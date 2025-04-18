@@ -231,7 +231,7 @@
                 
                 <button
                   class="flex w-full items-center px-4 py-2 text-left text-sm text-red-700 hover:bg-gray-50"
-                  @click="deletePet(pet.id)"
+                  @click="confirmDeletePet(pet.id)"
                 >
                   <Icon name="heroicons:trash" class="mr-2 h-4 w-4" />
                   Eliminar
@@ -395,6 +395,16 @@
         </div>
       </div>
     </div>
+    
+    <!-- Modal para confirmación/alertas -->
+    <ModalAlert
+      :show="showModal"
+      :type="modalType"
+      :title="modalTitle"
+      :message="modalMessage"
+      :confirm-button-text="modalConfirmText"
+      @confirm="confirmAction"
+    />
   </div>
 </template>
 
@@ -406,6 +416,7 @@ import { useAdoptions } from '~/composables/useAdoptions'
 import { useAuth } from '~/composables/useAuth'
 import { useFirebaseApp } from 'vuefire'
 import { getDatabase, ref as dbRef, update } from 'firebase/database'
+import ModalAlert from '~/components/common/ModalAlert'
 
 // Rutas y autenticación
 const router = useRouter()
@@ -428,6 +439,14 @@ const pendingAdoptionPet = ref(null)
 const adoptionRequests = ref([])
 const selectedAdoption = ref(null)
 const adoptionType = ref('platform')
+
+// Estados para el modal de confirmación/alerta
+const showModal = ref(false)
+const modalType = ref('')
+const modalTitle = ref('')
+const modalMessage = ref('')
+const modalConfirmText = ref('')
+let confirmAction = () => {}
 
 // Filtros disponibles
 const filters = [
@@ -579,27 +598,41 @@ const handleImageError = (event) => {
 }
 
 // Funciones de gestión de publicaciones
-const deletePet = async (petId) => {
-  if (!confirm('¿Estás seguro de que quieres eliminar esta publicación? Esta acción no se puede deshacer.')) {
-    return
-  }
-  
-  try {
-    loading.value = true
-    const success = await deletePetAction(petId)
-    
-    if (success) {
-      userPets.value = userPets.value.filter(pet => pet.id !== petId)
-      showMenuFor.value = null
-    } else {
-      alert('No se pudo eliminar la publicación. Por favor, intenta de nuevo.')
+const confirmDeletePet = (petId) => {
+  modalType.value = 'confirm'
+  modalTitle.value = 'Eliminar publicación'
+  modalMessage.value = '¿Estás seguro de que quieres eliminar esta publicación? Esta acción no se puede deshacer.'
+  modalConfirmText.value = 'Eliminar'
+  confirmAction = async () => {
+    try {
+      loading.value = true
+      const success = await deletePetAction(petId)
+      
+      if (success) {
+        userPets.value = userPets.value.filter(pet => pet.id !== petId)
+        showMenuFor.value = null
+      } else {
+        showAlert('Error', 'No se pudo eliminar la publicación. Por favor, intenta de nuevo.')
+      }
+    } catch (err) {
+      console.error('Error al eliminar mascota:', err)
+      showAlert('Error', 'Error al eliminar la publicación. Por favor, intenta de nuevo.')
+    } finally {
+      loading.value = false
     }
-  } catch (err) {
-    console.error('Error al eliminar mascota:', err)
-    alert('Error al eliminar la publicación. Por favor, intenta de nuevo.')
-  } finally {
-    loading.value = false
   }
+  showModal.value = true
+}
+
+const showAlert = (title, message) => {
+  modalType.value = 'alert'
+  modalTitle.value = title
+  modalMessage.value = message
+  modalConfirmText.value = 'Aceptar'
+  confirmAction = () => {
+    showModal.value = false
+  }
+  showModal.value = true
 }
 
 const updatePetStatus = async (petId, status) => {
@@ -615,11 +648,11 @@ const updatePetStatus = async (petId, status) => {
       }
       showMenuFor.value = null
     } else {
-      alert('No se pudo actualizar el estado de la publicación. Por favor, intenta de nuevo.')
+      showAlert('Error', 'No se pudo actualizar el estado de la publicación. Por favor, intenta de nuevo.')
     }
   } catch (err) {
     console.error('Error al actualizar estado:', err)
-    alert('Error al actualizar el estado de la publicación. Por favor, intenta de nuevo.')
+    showAlert('Error', 'Error al actualizar el estado de la publicación. Por favor, intenta de nuevo.')
   } finally {
     loading.value = false
   }
@@ -701,7 +734,7 @@ const confirmAdoption = async () => {
         closeAdoptionModal()
         router.push(`/certificados/${adoptionId}`)
       } else {
-        alert('Error al completar la adopción. Por favor, intenta de nuevo.')
+        showAlert('Error', 'Error al completar la adopción. Por favor, intenta de nuevo.')
       }
     } else {
       // Adopción externa (sin adoptante registrado)
@@ -716,14 +749,14 @@ const confirmAdoption = async () => {
         }
         
         closeAdoptionModal()
-        alert('La mascota ha sido marcada como adoptada exitosamente.')
+        showAlert('Éxito', 'La mascota ha sido marcada como adoptada exitosamente.')
       } else {
-        alert('Error al marcar la mascota como adoptada. Por favor, intenta de nuevo.')
+        showAlert('Error', 'Error al marcar la mascota como adoptada. Por favor, intenta de nuevo.')
       }
     }
   } catch (err) {
     console.error('Error al confirmar adopción:', err)
-    alert('Error al confirmar la adopción. Por favor, intenta de nuevo.')
+    showAlert('Error', 'Error al confirmar la adopción. Por favor, intenta de nuevo.')
   } finally {
     loading.value = false
   }

@@ -42,7 +42,7 @@
             <div
               class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100"
             >
-              <PawPrintIcon class="h-10 w-10 text-emerald-600" />
+              <Icon name="mdi:paw" class="h-10 w-10 text-emerald-600" />
             </div>
             <h3 class="mb-2 text-3xl font-bold text-emerald-800">{{ siteStats.totalPets || 1240 }}</h3>
             <p class="text-gray-600">Mascotas registradas</p>
@@ -54,7 +54,7 @@
             <div
               class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100"
             >
-              <HomeIcon class="h-10 w-10 text-emerald-600" />
+              <Icon name="mdi:home" class="h-10 w-10 text-emerald-600" />
             </div>
             <h3 class="mb-2 text-3xl font-bold text-emerald-800">{{ siteStats.totalAdoptions || "Aun no hay" }}</h3>
             <p class="text-gray-600">Adopciones exitosas</p>
@@ -74,7 +74,7 @@
               <div class="mx-auto bg-emerald-600 text-[#fefffa] p-4 hover:bg-emerald-700 rounded-xl max-w-xs items-center flex justify-center">
                 <span class="ml-2"> Mas detalles</span>
        
-                <ChevronDownIcon class="h-5 w-5 text-amber-50 transition-transform" />
+                <Icon name="mdi:chevron-down" class="h-5 w-5 text-amber-50 transition-transform" />
               </div>
             </NuxtLink>
           </div>
@@ -136,7 +136,8 @@
               @click="toggleFaq(index)"
             >
               <span class="font-medium text-emerald-800">{{ faq.question }}</span>
-              <ChevronDownIcon
+              <Icon
+                name="mdi:chevron-down"
                 class="h-5 w-5 text-emerald-600 transition-transform"
                 :class="{ 'rotate-180 transform': openFaq === index }"
               />
@@ -161,14 +162,14 @@
               href="#donate"
               class="inline-flex items-center justify-center rounded-lg bg-white px-6 py-3 text-lg font-semibold text-emerald-700 transition-colors hover:bg-emerald-50"
             >
-              <HeartIcon class="mr-2 h-5 w-5" />
+              <Icon name="mdi:heart" class="mr-2 h-5 w-5" />
               Donar ahora
             </a>
             <a
               href="/contacto"
               class="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-6 py-3 text-lg font-semibold text-white transition-colors hover:bg-emerald-500"
             >
-              <MessageCircleIcon class="mr-2 h-5 w-5" />
+              <Icon name="mdi:message-circle" class="mr-2 h-5 w-5" />
               Contactar
             </a>
           </div>
@@ -180,18 +181,6 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import {
-  PawPrintIcon,
-  HomeIcon,
-  HeartIcon,
-  CreditCardIcon,
-  CheckIcon,
-  StarIcon,
-  ChevronDownIcon,
-  MessageCircleIcon,
-  GiftIcon,
-  CalendarIcon,
-} from 'lucide-vue-next'
 import { useStats } from '~/composables/useStats'
 
 // Estadísticas de impacto
