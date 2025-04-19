@@ -5,7 +5,7 @@
         :src="imgSrc"
         :sizes="imgSizes"
         alt="Perros y gatos felices"
-        class="h-full w-full object-cover opacity-20"
+        class="h-full w-full object-cover opacity-20 hidden md:block"
         loading="lazy"
         :quality="imgQuality"
         format="webp"
