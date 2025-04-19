@@ -22,7 +22,6 @@ export function useImageGen2() {
       // Configuración predeterminada
       const backgroundColor = options.backgroundColor || '#f5f5f4'
       const frameImageUrl = options.frameImageUrl || '/frame.png'
-      const logoUrl = options.logoUrl || '/logo.svg'
       const downloadFilename = options.downloadFilename || `adopta-a-${petName.toLowerCase().replace(/\s+/g, '-')}.png`
       
       // Dimensiones del canvas (4:5 ratio)
@@ -64,7 +63,6 @@ export function useImageGen2() {
       // Cargar imágenes necesarias
       const [frameImage, petImage] = await Promise.all([
         loadImage(frameImageUrl),
-        loadImage(logoUrl),
         loadImage(petImageUrl)
       ])
 

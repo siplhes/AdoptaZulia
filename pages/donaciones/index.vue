@@ -261,17 +261,7 @@ const faqs = [
   {
     question: "¿Cómo se utilizan mis donaciones?",
     answer:
-      "Tus donaciones se destinan principalmente a alimentación, atención veterinaria, medicamentos, mantenimiento de refugios temporales y gastos de transporte para el rescate de animales. Publicamos informes trimestrales detallando el uso de los fondos en nuestra sección de transparencia.",
-  },
-  {
-    question: "¿Las donaciones son deducibles de impuestos?",
-    answer:
-      "Sí, AdoptaPet es una organización sin ánimo de lucro registrada oficialmente, por lo que tus donaciones pueden ser deducibles de impuestos según la legislación fiscal vigente. Te enviaremos un certificado de donación que podrás utilizar en tu declaración de la renta.",
-  },
-  {
-    question: "¿Puedo cancelar mi donación mensual en cualquier momento?",
-    answer:
-      "Por supuesto. Puedes cancelar tu donación mensual en cualquier momento desde tu perfil en nuestra web o contactando con nuestro equipo de atención al donante. No hay compromisos de permanencia ni penalizaciones por cancelación.",
+      "Tus donaciones se destinan principalmente a alimentación, atención veterinaria, medicamentos, mantenimiento de refugios temporales para el rescate de animales. Estas donaciones seran repartidas a diversos refugios de animales del estado, por ejemplo: ASODEPA.",
   },
   {
     question: "¿Qué tipo de donaciones en especie aceptáis?",

@@ -662,15 +662,15 @@
               </h2>
               <p class="text-amber-700">
                 <span v-if="adoptionStatus === 'pending'">
-                  La información de contacto estará disponible una vez que tu solicitud de
-                  adopción sea aprobada.
+                    Por temas de seguridad y privacidad, para acceder a la información de contacto del publicador, debes enviar
+                  una solicitud de adopción.
                 </span>
                 <span v-else-if="adoptionStatus === 'rejected'">
                   Tu solicitud de adopción fue rechazada. Si crees que ha sido un error,
                   por favor comunícate con nosotros.
                 </span>
                 <span v-else>
-                  Para acceder a la información de contacto del publicador, debes enviar
+                  Por temas de seguridad y privacidad, para acceder a la información de contacto del publicador, debes enviar
                   una solicitud de adopción.
                 </span>
               </p>
@@ -1226,33 +1226,61 @@ const sharePet = async () => {
 // Generar imagen compartible con la implementación alternativa
 const generateShareImage = async () => {
   if (!pet.value) return;
-  
   generatingImage.value = true;
-  
   try {
     const { generatePetImage } = useImageGen2();
     
     // Obtener la imagen actual (la que se muestra o la principal)
     const imageUrl = currentPhoto.value || pet.value.image;
     
+    console.log("DEBUG - Generando imagen para mascota:", pet.value.name);
+    console.log("DEBUG - URL de imagen que se enviará:", imageUrl);
+    
+    // Verificar si la URL es válida antes de continuar
+    if (!imageUrl || imageUrl === 'undefined' || imageUrl === 'null') {
+      throw new Error("URL de imagen no válida");
+    }
+    
+    // Si la imagen es un placeholder, buscar otra imagen disponible
+    if (imageUrl.includes('placeholder')) {
+      console.log("DEBUG - Detectada imagen placeholder, buscando alternativa");
+      // Intentar usar otra foto de la galería si está disponible
+      if (pet.value.photos && pet.value.photos.length > 0) {
+        const alternativeImage = pet.value.photos.find(photo => !photo.includes('placeholder'));
+        if (alternativeImage) {
+          console.log("DEBUG - Usando imagen alternativa:", alternativeImage);
+          await generatePetImage(
+            pet.value.name, 
+            alternativeImage, 
+            petId,
+            {
+              backgroundColor: '#f5f5f4',
+              downloadFilename: `adopta-a-${pet.value.name.toLowerCase().replace(/\s+/g, '-')}.png`
+            }
+          );
+          return;
+        }
+      }
+    }
+    
     // Generar la imagen con el nuevo método
-    await generatePetImage(
+    const result = await generatePetImage(
       pet.value.name, 
       imageUrl, 
       petId,
       {
-        // Colores personalizados según la paleta de la aplicación
-        backgroundColor: '#f5f5f4', // fondo amber-50
-        textColor: '#047857',      // texto emerald-800
-        frameColor: '#d9f99d',     // borde lime-200
+        backgroundColor: '#f5f5f4',
         downloadFilename: `adopta-a-${pet.value.name.toLowerCase().replace(/\s+/g, '-')}.png`
       }
     );
     
-    // No es necesario mostrar alerta, ya que la imagen se descarga automáticamente
+    if (!result) {
+      throw new Error("No se pudo generar la imagen");
+    }
+    
   } catch (error) {
     console.error("Error generando la imagen compartible:", error);
-    alert("Error al generar la imagen. Por favor, intenta de nuevo.");
+    alert("Error al generar la imagen. Por favor, intenta de nuevo más tarde.");
   } finally {
     generatingImage.value = false;
   }

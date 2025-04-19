@@ -54,6 +54,13 @@
           @toggle-favorite="toggleFavorite"
         />
       </div>
+      <NuxtLink
+        to="/mascotas"
+        class="mt-8 flex items-center w-1/4 mx-auto justify-center rounded-lg bg-[#fefffa] px-4 py-2 text-emerald-600 transition-all hover:text-emerald-700 hover:scale-110"
+      >
+        Ver todas las mascotas
+        <Icon name="mdi:arrow-right" class="ml-1 h-5 w-5" />
+      </NuxtLink>
     </div>
   </section>
 </template>
