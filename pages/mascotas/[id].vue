@@ -45,7 +45,7 @@
               <NuxtImg
                 :src="currentPhoto || pet.image"
                 :alt="pet.name"
-                class="h-64 w-full rounded-lg object-cover lg:h-96"
+                class="h-[33rem] w-full rounded-lg object-none lg:h-96"
                 sizes="sm:100vw md:80vw lg:33vw"
                 placeholder
                 @error="handleImageError"
@@ -60,7 +60,7 @@
               <div
                 v-for="(photo, index) in pet.photos"
                 :key="index"
-                class="h-16 cursor-pointer overflow-hidden rounded-md md:h-20"
+                class="h-32 cursor-pointer overflow-hidden rounded-md md:h-20"
                 :class="{ 'ring-2 ring-emerald-500': currentPhoto === photo }"
                 @click="currentPhoto = photo"
               >
@@ -68,7 +68,7 @@
                   :src="photo"
                   :alt="`Foto ${index + 1} de ${pet.name}`"
                   class="h-full w-full object-cover"
-                  sizes="sm:25vw md:25vw lg:8vw"
+                  sizes="sm:35vw md:25vw lg:8vw"
                   placeholder
                   @error="handleImageError"
                 />

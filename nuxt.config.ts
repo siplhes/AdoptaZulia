@@ -20,18 +20,14 @@ export default defineNuxtConfig({
     'nuxt-booster'
   ],
 
-  // Variables de entorno públicas y privadas
   runtimeConfig: {
-    // Claves privadas (solo del lado del servidor)
     awsSecretKey: process.env.AWS_SECRET_ACCESS_KEY,
-    // Claves que se exponen al cliente
     public: {
       recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
       awsRegion: process.env.AWS_REGION,
       awsAccessKey: process.env.AWS_ACCESS_KEY_ID,
       awsS3BucketName: process.env.AWS_S3_BUCKET_NAME,
       baseUrl: process.env.BASE_URL,
-      // Configuración de Firebase para que esté disponible en runtime config
       firebase: {
         apiKey: process.env.FIREBASE_API_KEY,
         authDomain: process.env.FIREBASE_AUTH_DOMAIN,
@@ -42,15 +38,14 @@ export default defineNuxtConfig({
         measurementId: process.env.FIREBASE_MEASUREMENT_ID,
         databaseURL: process.env.FIREBASE_DATABASE_URL,
       },
-      // Admin emails configuration
       adminEmails: process.env.ADMIN_EMAILS,
     },
   },
 
   vuefire: {
     auth: {
-      enabled: true, // Habilitamos la autenticación
-      modularAuth: true, // Soporte modular
+      enabled: true,
+      modularAuth: true,
     },
     config: {
       apiKey: process.env.FIREBASE_API_KEY,
@@ -63,24 +58,18 @@ export default defineNuxtConfig({
       databaseURL: process.env.FIREBASE_DATABASE_URL,
 
     },
-    // IMPORTANTE: Desactivamos la inicialización automática de Firebase Admin
-    // ya que lo estamos manejando manualmente a través de nuestro plugin de Nitro
     admin: false,
   },
-
   plugins: ['~/plugins/firebase.ts'],
-
   nitro: {
     compressPublicAssets: true,
   },
-
   tailwindcss: {
     exposeConfig: true,
     config: {
       purge: ['./components/**/*.{vue,js}', './pages/**/*.vue', './layouts/**/*.vue'],
     },
   },
-
   build: {
     optimization: {
       splitChunks: {
@@ -90,7 +79,6 @@ export default defineNuxtConfig({
       },
     },
   },
-
   app: {
     head: {
       title: 'Adopta Zulia',
@@ -101,7 +89,6 @@ export default defineNuxtConfig({
       link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
     },
   },
-
   image: {
     domains: [
       'nsfwclothesmaracaibo.s3.us-east-2.amazonaws.com'
@@ -114,7 +101,6 @@ export default defineNuxtConfig({
       }
     }
   },
-
   booster: {
     detection: {
       performance: true,
