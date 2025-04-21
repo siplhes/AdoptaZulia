@@ -66,9 +66,6 @@ export default defineNuxtConfig({
   },
   tailwindcss: {
     exposeConfig: true,
-    config: {
-      purge: ['./components/**/*.{vue,js}', './pages/**/*.vue', './layouts/**/*.vue'],
-    },
   },
   build: {
     optimization: {

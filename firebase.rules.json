@@ -12,6 +12,7 @@
     "pets": {
       ".read": true,
       ".write": "auth != null",
+      ".indexOn": ["typeValue", "userId"],
       "$petId": {
         ".write": "(auth != null && data.child('userId').val() == auth.uid) || root.child('admins').child(auth.uid).exists()"
       }
@@ -23,6 +24,7 @@
     "adoptions": {
       ".read": "auth != null && root.child('admins').child(auth.uid).exists()",
       ".write": "auth != null",
+      ".indexOn": ["userId", "petId"],
       "$adoptionId": {
         ".read": "auth != null && (data.child('userId').val() == auth.uid || root.child('admins').child(auth.uid).exists())",
         ".write": "auth != null && (data.child('userId').val() == auth.uid || root.child('admins').child(auth.uid).exists())"

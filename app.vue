@@ -9,14 +9,14 @@
 useSeoMeta({
   title: 'Adopta Zulia | Adopta, no compres',
   description: 'Salvemos a las mascotas',
-  image: 'og.jpg',
+  image: 'https://adopta-zulia.vercel.app/og.jpg',
   ogTitle: 'Adopta Zulia | Adopta, no compres',
   ogDescription: 'Salvemos a las mascotas',
-  ogImage: 'og.jpg',
+  ogImage: 'https://adopta-zulia.vercel.app/og.jpg',
   ogUrl: 'https://adopta-zulia.vercel.app',
   twitterTitle: 'Adopta Zulia | Adopta, no compres',
   twitterDescription: 'Salvemos a las mascotas',
-  twitterImage: 'og.jpg',
+  twitterImage: 'https://adopta-zulia.vercel.app/og.jpg',
   twitterCard: 'summary',
 })
 

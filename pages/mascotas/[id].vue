@@ -45,13 +45,14 @@
               <NuxtImg
                 :src="currentPhoto || pet.image"
                 :alt="pet.name"
-                class="h-[33rem] w-full rounded-lg object-none lg:h-96"
+                class="h-[33rem] w-full rounded-lg object-none lg:h-96 cursor-zoom-in"
                 sizes="sm:100vw md:80vw lg:33vw"
                 placeholder
                 @error="handleImageError"
-              />
+                @click="openImageModal(currentPhoto || pet.image)"
+              />   <p class="text-xs font-mono" >Haz clic que en imagen para ampliar</p>
             </div>
-
+         
             <!-- Miniaturas de fotos -->
             <div
               v-if="pet.photos && pet.photos.length > 1"
@@ -62,7 +63,7 @@
                 :key="index"
                 class="h-32 cursor-pointer overflow-hidden rounded-md md:h-20"
                 :class="{ 'ring-2 ring-emerald-500': currentPhoto === photo }"
-                @click="currentPhoto = photo"
+                @click="() => { currentPhoto = photo }"
               >
                 <NuxtImg
                   :src="photo"
@@ -72,6 +73,18 @@
                   placeholder
                   @error="handleImageError"
                 />
+              </div>
+            </div>
+            <!-- Modal de imagen ampliada -->
+            <div v-if="showImageModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 p-4">
+              <div class="relative max-w-3xl w-full">
+                <button class="absolute flex items-center justify-center top-2 right-2 z-10 text-white bg-red-500 bg-opacity-80 rounded-full p-2 hover:bg-opacity-100" @click="closeImageModal">
+                  <Icon name="heroicons:x-mark" class="h-6 w-6" />
+                </button>
+                <NuxtImg 
+                :src="modalImage"
+                 :alt="pet.name" class="w-full max-h-[80vh] object-contain rounded-lg shadow-2xl
+                bg-amber-600 bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-10" />
               </div>
             </div>
             <!-- Mensaje de mascota adoptada -->
@@ -95,15 +108,14 @@
             <div v-if="pet.status !== 'adopted'">
               <div
                 v-if="pet.urgent"
-                class="mt-4 rounded border-l-4 border-red-500 bg-red-100 p-3"
+                class="mt-4 bg-red-600 rounded-xl p-3"
               >
-                <div class="flex">
-                  <div class="flex-shrink-0">
-                    <Icon name="heroicons:exclamation-circle" class="h-5 w-5 text-red-500" />
-                  </div>
+                <div class="flex items-center justify-center">
+
+                    <Icon name="heroicons:exclamation-circle" class="h-10 w-10 text-[#fefffa]" />
+
                   <div class="ml-3">
-                    <p class="text-sm font-medium text-red-700">Adopción urgente</p>
-                    <p class="mt-1 text-xs text-red-600">
+                    <p class="mt-1 text-sm text-[#fefffa]">
                       Esta mascota necesita encontrar un hogar con urgencia.
                     </p>
                   </div>
@@ -838,6 +850,10 @@ const ownerAdoptionCount = ref(0);
 // Estado para generar imagen compartible
 const generatingImage = ref(false);
 
+// Estado para el modal de imagen ampliada
+const showImageModal = ref(false);
+const modalImage = ref(null);
+
 // Verificar si el usuario actual es el propietario de la mascota
 const isOwner = computed(() => {
   if (!isAuthenticated.value || !user.value || !pet.value || !pet.value.userId)
@@ -878,6 +894,18 @@ const openAdoptionModal = () => {
 const closeAdoptionModal = () => {
   showAdoptionModal.value = false;
   adoptionMessage.value = "";
+};
+
+// Función para abrir el modal de imagen
+const openImageModal = (image) => {
+  modalImage.value = image;
+  showImageModal.value = true;
+};
+
+// Función para cerrar el modal de imagen
+const closeImageModal = () => {
+  showImageModal.value = false;
+  modalImage.value = null;
 };
 
 // Función para enviar la solicitud de adopción
