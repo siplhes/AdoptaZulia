@@ -14,17 +14,17 @@
         :height="imgHeight"
       />
     </div>
-    <div class="container relative z-10 mx-auto px-4 py-16 md:py-24">
+    <div class="container relative z-10 mx-auto px-4 py-8 md:py-12">
       <div class="max-w-3xl">
-        <h1 class="mb-6 text-4xl font-bold md:text-5xl lg:text-6xl">
+        <h1 class="mb-3 text-2xl font-bold md:text-3xl lg:text-3xl">
           Encuentra tu compañero perfecto
         </h1>
-        <p class="mb-8 text-xl text-amber-100 md:text-2xl">
+        <p class="mb-4 text-xl text-amber-100 md:text-2xl">
           En el estado Zulia, hay miles de mascotas están esperando un hogar.
           <strong>¡Adopta!</strong>
           no compres y cambia una vida para siempre.
         </p>
-        <div class="flex flex-col gap-4 sm:flex-row">
+        <div class="flex flex-col mb-6 gap-4 sm:flex-row">
           <a
             href="/mascotas"
             class="inline-flex items-center justify-center rounded-lg bg-white px-6 py-3 text-lg font-semibold text-emerald-700 transition-colors hover:bg-emerald-50"
