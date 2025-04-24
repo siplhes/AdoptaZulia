@@ -16,7 +16,7 @@
     </div>
     <div class="container relative z-10 mx-auto px-4 py-8 md:py-12">
       <div class="max-w-3xl">
-        <h1 class="mb-3 text-2xl font-bold md:text-3xl lg:text-3xl">
+        <h1 class="mb-3 text-3xl font-bold md:text-4xl lg:text-5xl">
           Encuentra tu compañero perfecto
         </h1>
         <p class="mb-4 text-xl text-amber-100 md:text-2xl">
