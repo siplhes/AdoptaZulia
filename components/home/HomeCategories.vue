@@ -24,23 +24,23 @@
       </div>
 
       <!-- Grid de categorías -->
-      <div v-else class="grid grid-cols-2 gap-6 md:grid-cols-4">
+      <div v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4">
         <a
           v-for="(category, index) in petCategories"
           :key="index"
           :href="category.link"
-          class="group flex flex-inline-block rounded-xl bg-emerald-600 p-3 transition-transform hover:scale-105 hover:transform hover:bg-emerald-700"
+          class="group flex flex-col items-center rounded-xl bg-emerald-600 p-3 transition-transform hover:scale-105 hover:bg-emerald-700"
         >
           <div
-            class="group-hover:bg-amber-60 mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-amber-50 shadow-md transition-colors"
+        class="group-hover:bg-amber-60 mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-amber-50 shadow-md transition-colors"
           >
-            <Icon :name="category.icon" class="h-12 w-12 text-emerald-600" />
+        <Icon :name="category.icon" class="h-12 w-12 text-emerald-600" />
           </div>
-          <div class="flex flex-col mx-auto items-center justify-center">
-            <h3 class="mb-2 text-xl font-semibold text-[#FEFFFA]">
-              {{ category.name }}
-            </h3>
-            <p class="text-gray-200">{{ category.count }} disponibles</p>
+          <div class="flex flex-col items-center justify-center">
+        <h3 class="mb-2 text-xl font-semibold text-[#FEFFFA]">
+          {{ category.name }}
+        </h3>
+        <p class="text-gray-200">{{ category.count }} disponibles</p>
           </div>
         </a>
       </div>

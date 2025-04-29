@@ -45,7 +45,7 @@
               <NuxtImg
                 :src="currentPhoto || pet.image"
                 :alt="pet.name"
-                class="h-[33rem] w-full rounded-lg object-none lg:h-96 cursor-zoom-in"
+                class="h-full object-cover md:h-[33rem] w-full rounded-lg  lg:h-96 cursor-zoom-in"
                 sizes="sm:100vw md:80vw lg:33vw"
                 placeholder
                 @error="handleImageError"

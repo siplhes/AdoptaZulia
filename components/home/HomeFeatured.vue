@@ -45,7 +45,7 @@
       </div>
 
       <!-- Grid de mascotas usando PetCard -->
-      <div v-else class="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
+      <div v-else class="grid grid-cols-1 gap-6 sm:grid-cols-3 lg:grid-cols-4">
         <PetCard
           v-for="pet in featuredPets"
           :key="pet.id"
@@ -56,7 +56,7 @@
       </div>
       <NuxtLink
         to="/mascotas"
-        class="mt-8 flex items-center w-1/4 mx-auto justify-center rounded-lg bg-[#fefffa] px-4 py-2 text-emerald-600 transition-all hover:text-emerald-700 hover:scale-110"
+        class="mt-8 flex items-center w-full md:w-1/4 mx-auto justify-center rounded-lg bg-[#fefffa] px-4 py-2 text-emerald-600 transition-all hover:text-emerald-700 hover:scale-110"
       >
         Ver todas las mascotas
         <Icon name="mdi:arrow-right" class="ml-1 h-5 w-5" />
