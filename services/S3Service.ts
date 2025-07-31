@@ -59,7 +59,7 @@ export class S3Service {
           Key: key,
           Body: fileBody,
           ContentType: contentType,
-          ACL: 'public-read',
+         // ACL: 'public-read',
         },
       })
       await upload.done()
