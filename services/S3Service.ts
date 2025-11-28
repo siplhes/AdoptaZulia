@@ -103,15 +103,18 @@ export class S3Service {
    * Sanitize a path to prevent directory traversal attacks
    */
   private sanitizePath(path: string): string {
-    // Remove any path traversal patterns
-    path = path.replace(/\.\.\//g, '').replace(/\.\.\\/g, '')
-    
+    // Remove any path traversal patterns like ../ and ..\
+    path = path.split('../').join('').split('..\\').join('')
+
+    // Replace backslashes with forward slashes
+    path = path.split('\\').join('/')
+
     // Remove any leading slashes
-    path = path.replace(/^[\/\\]+/, '')
-    
-    // Replace multiple slashes with a single one
-    path = path.replace(/[\/\\]+/g, '/')
-    
+    while (path.startsWith('/')) path = path.slice(1)
+
+    // Collapse multiple slashes into one
+    while (path.includes('//')) path = path.replace('//', '/')
+
     return path
   }
   

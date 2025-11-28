@@ -27,27 +27,34 @@
             >
               Iniciar sesión
             </NuxtLink>
-            <NuxtLink
-              to="/register"
-              class="rounded-lg border border-emerald-600 px-6 py-2 text-emerald-600 hover:bg-emerald-50"
-            >
-              Registrarse
-            </NuxtLink>
+
           </div>
         </div>
       </div>
 
-      <!-- Formulario de publicación -->
+      <!-- Formulario de publicación (wizard por pasos) -->
       <form v-else class="rounded-lg bg-white p-6 shadow-md" @submit.prevent="submitForm">
+        <!-- Barra de progreso -->
+        <div class="mb-6">
+          <div class="mb-2 flex items-center justify-between text-sm text-gray-600">
+            <div>Paso {{ currentStep }} de {{ steps.length }}</div>
+            <div class="font-medium text-emerald-700">{{ steps[currentStep-1].title }}</div>
+          </div>
+          <div class="h-2 w-full rounded-full bg-gray-200">
+            <div :style="{ width: `${Math.round((currentStep/steps.length)*100)}%` }" class="h-2 rounded-full bg-emerald-600" />
+          </div>
+        </div>
         <!-- Error general -->
         <div
           v-if="error"
+          role="alert"
+          aria-live="assertive"
           class="relative mb-6 rounded border border-red-200 bg-red-50 px-4 py-3 text-red-700"
         >
           {{ error }}
         </div>
 
-        <div class="mb-8">
+        <div v-show="currentStep === 1" class="mb-8">
           <h2 class="mb-4 border-b border-gray-200 pb-2 text-xl font-semibold text-emerald-800">
             Información básica
           </h2>
@@ -59,12 +66,14 @@
                 Nombre de la mascota *
               </label>
               <input
-                id="name"
-                v-model="petData.name"
-                type="text"
-                required
-                class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-              >
+                  id="name"
+                  ref="nameInput"
+                  v-model="petData.name"
+                  type="text"
+                  required
+                  :aria-invalid="invalidFields.name ? 'true' : 'false'"
+                  class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+                >
             </div>
 
             <!-- Tipo de mascota -->
@@ -74,8 +83,10 @@
               </label>
               <select
                 id="type"
+                ref="typeInput"
                 v-model="petData.typeValue"
                 required
+                :aria-invalid="invalidFields.typeValue ? 'true' : 'false'"
                 class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
                 @change="updateTypeLabel"
               >
@@ -95,6 +106,7 @@
                 id="breed"
                 v-model="petData.breed"
                 type="text"
+                :aria-invalid="invalidFields.breed ? 'true' : 'false'"
                 class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
               >
             </div>
@@ -102,7 +114,7 @@
             <!-- Género -->
             <div>
               <label class="mb-1 block text-sm font-medium text-gray-700">Género *</label>
-              <div class="flex space-x-4">
+              <div class="flex space-x-4" role="radiogroup" aria-labelledby="gender-label">
                 <label class="inline-flex items-center">
                   <input
                     v-model="petData.gender"
@@ -110,6 +122,8 @@
                     value="macho"
                     class="h-4 w-4 border-gray-300 text-emerald-600 focus:ring-emerald-500"
                     required
+                    ref="genderInput"
+                    :aria-invalid="invalidFields.gender ? 'true' : 'false'"
                   >
                   <span class="ml-2 text-gray-700">Macho</span>
                 </label>
@@ -132,9 +146,11 @@
               </label>
               <input
                 id="age"
+                ref="ageInput"
                 v-model="petData.age"
                 type="text"
                 required
+                :aria-invalid="invalidFields.age ? 'true' : 'false'"
                 class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
                 placeholder="Por ejemplo: 2 años, 6 meses..."
               >
@@ -147,8 +163,10 @@
               </label>
               <select
                 id="age-range"
+                ref="ageRangeInput"
                 v-model="petData.ageValue"
                 required
+                :aria-invalid="invalidFields.ageValue ? 'true' : 'false'"
                 class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
               >
                 <option value="" disabled>Seleccionar rango</option>
@@ -166,8 +184,10 @@
               </label>
               <select
                 id="size"
+                ref="sizeInput"
                 v-model="petData.sizeValue"
                 required
+                :aria-invalid="invalidFields.sizeValue ? 'true' : 'false'"
                 class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
                 @change="updateSizeLabel"
               >
@@ -185,9 +205,11 @@
               </label>
               <input
                 id="location"
+                ref="locationInput"
                 v-model="petData.location"
                 type="text"
                 required
+                :aria-invalid="invalidFields.location ? 'true' : 'false'"
                 class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
                 placeholder="Ciudad o municipio"
               >
@@ -201,9 +223,11 @@
             </label>
             <textarea
               id="description"
+              ref="descriptionInput"
               v-model="petData.description"
               rows="4"
               required
+              :aria-invalid="invalidFields.description ? 'true' : 'false'"
               class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
               placeholder="Describe la personalidad, hábitos, por qué está en adopción y cualquier otra información relevante..."
             />
@@ -316,7 +340,7 @@
         </div>
 
         <!-- Sección de fotos -->
-        <div class="mb-8">
+        <div v-show="currentStep === 2" class="mb-8">
           <h2 class="mb-4 border-b border-gray-200 pb-2 text-xl font-semibold text-emerald-800">
             Fotos
           </h2>
@@ -408,7 +432,7 @@
         </div>
 
         <!-- Sección de contacto -->
-        <div class="mb-8">
+        <div v-show="currentStep === 3" class="mb-8">
           <h2 class="mb-4 border-b border-gray-200 pb-2 text-xl font-semibold text-emerald-800">
             Información de contacto
           </h2>
@@ -421,9 +445,11 @@
               </label>
               <input
                 id="contact-name"
+                ref="contactNameInput"
                 v-model="petData.contact.name"
                 type="text"
                 required
+                :aria-invalid="invalidFields.contactName ? 'true' : 'false'"
                 class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
               >
             </div>
@@ -453,9 +479,11 @@
               </label>
               <input
                 id="contact-email"
+                ref="contactEmailInput"
                 v-model="petData.contact.email"
                 type="email"
                 required
+                :aria-invalid="invalidFields.contactEmail ? 'true' : 'false'"
                 class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
               >
             </div>
@@ -467,9 +495,11 @@
               </label>
               <input
                 id="contact-phone"
+                ref="contactPhoneInput"
                 v-model="petData.contact.phone"
                 type="tel"
                 required
+                :aria-invalid="invalidFields.contactPhone ? 'true' : 'false'"
                 class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
               >
             </div>
@@ -527,7 +557,7 @@
         </div>
 
         <!-- Sección de adopción -->
-        <div class="mb-8">
+        <div v-show="currentStep === 4" class="mb-8">
           <h2 class="mb-4 border-b border-gray-200 pb-2 text-xl font-semibold text-emerald-800">
             Información de adopción
           </h2>
@@ -562,30 +592,7 @@
           </div>
           
           <!-- Cuota de adopción -->
-          <div class="mb-4">
-            <label for="adoption-fee" class="mb-1 block text-sm font-medium text-gray-700">
-              Cuota de adopción (opcional)
-            </label>
-            <div class="flex items-center">
-              <span
-                class="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3 text-gray-500"
-              >
-                $
-              </span>
-              <input
-                id="adoption-fee"
-                v-model.number="petData.adoptionFee"
-                type="number"
-                min="0"
-                step="0.01"
-                class="w-full rounded-r-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-                placeholder="0.00"
-              >
-            </div>
-            <p class="mt-1 text-xs text-gray-500">
-              Si solicitas una cuota de adopción, especifica qué incluye (vacunas, castración, etc.).
-            </p>
-          </div>
+  
 
           <!-- Detalles de cuota de adopción -->
           <div v-if="petData.adoptionFee > 0" class="mb-4">
@@ -639,55 +646,75 @@
           </div>
         </div>
 
-        <!-- Botones de acción -->
+        <!-- Botones de acción del wizard -->
         <div class="flex justify-between">
           <button
             type="button"
             class="rounded-lg border border-gray-300 px-6 py-2 text-gray-700 hover:bg-gray-50"
-            @click="router.back()"
+            @click="onCancel"
           >
             Cancelar
           </button>
 
           <div class="flex space-x-4">
             <button
+              v-if="currentStep > 1"
               type="button"
-              class="rounded-lg border border-emerald-600 px-6 py-2 text-emerald-600 hover:bg-emerald-50"
-              :disabled="loading"
-              @click="saveAsDraft"
+              class="rounded-lg border border-gray-300 px-6 py-2 text-gray-700 hover:bg-gray-50"
+              @click="prevStep"
             >
-              Guardar borrador
+              Atrás
             </button>
 
             <button
-              type="submit"
-              class="rounded-lg bg-emerald-600 px-6 py-2 text-white hover:bg-emerald-700 disabled:opacity-50"
-              :disabled="loading"
+              v-if="currentStep < steps.length"
+              type="button"
+              class="rounded-lg border border-emerald-600 px-6 py-2 text-emerald-600 hover:bg-emerald-50"
+              @click="nextStep"
             >
-              <span v-if="loading" class="flex items-center">
-                <svg
-                  class="-ml-1 mr-2 h-4 w-4 animate-spin text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                  />
-                  <path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-                Publicando...
-              </span>
-              <span v-else>Publicar</span>
+              Siguiente
             </button>
+
+            <div v-else class="flex items-center gap-4">
+              <button
+                type="button"
+                class="rounded-lg border border-emerald-600 px-6 py-2 text-emerald-600 hover:bg-emerald-50"
+                :disabled="loading"
+                @click="saveAsDraft"
+              >
+                Guardar borrador
+              </button>
+
+              <button
+                type="submit"
+                class="rounded-lg bg-emerald-600 px-6 py-2 text-white hover:bg-emerald-700 disabled:opacity-50"
+                :disabled="loading"
+              >
+                <span v-if="loading" class="flex items-center">
+                  <svg
+                    class="-ml-1 mr-2 h-4 w-4 animate-spin text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    />
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  Publicando...
+                </span>
+                <span v-else>Publicar</span>
+              </button>
+            </div>
           </div>
         </div>
       </form>
@@ -729,6 +756,189 @@ const mainImagePreview = ref('')
 const mainImageFile = ref(null)
 const additionalImagePreviews = ref([])
 const additionalImageFiles = ref([])
+
+// Invalid fields map for accessibility and aria-invalid
+const invalidFields = reactive({
+  name: false,
+  typeValue: false,
+  gender: false,
+  age: false,
+  ageValue: false,
+  sizeValue: false,
+  location: false,
+  description: false,
+  contactName: false,
+  contactEmail: false,
+  contactPhone: false,
+  mainImage: false
+})
+
+// Wizard: pasos y estado
+const steps = [
+  { title: 'Datos básicos' },
+  { title: 'Fotos & Salud' },
+  { title: 'Contacto' },
+  { title: 'Adopción' }
+]
+const currentStep = ref(1)
+
+const validateStep = () => {
+  // Reset invalid fields map
+  for (const k in invalidFields) {
+    invalidFields[k] = false
+  }
+
+  const errors = []
+
+  if (currentStep.value === 1) {
+    if (!petData.name) {
+      errors.push({ field: 'name', msg: 'Nombre de la mascota es obligatorio.' })
+    }
+    if (!petData.typeValue) {
+      errors.push({ field: 'typeValue', msg: 'Selecciona el tipo de mascota.' })
+    }
+    if (!petData.gender) {
+      errors.push({ field: 'gender', msg: 'Selecciona el género.' })
+    }
+    if (!petData.age) {
+      errors.push({ field: 'age', msg: 'Indica la edad aproximada.' })
+    }
+    if (!petData.ageValue) {
+      errors.push({ field: 'ageValue', msg: 'Selecciona un rango de edad.' })
+    }
+    if (!petData.sizeValue) {
+      errors.push({ field: 'sizeValue', msg: 'Selecciona el tamaño.' })
+    }
+    if (!petData.location) {
+      errors.push({ field: 'location', msg: 'Indica la ubicación (ciudad o municipio).' })
+    }
+    if (!(petData.description || '').trim() || petData.description.trim().length < 10) {
+      errors.push({ field: 'description', msg: 'Describe la mascota con al menos 10 caracteres.' })
+    }
+  }
+
+  if (currentStep.value === 2) {
+    if (!mainImagePreview.value && !mainImageFile.value) {
+      errors.push({ field: 'mainImage', msg: 'Sube al menos una foto principal.' })
+    }
+  }
+
+  if (currentStep.value === 3) {
+    if (!petData.contact.name) {
+      errors.push({ field: 'contactName', msg: 'Nombre de contacto obligatorio.' })
+    }
+    if (!petData.contact.email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(petData.contact.email)) {
+      errors.push({ field: 'contactEmail', msg: 'Proporciona un email válido.' })
+    }
+    if (!petData.contact.phone || !/^[0-9()+\-\s]{6,20}$/.test(petData.contact.phone)) {
+      errors.push({ field: 'contactPhone', msg: 'Proporciona un teléfono válido (6-20 dígitos).' })
+    }
+  }
+
+  if (errors.length > 0) {
+    // Mark invalid fields
+    errors.forEach(e => {
+      invalidFields[e.field] = true
+    })
+
+    // Build message list
+    const list = errors.map(e => `• ${e.msg}`).join('\n')
+    showModalAlert('warning', 'Faltan datos', `Corrige los siguientes puntos:\n${list}`)
+
+    // Focus first invalid field
+    const first = errors[0].field
+    setTimeout(() => {
+      focusField(first)
+    }, 50)
+
+    return false
+  }
+
+  return true
+}
+
+const nextStep = () => {
+  if (currentStep.value >= steps.length) return
+  if (validateStep()) {
+    currentStep.value += 1
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+}
+
+const prevStep = () => {
+  if (currentStep.value > 1) {
+    currentStep.value -= 1
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+}
+
+const onCancel = () => {
+  // Confirmación simple antes de cancelar para usuarios poco técnicos
+  if (confirm('¿Seguro que deseas cancelar la publicación? Los datos no guardados se perderán.')) {
+    router.back()
+  }
+}
+
+// Accessibility helpers: focus fields by name
+const focusField = (field) => {
+  try {
+    switch (field) {
+      case 'name':
+        nameInput.value?.focus()
+        break
+      case 'typeValue':
+        typeInput.value?.focus()
+        break
+      case 'gender':
+        genderInput.value?.focus()
+        break
+      case 'age':
+        ageInput.value?.focus()
+        break
+      case 'ageValue':
+        ageRangeInput.value?.focus()
+        break
+      case 'sizeValue':
+        sizeInput.value?.focus()
+        break
+      case 'location':
+        locationInput.value?.focus()
+        break
+      case 'description':
+        descriptionInput.value?.focus()
+        break
+      case 'contactName':
+        contactNameInput.value?.focus()
+        break
+      case 'contactEmail':
+        contactEmailInput.value?.focus()
+        break
+      case 'contactPhone':
+        contactPhoneInput.value?.focus()
+        break
+      case 'mainImage':
+        mainImageInput.value?.focus()
+        break
+      default:
+        // nothing
+    }
+  } catch (e) {
+    // ignore
+  }
+}
+
+// Refs proxy for template refs
+const nameInput = ref(null)
+const typeInput = ref(null)
+const genderInput = ref(null)
+const ageInput = ref(null)
+const ageRangeInput = ref(null)
+const sizeInput = ref(null)
+const locationInput = ref(null)
+const descriptionInput = ref(null)
+const contactNameInput = ref(null)
+const contactEmailInput = ref(null)
+const contactPhoneInput = ref(null)
 
 // Datos de la mascota
 const petData = reactive({
@@ -966,9 +1176,14 @@ const saveAsDraft = async () => {
 // Enviar formulario
 const submitForm = async () => {
   try {
+    // Sanitizar datos antes de enviar
+    sanitizePetData()
+
     // Validar imagen principal
-    if (!mainImageFile.value) {
+    if (!mainImageFile.value && !mainImagePreview.value) {
+      invalidFields.mainImage = true
       showModalAlert('warning', 'Imagen requerida', 'Debes subir al menos una imagen principal')
+      focusField('mainImage')
       return
     }
 
@@ -1025,5 +1240,35 @@ const showModalAlert = (type, title, message, confirmText = 'Aceptar') => {
   modalMessage.value = message
   modalConfirmText.value = confirmText
   showModal.value = true
+}
+
+// Sanitización básica de los datos del formulario
+const sanitizePetData = () => {
+  // Trim all string fields and limit lengths
+  const trim = (v, max = 1000) => (typeof v === 'string' ? v.trim().slice(0, max) : v)
+
+  petData.name = trim(petData.name, 80)
+  petData.type = trim(petData.type, 30)
+  petData.typeValue = trim(petData.typeValue, 30)
+  petData.breed = trim(petData.breed, 50)
+  petData.age = trim(petData.age, 30)
+  petData.ageValue = trim(petData.ageValue, 30)
+  petData.size = trim(petData.size, 30)
+  petData.sizeValue = trim(petData.sizeValue, 30)
+  petData.location = trim(petData.location, 100)
+  petData.description = trim(petData.description, 1000)
+  petData.vaccineInfo = trim(petData.vaccineInfo, 200)
+  petData.neuterDate = trim(petData.neuterDate, 50)
+  petData.chipNumber = trim(petData.chipNumber, 80)
+  petData.healthDescription = trim(petData.healthDescription, 500)
+  petData.adoptionRequirements = trim(petData.adoptionRequirements, 500)
+  petData.feeDetails = trim(petData.feeDetails, 300)
+  petData.followUpDetails = trim(petData.followUpDetails, 300)
+
+  // Contact sanitization
+  petData.contact.name = trim(petData.contact.name, 80)
+  petData.contact.email = trim(petData.contact.email, 120)
+  petData.contact.phone = (petData.contact.phone || '').toString().trim().slice(0, 30)
+  petData.contact.notes = trim(petData.contact.notes, 500)
 }
 </script>

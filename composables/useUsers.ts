@@ -24,7 +24,7 @@ export function useUsers() {
   const users = ref<UserProfile[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
-  
+
   // Usamos el composable de autenticación para verificar permisos de administrador
   const { isAdmin } = useAuth()
 
@@ -119,6 +119,53 @@ export function useUsers() {
     } catch (error) {
       console.error(`Error al obtener publicaciones del usuario ${userId}:`, error)
       return 0
+    }
+  }
+
+  /**
+   * Obtiene los datos de un usuario por su ID
+   * Esta función no requiere permisos de administrador ya que se usa para mostrar
+   * información de usuarios en solicitudes de adopción y otras partes de la aplicación
+   */
+  async function fetchUserById(userId: string): Promise<UserProfile | null> {
+    loading.value = true
+    error.value = null
+
+    try {
+      const firebaseApp = useFirebaseApp()
+      const db = getDatabase(firebaseApp)
+      const userRef = dbRef(db, `users/${userId}`)
+
+      const snapshot = await get(userRef)
+
+      if (snapshot.exists()) {
+        const userData = snapshot.val()
+
+        const userProfile: UserProfile = {
+          id: userId,
+          displayName: userData.displayName || '',
+          email: userData.email || '',
+          photoURL: userData.photoURL || '',
+          role: userData.role || 'user',
+          status: userData.status || 'active',
+          phone: userData.phoneNumber || userData.phone || '',
+          address: userData.address || '',
+          createdAt: userData.createdAt || 0,
+          lastLogin: userData.lastLogin || 0,
+          postCount: await fetchUserPostCount(userId, db),
+        }
+
+        return userProfile
+      } else {
+        error.value = 'Usuario no encontrado'
+        return null
+      }
+    } catch (err: any) {
+      console.error(`Error al obtener usuario ${userId}:`, err)
+      error.value = 'Error al cargar usuario. Por favor, intenta de nuevo.'
+      return null
+    } finally {
+      loading.value = false
     }
   }
 
@@ -274,7 +321,7 @@ export function useUsers() {
     if (!checkAdminPermission()) {
       return false
     }
-    
+
     return updateUser(userId, { status })
   }
 
@@ -321,6 +368,7 @@ export function useUsers() {
     loading,
     error,
     fetchAllUsers,
+    fetchUserById,
     createUser,
     updateUser,
     updateUserStatus,

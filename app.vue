@@ -1,22 +1,28 @@
 <template>
-  <NuxtLoadingIndicator />
-  <NuxtLayout>
-    <NuxtPage class="min-h-100 bg-amber-50" />
-  </NuxtLayout>
+  <div>
+    <NuxtLoadingIndicator />
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+    <ToastContainer />
+  </div>
 </template>
 
 <script setup>
+const config = useRuntimeConfig()
+const baseUrl = config.public.baseUrl || 'https://adopta-zulia.vercel.app'
+
 useSeoMeta({
   title: 'Adopta Zulia | Adopta, no compres',
   description: 'Salvemos a las mascotas',
-  image: 'https://adopta-zulia.vercel.app/og.jpg',
+  image: `${baseUrl}/og.jpg`,
   ogTitle: 'Adopta Zulia | Adopta, no compres',
   ogDescription: 'Salvemos a las mascotas',
-  ogImage: 'https://adopta-zulia.vercel.app/og.jpg',
-  ogUrl: 'https://adopta-zulia.vercel.app',
+  ogImage: `${baseUrl}/og.jpg`,
+  ogUrl: baseUrl,
   twitterTitle: 'Adopta Zulia | Adopta, no compres',
   twitterDescription: 'Salvemos a las mascotas',
-  twitterImage: 'https://adopta-zulia.vercel.app/og.jpg',
+  twitterImage: `${baseUrl}/og.jpg`,
   twitterCard: 'summary',
 })
 
@@ -43,23 +49,4 @@ useHead({
     }
   ]
 })
-
-/*
-onMounted(() => {
-  const loadKofiWidget = () => {
-    if (typeof window !== 'undefined' && window.kofiWidgetOverlay) {
-      window.kofiWidgetOverlay.draw('adoptazulia', {
-        'type': 'floating-chat',
-        'floating-chat.donateButton.text': 'Ayudanos',
-        'floating-chat.donateButton.background-color': '#fefffa',
-        'floating-chat.donateButton.text-color': '#121212'
-      });
-    } else {
-      setTimeout(loadKofiWidget, 500);
-    }
-  };
-  
-  setTimeout(loadKofiWidget, 1000);
-})
-*/
 </script>

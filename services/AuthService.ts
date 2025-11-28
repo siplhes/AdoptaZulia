@@ -1,28 +1,24 @@
 import {
   getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
   signOut as firebaseSignOut,
   updateProfile,
-  sendPasswordResetEmail,
   GoogleAuthProvider,
-  FacebookAuthProvider,
   signInWithPopup,
   onAuthStateChanged,
   type UserInfo,
-  inMemoryPersistence,
   browserLocalPersistence,
   setPersistence,
 } from 'firebase/auth'
-import { getDatabase, ref, set, get, update } from 'firebase/database'
+import { getDatabase, ref, set, get, update, query, orderByChild, equalTo, limitToFirst } from 'firebase/database'
 import { initializeApp, getApps, getApp } from 'firebase/app'
 import { useFirebaseApp } from 'vuefire'
 import { useRuntimeConfig } from '#app'
 import type { UserData } from '~/models/User'
 
+// Use the firebase User type shape but allow email to be nullable to match library
 type User = UserInfo & {
   uid: string
-  email: string
+  email: string | null
   emailVerified: boolean
   isAnonymous: boolean
   metadata?: {
@@ -42,7 +38,7 @@ export class AuthService {
       if (config.public.adminEmails) {
         this.adminEmails = config.public.adminEmails.split(',').map((email: string) => email.trim().toLowerCase())
       } else {
-        this.adminEmails = ['admin@adoptazulia.com', 'soporte@adoptazulia.com'] 
+        this.adminEmails = ['admin@adoptazulia.com', 'soporte@adoptazulia.com']
       }
     } catch (error) {
       console.error('Error loading admin emails from config:', error)
@@ -76,53 +72,7 @@ export class AuthService {
       return getDatabase(firebaseApp)
     }
   }
-  async register(
-    email: string,
-    password: string,
-    displayName: string,
-    userName: string
-  ): Promise<User> {
-    const auth = this.getAuthInstance()
 
-    try {
-      await setPersistence(auth, browserLocalPersistence)
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
-      if (auth.currentUser) {
-        await updateProfile(auth.currentUser, {
-          displayName,
-        })
-      }
-      await this.saveUserData(userCredential.user.uid, {
-        userName,
-        displayName,
-        email,
-        photoURL: userCredential.user.photoURL || '',
-        createdAt: Date.now(),
-        lastLogin: Date.now(),
-      })
-      return userCredential.user
-    } catch (error) {
-      console.error('Error registrando usuario:', error)
-      throw error
-    }
-  }
-  async login(email: string, password: string): Promise<User> {
-    const auth = this.getAuthInstance()
-
-    try {
-      await setPersistence(auth, browserLocalPersistence)
-
-      const userCredential = await signInWithEmailAndPassword(auth, email, password)
-
-      // Actualizar fecha de último login
-      await this.updateLastLogin(userCredential.user.uid)
-
-      return userCredential.user
-    } catch (error) {
-      console.error('Error iniciando sesión:', error)
-      throw error
-    }
-  }
 
   /**
    * Inicia sesión con Google
@@ -136,47 +86,41 @@ export class AuthService {
 
       const result = await signInWithPopup(auth, provider)
 
-      // Guardar o actualizar datos de usuario en RTDB
+      // Verificar si ya existe un profile en RTDB
+      const existingProfile = await this.getUserProfile(result.user.uid)
+
+      // Generar un userName corto y único si no existe
+      let userNameToSave = existingProfile?.userName
+      if (!userNameToSave) {
+        userNameToSave = await this.generateUniqueUserName(result.user.displayName || '', result.user.email || '', result.user.uid)
+      }
+
+      // Guardar o actualizar datos de usuario en RTDB (no sobreescribe campos si ya existen)
       await this.saveUserData(result.user.uid, {
+        userName: userNameToSave,
         displayName: result.user.displayName || '',
         email: result.user.email || '',
         photoURL: result.user.photoURL || '',
         lastLogin: Date.now(),
       })
 
-      return result.user
+      // Intentar actualizar el displayName en Auth si hace falta
+      try {
+        if (auth.currentUser && (!auth.currentUser.displayName || auth.currentUser.displayName !== result.user.displayName)) {
+          await updateProfile(auth.currentUser, { displayName: result.user.displayName || '' })
+        }
+      } catch (err) {
+        console.warn('No se pudo actualizar displayName en Auth:', err)
+      }
+
+      return result.user as unknown as User
     } catch (error) {
       console.error('Error iniciando sesión con Google:', error)
       throw error
     }
   }
 
-  /**
-   * Inicia sesión con Facebook
-   */
-  async loginWithFacebook(): Promise<User> {
-    const auth = this.getAuthInstance()
-    const provider = new FacebookAuthProvider()
 
-    try {
-      await setPersistence(auth, browserLocalPersistence)
-
-      const result = await signInWithPopup(auth, provider)
-
-      // Guardar o actualizar datos de usuario en RTDB
-      await this.saveUserData(result.user.uid, {
-        displayName: result.user.displayName || '',
-        email: result.user.email || '',
-        photoURL: result.user.photoURL || '',
-        lastLogin: Date.now(),
-      })
-
-      return result.user
-    } catch (error) {
-      console.error('Error iniciando sesión con Facebook:', error)
-      throw error
-    }
-  }
 
   /**
    * Actualiza la fecha de último login
@@ -220,23 +164,17 @@ export class AuthService {
     const userRef = ref(db, `users/${userId}`)
 
     try {
-      // Obtener datos existentes si los hay
-      const snapshot = await get(userRef)
-      const existingData = snapshot.exists() ? snapshot.val() : {}
-
       // Filtrar propiedades con valores undefined
       const cleanUserData: Partial<UserData> = {}
-      for (const key in userData) {
-        if (userData[key] !== undefined) {
-          cleanUserData[key] = userData[key]
+      for (const key of Object.keys(userData) as Array<keyof UserData>) {
+        const k = key as keyof UserData
+        if (userData[k] !== undefined) {
+          cleanUserData[k] = userData[k] as any
         }
       }
 
-      // Combinar datos existentes con nuevos datos
-      await set(userRef, {
-        ...existingData,
-        ...cleanUserData,
-      })
+      // Use update instead of set to avoid accidentally overwriting other fields
+      await update(userRef, cleanUserData)
     } catch (error) {
       console.error('Error al guardar datos de usuario:', error)
       throw error
@@ -257,25 +195,13 @@ export class AuthService {
     }
   }
 
-  /**
-   * Envía un correo para restablecer la contraseña
-   */
-  async resetPassword(email: string): Promise<void> {
-    const auth = this.getAuthInstance()
 
-    try {
-      await sendPasswordResetEmail(auth, email)
-    } catch (error) {
-      console.error('Error enviando correo de recuperación:', error)
-      throw error
-    }
-  }
 
   /**
    * Suscribe a cambios en el estado de autenticación
    * @param callback Función a ejecutar cuando cambia el estado de autenticación
    */
-  onAuthStateChanged(callback: (user: User | null) => void): () => void {
+  onAuthStateChanged(callback: (user: any | null) => void): () => void {
     const auth = this.getAuthInstance()
     return onAuthStateChanged(auth, callback)
   }
@@ -343,27 +269,15 @@ export class AuthService {
   async getUserByUsername(username: string): Promise<UserData | null> {
     try {
       const db = this.getDatabaseInstance()
+      // Use a RTDB query to find the user by username efficiently
       const usersRef = ref(db, 'users')
-      const snapshot = await get(usersRef)
-
+      const q = query(usersRef, orderByChild('userName'), equalTo(username), limitToFirst(1))
+      const snapshot = await get(q)
       if (snapshot.exists()) {
-        const users = snapshot.val()
-        for (const userId in users) {
-          const userData = users[userId]
-          if (
-            userData &&
-            userData.userName &&
-            userData.userName.toLowerCase() === username.toLowerCase()
-          ) {
-            // Incluir el ID del usuario en el objeto de retorno
-            return {
-              ...userData,
-              uid: userId, // Aseguramos que el uid esté incluido
-            }
-          }
-        }
+        const data = snapshot.val()
+        const firstKey = Object.keys(data)[0]
+        return { ...(data[firstKey] as any), uid: firstKey }
       }
-
       return null
     } catch (error) {
       console.error('Error al buscar usuario por nombre de usuario:', error)
@@ -398,6 +312,7 @@ export class AuthService {
           const userEmail = userData.email.toLowerCase()
           const isAdminByEmail = this.adminEmails.includes(userEmail)
           // Si es admin por email pero no está en la colección, lo agregamos
+          // Si es admin por email pero no está en la colección, lo agregamos
           if (isAdminByEmail) {
             try {
               await set(adminRef, true)
@@ -422,5 +337,77 @@ export class AuthService {
    */
   isAdminEmail(email: string): boolean {
     return this.adminEmails.includes(email.toLowerCase())
+  }
+
+  /**
+   * Genera un userName único a partir de displayName/email.
+   * Reglas: todo junto (sin espacios), minúsculas, máximo 8 caracteres.
+   * Si existe conflicto, se añade un sufijo numérico (truncando la base si es necesario).
+   */
+  private async generateUniqueUserName(displayName?: string | null, email?: string | null, currentUserId?: string | null): Promise<string> {
+    const maxLen = 8
+
+    const slugify = (s: string) =>
+      s
+        .normalize('NFD')
+        // remove diacritics and non-alphanumeric characters
+        .replace(/[\u0300-\u036f]/g, '') // remover diacríticos
+        .replace(/[^a-zA-Z0-9]/g, '')
+        .toLowerCase()
+
+    // Preparar base desde displayName o email
+    let base = ''
+    if (displayName) base = slugify(displayName)
+    if (!base && email) base = slugify((email.split('@')[0]) || '')
+    if (!base) base = 'user'
+
+    // Asegurarnos que al menos tenga caracteres alfanuméricos
+    base = base.replace(/[^a-z0-9]/gi, '')
+    if (!base) base = 'user'
+
+    // Intento sin sufijo
+    let candidate = base.slice(0, maxLen)
+    try {
+      const found = await this.getUserByUsername(candidate)
+      if (!found || (currentUserId && found.uid === currentUserId)) {
+        return candidate
+      }
+    } catch (err) {
+      // Si falla la búsqueda, seguir intentando con fallback
+      console.warn('Warning: no se pudo verificar unicidad del username inicial:', err)
+    }
+
+    // Intentar con sufijos numéricos
+    for (let i = 1; i < 1000; i++) {
+      const suffix = String(i)
+      const allowedBaseLen = Math.max(1, maxLen - suffix.length)
+      const baseTrunc = base.slice(0, allowedBaseLen)
+      candidate = (baseTrunc + suffix).slice(0, maxLen)
+
+      try {
+        const found = await this.getUserByUsername(candidate)
+        if (!found || (currentUserId && found.uid === currentUserId)) {
+          return candidate
+        }
+      } catch (err) {
+        console.warn('Warning: error verificando username', candidate, err)
+        // si la verificación falla, pero el candidate parece válido, podemos devolverlo como último recurso
+      }
+    }
+
+    // Si no encontramos un nombre disponible con el método anterior, generar uno aleatorio alfanumérico de 8 chars
+    const randomCandidate = () => Math.random().toString(36).slice(2, 2 + maxLen)
+    for (let i = 0; i < 10; i++) {
+      const c = randomCandidate()
+      try {
+        const found = await this.getUserByUsername(c)
+        if (!found) return c
+      } catch (err) {
+        // ignorar y seguir
+      }
+    }
+
+    // Fallback final
+    return candidate
   }
 }

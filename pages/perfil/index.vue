@@ -40,12 +40,7 @@
             >
               Iniciar sesión
             </NuxtLink>
-            <NuxtLink
-              to="/register"
-              class="rounded-lg bg-emerald-600 px-4 py-2 text-white transition-colors hover:bg-emerald-700"
-            >
-              Registrarse
-            </NuxtLink>
+
           </div>
         </div>
       </div>
@@ -188,21 +183,7 @@
             </form>
           </div>
 
-          <!-- Sección de Seguridad -->
-          <div class="mt-6 rounded-lg bg-white p-6 shadow-md">
-            <h3 class="mb-4 text-lg font-semibold text-gray-800">Seguridad</h3>
-            <div class="space-y-4">
-              <div>
-                <button
-                  class="flex items-center text-sm text-emerald-600 hover:text-emerald-700"
-                  @click="handleResetPassword"
-                >
-                  <Icon name="mdi:lock-outline" class="mr-1 h-4 w-4" />
-                  Cambiar contraseña
-                </button>
-              </div>
-            </div>
-          </div>
+
           
           <!-- Sección de Solicitudes de Adopción -->
           <div v-if="userPets.length > 0" class="mt-6 rounded-lg bg-white p-6 shadow-md">

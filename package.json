@@ -35,7 +35,7 @@
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.1",
     "lucide-vue-next": "^0.487.0",
-    "nuxt": "^3.16.2",
+    "nuxt": "^4.2.1",
     "nuxt-booster": "^3.2.8",
     "nuxt-vuefire": "^1.0.5",
     "qrcode": "^1.5.4",

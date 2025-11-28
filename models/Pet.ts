@@ -2,26 +2,26 @@
  * Interface que define la estructura de datos de una mascota
  */
 export interface Pet {
-  id?: string | any
-  name: string | any
+  id?: string
+  name: string
   type: string
-  typeValue: string
-  breed: string
-  age: string
-  ageValue: string
-  gender: string
-  size: string
-  sizeValue: string
-  location: string
-  description: string
-  urgent: boolean
-  image: string
-  photos?: string[] | any
-  healthStatus: number
+  typeValue?: string
+  breed?: string
+  age?: string
+  ageValue?: string
+  gender?: 'macho' | 'hembra' | string
+  size?: string
+  sizeValue?: string
+  location?: string
+  description?: string
+  urgent?: boolean
+  image?: string
+  photos?: string[]
+  healthStatus?: number
   healthDescription?: string
-  vaccinated: boolean
+  vaccinated?: boolean
   vaccines?: Vaccine[]
-  neutered: boolean
+  neutered?: boolean
   microchipped?: boolean
   medicalRecords?: MedicalRecord[]
   traits?: string[]
@@ -29,8 +29,8 @@ export interface Pet {
   adoptionRequirements?: string
   adoptionFee?: number
   contact: Contact
-  createdAt: string
-  userId: string | null
+  createdAt?: number | string
+  userId?: string | null
   status?: 'available' | 'adopted' | 'pending' | 'lost' | 'found'
 }
 
@@ -42,26 +42,28 @@ export interface Vaccine {
 export interface MedicalRecord {
   title: string
   date: string
-  description: string
+  description?: string
 }
 
 export interface Contact {
-  name: string
-  email: string
-  phone: string
-  type: string
+  name?: string
+  email?: string | null
+  phone?: string
+  type?: string
+  preferredMethod?: 'email' | 'phone' | 'whatsapp' | string
+  notes?: string
 }
 
 export enum PetType {
   DOG = 'perro',
   CAT = 'gato',
-  RABBIT = 'conejo',
   BIRD = 'ave',
+  RABBIT = 'conejo',
   OTHER = 'otro',
 }
 
 export enum AgeRange {
-  PUPPY = 'cachorro',
+  BABY = 'cachorro',
   YOUNG = 'joven',
   ADULT = 'adulto',
   SENIOR = 'senior',
@@ -78,15 +80,10 @@ export enum Gender {
   FEMALE = 'hembra',
 }
 
-interface PetFilters {
-  types?: string[]
-  ages?: string[]
-  sizes?: string[]
+export type PetFilters = {
+  type?: string
+  size?: string
   gender?: string
-  vaccinated?: boolean
-  neutered?: boolean
-  urgent?: boolean
   location?: string
+  urgent?: boolean
 }
-
-export type { PetFilters }

@@ -1,11 +1,28 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+// nuxt.config.ts - Optimizado para Nuxt 4
+
 import { defineNuxtConfig } from 'nuxt/config'
 
 export default defineNuxtConfig({
+  // ✨ 1. Alineación con Nuxt 4
+  // La fecha de compatibilidad debería ser '2024-11-01' para alinearse con Nuxt 4
   compatibilityDate: '2024-11-01',
+
   devtools: { enabled: false },
+  // **Nota sobre ssr: false:** Si buscas el máximo rendimiento (Modo Turbo) para renderizado
+  // en el servidor o pre-renderizado, ssr debe ser true. ssr: false (SPA) evita muchas
+  // de las optimizaciones de Nuxt en el servidor. Lo mantengo como lo tenías.
   ssr: false,
 
+  // --- Optimizaciones de Rendimiento y DX (Modo Turbo) ---
+  experimental: {
+    // Activa el plugin de TypeScript mejorado para la Experiencia de Desarrollo (DX)
+    typescriptPlugin: true,
+
+    // Si usaras ssr: true, esto reduciría el bundle del cliente al extraer los handlers de datos:
+    // extractAsyncDataHandlers: true, 
+  },
+
+  // --- Configuraciones Existentes ---
   modules: [
     '@nuxt/eslint',
     '@nuxt/fonts',
@@ -27,6 +44,7 @@ export default defineNuxtConfig({
       awsRegion: process.env.AWS_REGION,
       awsAccessKey: process.env.AWS_ACCESS_KEY_ID,
       awsS3BucketName: process.env.AWS_S3_BUCKET_NAME,
+      awsS3BucketDomain: process.env.AWS_S3_BUCKET_DOMAIN,
       baseUrl: process.env.BASE_URL,
       firebase: {
         apiKey: process.env.FIREBASE_API_KEY,
@@ -56,25 +74,19 @@ export default defineNuxtConfig({
       messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
       measurementId: process.env.FIREBASE_MEASUREMENT_ID,
       databaseURL: process.env.FIREBASE_DATABASE_URL,
-
     },
     admin: false,
   },
-  plugins: ['~/plugins/firebase.ts'],
+
+  // 3. Optimizaciones de 'nitro' (Core del Modo Turbo)
   nitro: {
+    // Esta es una buena práctica y ya está incluida:
     compressPublicAssets: true,
   },
+
+  plugins: ['~/plugins/firebase.ts'],
   tailwindcss: {
     exposeConfig: true,
-  },
-  build: {
-    optimization: {
-      splitChunks: {
-        layouts: true,
-        pages: true,
-        commons: true,
-      },
-    },
   },
   app: {
     head: {
@@ -88,12 +100,12 @@ export default defineNuxtConfig({
   },
   image: {
     domains: [
-      'nsfwclothesmaracaibo.s3.us-east-2.amazonaws.com'
+      process.env.AWS_S3_BUCKET_DOMAIN || 'nsfwclothesmaracaibo.s3.us-east-2.amazonaws.com'
     ],
     ipx: {
       remote: {
         domains: [
-          'nsfwclothesmaracaibo.s3.us-east-2.amazonaws.com'
+          process.env.AWS_S3_BUCKET_DOMAIN || 'nsfwclothesmaracaibo.s3.us-east-2.amazonaws.com'
         ]
       }
     }

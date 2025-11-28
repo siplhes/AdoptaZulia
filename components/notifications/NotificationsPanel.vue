@@ -47,8 +47,9 @@
         <li 
           v-for="notification in notifications" 
           :key="notification.id"
-          class="relative py-3 px-4 hover:bg-gray-50 transition-colors"
+          class="relative py-3 px-4 hover:bg-gray-50 transition-colors cursor-pointer"
           :class="{ 'bg-emerald-50': !notification.read }"
+          @click="openNotification(notification)"
         >
           <div class="flex items-start gap-x-3">
             <div class="flex-shrink-0">
@@ -84,14 +85,14 @@
                 v-if="!notification.read"
                 class="text-emerald-600 hover:text-emerald-800" 
                 aria-label="Marcar como leída"
-                @click="markAsRead(notification.id)"
+                @click.stop="markAsRead(notification.id)"
               >
                 <Icon name="heroicons:check-circle" class="h-5 w-5" />
               </button>
               <button 
                 class="text-gray-400 hover:text-gray-600" 
                 aria-label="Eliminar notificación"
-                @click="deleteNotification(notification.id)"
+                @click.stop="deleteNotification(notification.id)"
               >
                 <Icon name="heroicons:trash" class="h-5 w-5" />
               </button>
@@ -105,6 +106,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useNotifications } from '~/composables/useNotifications'
 
 const {
@@ -118,6 +120,7 @@ const {
 } = useNotifications()
 
 const isOpen = ref(false)
+const router = useRouter()
 
 // Función para alternar el panel de notificaciones
 const toggleNotifications = () => {
@@ -157,6 +160,22 @@ const handleNotificationClick = (notification) => {
     markAsRead(notification.id)
   }
   isOpen.value = false
+}
+
+// Abrir notificación desde cualquier parte del item: marca como leída y navega a actionLink si existe
+const openNotification = (notification) => {
+  if (!notification) return
+  if (!notification.read) {
+    markAsRead(notification.id)
+  }
+  isOpen.value = false
+  if (notification.actionLink) {
+    try {
+      router.push(notification.actionLink)
+    } catch (err) {
+      console.warn('Navigation failed for notification actionLink', err)
+    }
+  }
 }
 
 // Obtener icono basado en el tipo de notificación

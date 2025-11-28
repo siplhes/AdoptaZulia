@@ -339,7 +339,7 @@ const router = useRouter()
 const petId = route.params.id
 
 // Composables
-const { fetchAdoptionsForOwner, updateAdoptionStatus, updateAdoptionNotes } = useAdoptions()
+const { fetchAdoptionsForOwner, updateAdoptionStatus, updateAdoptionNotes, getAdoptionById } = useAdoptions()
 const { fetchPetById, updatePetStatus } = usePets()
 const { isAuthenticated, user } = useAuth()
 
@@ -362,9 +362,24 @@ onMounted(async () => {
   }
 
   try {
-    // Cargar la mascota
+    // Cargar la mascota (el parámetro puede ser petId o accidentalmente adoptionId)
     loading.value = true
     pet.value = await fetchPetById(petId)
+
+    // Si no encontramos una mascota, intentamos tratar el id como adoptionId
+    if (!pet.value) {
+      try {
+        const adoption = await getAdoptionById(petId)
+        if (adoption && adoption.petId) {
+          // Redirigir al petId correcto para mostrar las solicitudes del propietario
+          await router.replace(`/adopciones/${adoption.petId}`)
+          return
+        }
+      } catch (adErr) {
+        // Si falla la consulta, seguimos al error general abajo
+        console.debug('No se pudo resolver como adoptionId:', adErr)
+      }
+    }
 
     // Verificar si el usuario es el propietario
     if (!pet.value || pet.value.userId !== user.value.uid) {

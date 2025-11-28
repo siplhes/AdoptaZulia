@@ -797,6 +797,7 @@ import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { usePets } from "~/composables/usePets";
 import { useAuth } from "~/composables/useAuth";
+import { useToast } from "~/composables/useToast";
 import { useAdoptions } from "~/composables/useAdoptions";
 import { useImageGen2 } from "~/composables/useImageGen2";
 import {

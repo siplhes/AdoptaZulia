@@ -48,9 +48,7 @@
           }"
         >
           <div class="flex items-center justify-between">
-            <h1 class="text-2xl font-bold text-gray-800">
-              Solicitud de adopción para {{ adoption.pet?.name }}
-            </h1>
+       
             
             <span
               class="inline-flex rounded-full px-3 py-1 text-sm font-semibold leading-5"
@@ -72,7 +70,9 @@
               }}
             </span>
           </div>
-          
+               <h1 class="text-2xl font-bold text-gray-800">
+              Solicitud de adopciósssn para {{ adoption.pet?.name }}
+            </h1>
           <p class="mt-1 text-sm text-gray-600">
             Enviada el {{ formatDate(adoption.createdAt) }}
             <span v-if="adoption.updatedAt && adoption.updatedAt !== adoption.createdAt">

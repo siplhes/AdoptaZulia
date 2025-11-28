@@ -30,32 +30,7 @@ const needsProfileCompletion = ref(false)
 let unsubscribeAuth: (() => void) | null = null
 let isInitialized = false
 
-// Validate inputs for security
-function validateEmail(email: string): boolean {
-  if (!email || typeof email !== 'string') return false
-  // Basic email validation regex
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return emailRegex.test(email)
-}
 
-function validatePassword(password: string): boolean {
-  if (!password || typeof password !== 'string') return false
-  // Password should be at least 6 characters
-  return password.length >= 6
-}
-
-function validateDisplayName(name: string): boolean {
-  if (!name || typeof name !== 'string') return false
-  // Prevent scripts and HTML injection
-  return !/<[^>]*>/.test(name) && name.length >= 2 && name.length <= 50
-}
-
-function validateUserName(username: string): boolean {
-  if (!username || typeof username !== 'string') return false
-  // Allow only letters, numbers, underscores, and hyphens
-  const usernameRegex = /^[a-zA-Z0-9_-]{2,30}$/
-  return usernameRegex.test(username)
-}
 
 function initializeAuth() {
   if (isInitialized || !import.meta.client) return
@@ -105,82 +80,16 @@ function initializeAuth() {
 
 export function useAuth() {
   const nuxtApp = useNuxtApp()
+  // Initialize auth immediately on client so onAuthStateChanged is registered
+  // before page components run their onMounted checks. The previous 100ms
+  // delay could cause pages to redirect to /login before auth state was known.
   if (import.meta.client && !isInitialized) {
-    setTimeout(() => {
-      initializeAuth()
-    }, 100)
+    initializeAuth()
   }
   const authService = new AuthService()
   const isAuthenticated = computed(() => !!user.value)
-  
-  async function register(email: string, password: string, displayName: string, userName: string) {
-    loading.value = true
-    error.value = null
-    
-    try {
-      // Input validation for security
-      if (!validateEmail(email)) {
-        error.value = 'El formato del correo electrónico no es válido'
-        return false
-      }
-      
-      if (!validatePassword(password)) {
-        error.value = 'La contraseña debe tener al menos 6 caracteres'
-        return false
-      }
-      
-      if (!validateDisplayName(displayName)) {
-        error.value = 'El nombre debe tener entre 2 y 50 caracteres y no puede contener HTML'
-        return false
-      }
-      
-      if (!validateUserName(userName)) {
-        error.value = 'El nombre de usuario debe contener solo letras, números, guiones bajos o guiones y tener entre 2 y 30 caracteres'
-        return false
-      }
-      
-      user.value = await authService.register(email, password, displayName, userName)
-      return true
-    } catch (err: any) {
-      console.error('Error al registrar usuario:', err)
-      error.value = traducirErrorFirebase(err.code)
-      return false
-    } finally {
-      loading.value = false
-    }
-  }
 
-  async function login(email: string, password: string) {
-    loading.value = true
-    error.value = null
 
-    try {
-      user.value = await authService.login(email, password)
-      if (user.value) {
-        isAdmin.value =
-          (await authService.isAdmin(user.value.uid)) ||
-          authService.isAdminEmail(user.value.email || '')
-        const rtdbProfile = await authService.getUserProfile(user.value.uid)
-        userProfile.value = {
-          uid: user.value.uid,
-          displayName: user.value.displayName,
-          email: user.value.email,
-          photoURL: user.value.photoURL,
-          isAdmin: isAdmin.value,
-          ...rtdbProfile,
-        }
-        needsProfileCompletion.value = !rtdbProfile?.userName
-      }
-
-      return true
-    } catch (err: any) {
-      console.error('Error al iniciar sesión:', err)
-      error.value = traducirErrorFirebase(err.code)
-      return false
-    } finally {
-      loading.value = false
-    }
-  }
 
   async function loginWithGoogle() {
     loading.value = true
@@ -212,37 +121,8 @@ export function useAuth() {
       loading.value = false
     }
   }
-  
-  async function loginWithFacebook() {
-    loading.value = true
-    error.value = null
-    try {
-      const authUser = await authService.loginWithFacebook()
-      user.value = authUser as User
-      if (user.value) {
-        isAdmin.value =
-          (await authService.isAdmin(user.value.uid)) ||
-          authService.isAdminEmail(user.value.email || '')
-        const rtdbProfile = await authService.getUserProfile(user.value.uid)
-        userProfile.value = {
-          uid: user.value.uid,
-          displayName: user.value.displayName || '',
-          email: user.value.email,
-          photoURL: user.value.photoURL || null,
-          isAdmin: isAdmin.value,
-          ...(rtdbProfile || {}),
-        }
-        needsProfileCompletion.value = !rtdbProfile?.userName
-      }
-      return true
-    } catch (err: any) {
-      console.error('Error al iniciar sesión con Facebook:', err)
-      error.value = traducirErrorFirebase(err.code)
-      return false
-    } finally {
-      loading.value = false
-    }
-  }
+
+
   async function logout() {
     loading.value = true
     error.value = null
@@ -252,6 +132,13 @@ export function useAuth() {
       userProfile.value = null
       isAdmin.value = false
       needsProfileCompletion.value = false
+      // Redirect to home after successful logout
+      try {
+        nuxtApp?.$router?.push('/')
+      } catch (err) {
+        // Ignore navigation errors in environments without router
+        console.warn('Logout: unable to navigate to home', err)
+      }
       return true
     } catch (err: any) {
       console.error('Error al cerrar sesión:', err)
@@ -261,20 +148,7 @@ export function useAuth() {
       loading.value = false
     }
   }
-  async function resetPassword(email: string) {
-    loading.value = true
-    error.value = null
-    try {
-      await authService.resetPassword(email)
-      return true
-    } catch (err: any) {
-      console.error('Error al restablecer contraseña:', err)
-      error.value = traducirErrorFirebase(err.code)
-      return false
-    } finally {
-      loading.value = false
-    }
-  }
+
   async function updateProfile(
     displayName?: string,
     photoURL?: string,
@@ -321,10 +195,6 @@ export function useAuth() {
         return 'Esta cuenta de usuario ha sido deshabilitada'
       case 'auth/user-not-found':
         return 'No existe una cuenta con este correo electrónico'
-      case 'auth/wrong-password':
-        return 'La contraseña es incorrecta'
-      case 'auth/weak-password':
-        return 'La contraseña debe tener al menos 6 caracteres'
       case 'auth/operation-not-allowed':
         return 'Esta operación no está permitida'
       case 'auth/too-many-requests':
@@ -348,12 +218,12 @@ export function useAuth() {
     error.value = null
     try {
       const userData = await authService.getUserByUsername(username)
-      
+
       if (userData) {
         // Asegurarnos de que todos los campos requeridos estén presentes
         return {
           ...userData,
-          uid: userData.uid || '', 
+          uid: userData.uid || '',
           displayName: userData.displayName || '',
           email: userData.email || null,
           photoURL: userData.photoURL || null,
@@ -379,15 +249,15 @@ export function useAuth() {
   async function getCurrentUserData(): Promise<UserData | null> {
     loading.value = true
     error.value = null
-    
+
     try {
       if (!user.value) return null
-      
+
       // Get user data from database
       const userData = await authService.getUserById(user.value.uid)
-      
+
       if (!userData) return null
-      
+
       // Combine auth profile with database data
       return {
         ...userData,
@@ -420,12 +290,8 @@ export function useAuth() {
     isAdmin,
     isAuthenticated,
     needsProfileCompletion,
-    register,
-    login,
     loginWithGoogle,
-    loginWithFacebook,
     logout,
-    resetPassword,
     updateProfile,
     isLoggedIn,
     getUserByUsername,

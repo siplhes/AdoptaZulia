@@ -111,7 +111,7 @@
         </div>
 
         <!-- Listado de mascotas -->
-        <div v-if="filteredPets.length > 0" class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        <div v-if="filteredPets.length > 0" class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           <div
             v-for="pet in filteredPets"
             :key="pet.id"
@@ -121,7 +121,7 @@
               <NuxtImg
                 :src="pet.image"
                 :alt="pet.name"
-                class="h-48 w-full object-cover"
+                class="h-44 sm:h-48 md:h-48 lg:h-56 w-full object-cover"
                 sizes="sm:100vw md:50vw lg:33vw"
                 placeholder
                 @error="handleImageError"
@@ -157,17 +157,58 @@
                 </span>
               </div>
 
-              <!-- Solicitudes de adopción -->
-              <div class="mb-4 flex items-center justify-between">
-                <span class="text-sm text-gray-700">
-                  {{ pet.adoptionRequestsCount || 0 }} solicitudes
-                </span>
-                <NuxtLink
-                  :to="`/adopciones/${pet.id}`"
-                  class="text-sm text-emerald-600 hover:text-emerald-800"
+              <!-- Solicitudes de adopción (preview + ver más) -->
+              <div class="mb-4">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-gray-700">{{ pet.adoptionRequestsCount || 0 }} solicitudes</span>
+                  <div class="flex items-center gap-3">
+                    <button
+                      :aria-expanded="showRequestsFor === pet.id ? 'true' : 'false'"
+                      :aria-controls="`requests-${pet.id}`"
+                      class="text-sm text-emerald-600 hover:text-emerald-800"
+                      @click="toggleRequests(pet.id)"
+                    >
+                      {{ showRequestsFor === pet.id ? 'Ocultar solicitudes' : 'Ver solicitudes' }}
+                    </button>
+                    <NuxtLink
+                      :to="`/adopciones/${pet.id}`"
+                      class="hidden sm:inline-block text-sm text-emerald-600 hover:text-emerald-800"
+                    >
+                      Ver en página
+                    </NuxtLink>
+                  </div>
+                </div>
+
+                <!-- Collapsible preview -->
+                <div
+                  v-if="showRequestsFor === pet.id"
+                  :id="`requests-${pet.id}`"
+                  class="mt-3 rounded-md border border-gray-100 bg-gray-50 p-3"
                 >
-                  Ver solicitudes
-                </NuxtLink>
+                  <div v-if="requestsCache[pet.id] && requestsCache[pet.id].length > 0">
+                    <div
+                      v-for="req in requestsCache[pet.id].slice(0,5)"
+                      :key="req.id"
+                      class="flex items-center justify-between py-2"
+                    >
+                      <div class="flex items-center">
+                        <div class="h-8 w-8 overflow-hidden rounded-full bg-emerald-100">
+                          <img v-if="req.user?.photoURL" :src="req.user.photoURL" :alt="req.user?.name || 'Usuario'" class="h-full w-full object-cover" />
+                          <div v-else class="flex h-full w-full items-center justify-center font-bold text-emerald-700">{{ getInitials(req.user?.name || req.user?.email || 'U') }}</div>
+                        </div>
+                        <div class="ml-3">
+                          <p class="text-sm font-medium text-gray-900">{{ req.user?.name || req.user?.email || 'Usuario' }}</p>
+                          <p class="text-xs text-gray-500">{{ formatShortDate(req.createdAt) }} — <span class="capitalize">{{ req.status }}</span></p>
+                        </div>
+                      </div>
+                      <div class="text-sm text-gray-500">
+                        <NuxtLink :to="`/mi-solicitud/${req.id}`" class="text-emerald-600 hover:text-emerald-800">Ver solicitud</NuxtLink>
+                      </div>
+                    </div>
+                    <div v-if="requestsCache[pet.id].length > 5" class="mt-2 text-xs text-gray-500">Mostrando 5 de {{ requestsCache[pet.id].length }} solicitudes</div>
+                  </div>
+                  <div v-else class="text-sm text-gray-500">No hay solicitudes aún.</div>
+                </div>
               </div>
 
               <!-- Acciones -->
@@ -181,17 +222,20 @@
                 </NuxtLink>
                 
                 <button
+                  :aria-expanded="showMenuFor === pet.id ? 'true' : 'false'"
+                  aria-controls="menu-{{pet.id}}"
                   class="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50"
                   @click="showMenuFor = pet.id === showMenuFor ? null : pet.id"
                 >
-                  <Icon name="heroicons:ellipsis-horizontal" class="h-5 w-5" />
-                  Más opciones
+                  <Icon name="heroicons:ellipsis-horizontal" class="h-5 w-5" aria-hidden="true" />
+                  <span class="sr-only">Más opciones</span>
                 </button>
               </div>
               
               <!-- Menú desplegable de opciones -->
-              <div
+                <div
                 v-if="showMenuFor === pet.id"
+                :id="`menu-${pet.id}`"
                 class="mt-2 divide-y divide-gray-100 rounded-md border border-gray-200 bg-white"
               >
                 <NuxtLink
@@ -432,6 +476,8 @@ const error = ref(null)
 const userPets = ref([])
 const selectedFilter = ref('all')
 const showMenuFor = ref(null)
+const showRequestsFor = ref(null)
+const requestsCache = ref({})
 
 // Estados para el modal de adopción completada
 const showAdoptionModal = ref(false)
@@ -500,6 +546,9 @@ onMounted(async () => {
       try {
         const requests = await findAdoptionsByPetId(pet.id)
         pet.adoptionRequestsCount = requests.length
+        // Guardar una vista previa (hasta 2) para mostrar inline rápidamente
+        requestsCache.value[pet.id] = requests
+        pet.adoptionRequestsPreview = requests.slice(0, 2)
       } catch (err) {
         console.error(`Error al obtener solicitudes para mascota ${pet.id}:`, err)
         pet.adoptionRequestsCount = 0
@@ -622,6 +671,26 @@ const confirmDeletePet = (petId) => {
     }
   }
   showModal.value = true
+}
+
+// Toggle showing requests inline and fetch if not cached
+const toggleRequests = async (petId) => {
+  if (showRequestsFor.value === petId) {
+    showRequestsFor.value = null
+    return
+  }
+
+  // Open and ensure cached
+  showRequestsFor.value = petId
+  if (!requestsCache.value[petId]) {
+    try {
+      const requests = await findAdoptionsByPetId(petId)
+      requestsCache.value[petId] = requests
+    } catch (err) {
+      console.error('Error al cargar solicitudes inline:', err)
+      requestsCache.value[petId] = []
+    }
+  }
 }
 
 const showAlert = (title, message) => {

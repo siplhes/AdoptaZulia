@@ -48,7 +48,7 @@
 
           <h3 class="mb-2 text-lg font-medium text-emerald-600">Información que nos proporcionas:</h3>
           <ul class="mb-4 list-inside list-disc space-y-2 text-gray-700">
-            <li>Datos de registro: nombre, dirección de correo electrónico, contraseña, nombre de usuario.</li>
+            <li>Datos de registro: nombre, dirección de correo electrónico, nombre de usuario.</li>
             <li>Información de perfil: fotografía, datos de contacto, ubicación, biografía.</li>
             <li>Información sobre mascotas: fotografías, descripciones, detalles de salud, ubicación.</li>
             <li>Comunicaciones: mensajes enviados a través de nuestras plataformas, solicitudes de adopción.</li>

@@ -67,7 +67,7 @@
           </p>
           <ul class="mb-4 list-inside list-disc space-y-2 text-gray-700">
             <li>Proporcionar información precisa y completa durante el proceso de registro.</li>
-            <li>Mantener la confidencialidad de tu contraseña y no compartir tu cuenta con terceros.</li>
+            <li>Mantener la seguridad de tu cuenta y no compartirla con terceros.</li>
             <li>Asumir la responsabilidad de todas las actividades realizadas bajo tu cuenta.</li>
             <li>Notificarnos inmediatamente si detectas un uso no autorizado de tu cuenta.</li>
           </ul>

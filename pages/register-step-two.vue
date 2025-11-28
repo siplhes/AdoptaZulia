@@ -127,13 +127,14 @@ definePageMeta({
 // Composables
 const router = useRouter()
 const route = useRoute()
-const { user, userProfile, updateProfile, loading: authLoading, error: authError } = useAuth()
+const { user, userProfile, updateProfile, loading: authLoading, error: authError, needsProfileCompletion } = useAuth()
 const { uploadFile } = useS3()
 
 // Estado local
 const loading = ref(false)
 const error = ref(null)
 const userName = ref('')
+const suggestedUsername = ref('')
 const photoPreview = ref(null)
 const photoError = ref(null)
 const fileInput = ref(null)
@@ -150,6 +151,23 @@ onMounted(() => {
   // Si el usuario ya tiene un nombre de usuario, redirigir a inicio
   if (userProfile.value?.userName) {
     router.push('/')
+  }
+
+  // Generar sugerencia de username a partir del displayName o email
+  const makeSuggestion = (s) =>
+    s
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9]/g, '')
+      .toLowerCase()
+      .slice(0, 8)
+
+  if (userProfile.value?.userName) {
+    suggestedUsername.value = userProfile.value.userName
+  } else if (user.value?.displayName) {
+    suggestedUsername.value = makeSuggestion(user.value.displayName)
+  } else if (user.value?.email) {
+    suggestedUsername.value = makeSuggestion(user.value.email.split('@')[0])
   }
 })
 

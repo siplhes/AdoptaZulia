@@ -3,6 +3,7 @@
     <header class="mx-auto max-w-4xl px-6 py-2 lg:py-2">
       <div class="flex flex-wrap items-center justify-between">
         <NuxtLink to="/" class="flex items-center">
+
           <NuxtPicture src="/logo.svg" class="h-12 w-12 text-[#fefffa] lg:h-16 lg:w-16" loading="lazy" sizes="sm:48px md:48px lg:64px" alt="Adopta Zulia isotipo" width="3rem" height="3rem" placeholder />
           <h1 id="webTitle" class="ml-2">Adopta Zulia</h1>
         </NuxtLink>

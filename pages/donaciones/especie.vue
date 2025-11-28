@@ -10,9 +10,9 @@
       </div>
 
       <!-- Introducción -->
-      <div class="mx-auto mb-12 max-w-4xl rounded-lg bg-white p-6 shadow-lg md:p-8">
-        <div class="flex flex-col items-center justify-between gap-8 md:flex-row">
-          <div class="md:w-1/2">
+      <div class="mx-auto mb-8 max-w-4xl rounded-lg bg-white p-6 shadow-lg md:p-8">
+        <div class="flex flex-col-reverse items-center gap-6 md:flex-row md:items-center md:gap-8">
+          <div class="w-full md:w-1/2">
             <h2 class="mb-4 text-2xl font-semibold text-emerald-700">¿Por qué donar en especie?</h2>
             <p class="mb-4 text-gray-700">
               Las donaciones en especie son fundamentales para proporcionar cuidados diarios a las mascotas rescatadas mientras esperan encontrar un hogar permanente.
@@ -21,8 +21,10 @@
               Cada bolsa de alimento, manta, medicamento o accesorio que donas ayuda directamente a mejorar la calidad de vida de estos animales y nos permite destinar más recursos a rescates, tratamientos médicos y programas de adopción.
             </p>
           </div>
-          <div class="md:w-2/5">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-64 w-64 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+          <div class="w-full md:w-1/2 flex items-center justify-center">
+            <!-- Hero illustration: improved responsive sizing and accessible -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-40 w-40 md:h-64 md:w-64 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Ilustración mascotas">
+              <title>Ilustración de mascotas</title>
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
               <circle cx="9" cy="7" r="4"/>
               <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
@@ -40,11 +42,11 @@
       <div class="mx-auto mb-12 max-w-4xl">
         <h2 class="mb-8 text-center text-2xl font-semibold text-emerald-800">¿Qué puedes donar?</h2>
         
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <!-- Alimentación -->
-          <div class="rounded-lg bg-white p-6 shadow-md transition-transform hover:scale-105">
-            <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <div class="rounded-lg bg-white p-6 shadow-md transition-transform hover:scale-105 focus-within:scale-105">
+            <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon-illustration text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
                 <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
                 <line x1="6" y1="1" x2="6" y2="4"/>
@@ -64,8 +66,8 @@
 
           <!-- Medicamentos y salud -->
           <div class="rounded-lg bg-white p-6 shadow-md transition-transform hover:scale-105">
-            <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon-illustration text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
               </svg>
             </div>
@@ -82,8 +84,8 @@
 
           <!-- Accesorios e higiene -->
           <div class="rounded-lg bg-white p-6 shadow-md transition-transform hover:scale-105">
-            <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon-illustration text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <rect x="2" y="4" width="20" height="16" rx="2"/>
                 <path d="M12 9v4"/>
                 <path d="M12 16h.01"/>
@@ -102,8 +104,8 @@
 
           <!-- Materiales de oficina -->
           <div class="rounded-lg bg-white p-6 shadow-md transition-transform hover:scale-105">
-            <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon-illustration text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M12 19l7-7 3 3-7 7-3-3z"/>
                 <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
                 <path d="M2 2l7.586 7.586"/>
@@ -144,8 +146,8 @@
 
           <!-- Servicios -->
           <div class="rounded-lg bg-white p-6 shadow-md transition-transform hover:scale-105">
-            <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <div class="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="icon-illustration text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M17 18a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2"/>
                 <rect x="3" y="4" width="18" height="14" rx="2"/>
                 <path d="M8 2v2"/>
@@ -168,7 +170,7 @@
       </div>
 
       <!-- Proceso de donación -->
-      <div class="mx-auto mb-12 max-w-4xl">
+  <div class="mx-auto mb-12 max-w-4xl">
         <h2 class="mb-8 text-center text-2xl font-semibold text-emerald-800">¿Cómo funciona el proceso?</h2>
         
         <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -219,7 +221,7 @@
       </div>
 
       <!-- Puntos de recogida -->
-      <div class="mx-auto mb-12 max-w-4xl rounded-lg bg-white p-6 shadow-lg md:p-8">
+  <div class="mx-auto mb-12 max-w-4xl rounded-lg bg-white p-6 shadow-lg md:p-8">
         <h2 class="mb-6 text-center text-2xl font-semibold text-emerald-800">Puntos de Recogida</h2>
 
         <div class="flex flex-col gap-8 md:flex-row">
@@ -239,143 +241,28 @@
               </li>
             </ul>
           </div>
-
-        <!--  <div class="md:w-1/2">
-            <h3 class="mb-4 text-xl font-medium text-emerald-700">Establecimientos asociados</h3>
-            <ul class="space-y-4">
-              <li class="flex items-start">
-                <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 mt-1 h-5 w-5 flex-shrink-0 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
-                  <circle cx="12" cy="7" r="4"/>
-                </svg>
-                <div>
-                  <strong class="block text-gray-800">Veterinaria Patitas Felices</strong>
-                  <p class="text-gray-600">Av. Universidad, C.C. Plaza Mayor, Local 12, Maracaibo</p>
-                  <p class="text-gray-600">Horario: Lunes a Sábado, 8:00 AM - 7:00 PM</p>
-                </div>
-              </li>
-       
-            </ul>
-          </div>
-           -->
         </div>
       </div>
 
-      <!-- Campaña de donación en especie
-      <div class="mx-auto mb-12 max-w-4xl overflow-hidden rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-800 shadow-xl">
-        <div class="flex flex-col md:flex-row">
-          <div class="md:w-1/2">
-            <div class="p-6 md:p-8">
-              <h2 class="mb-4 text-2xl font-bold text-white">Campaña Especial: "Un Plato Lleno"</h2>
-              <p class="mb-4 text-emerald-100">
-                Estamos recolectando alimentos para mascotas rescatadas y en situación de calle. ¡Cada bolsa de alimento marca la diferencia!
-              </p>
-              <ul class="mb-6 space-y-2 text-emerald-100">
-                <li class="flex items-start">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-5 w-5 text-emerald-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                    <path d="M22 4L12 14.01l-3-3"/>
-                  </svg>
-                  <span>Meta: 500 kg de alimento para perros y gatos</span>
-                </li>
-                <li class="flex items-start">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-5 w-5 text-emerald-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                    <path d="M22 4L12 14.01l-3-3"/>
-                  </svg>
-                  <span>Fecha: 15 de abril al 15 de mayo de 2025</span>
-                </li>
-                <li class="flex items-start">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-5 w-5 text-emerald-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                    <path d="M22 4L12 14.01l-3-3"/>
-                  </svg>
-                  <span>Recogemos a domicilio o puedes llevarlo a nuestras sedes</span>
-                </li>
-              </ul>
-              <button class="w-full rounded-lg bg-white py-3 font-medium text-emerald-700 transition-colors hover:bg-emerald-50">
-                Participar en la campaña
-              </button>
-            </div>
-          </div>
-          <div class="flex items-center justify-center bg-emerald-700 p-6 md:w-1/2 md:p-8">
-            <div class="text-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-32 w-32 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="5" r="3"/>
-                <line x1="12" y1="22" x2="12" y2="8"/>
-                <path d="M5 12H2a10 10 0 0 0 20 0h-3"/>
-                <line x1="8" y1="14" x2="16" y2="14"/>
-                <circle cx="17" cy="5" r="1" fill="currentColor"/>
-                <circle cx="7" cy="5" r="1" fill="currentColor"/>
-              </svg>
-              <p class="mt-4 text-xl font-bold text-white">¡Cada donación alimenta esperanza!</p>
-            </div>
-          </div>
-        </div>
-      </div>
- -->
       <!-- Preguntas frecuentes -->
       <div class="mx-auto mb-12 max-w-4xl rounded-lg bg-white p-6 shadow-lg md:p-8">
         <h2 class="mb-6 text-center text-2xl font-semibold text-emerald-800">Preguntas Frecuentes</h2>
 
         <div class="space-y-4">
-          <!-- Pregunta 1 -->
-          <div class="rounded-lg border border-gray-200">
-            <button class="flex w-full items-center justify-between p-4 text-left">
-              <span class="text-lg font-medium text-gray-800">¿Puedo donar artículos usados?</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <div v-for="(faq, idx) in faqs" :key="idx" class="rounded-lg border border-gray-200">
+            <button
+              :aria-expanded="openFaq === idx"
+              :aria-controls="`faq-${idx}-content`"
+              class="flex w-full items-center justify-between p-4 text-left"
+              @click="toggleFaq(idx)"
+            >
+              <span class="text-lg font-medium text-gray-800">{{ faq.question }}</span>
+              <svg xmlns="http://www.w3.org/2000/svg" :class="['h-5 w-5 transform transition-transform', openFaq === idx ? 'rotate-180' : 'rotate-0']" class="h-5 w-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <polyline points="6 9 12 15 18 9"/>
               </svg>
             </button>
-            <div class="border-t border-gray-200 p-4">
-              <p class="text-gray-700">
-                Sí, aceptamos artículos usados en buen estado como mantas, toallas, transportadoras y camas. Todos los artículos textiles deben estar limpios y sin roturas significativas. Para otros artículos, evaluamos caso por caso según su estado y funcionalidad.
-              </p>
-            </div>
-          </div>
-
-          <!-- Pregunta 2 -->
-          <div class="rounded-lg border border-gray-200">
-            <button class="flex w-full items-center justify-between p-4 text-left">
-              <span class="text-lg font-medium text-gray-800">¿Qué hago si los productos están cerca de su fecha de caducidad?</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="6 9 12 15 18 9"/>
-              </svg>
-            </button>
-            <div class="border-t border-gray-200 p-4">
-              <p class="text-gray-700">
-                Para alimentos y medicamentos, preferimos productos con al menos 3 meses antes de su fecha de caducidad. Sin embargo, para productos que vencen pronto pero son seguros de usar, también los aceptamos y les damos prioridad de uso inmediato.
-              </p>
-            </div>
-          </div>
-
-          <!-- Pregunta 3 -->
-          <div class="rounded-lg border border-gray-200">
-            <button class="flex w-full items-center justify-between p-4 text-left">
-              <span class="text-lg font-medium text-gray-800">¿Puedo obtener un recibo o certificado por mi donación?</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="6 9 12 15 18 9"/>
-              </svg>
-            </button>
-            <div class="border-t border-gray-200 p-4">
-              <p class="text-gray-700">
-                Sí, emitimos certificados de donación para todas las contribuciones en especie. Este documento especifica los artículos donados y su valor aproximado, que puede ser útil para fines administrativos o fiscales.
-              </p>
-            </div>
-          </div>
-
-          <!-- Pregunta 4 -->
-          <div class="rounded-lg border border-gray-200">
-            <button class="flex w-full items-center justify-between p-4 text-left">
-              <span class="text-lg font-medium text-gray-800">¿Puedo organizar una colecta en mi comunidad o empresa?</span>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="6 9 12 15 18 9"/>
-              </svg>
-            </button>
-            <div class="border-t border-gray-200 p-4">
-              <p class="text-gray-700">
-                ¡Absolutamente! Apoyamos y fomentamos las colectas comunitarias. Podemos proporcionarte materiales informativos, afiches digitales e incluso una charla virtual sobre nuestra labor. Contáctanos para coordinar los detalles y la recogida de los artículos.
-              </p>
+            <div v-show="openFaq === idx" :id="`faq-${idx}-content`" class="border-t border-gray-200 p-4">
+              <p class="text-gray-700">{{ faq.answer }}</p>
             </div>
           </div>
         </div>
@@ -388,21 +275,21 @@
           Si tienes preguntas adicionales o quieres coordinar tu donación, no dudes en contactarnos:
         </p>
 
-        <div class="flex flex-col items-center justify-center gap-6 md:flex-row">
-          <a href="tel:+584146646526" class="flex w-full items-center justify-center gap-3 rounded-lg bg-emerald-600 px-6 py-3 text-center font-medium text-white transition-colors hover:bg-emerald-700 md:w-auto">
+        <div class="flex flex-col items-center justify-center gap-4 sm:flex-row sm:justify-center">
+          <a href="tel:+584146646526" aria-label="Llamar al número +58 414 664 6526" class="flex w-full sm:w-auto items-center justify-center gap-3 rounded-lg bg-emerald-600 px-6 py-3 text-center font-medium text-white transition-colors hover:bg-emerald-700">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
             </svg>
             +58 414 664 6526
           </a>
-          <a href="mailto:adoptazulia@gmail.com" class="flex w-full items-center justify-center gap-3 rounded-lg border border-emerald-600 px-6 py-3 text-center font-medium text-emerald-600 transition-colors hover:bg-emerald-50 md:w-auto">
+          <a href="mailto:adoptazulia@gmail.com" aria-label="Enviar correo a adoptazulia@gmail.com" class="flex w-full sm:w-auto items-center justify-center gap-3 rounded-lg border border-emerald-600 px-6 py-3 text-center font-medium text-emerald-600 transition-colors hover:bg-emerald-50">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
               <polyline points="22,6 12,13 2,6"/>
             </svg>
             adoptazulia@gmail.com
           </a>
-          <a href="https://wa.me/584146646526" class="flex w-full items-center justify-center gap-3 rounded-lg bg-green-500 px-6 py-3 text-center font-medium text-white transition-colors hover:bg-green-600 md:w-auto">
+          <a href="https://wa.me/584146646526" aria-label="Abrir chat de WhatsApp" class="flex w-full sm:w-auto items-center justify-center gap-3 rounded-lg bg-green-500 px-6 py-3 text-center font-medium text-white transition-colors hover:bg-green-600">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
             </svg>
@@ -423,7 +310,9 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { ref } from 'vue'
+
 definePageMeta({
   layout: 'default',
 })
@@ -437,4 +326,48 @@ useHead({
     },
   ],
 })
+
+// Simple accordion state for FAQs
+const openFaq = ref<number | null>(0)
+const faqs = [
+  {
+    question: '¿Puedo donar artículos usados?',
+    answer:
+      'Sí, aceptamos artículos usados en buen estado como mantas, toallas, transportadoras y camas. Todos los artículos textiles deben estar limpios y sin roturas significativas. Para otros artículos, evaluamos caso por caso según su estado y funcionalidad.',
+  },
+  {
+    question: '¿Qué hago si los productos están cerca de su fecha de caducidad?',
+    answer:
+      'Para alimentos y medicamentos, preferimos productos con al menos 3 meses antes de su fecha de caducidad. Sin embargo, para productos que vencen pronto pero son seguros de usar, también los aceptamos y les damos prioridad de uso inmediato.',
+  },
+  {
+    question: '¿Puedo obtener un recibo o certificado por mi donación?',
+    answer:
+      'Sí, emitimos certificados de donación para todas las contribuciones en especie. Este documento especifica los artículos donados y su valor aproximado, que puede ser útil para fines administrativos o fiscales.',
+  },
+  {
+    question: '¿Puedo organizar una colecta en mi comunidad o empresa?',
+    answer:
+      '¡Absolutamente! Apoyamos y fomentamos las colectas comunitarias. Podemos proporcionarte materiales informativos, afiches digitales e incluso una charla virtual sobre nuestra labor. Contáctanos para coordinar los detalles y la recogida de los artículos.',
+  },
+]
+
+function toggleFaq(idx: number) {
+  openFaq.value = openFaq.value === idx ? null : idx
+}
 </script>
+
+<style scoped>
+/* Icon sizing helpers for consistent look */
+.icon-illustration {
+  width: 36px;
+  height: 36px;
+}
+
+@media (min-width: 768px) {
+  .icon-illustration { width: 40px; height: 40px; }
+}
+
+/* Make cards more touch-friendly */
+.rounded-lg:focus-within { outline: 2px solid rgba(16, 185, 129, 0.15); outline-offset: 2px; }
+</style>

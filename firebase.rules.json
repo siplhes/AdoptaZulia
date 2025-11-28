@@ -4,6 +4,9 @@
     ".write": false,
     "users": {
       ".read": "auth != null",
+      ".indexOn": [
+        "userName"
+      ],
       "$uid": {
         ".read": "auth != null",
         ".write": "(auth != null && auth.uid == $uid) || root.child('admins').child(auth.uid).exists()"
@@ -11,10 +14,19 @@
     },
     "pets": {
       ".read": true,
-      ".write": "auth != null",
-      ".indexOn": ["typeValue", "userId"],
+      ".indexOn": [
+        "typeValue",
+        "userId"
+      ],
       "$petId": {
-        ".write": "(auth != null && data.child('userId').val() == auth.uid) || root.child('admins').child(auth.uid).exists()"
+        ".write": "auth != null && ((!data.exists() && newData.child('userId').val() == auth.uid) || (data.exists() && data.child('userId').val() == auth.uid) || root.child('admins').child(auth.uid).exists())"
+      }
+    },
+    "notifications": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null",
+        ".indexOn": ["createdAt", "read"]
       }
     },
     "admins": {
@@ -23,25 +35,25 @@
     },
     "adoptions": {
       ".read": "auth != null && root.child('admins').child(auth.uid).exists()",
-      ".write": "auth != null",
-      ".indexOn": ["userId", "petId"],
+      ".indexOn": [
+        "userId",
+        "petId"
+      ],
       "$adoptionId": {
         ".read": "auth != null && (data.child('userId').val() == auth.uid || root.child('admins').child(auth.uid).exists())",
-        ".write": "auth != null && (data.child('userId').val() == auth.uid || root.child('admins').child(auth.uid).exists())"
+        ".write": "auth != null && ((!data.exists() && newData.child('userId').val() == auth.uid) || (data.exists() && data.child('userId').val() == auth.uid) || root.child('admins').child(auth.uid).exists())"
       }
     },
     "petComments": {
       ".read": true,
-      ".write": "auth != null",
       "$commentId": {
-        ".write": "(auth != null && data.child('userId').val() == auth.uid) || root.child('admins').child(auth.uid).exists()"
+        ".write": "auth != null && ((!data.exists() && newData.child('userId').val() == auth.uid) || (data.exists() && data.child('userId').val() == auth.uid) || root.child('admins').child(auth.uid).exists())"
       }
     },
     "adoptionStories": {
       ".read": true,
-      ".write": "auth != null",
       "$storyId": {
-        ".write": "(auth != null && data.child('userId').val() == auth.uid) || root.child('admins').child(auth.uid).exists()"
+        ".write": "auth != null && ((!data.exists() && newData.child('userId').val() == auth.uid) || (data.exists() && data.child('userId').val() == auth.uid) || root.child('admins').child(auth.uid).exists())"
       }
     },
     "statistics": {
