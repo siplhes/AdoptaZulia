@@ -74,7 +74,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import Icon from '~/components/common/Icon.vue'
 import PetCard from '~/components/PetCard.vue'
 import { useLostPets } from '~/composables/useLostPets'
 
