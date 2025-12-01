@@ -182,6 +182,11 @@ const baseLinks = [
     alt: 'Adoptar mascotas',
   },
   {
+    name: 'Perdidas',
+    link: '/perdidas',
+    alt: 'Mascotas perdidas',
+  },
+  {
     name: 'Publica',
     link: '/publicar',
     alt: 'Dar en adopcion a mascotas',

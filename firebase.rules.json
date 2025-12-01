@@ -50,10 +50,41 @@
         ".write": "auth != null && ((!data.exists() && newData.child('userId').val() == auth.uid) || (data.exists() && data.child('userId').val() == auth.uid) || root.child('admins').child(auth.uid).exists())"
       }
     },
-    "adoptionStories": {
+    "adoption_stories": {
       ".read": true,
       "$storyId": {
-        ".write": "auth != null && ((!data.exists() && newData.child('userId').val() == auth.uid) || (data.exists() && data.child('userId').val() == auth.uid) || root.child('admins').child(auth.uid).exists())"
+        ".write": "auth != null && (
+          (!data.exists() && newData.root.child('petStories').child(newData.child('petId').val()).val() === $storyId && (
+            newData.child('userId').val() == auth.uid || root.child('pets').child(newData.child('petId').val()).child('userId').val() == auth.uid || root.child('admins').child(auth.uid).exists()
+          ))
+          || (data.exists() && (data.child('userId').val() == auth.uid || root.child('pets').child(data.child('petId').val()).child('userId').val() == auth.uid || root.child('admins').child(auth.uid).exists()))
+        )"
+      }
+    },
+    "petStories": {
+      ".read": true,
+      "$petId": {
+        ".write": "auth != null && (
+          (!data.exists() && newData.exists() && newData.root.child('adoption_stories').child(newData.val()).child('petId').val() === $petId && (
+            newData.root.child('adoption_stories').child(newData.val()).child('userId').val() == auth.uid || root.child('pets').child($petId).child('userId').val() == auth.uid || root.child('admins').child(auth.uid).exists()
+          ))
+          || root.child('admins').child(auth.uid).exists()
+        )"
+      }
+    },
+    "adoptionVerifications": {
+      ".read": true,
+      "$vid": {
+        ".write": "auth != null && root.child('admins').child(auth.uid).exists()"
+      }
+    },
+    "lost_pets": {
+      ".read": true,
+      "$reportId": {
+        ".write": "auth != null && (
+          (!data.exists() && newData.child('ownerId').val() == auth.uid) ||
+          (data.exists() && (data.child('ownerId').val() == auth.uid || root.child('admins').child(auth.uid).exists()))
+        )"
       }
     },
     "statistics": {

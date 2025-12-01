@@ -54,6 +54,61 @@ export const useS3 = () => {
     }
   }
 
+  // Upload with progress callback (onProgress receives 0-100)
+  const uploadFileWithProgress = (file: File, folder: string, fileName: string, onProgress: (p: number) => void, options?: {
+    optimize?: boolean,
+    maxSizeMB?: number,
+    maxWidthOrHeight?: number,
+    quality?: number
+  }): Promise<string> => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        // Optimize if needed
+        const shouldOptimize = options?.optimize !== false
+        let fileToUpload: File = file
+        if (shouldOptimize && file.type.startsWith('image/')) {
+          const optimizationOptions = {
+            maxSizeMB: options?.maxSizeMB || 1,
+            maxWidthOrHeight: options?.maxWidthOrHeight || 1920,
+            quality: options?.quality || 0.8,
+            useWebWorker: true
+          }
+          fileToUpload = await optimizeImage(file, optimizationOptions)
+        }
+
+        const formData = new FormData()
+        formData.append('file', fileToUpload)
+        formData.append('folder', folder)
+        formData.append('fileName', fileName)
+
+        const xhr = new XMLHttpRequest()
+        xhr.open('POST', '/api/upload')
+        xhr.upload.onprogress = (ev) => {
+          if (ev.lengthComputable) {
+            const percent = Math.round((ev.loaded / ev.total) * 100)
+            try { onProgress(percent) } catch (e) { /* ignore */ }
+          }
+        }
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              const resp = JSON.parse(xhr.responseText)
+              resolve(resp.fileUrl)
+            } catch (e) {
+              reject(new Error('Invalid response from upload'))
+            }
+          } else {
+            reject(new Error(`Upload failed: ${xhr.status}`))
+          }
+        }
+        xhr.onerror = () => reject(new Error('Network error during upload'))
+        xhr.send(formData)
+      } catch (err) {
+        reject(err)
+      }
+    })
+  }
+
   const deleteFile = async (fileUrl: string): Promise<void> => {
     try {
       // Llamar al endpoint del servidor para eliminar el archivo
@@ -77,6 +132,7 @@ export const useS3 = () => {
 
   return {
     uploadFile,
+    uploadFileWithProgress,
     deleteFile,
   }
 }

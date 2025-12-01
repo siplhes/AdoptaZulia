@@ -102,6 +102,7 @@
             <select
               id="pet"
               v-model="storyData.petId"
+              @change="() => checkSelectedPetStory(storyData.petId)"
               class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
             >
               <option value="" selected>Sin mascota asociada</option>
@@ -112,6 +113,9 @@
             <p class="mt-1 text-xs text-gray-500">
               Selecciona la mascota sobre la que trata esta historia
             </p>
+            <div v-if="selectedPetHasStory" class="mt-2 rounded-md border-l-4 border-amber-500 bg-amber-50 p-3 text-sm text-amber-800">
+              Ya existe una historia publicada para esta mascota. Solo el adoptante, el dueño anterior o un administrador pueden editarla.
+            </div>
           </div>
 
           <!-- Contenido de la historia -->
@@ -186,36 +190,15 @@
             >
               Cancelar
             </NuxtLink>
-            <button
+            <LoadingButton
               type="submit"
-              class="rounded-md border border-transparent bg-emerald-600 px-6 py-2 text-base font-medium text-white shadow-sm hover:bg-emerald-700 disabled:opacity-70"
-              :disabled="loading || !isFormValid"
+              :loading="loading"
+              :disabled="!isFormValid || selectedPetHasStory"
+              variant="primary"
+              loadingLabel="Guardando..."
             >
-              <span v-if="loading">
-                <svg
-                  class="-ml-1 mr-2 inline-block h-4 w-4 animate-spin text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                  />
-                  <path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-                Guardando...
-              </span>
-              <span v-else>Publicar historia</span>
-            </button>
+              Publicar historia
+            </LoadingButton>
           </div>
         </form>
       </div>
@@ -230,6 +213,8 @@ import { useAuth } from '~/composables/useAuth'
 import { useAdoptionStories } from '~/composables/useAdoptionStories'
 import { usePets } from '~/composables/usePets'
 import { useS3 } from '~/composables/useS3'
+import LoadingButton from '~/components/LoadingButton.vue'
+import { useToast } from '~/composables/useToast'
 import { useFirebaseApp } from 'vuefire'
 import { getDatabase, ref as dbRef, query, orderByChild, equalTo, get } from 'firebase/database'
 
@@ -239,6 +224,7 @@ const { user, isAuthenticated } = useAuth()
 const { createStory } = useAdoptionStories()
 const { fetchUserPets } = usePets()
 const { uploadImage } = useS3()
+const { success: toastSuccess, error: toastError } = useToast()
 
 // Redireccionar si no está autenticado
 onMounted(() => {
@@ -264,6 +250,22 @@ const storyData = ref({
   petId: '',
   images: [],
 })
+
+// UX: comprobar si la mascota seleccionada ya tiene una historia
+const selectedPetHasStory = ref(false)
+
+async function checkSelectedPetStory(petId) {
+  selectedPetHasStory.value = false
+  if (!petId) return
+  try {
+    const firebaseApp = useFirebaseApp()
+    const db = getDatabase(firebaseApp)
+    const snap = await get(dbRef(db, `petStories/${petId}`))
+    if (snap.exists()) selectedPetHasStory.value = true
+  } catch (e) {
+    console.warn('Error checking pet story:', e)
+  }
+}
 
 // Imágenes
 const images = ref([])
@@ -440,10 +442,11 @@ const submitStory = async () => {
     })
 
     // Redirigir a la historia creada
+    toastSuccess('Historia publicada', 'Tu historia se publicó correctamente')
     router.push(`/historias/${storyId}`)
   } catch (error) {
     console.error('Error al crear historia:', error)
-    alert('Ocurrió un error al crear la historia. Por favor, intenta de nuevo.')
+    toastError('Error', 'Ocurrió un error al crear la historia. Por favor, intenta de nuevo.')
   } finally {
     loading.value = false
   }

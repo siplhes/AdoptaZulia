@@ -30,7 +30,7 @@ export function useAdoptionStories() {
     try {
       const firebaseApp = useFirebaseApp()
       const db = getDatabase(firebaseApp)
-      const storiesRef = dbRef(db, 'adoptionStories')
+      const storiesRef = dbRef(db, 'adoption_stories')
 
       // Obtenemos las historias ordenadas por fecha de creación (más recientes primero)
       const storiesQuery = query(storiesRef, orderByChild('createdAt'))
@@ -89,7 +89,7 @@ export function useAdoptionStories() {
     try {
       const firebaseApp = useFirebaseApp()
       const db = getDatabase(firebaseApp)
-      const storiesRef = dbRef(db, 'adoptionStories')
+      const storiesRef = dbRef(db, 'adoption_stories')
 
       // Obtenemos todas las historias
       const snapshot = await get(storiesRef)
@@ -225,7 +225,7 @@ export function useAdoptionStories() {
     try {
       const firebaseApp = useFirebaseApp()
       const db = getDatabase(firebaseApp)
-      const storyRef = dbRef(db, `adoptionStories/${storyId}`)
+      const storyRef = dbRef(db, `adoption_stories/${storyId}`)
 
       const snapshot = await get(storyRef)
 
@@ -272,29 +272,48 @@ export function useAdoptionStories() {
     try {
       const firebaseApp = useFirebaseApp()
       const db = getDatabase(firebaseApp)
-      const storiesRef = dbRef(db, 'adoptionStories')
+      const storiesRef = dbRef(db, 'adoption_stories')
+
+      const petId = storyData.petId
+      if (!petId) {
+        error.value = 'La historia debe estar asociada a una mascota (petId)'
+        return null
+      }
+
+      // Verificamos si ya existe una historia para esta mascota (usando el índice petStories)
+      const petStoriesRef = dbRef(db, `petStories/${petId}`)
+      const petStorySnap = await get(petStoriesRef)
+      if (petStorySnap.exists()) {
+        error.value = 'Ya existe una historia para esta mascota'
+        return null
+      }
 
       // Generamos un ID único para la nueva historia
       const newStoryRef = push(storiesRef)
+      const storyId = newStoryRef.key
 
       // Datos mínimos requeridos
       const newStory = {
-        petId: storyData.petId,
+        petId: petId,
+        adoptionId: storyData.adoptionId || null,
         userId: storyData.userId,
         title: storyData.title || '',
         content: storyData.content || '',
         images: storyData.images || [],
         featured: storyData.featured || false,
+        verified: storyData.verified || false,
+        verificationId: storyData.verificationId || null,
         likes: 0,
         createdAt: Date.now(),
         updatedAt: Date.now(),
       }
 
-      // Guardamos en la base de datos
-      await set(newStoryRef, newStory)
+      // Guardamos usando una escritura multi-path para garantizar la única referencia en petStories
+      const updates: Record<string, any> = {}
+      updates[`/adoption_stories/${storyId}`] = newStory
+      updates[`/petStories/${petId}`] = storyId
 
-      // Extraemos el ID generado
-      const storyId = newStoryRef.key
+      await update(dbRef(db, '/'), updates)
 
       return storyId
     } catch (err: any) {
@@ -316,7 +335,7 @@ export function useAdoptionStories() {
     try {
       const firebaseApp = useFirebaseApp()
       const db = getDatabase(firebaseApp)
-      const storyRef = dbRef(db, `adoptionStories/${storyId}`)
+      const storyRef = dbRef(db, `adoption_stories/${storyId}`)
 
       // Preparamos los datos a actualizar
       const updateData: any = {
@@ -360,7 +379,7 @@ export function useAdoptionStories() {
     try {
       const firebaseApp = useFirebaseApp()
       const db = getDatabase(firebaseApp)
-      const storyRef = dbRef(db, `adoptionStories/${storyId}`)
+      const storyRef = dbRef(db, `adoption_stories/${storyId}`)
 
       // Obtenemos los datos actuales
       const snapshot = await get(storyRef)
@@ -405,10 +424,22 @@ export function useAdoptionStories() {
     try {
       const firebaseApp = useFirebaseApp()
       const db = getDatabase(firebaseApp)
-      const storyRef = dbRef(db, `adoptionStories/${storyId}`)
+      const storyRef = dbRef(db, `adoption_stories/${storyId}`)
 
-      // Eliminamos de la base de datos
-      await remove(storyRef)
+      const snap = await get(storyRef)
+      if (!snap.exists()) {
+        error.value = 'Historia no encontrada'
+        return false
+      }
+
+      const story = snap.val()
+      const petId = story.petId
+
+      // Eliminamos usando multi-path para limpiar también petStories
+      const updates: Record<string, any> = {}
+      updates[`/adoption_stories/${storyId}`] = null
+      if (petId) updates[`/petStories/${petId}`] = null
+      await update(dbRef(db, '/'), updates)
 
       // Eliminamos también del estado local
       stories.value = stories.value.filter((s) => s.id !== storyId)
@@ -434,7 +465,7 @@ export function useAdoptionStories() {
     try {
       const firebaseApp = useFirebaseApp()
       const db = getDatabase(firebaseApp)
-      const storiesRef = dbRef(db, 'adoptionStories')
+      const storiesRef = dbRef(db, 'adoption_stories')
 
       // Obtenemos todas las historias
       const snapshot = await get(storiesRef)
@@ -491,7 +522,7 @@ export function useAdoptionStories() {
     try {
       const firebaseApp = useFirebaseApp()
       const db = getDatabase(firebaseApp)
-      const storiesRef = dbRef(db, 'adoptionStories')
+      const storiesRef = dbRef(db, 'adoption_stories')
 
       // Obtenemos todas las historias
       const snapshot = await get(storiesRef)

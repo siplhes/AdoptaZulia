@@ -409,7 +409,7 @@ const router = useRouter()
 const adoptionId = route.params.id
 
 // Composables
-const { getAdoptionById, updateAdoptionStatus } = useAdoptions()
+const { getAdoptionById, updateAdoptionStatus, confirmAdoptionAndVerify } = useAdoptions()
 const { fetchPetById, updatePetStatus } = usePets()
 const { isAuthenticated, user } = useAuth()
 
@@ -595,38 +595,22 @@ const confirmAdoption = async () => {
     const firebaseApp = useFirebaseApp();
     const db = getDatabase(firebaseApp);
     
-    // Completar la adopción
-    const success = await updateAdoptionStatus(adoptionId, 'completed');
-    
-    if (success) {
-      // También actualizar el estado de la mascota a 'adopted'
-      // Guardar también quien adoptó la mascota
-      await updatePetStatus(pet.value.id, 'adopted');
-      
-      // Actualizar información adicional sobre la adopción
-      const petRef = dbRef(db, `pets/${pet.value.id}`);
-      
-      await update(petRef, {
-        adoptedBy: user.value.uid,
-        adoptionId: adoptionId,
-        adoptionDate: Date.now(),
-        updatedAt: Date.now()
-      });
-      
-      // Actualizar el estado local
+    // Completar la adopción y crear verificación
+    const verificationId = await confirmAdoptionAndVerify(adoptionId, null, false)
+
+    if (verificationId) {
+      // Actualizar estado local similar a antes
       adoption.value.status = 'completed';
       adoption.value.updatedAt = Date.now();
-      
-      // Actualizar el estado de la mascota en la UI
+
       if (pet.value) {
         pet.value.status = 'adopted';
         pet.value.adoptedBy = user.value.uid;
         pet.value.adoptionId = adoptionId;
         pet.value.adoptionDate = Date.now();
       }
-      
-      // Mostrar mensaje de éxito
-      alert('¡Felicidades! La adopción ha sido completada con éxito. Ahora puedes acceder al certificado de adopción.');
+
+      alert('¡Felicidades! La adopción ha sido completada y verificada. Ahora puedes acceder al certificado de adopción.');
     } else {
       error.value = 'Error al completar la adopción';
     }

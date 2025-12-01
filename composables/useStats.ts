@@ -19,6 +19,9 @@ export interface Stats {
   totalPets: number
   totalAdoptions: number
   totalUsers: number
+  totalLostPets: number
+  lostFoundRate: number
+  highRewardCount: number
   urgentPets: number
   pendingRequests: number
   requestDistribution: {
@@ -53,6 +56,9 @@ export function useStats() {
     totalPets: 0,
     totalAdoptions: 0,
     totalUsers: 0,
+    totalLostPets: 0,
+    lostFoundRate: 0,
+    highRewardCount: 0,
     urgentPets: 0,
     pendingRequests: 0,
     requestDistribution: {
@@ -267,6 +273,33 @@ export function useStats() {
 
       // Tasa de éxito de adopciones
       stats.value.adoptionSuccess = Math.round((approved / (approved + rejected || 1)) * 100)
+    }
+
+    // Estadísticas de reportes de mascotas perdidas
+    try {
+      const lostRef = dbRef(db, 'lost_pets')
+      const lostSnap = await get(lostRef)
+      if (lostSnap.exists()) {
+        const lostArr = Object.values(lostSnap.val() || {}) as any[]
+        const totalLost = lostArr.length
+        const foundCount = lostArr.filter((l) => l.status === 'found').length
+        const lostCount = lostArr.filter((l) => l.status === 'lost' || !l.status).length
+        const highReward = lostArr.filter((l) => Number(l.reward) >= 50).length
+
+        stats.value.totalLostPets = totalLost
+        stats.value.highRewardCount = highReward
+        const denom = foundCount + lostCount || 1
+        stats.value.lostFoundRate = Math.round((foundCount / denom) * 100)
+      } else {
+        stats.value.totalLostPets = 0
+        stats.value.highRewardCount = 0
+        stats.value.lostFoundRate = 0
+      }
+    } catch (e) {
+      console.warn('Error loading lost_pets stats', e)
+      stats.value.totalLostPets = 0
+      stats.value.highRewardCount = 0
+      stats.value.lostFoundRate = 0
     }
   }
 
@@ -504,6 +537,11 @@ export function useStats() {
         metric: 'Nuevas mascotas publicadas',
         actual: stats.value.totalPets,
         target: metasMensuales.nuevasMascotas,
+      },
+      {
+        metric: 'Reportes de mascotas perdidas',
+        actual: stats.value.totalLostPets,
+        target: 50,
       },
       {
         metric: 'Adopciones completadas',

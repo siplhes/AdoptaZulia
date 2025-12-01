@@ -4,6 +4,9 @@ export interface AdoptionStory {
   content: string
   userId: string
   petId?: string
+  adoptionId?: string
+  verified?: boolean
+  verificationId?: string
   images?: string[]
   createdAt: number
   updatedAt: number

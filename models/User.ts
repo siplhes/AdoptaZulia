@@ -17,6 +17,12 @@ export interface UserProfile {
   postCount?: number
   isAdmin?: boolean
   preferences?: Record<string, any>
+  verifiedAdoptions?: Array<{
+    verificationId?: string
+    petId?: string
+    adoptionId?: string
+    verifiedAt?: number
+  }>
 }
 
 export interface UserData {

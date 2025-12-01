@@ -56,12 +56,10 @@
         </div>
 
         <!-- Summary stats -->
-        <div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-5">
           <div class="rounded-lg bg-white p-6 shadow-md">
             <div class="mb-2 flex items-center">
-              <div
-                class="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100"
-              >
+              <div class="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100">
                 <Icon name="mdi:paw" class="h-4 w-4 text-emerald-600" />
               </div>
               <h3 class="text-lg font-medium text-gray-900">Mascotas</h3>
@@ -157,6 +155,26 @@
               <span>{{ stats.requestDistribution.pending }}% pendientes</span>
               <span>{{ stats.requestDistribution.approved }}% aprobadas</span>
               <span>{{ stats.requestDistribution.rejected }}% rechazadas</span>
+            </div>
+          </div>
+
+          <div class="rounded-lg bg-white p-6 shadow-md">
+            <div class="mb-2 flex items-center">
+              <div class="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-red-100">
+                <Icon name="heroicons:exclamation-triangle" class="h-4 w-4 text-red-600" />
+              </div>
+              <h3 class="text-lg font-medium text-gray-900">Perdidos</h3>
+            </div>
+            <div class="flex items-baseline justify-between">
+              <p class="text-3xl font-bold text-red-600">{{ stats.totalLostPets }}</p>
+              <p class="text-sm text-gray-500">Reportes</p>
+            </div>
+            <div class="mt-4 h-1 w-full bg-gray-200">
+              <div class="h-1 bg-red-600" :style="{ width: `${Math.min(100, stats.lostFoundRate)}%` }" />
+            </div>
+            <div class="mt-2 flex justify-between text-xs text-gray-500">
+              <span>Encontrados: {{ stats.lostFoundRate }}%</span>
+              <span>Altas recomp.: {{ stats.highRewardCount }}</span>
             </div>
           </div>
         </div>

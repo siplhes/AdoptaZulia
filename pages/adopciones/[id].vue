@@ -339,7 +339,7 @@ const router = useRouter()
 const petId = route.params.id
 
 // Composables
-const { fetchAdoptionsForOwner, updateAdoptionStatus, updateAdoptionNotes, getAdoptionById } = useAdoptions()
+const { fetchAdoptionsForOwner, updateAdoptionStatus, updateAdoptionNotes, getAdoptionById, confirmAdoptionAndVerify } = useAdoptions()
 const { fetchPetById, updatePetStatus } = usePets()
 const { isAuthenticated, user } = useAuth()
 
@@ -500,33 +500,16 @@ const completeAdoption = async (adoption) => {
       return
     }
     
-    // Completar la adopción
-    const success = await updateAdoptionStatus(adoption.id, 'completed')
-    
-    if (success) {
+    // Completar la adopción y crear verificación
+    const verificationId = await confirmAdoptionAndVerify(adoption.id, null, false)
+
+    if (verificationId) {
       // Actualizar el estado en la UI
       const index = adoptionRequests.value.findIndex(a => a.id === adoption.id)
       if (index !== -1) {
         adoptionRequests.value[index].status = 'completed'
         adoptionRequests.value[index].updatedAt = Date.now()
       }
-      
-      // También actualizar el estado de la mascota a 'adopted'
-      // Guardar también quien adoptó la mascota
-      await updatePetStatus(petId, 'adopted')
-      
-      // Actualizar información adicional sobre la adopción
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
-      const petRef = dbRef(db, `pets/${petId}`)
-      
-      await update(petRef, {
-        adoptedBy: adoption.userId,
-        adoptionId: adoption.id,
-        adoptionDate: Date.now(),
-        updatedAt: Date.now()
-      })
-      
       // Actualizar el estado de la mascota en la UI
       if (pet.value) {
         pet.value.status = 'adopted'
@@ -534,7 +517,7 @@ const completeAdoption = async (adoption) => {
         pet.value.adoptionId = adoption.id
         pet.value.adoptionDate = Date.now()
       }
-      
+
       // Redirigir al certificado de adopción
       router.push(`/certificados/${adoption.id}`)
     } else {

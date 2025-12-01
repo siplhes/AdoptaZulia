@@ -3,7 +3,8 @@
     <HomeHero />
     <HomeCategories />
     <HomeFeatured />
-    <HomeHowItWorks />
+    <HomeHowItWorks />    
+    <HomeLostPetsHero />
     <HomeAdoptionStories />
     <HomeDonation />
     <HomeSocial />
@@ -11,7 +12,6 @@
 </template>
 
 <script setup>
-// Importar componentes modulares siguiendo principios SOLID
 import HomeHero from '~/components/home/HomeHero.vue'
 import HomeCategories from '~/components/home/HomeCategories.vue'
 import HomeFeatured from '~/components/home/HomeFeatured.vue'
@@ -19,6 +19,7 @@ import HomeHowItWorks from '~/components/home/HomeHowItWorks.vue'
 import HomeAdoptionStories from '~/components/home/HomeAdoptionStories.vue'
 import HomeDonation from '~/components/home/HomeDonation.vue'
 import HomeSocial from '~/components/home/HomeSocial.vue'
+import HomeLostPetsHero from '~/components/home/HomeLostPetsHero.vue'
 
 onMounted(() => {
   useHead({

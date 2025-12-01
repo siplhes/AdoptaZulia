@@ -462,6 +462,35 @@
       </div>
       
       <!-- Modal para alertas y mensajes -->
+      <!-- Verificaciones de adopción del usuario -->
+      <div v-if="verifiedAdoptions.length > 0" class="mt-6 rounded-lg bg-white p-6 shadow-md">
+        <h3 class="mb-4 text-lg font-semibold text-gray-800">Verificaciones de adopción</h3>
+        <div class="space-y-3">
+          <div v-for="v in verifiedAdoptions" :key="v.id" class="flex items-center justify-between rounded-md border p-3">
+            <div>
+              <div class="text-sm font-medium text-gray-900">{{ v.pet?.name || 'Mascota' }}</div>
+            <!-- Reportes de mascotas perdidas del usuario -->
+            <div v-if="userLostReports.length > 0" class="mt-6">
+              <h3 class="mb-4 text-lg font-semibold text-gray-800">Tus reportes de mascotas perdidas</h3>
+              <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <PetCard
+                  v-for="r in mappedUserLost"
+                  :key="r.id"
+                  :pet="r"
+                  class=""
+                />
+              </div>
+            </div>
+
+            <!-- Verificaciones de adopción del usuario -->
+            </div>
+            <div class="flex items-center gap-3">
+              <NuxtLink v-if="v.adoptionId" :to="`/certificados/${v.adoptionId}`" class="text-amber-800 underline text-sm">Ver certificado</NuxtLink>
+              <NuxtLink :to="`/verificar?vid=${v.id}`" class="text-amber-800 underline text-sm">Verificar</NuxtLink>
+            </div>
+          </div>
+        </div>
+      </div>
       <ModalAlert
         :show="showModal"
         :type="modalType"
@@ -478,9 +507,82 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '~/composables/useAuth'
+const { user } = useAuth()
 import { usePets } from '~/composables/usePets'
 import { useAdoptions } from '~/composables/useAdoptions'
 import { getDatabase, ref as dbRef, get, query, orderByChild, equalTo } from 'firebase/database'
 import { useFirebaseApp } from 'vuefire'
 import ModalAlert from '~/components/common/ModalAlert.vue'
+import { useLostPets } from '~/composables/useLostPets'
+import PetCard from '~/components/PetCard.vue'
+
+function formatDate(ts) {
+  if (!ts) return '—'
+  const d = new Date(ts)
+  return d.toLocaleDateString('es-ES')
+}
+
+// Verificaciones
+const verifiedAdoptions = ref([])
+const loadingVerified = ref(false)
+const userLostReports = ref([])
+
+onMounted(async () => {
+  try {
+    if (!user || !user.value) return
+    loadingVerified.value = true
+    const firebaseApp = useFirebaseApp()
+    const db = getDatabase(firebaseApp)
+    const userVerSnap = await get(dbRef(db, `users/${user.value.uid}/verifiedAdoptions`))
+    if (!userVerSnap.exists()) return
+    const userVer = userVerSnap.val()
+    for (const vid of Object.keys(userVer)) {
+      try {
+        const verSnap = await get(dbRef(db, `adoptionVerifications/${vid}`))
+        if (!verSnap.exists()) continue
+        const ver = verSnap.val()
+        const item = { id: vid, ...ver }
+        // fetch pet basic
+        if (ver.petId) {
+          const petSnap = await get(dbRef(db, `pets/${ver.petId}`))
+          if (petSnap.exists()) item.pet = petSnap.val()
+        }
+        verifiedAdoptions.push(item)
+      } catch (e) {
+        // ignore individual failures
+      }
+    }
+      // Cargar reportes perdidos del usuario
+      try {
+        const { fetchUserLostPets } = useLostPets()
+        const lost = await fetchUserLostPets(user.value.uid)
+        userLostReports.value = lost || []
+      } catch (e) {
+        console.error('Error loading user lost reports', e)
+      }
+  } catch (e) {
+    console.error('Error loading verified adoptions', e)
+  } finally {
+    loadingVerified.value = false
+  }
+})
+
+// Map lost report shape into PetCard-friendly pet objects
+const mappedUserLost = computed(() => {
+  return userLostReports.value.map((r) => ({
+    id: r.id,
+    image: r.images?.[0] || r.image || '/placeholder.webp',
+    name: r.name || 'Sin nombre',
+    status: r.status || 'lost',
+    createdAt: r.createdAt || r.lastSeenAt || Date.now(),
+    breed: r.breed || null,
+    age: r.age || null,
+    location: r.location || null,
+    urgent: r.urgent || false,
+    vaccinated: false,
+    neutered: false,
+    size: r.size || null,
+    gender: r.gender || null,
+  }))
+})
 </script>

@@ -37,6 +37,16 @@ export interface Adoption {
   }
 }
 
+  /**
+   * Confirma una adopción y crea una verificación oficial.
+   * - Marca la solicitud como 'completed'
+   * - Actualiza la mascota a 'adopted' y registra `adoptedBy`
+   * - Crea un registro en `adoptionVerifications`
+   * - Añade entrada en `users/{adopterId}/verifiedAdoptions`
+   * - Opcionalmente crea una historia de adopción verificada
+   */
+  
+
 // Caché para los datos de mascotas y usuarios
 interface DataCache {
   pets: Map<string, any>;
@@ -1345,6 +1355,126 @@ export function useAdoptions() {
     }
   }
 
+  /**
+   * Confirma una adopción y crea una verificación oficial.
+   * Este método ahora está dentro de useAdoptions para poder usar `loading`, `error` y `createNotification`.
+   */
+  async function confirmAdoptionAndVerify(
+    adoptionId: string,
+    verifierId?: string,
+    createStory: boolean = false,
+    storyData: Partial<any> = {}
+  ): Promise<string | null> {
+    loading.value = true;
+    error.value = null;
+
+    try {
+      const firebaseApp = useFirebaseApp();
+      const db = getDatabase(firebaseApp);
+
+      const adoptionRef = dbRef(db, `adoptions/${adoptionId}`);
+      const adoptionSnap = await get(adoptionRef);
+      if (!adoptionSnap.exists()) {
+        error.value = 'Solicitud de adopción no encontrada';
+        return null;
+      }
+
+      const adoption = adoptionSnap.val();
+      const petId = adoption.petId;
+      const adopterId = adoption.userId;
+
+      // 1) Actualizar solicitud a completed
+      await update(adoptionRef, { status: 'completed', updatedAt: Date.now() });
+
+      // 2) Actualizar mascota
+      const petRef = dbRef(db, `pets/${petId}`);
+      await update(petRef, {
+        status: 'adopted',
+        adoptedBy: adopterId,
+        adoptionDate: Date.now(),
+        updatedAt: Date.now(),
+      });
+
+      // 3) Crear verificación
+      const verRef = push(dbRef(db, 'adoptionVerifications'));
+      const verificationRecord = {
+        adoptionId,
+        petId,
+        adopterId,
+        verifierId: verifierId || null,
+        verifiedAt: Date.now(),
+        note: 'Verificado a través de AdoptaZulia'
+      };
+      await set(verRef, verificationRecord);
+      const verificationId = verRef.key || null;
+
+      // 4) Registrar en perfil de usuario
+      if (verificationId) {
+        const userVerRef = dbRef(db, `users/${adopterId}/verifiedAdoptions/${verificationId}`);
+        await set(userVerRef, {
+          verificationId,
+          petId,
+          adoptionId,
+          verifiedAt: verificationRecord.verifiedAt,
+        });
+      }
+
+      // 5) Opcional: crear historia verificada
+      if (createStory) {
+        // Creamos la historia solo si no existe ya una para esta mascota (petStories index)
+        const petStoriesRef = dbRef(db, `petStories/${petId}`)
+        const petStorySnap = await get(petStoriesRef)
+        if (!petStorySnap.exists()) {
+          const storiesRef = dbRef(db, 'adoption_stories')
+          const newStoryKey = push(storiesRef).key
+          const newStory = {
+            petId,
+            adoptionId,
+            userId: adopterId,
+            title: storyData.title || `Mi adopción de ${petId}`,
+            content: storyData.content || '',
+            images: storyData.images || [],
+            featured: false,
+            verified: true,
+            verificationId: verificationId,
+            likes: 0,
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+          }
+
+          const updates: Record<string, any> = {}
+          updates[`/adoption_stories/${newStoryKey}`] = newStory
+          updates[`/petStories/${petId}`] = newStoryKey
+          await update(dbRef(db, '/'), updates)
+        }
+      }
+
+      // 6) Notificar al adoptante
+      try {
+        await createNotification(adopterId, {
+          type: 'adoption_verified',
+          title: 'Adopción confirmada',
+          message: 'Tu adopción ha sido confirmada y verificada en AdoptaZulia.',
+          data: { adoptionId, verificationId },
+          actionLink: `/certificados/${adoptionId}`,
+          actionText: 'Ver certificado',
+          read: false,
+          createdAt: Date.now(),
+        });
+      } catch (err) {
+        console.warn('No se pudo enviar notificación de verificación', err);
+      }
+
+      return verificationId;
+    } catch (err: any) {
+      console.error('Error al confirmar y verificar adopción:', err);
+      error.value = 'Error al confirmar adopción. Por favor, intenta de nuevo.';
+      return null;
+    } finally {
+      loading.value = false;
+    }
+  }
+
   // Exportar funciones y valores reactivos
   return {
     adoptions,
@@ -1362,6 +1492,7 @@ export function useAdoptions() {
     getAdoptionById,
     checkAdoptionRequestForPet,
     findAdoptionsByPetId,
+    confirmAdoptionAndVerify,
     hasUserRequestedAdoption,
     getOwnerAdoptionStats
   }

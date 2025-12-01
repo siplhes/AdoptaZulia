@@ -116,6 +116,11 @@ function handleImageError(event:any) {
               </NuxtLink>
             </li>
             <li>
+              <NuxtLink to="/perdidas" class="transition-colors hover:text-emerald-300 text-center">
+                Mascotas perdidas
+              </NuxtLink>
+            </li>
+            <li>
               <NuxtLink to="/publicar" class="transition-colors hover:text-emerald-300 text-center">
                 Publicar en adopción
               </NuxtLink>

@@ -16,10 +16,9 @@
           />
         </div>
         <div class="relative z-10 max-w-3xl">
-          <h1 class="mb-4 text-3xl font-bold md:text-4xl">Encuentra tu compañero perfecto</h1>
+          <h1 class="mb-4 text-3xl font-bold md:text-4xl">Mascotas perdidas</h1>
           <p class="mb-6 text-lg text-emerald-100">
-            Explora nuestra lista de mascotas disponibles para adopción y filtra según tus
-            preferencias para encontrar tu compañero ideal.
+            Consulta reportes de mascotas perdidas y ayuda a reunirlas con sus familias.
           </p>
 
           <!-- Search Bar -->
@@ -29,7 +28,7 @@
               <input
                 v-model="searchQuery"
                 type="text"
-                placeholder="Buscar por nombre, raza, ubicación..."
+                placeholder="Buscar por nombre, ubicación o descripción..."
                 class="w-full text-gray-800 focus:outline-none"
               >
             </div>
@@ -88,7 +87,7 @@
                 </select>
               </div>
               <!-- Type Filter -->
-              <div class="mb-6">
+              <div v-if="petTypes && petTypes.length" class="mb-6">
                 <h3 class="mb-3 font-medium text-gray-900">Tipo de mascota</h3>
                 <div class="space-y-2">
                   <label v-for="type in petTypes" :key="type.value" class="flex items-center">
@@ -104,7 +103,7 @@
               </div>
 
               <!-- Age Filter -->
-              <div class="mb-6">
+              <div v-if="ageRanges && ageRanges.length" class="mb-6">
                 <h3 class="mb-3 font-medium text-gray-900">Edad</h3>
                 <div class="space-y-2">
                   <label v-for="age in ageRanges" :key="age.value" class="flex items-center">
@@ -120,7 +119,7 @@
               </div>
 
               <!-- Size Filter -->
-              <div class="mb-6">
+              <div v-if="sizes && sizes.length" class="mb-6">
                 <h3 class="mb-3 font-medium text-gray-900">Tamaño</h3>
                 <div class="space-y-2">
                   <label v-for="size in sizes" :key="size.value" class="flex items-center">
@@ -136,7 +135,7 @@
               </div>
 
               <!-- Gender Filter -->
-              <div class="mb-6">
+              <div v-if="genders && genders.length" class="mb-6">
                 <h3 class="mb-3 font-medium text-gray-900">Género</h3>
                 <div class="space-y-2">
                   <label v-for="gender in genders" :key="gender.value" class="flex items-center">
@@ -151,33 +150,17 @@
                 </div>
               </div>
 
-              <!-- Additional Filters -->
+              <!-- Additional Filters (only relevant ones for lost reports) -->
               <div class="mb-6">
                 <h3 class="mb-3 font-medium text-gray-900">Características</h3>
                 <div class="space-y-2">
-                  <label class="flex items-center">
-                    <input
-                      v-model="filters.vaccinated"
-                      type="checkbox"
-                      class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                    >
-                    <span class="ml-2 text-gray-700">Vacunado</span>
-                  </label>
-                  <label class="flex items-center">
-                    <input
-                      v-model="filters.neutered"
-                      type="checkbox"
-                      class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                    >
-                    <span class="ml-2 text-gray-700">Esterilizado</span>
-                  </label>
                   <label class="flex items-center">
                     <input
                       v-model="filters.urgent"
                       type="checkbox"
                       class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                     >
-                    <span class="ml-2 text-gray-700">Casos urgentes</span>
+                    <span class="ml-2 text-gray-700">Con recompensa</span>
                   </label>
                 </div>
               </div>
@@ -243,36 +226,23 @@
               class="overflow-hidden rounded-lg bg-white shadow-md transition-shadow hover:shadow-lg"
             >
               <div class="relative">
-                <NuxtImg 
-                  :src="pet.image" 
-                  :alt="pet.name" 
-                  class="h-80 w-full object-cover sm:h-64 lg:h-64" 
+                <NuxtImg
+                  :src="(pet.images && pet.images.length) ? pet.images[0] : (pet.image || '/img/placeholder.png')"
+                  :alt="pet.name"
+                  class="h-80 w-full object-cover sm:h-64 lg:h-64"
                   loading="lazy"
                   sizes="sm:100vw md:50vw lg:33vw"
                   placeholder
                 />
-                <!-- Overlay completo cuando la mascota está adoptada -->
-                <div
-                  v-if="pet.status === 'adopted'"
-                  class="absolute inset-0 bg-black bg-opacity-60 z-10 flex items-center justify-center p-4"
-                >
-                  <div
-                    class="bg-white px-4 py-3 rounded-md font-bold text-emerald-700 transform transition-transform duration-300 flex flex-col items-center max-w-xs text-center"
-                  >
-                    <span class="text-xl">ADOPTADO</span>
-                    <span class="text-xs mt-1">¡Ya encontró un hogar!</span>
-                  </div>
-                </div>
-
                 <div class="absolute right-4 top-4 flex space-x-2 z-20">
-                  <!-- Badge de urgente con mejor contraste para accesibilidad (solo si no está adoptada) -->
+                  <!-- Mostrar recompensa si existe -->
                   <div
-                    v-if="pet.urgent && pet.status !== 'adopted'"
-                    class="rounded-full bg-red-600 px-2 py-1 text-xs font-bold text-white"
+                    v-if="pet.reward"
+                    class="rounded-full bg-yellow-500 px-2 py-1 text-xs font-bold text-white"
                     role="status"
                     aria-live="polite"
                   >
-                    URGENTE
+                    RECOMPENSA
                   </div>
                 </div>
               </div>
@@ -289,42 +259,20 @@
                 </div>
 
                 <p class="mb-4 text-gray-600">
-                  {{ pet.breed }} • {{ pet.age }} • {{ pet.location }}
+                  <span v-if="pet.lastSeenAt">Visto: {{ new Date(pet.lastSeenAt).toLocaleDateString() }}</span>
+                  <span v-if="pet.lastSeenAt"> • </span>
+                  <span>{{ pet.location }}</span>
                 </p>
 
-                <div class="mb-4 flex flex-wrap gap-2">
-                  <span
-                    v-if="pet.vaccinated"
-                    class="flex items-center rounded-full bg-green-100 px-2 py-1 text-xs text-green-800"
-                  >
-                    <Icon name="heroicons:check-circle" class="mr-1 h-3 w-3" />
-                    Vacunado
-                  </span>
-                  <span
-                    v-if="pet.neutered"
-                    class="flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs text-blue-800"
-                  >
-                    <Icon name="heroicons:check-circle" class="mr-1 h-3 w-3" />
-                    Esterilizado
-                  </span>
-                  <span
-                    class="flex items-center rounded-full bg-purple-100 px-2 py-1 text-xs text-purple-800"
-                  >
-                    <Icon name="heroicons:square-2-stack" class="mr-1 h-3 w-3" />
-                    {{ pet.size }}
-                  </span>
+                <div class="mb-4">
+                  <p class="text-sm text-gray-700 line-clamp-3">{{ pet.description }}</p>
                 </div>
 
                 <a
-                  :href="`/mascotas/${pet.id}`"
-                  class="block w-full rounded-lg py-2 text-center font-medium transition-colors"
-                  :class="[
-                    pet.status === 'adopted'
-                      ? 'bg-gray-400 text-white cursor-default'
-                      : 'bg-emerald-600 text-white hover:bg-emerald-700'
-                  ]"
+                  :href="`/perdidas/${pet.id}`"
+                  class="block w-full rounded-lg py-2 text-center font-medium transition-colors bg-emerald-600 text-white hover:bg-emerald-700"
                 >
-                  {{ pet.status === 'adopted' ? 'Mascota adoptada' : `Conoce a ${pet.name}` }}
+                  Ver reporte
                 </a>
               </div>
             </div>
@@ -383,10 +331,10 @@
 <script setup>
 import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
-import { usePets } from '~/composables/usePets'
+import { useLostPets } from '~/composables/useLostPets'
 
 const route = useRoute()
-const { fetchAllPets } = usePets()
+const { fetchLostPets } = useLostPets()
 
 const searchQuery = ref('')
 const filters = ref({
@@ -428,33 +376,11 @@ const sortBy = ref('recent')
 const currentPage = ref(1)
 const itemsPerPage = 9
 
-const petTypes = [
-  { value: 'perro', label: 'Perros' },
-  { value: 'gato', label: 'Gatos' },
-  { value: 'conejo', label: 'Conejos' },
-  { value: 'ave', label: 'Aves' },
-  { value: 'otro', label: 'Otros' },
-]
-
-const ageRanges = [
-  { value: 'cachorro', label: 'Cachorro (< 1 año)' },
-  { value: 'joven', label: 'Joven (1-3 años)' },
-  { value: 'adulto', label: 'Adulto (4-8 años)' },
-  { value: 'senior', label: 'Senior (> 8 años)' },
-]
-
-const sizes = [
-  { value: 'pequeño', label: 'Pequeño' },
-  { value: 'mediano', label: 'Mediano' },
-  { value: 'grande', label: 'Grande' },
-]
-
-const genders = [
-  { value: '', label: 'Todos' },
-  { value: 'macho', label: 'Macho' },
-  { value: 'hembra', label: 'Hembra' },
-]
-
+// For lost pets we keep only location options; other filters are not relevant to lost reports
+const petTypes = []
+const ageRanges = []
+const sizes = []
+const genders = []
 const locations = ['Maracaibo', 'San Francisco', 'Cabimas', 'Machiques', 'Lara', 'Falcon']
 
 const allPets = ref([])
@@ -467,43 +393,21 @@ const filteredPets = computed(() => {
     const query = searchQuery.value.toLowerCase()
     result = result.filter(
       (pet) =>
-        pet.name.toLowerCase().includes(query) ||
-        pet.breed.toLowerCase().includes(query) ||
-        pet.location.toLowerCase().includes(query) ||
-        (pet.description && pet.description.toLowerCase().includes(query))
+        (pet.name && pet.name.toLowerCase().includes(query)) ||
+        (pet.description && pet.description.toLowerCase().includes(query)) ||
+        (pet.location && pet.location.toLowerCase().includes(query)) ||
+        (pet.contact && pet.contact.toLowerCase().includes(query))
     )
   }
 
-  if (filters.value.types.length > 0) {
-    result = result.filter((pet) => filters.value.types.includes(pet.typeValue))
-  }
-
-  if (filters.value.ages.length > 0) {
-    result = result.filter((pet) => filters.value.ages.includes(pet.ageValue))
-  }
-
-  if (filters.value.sizes.length > 0) {
-    result = result.filter((pet) => filters.value.sizes.includes(pet.sizeValue))
-  }
-
-  if (filters.value.gender) {
-    result = result.filter((pet) => pet.gender === filters.value.gender)
-  }
-
-  if (filters.value.vaccinated) {
-    result = result.filter((pet) => pet.vaccinated)
-  }
-
-  if (filters.value.neutered) {
-    result = result.filter((pet) => pet.neutered)
-  }
-
-  if (filters.value.urgent) {
-    result = result.filter((pet) => pet.urgent)
-  }
-
+  // Location filter
   if (filters.value.location) {
     result = result.filter((pet) => pet.location === filters.value.location)
+  }
+
+  // 'Urgente' checkbox maps to presence of reward in lost reports
+  if (filters.value.urgent) {
+    result = result.filter((pet) => pet.reward)
   }
 
   switch (sortBy.value) {
@@ -514,10 +418,10 @@ const filteredPets = computed(() => {
       result.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
       break
     case 'name_asc':
-      result.sort((a, b) => a.name.localeCompare(b.name))
+      result.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
       break
     case 'name_desc':
-      result.sort((a, b) => b.name.localeCompare(a.name))
+      result.sort((a, b) => (b.name || '').localeCompare(a.name || ''))
       break
   }
 
@@ -534,43 +438,18 @@ const totalPages = computed(() => {
     const query = searchQuery.value.toLowerCase()
     result = result.filter(
       (pet) =>
-        pet.name.toLowerCase().includes(query) ||
-        pet.breed.toLowerCase().includes(query) ||
-        pet.location.toLowerCase().includes(query) ||
-        (pet.description && pet.description.toLowerCase().includes(query))
+        (pet.name && pet.name.toLowerCase().includes(query)) ||
+        (pet.description && pet.description.toLowerCase().includes(query)) ||
+        (pet.location && pet.location.toLowerCase().includes(query))
     )
-  }
-
-  if (filters.value.types.length > 0) {
-    result = result.filter((pet) => filters.value.types.includes(pet.typeValue))
-  }
-
-  if (filters.value.ages.length > 0) {
-    result = result.filter((pet) => filters.value.ages.includes(pet.ageValue))
-  }
-
-  if (filters.value.sizes.length > 0) {
-    result = result.filter((pet) => filters.value.sizes.includes(pet.sizeValue))
-  }
-
-  if (filters.value.gender) {
-    result = result.filter((pet) => pet.gender === filters.value.gender)
-  }
-
-  if (filters.value.vaccinated) {
-    result = result.filter((pet) => pet.vaccinated)
-  }
-
-  if (filters.value.neutered) {
-    result = result.filter((pet) => pet.neutered)
-  }
-
-  if (filters.value.urgent) {
-    result = result.filter((pet) => pet.urgent)
   }
 
   if (filters.value.location) {
     result = result.filter((pet) => pet.location === filters.value.location)
+  }
+
+  if (filters.value.urgent) {
+    result = result.filter((pet) => pet.reward)
   }
 
   return Math.ceil(result.length / itemsPerPage)
@@ -618,7 +497,7 @@ const goToPage = (page) => {
 const loadPets = async () => {
   isLoading.value = true
   try {
-    const petsData = await fetchAllPets()
+    const petsData = await fetchLostPets()
     allPets.value = petsData
   } catch (err) {
     console.error('Error al cargar mascotas:', err)
@@ -657,11 +536,11 @@ onMounted(async () => {
   }
 
   useHead({
-    title: 'Mascotas en adopción | Adopta Zulia',
+    title: 'Mascotas perdidas | Adopta Zulia',
     meta: [
       {
         name: 'description',
-        content: 'Encuentra tu compañero perfecto entre nuestras mascotas en adopción.',
+        content: 'Reportes de mascotas perdidas: ayuda a reunir a las mascotas con sus familias.',
       },
     ],
   })

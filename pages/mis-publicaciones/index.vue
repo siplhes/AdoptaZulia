@@ -468,7 +468,7 @@ const { isAuthenticated, user } = useAuth()
 
 // Composables
 const { fetchUserPets, deletePet: deletePetAction, updatePetStatus: updatePetStatusAction } = usePets()
-const { findAdoptionsByPetId, updateAdoptionStatus } = useAdoptions()
+const { findAdoptionsByPetId, updateAdoptionStatus, confirmAdoptionAndVerify } = useAdoptions()
 
 // Estados
 const loading = ref(true)
@@ -771,35 +771,16 @@ const confirmAdoption = async () => {
       // Adopción a través de la plataforma con un adoptante seleccionado
       const adoptionId = selectedAdoption.value
       
-      // 1. Actualizar el estado de la solicitud a 'completed'
-      const adoptionSuccess = await updateAdoptionStatus(adoptionId, 'completed')
-      
-      if (adoptionSuccess) {
-        // 2. Actualizar el estado de la mascota a 'adopted'
-        await updatePetStatusAction(petId, 'adopted')
-        
-        // 3. Actualizar información adicional sobre la adopción
-        const firebaseApp = useFirebaseApp()
-        const db = getDatabase(firebaseApp)
-        const petRef = dbRef(db, `pets/${petId}`)
-        
-        // Encontrar la solicitud seleccionada
-        const selectedRequest = adoptionRequests.value.find(req => req.id === adoptionId)
-        
-        await update(petRef, {
-          adoptedBy: selectedRequest.userId,
-          adoptionId: adoptionId,
-          adoptionDate: Date.now(),
-          updatedAt: Date.now()
-        })
-        
-        // 4. Actualizar la UI
+      // 1. Completar adopción y crear verificación centralizada
+      const verificationId = await confirmAdoptionAndVerify(adoptionId, null, false)
+
+      if (verificationId) {
+        // Actualizar la UI
         const index = userPets.value.findIndex(p => p.id === petId)
         if (index !== -1) {
           userPets.value[index].status = 'adopted'
         }
-        
-        // 5. Redirigir al certificado de adopción
+
         closeAdoptionModal()
         router.push(`/certificados/${adoptionId}`)
       } else {

@@ -191,6 +191,13 @@
             Este certificado puede ser verificado en 
             <span class="font-medium">adoptazulia.com/verificar</span>
           </p>
+          <div v-if="verificationId" class="mt-2 text-xs">
+            <p class="text-gray-700">Verificación: <span class="font-mono">{{ verificationId }}</span></p>
+            <div class="mt-1 flex items-center justify-center gap-2">
+              <NuxtLink :to="`/verificar?vid=${verificationId}`" class="text-amber-800 underline">Verificar públicamente</NuxtLink>
+              <button class="rounded bg-white px-2 py-1 text-sm border" @click="copyVerificationLink">Copiar enlace</button>
+            </div>
+          </div>
         </div>
       </div>
       
@@ -264,6 +271,7 @@ const error = ref(null)
 const certificateData = ref(null)
 const hasAdoptionStory = ref(false)
 const adoptionStoryId = ref(null)
+const verificationId = ref(null)
 
 // Cargar datos del certificado
 onMounted(async () => {
@@ -276,6 +284,9 @@ onMounted(async () => {
     loading.value = true
     await loadCertificateData()
     await checkForAdoptionStory()
+    if (adoptionId) {
+      await loadVerification(adoptionId)
+    }
   } catch (err) {
     console.error('Error al cargar el certificado:', err)
     error.value = 'Error al cargar el certificado. Por favor, intenta de nuevo.'
@@ -368,6 +379,33 @@ const loadCertificateData = async () => {
     console.error('Error al cargar datos del certificado:', err)
     error.value = 'Error al cargar los datos del certificado. Por favor, intenta de nuevo.'
   }
+}
+
+async function loadVerification(adoptionId) {
+  try {
+    const firebaseApp = useFirebaseApp()
+    const db = getDatabase(firebaseApp)
+    const snap = await get(dbRef(db, `adoptionVerifications`))
+    if (!snap.exists()) return
+    const data = snap.val()
+    for (const key of Object.keys(data)) {
+      const v = data[key]
+      if (v && v.adoptionId === adoptionId) {
+        verificationId.value = key
+        return
+      }
+    }
+  } catch (e) {
+    console.error('Error loading verification:', e)
+  }
+}
+
+function copyVerificationLink() {
+  if (!verificationId.value) return
+  const url = `${window.location.origin}/verificar?vid=${verificationId.value}`
+  navigator.clipboard?.writeText(url).then(() => {
+    alert('Enlace de verificación copiado al portapapeles')
+  })
 }
 
 // Verificar si existe una historia de adopción

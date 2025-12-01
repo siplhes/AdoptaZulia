@@ -132,6 +132,11 @@
               <PetCard v-for="pet in userPets" :key="pet.id" :pet="pet" />
             </div>
 
+            <!-- Reportes perdidos -->
+            <div v-else-if="activeTab === 'perdidas' && mappedUserLost.length > 0" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <PetCard v-for="r in mappedUserLost" :key="r.id" :pet="r" />
+            </div>
+
             <!-- Historias de adopción -->
             <div
               v-else-if="activeTab === 'stories' && userStories.length > 0"
@@ -168,6 +173,8 @@ import { useRoute } from 'vue-router'
 import { useAuth } from '~/composables/useAuth'
 import { usePets } from '~/composables/usePets'
 import { useAdoptionStories } from '~/composables/useAdoptionStories'
+import { useLostPets } from '~/composables/useLostPets'
+import PetCard from '~/components/PetCard.vue'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 
@@ -182,7 +189,26 @@ const userProfile = ref(null)
 const userPets = ref([])
 const userStories = ref([])
 const favoritePets = ref([])
+const userLostReports = ref([])
 const activeTab = ref('pets')
+
+const mappedUserLost = computed(() => {
+  return userLostReports.value.map((r) => ({
+    id: r.id,
+    image: r.images?.[0] || r.image || '/placeholder.webp',
+    name: r.name || 'Sin nombre',
+    status: r.status || 'lost',
+    createdAt: r.createdAt || r.lastSeenAt || Date.now(),
+    breed: r.breed || null,
+    age: r.age || null,
+    location: r.location || null,
+    urgent: r.urgent || false,
+    vaccinated: false,
+    neutered: false,
+    size: r.size || null,
+    gender: r.gender || null,
+  }))
+})
 
 // Composables
 const { getUserByUsername, user, isAuthenticated } = useAuth()
@@ -199,6 +225,7 @@ const isOwnProfile = computed(() => {
 const tabs = computed(() => {
   const baseTabs = [
     { id: 'pets', label: 'Mascotas publicadas' },
+    { id: 'perdidas', label: 'Perdidas' },
     { id: 'stories', label: 'Historias de adopción' },
   ]
 
@@ -258,6 +285,14 @@ onMounted(async () => {
       
       // Cargar historias de adopción del usuario
       userStories.value = await fetchUserStories(userProfile.value.uid)
+      // Cargar reportes de mascotas perdidas del usuario
+      try {
+        const { fetchUserLostPets } = useLostPets()
+        const lost = await fetchUserLostPets(userProfile.value.uid)
+        userLostReports.value = lost || []
+      } catch (e) {
+        console.error('Error loading user lost reports', e)
+      }
     } else {
       console.error('No se pudo obtener el uid del usuario')
       error.value = 'Error al cargar el perfil de usuario'
