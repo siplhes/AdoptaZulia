@@ -1,101 +1,91 @@
 {
   "rules": {
-    ".read": "auth != null",
-    ".write": false,
     "users": {
-      ".read": "auth != null",
-      ".indexOn": [
-        "userName"
-      ],
+      ".read": "auth != null", 
+      ".indexOn": ["userName"],
       "$uid": {
-        ".read": "auth != null",
+        // Users can write their own profile, Admins can write anyone's
         ".write": "(auth != null && auth.uid == $uid) || root.child('admins').child(auth.uid).exists()"
       }
     },
+    
     "pets": {
       ".read": true,
-      ".indexOn": [
-        "typeValue",
-        "userId"
-      ],
+      ".indexOn": ["typeValue", "userId"],
       "$petId": {
+        // Create: Must include owner ID matching auth. 
+        // Update: Existing data must match auth. 
+        // Admin: Can always write.
         ".write": "auth != null && ((!data.exists() && newData.child('userId').val() == auth.uid) || (data.exists() && data.child('userId').val() == auth.uid) || root.child('admins').child(auth.uid).exists())"
       }
     },
+
+    "admins": {
+      // READ: Allow authenticated users to check if they're admin (required for isAdmin check)
+      ".read": "auth != null",
+      // WRITE: Only admins can add/remove admins.
+      // NOTE: You must manually add the first admin via Firebase Console!
+      ".write": "auth != null && root.child('admins').child(auth.uid).exists()"
+    },
+
     "notifications": {
       "$uid": {
-        ".read": "auth != null && auth.uid === $uid",
+        ".read": "auth != null && auth.uid == $uid",
+        // Allow any authenticated user to write (recipientId is set in code). Admins always allowed.
         ".write": "auth != null",
         ".indexOn": ["createdAt", "read"]
       }
     },
-    "admins": {
-      ".read": "auth != null && root.child('admins').child(auth.uid).exists()",
-      ".write": "auth != null && root.child('admins').child(auth.uid).exists()"
-    },
+
     "adoptions": {
-      ".read": "auth != null && root.child('admins').child(auth.uid).exists()",
-      ".indexOn": [
-        "userId",
-        "petId"
-      ],
+      ".read": "auth != null",
+      ".indexOn": ["userId", "petId", "createdAt"],
       "$adoptionId": {
         ".read": "auth != null && (data.child('userId').val() == auth.uid || root.child('admins').child(auth.uid).exists())",
-        ".write": "auth != null && ((!data.exists() && newData.child('userId').val() == auth.uid) || (data.exists() && data.child('userId').val() == auth.uid) || root.child('admins').child(auth.uid).exists())"
+        ".write": "auth != null && ((!data.exists() && newData.child('userId').val() == auth.uid) || (data.exists() && (data.child('userId').val() == auth.uid || root.child('admins').child(auth.uid).exists() || root.child('pets').child(data.child('petId').val()).child('userId').val() == auth.uid)))"
       }
     },
+
     "petComments": {
       ".read": true,
       "$commentId": {
         ".write": "auth != null && ((!data.exists() && newData.child('userId').val() == auth.uid) || (data.exists() && data.child('userId').val() == auth.uid) || root.child('admins').child(auth.uid).exists())"
       }
     },
+
     "adoption_stories": {
       ".read": true,
+      ".indexOn": ["createdAt", "featured"],
       "$storyId": {
-        ".write": "auth != null && (
-          (!data.exists() && newData.root.child('petStories').child(newData.child('petId').val()).val() === $storyId && (
-            newData.child('userId').val() == auth.uid || root.child('pets').child(newData.child('petId').val()).child('userId').val() == auth.uid || root.child('admins').child(auth.uid).exists()
-          ))
-          || (data.exists() && (data.child('userId').val() == auth.uid || root.child('pets').child(data.child('petId').val()).child('userId').val() == auth.uid || root.child('admins').child(auth.uid).exists()))
-        )"
+        // Allow owner or admin to write
+        ".write": "auth != null && (root.child('admins').child(auth.uid).exists() || ((!data.exists() && newData.child('userId').val() == auth.uid) || (data.exists() && data.child('userId').val() == auth.uid)))"
       }
     },
-    "petStories": {
-      ".read": true,
-      "$petId": {
-        ".write": "auth != null && (
-          (!data.exists() && newData.exists() && newData.root.child('adoption_stories').child(newData.val()).child('petId').val() === $petId && (
-            newData.root.child('adoption_stories').child(newData.val()).child('userId').val() == auth.uid || root.child('pets').child($petId).child('userId').val() == auth.uid || root.child('admins').child(auth.uid).exists()
-          ))
-          || root.child('admins').child(auth.uid).exists()
-        )"
-      }
-    },
+
     "adoptionVerifications": {
       ".read": true,
       "$vid": {
         ".write": "auth != null && root.child('admins').child(auth.uid).exists()"
       }
     },
+
     "lost_pets": {
       ".read": true,
+      ".indexOn": ["ownerId"],
       "$reportId": {
-        ".write": "auth != null && (
-          (!data.exists() && newData.child('ownerId').val() == auth.uid) ||
-          (data.exists() && (data.child('ownerId').val() == auth.uid || root.child('admins').child(auth.uid).exists()))
-        )"
+        ".write": "auth != null && ((!data.exists() && newData.child('ownerId').val() == auth.uid) || (data.exists() && (data.child('ownerId').val() == auth.uid || root.child('admins').child(auth.uid).exists())))"
       }
     },
+
     "statistics": {
       "public": {
         ".read": true,
-        ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'"
+        ".write": "auth != null && root.child('admins').child(auth.uid).exists()"
       },
       "admin": {
-        ".read": "auth != null && root.child('admins').child(auth.uid).exists()"
-      },
-      ".write": "auth != null && root.child('admins').child(auth.uid).exists()"
+        ".read": "auth != null && root.child('admins').child(auth.uid).exists()",
+        ".write": "auth != null && root.child('admins').child(auth.uid).exists()"
+      }
     }
   }
 }

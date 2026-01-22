@@ -1,12 +1,14 @@
 import { defineNuxtRouteMiddleware, navigateTo } from 'nuxt/app'
 import { useAuth } from '~/composables/useAuth'
+import { useSecureLogger } from '~/composables/useSecureLogger'
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const { isAuthenticated, isAdmin, userProfile, loading } = useAuth()
+  const { warn } = useSecureLogger()
 
   // Si no está autenticado, redirigir al login
   if (!isAuthenticated.value) {
-    console.warn('Acceso denegado: Usuario no autenticado')
+    warn('Acceso denegado: Usuario no autenticado')
     return navigateTo('/login?redirect=' + encodeURIComponent(to.fullPath))
   }
 
@@ -24,7 +26,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
   // Evaluar permisos de admin después de intentar cargar el profile
   if (!isAdmin.value) {
-    console.warn('Acceso denegado: El usuario no tiene permisos de administrador')
+    warn('Acceso denegado: El usuario no tiene permisos de administrador')
     return navigateTo('/')
   }
 })

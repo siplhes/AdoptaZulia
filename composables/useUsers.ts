@@ -19,11 +19,13 @@ import {
 } from 'firebase/auth'
 import type { UserProfile, UserData } from '~/models/User'
 import { useAuth } from '~/composables/useAuth'
+import { useSecureLogger } from '~/composables/useSecureLogger'
 
 export function useUsers() {
   const users = ref<UserProfile[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
+  const { error: logError } = useSecureLogger()
 
   // Usamos el composable de autenticación para verificar permisos de administrador
   const { isAdmin } = useAuth()
@@ -35,7 +37,7 @@ export function useUsers() {
   function checkAdminPermission(): boolean {
     if (!isAdmin.value) {
       error.value = 'No tienes permisos para realizar esta operación. Se requiere rol de administrador.'
-      console.error('Intento de acceso a funcionalidad administrativa sin permisos')
+      logError('Intento de acceso a funcionalidad administrativa sin permisos')
       return false
     }
     return true
@@ -90,7 +92,7 @@ export function useUsers() {
         return []
       }
     } catch (err: any) {
-      console.error('Error al obtener usuarios:', err)
+      logError('Error al obtener usuarios:', err)
       error.value = 'Error al cargar usuarios. Por favor, intenta de nuevo.'
       return []
     } finally {
@@ -117,7 +119,7 @@ export function useUsers() {
 
       return 0
     } catch (error) {
-      console.error(`Error al obtener publicaciones del usuario ${userId}:`, error)
+      logError(`Error al obtener publicaciones del usuario ${userId}:`, error)
       return 0
     }
   }
@@ -161,7 +163,7 @@ export function useUsers() {
         return null
       }
     } catch (err: any) {
-      console.error(`Error al obtener usuario ${userId}:`, err)
+      logError(`Error al obtener usuario ${userId}:`, err)
       error.value = 'Error al cargar usuario. Por favor, intenta de nuevo.'
       return null
     } finally {
@@ -241,7 +243,7 @@ export function useUsers() {
 
       return user.uid
     } catch (err: any) {
-      console.error('Error al crear usuario:', err)
+      logError('Error al crear usuario:', err)
 
       // Manejar errores específicos de Firebase Auth
       if (err.code === 'auth/email-already-in-use') {
@@ -302,7 +304,7 @@ export function useUsers() {
 
       return true
     } catch (err: any) {
-      console.error(`Error al actualizar usuario (${userId}):`, err)
+      logError(`Error al actualizar usuario (${userId}):`, err)
       error.value = 'Error al actualizar usuario. Por favor, intenta de nuevo.'
       return false
     } finally {
@@ -355,7 +357,7 @@ export function useUsers() {
 
       return true
     } catch (err: any) {
-      console.error(`Error al eliminar usuario (${userId}):`, err)
+      logError(`Error al eliminar usuario (${userId}):`, err)
       error.value = 'Error al eliminar usuario. Por favor, intenta de nuevo.'
       return false
     } finally {

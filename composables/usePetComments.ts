@@ -12,11 +12,13 @@ import {
 } from 'firebase/database'
 import { useFirebaseApp } from 'vuefire'
 import type { PetComment } from '@/models/PetComment'
+import { useSecureLogger } from '~/composables/useSecureLogger'
 
 export function usePetComments() {
   const comments = ref<PetComment[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
+  const { error: logError } = useSecureLogger()
 
   /**
    * Obtiene todos los comentarios de una mascota
@@ -66,7 +68,7 @@ export function usePetComments() {
         return []
       }
     } catch (err: any) {
-      console.error(`Error al obtener comentarios de la mascota (${petId}):`, err)
+      logError(`Error al obtener comentarios de la mascota (${petId}):`, err)
       error.value = 'Error al cargar comentarios. Por favor, intenta de nuevo.'
       return []
     } finally {
@@ -146,7 +148,7 @@ export function usePetComments() {
 
       return commentId
     } catch (err: any) {
-      console.error('Error al crear comentario:', err)
+      logError('Error al crear comentario:', err)
       error.value = 'Error al publicar el comentario. Por favor, intenta de nuevo.'
       return null
     } finally {
@@ -188,7 +190,7 @@ export function usePetComments() {
 
       return true
     } catch (err: any) {
-      console.error(`Error al actualizar comentario (${commentId}):`, err)
+      logError(`Error al actualizar comentario (${commentId}):`, err)
       error.value = 'Error al actualizar el comentario. Por favor, intenta de nuevo.'
       return false
     } finally {
@@ -216,7 +218,7 @@ export function usePetComments() {
 
       return true
     } catch (err: any) {
-      console.error(`Error al eliminar comentario (${commentId}):`, err)
+      logError(`Error al eliminar comentario (${commentId}):`, err)
       error.value = 'Error al eliminar el comentario. Por favor, intenta de nuevo.'
       return false
     } finally {
@@ -250,7 +252,7 @@ export function usePetComments() {
 
       return Number((ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1))
     } catch (err) {
-      console.error(`Error al calcular calificación promedio (${petId}):`, err)
+      logError(`Error al calcular calificación promedio (${petId}):`, err)
       return 0
     }
   }
@@ -301,7 +303,7 @@ export function usePetComments() {
         return []
       }
     } catch (err: any) {
-      console.error(`Error al obtener comentarios del usuario (${userId}):`, err)
+      logError(`Error al obtener comentarios del usuario (${userId}):`, err)
       error.value = 'Error al cargar comentarios. Por favor, intenta de nuevo.'
       return []
     } finally {

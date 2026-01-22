@@ -2,11 +2,13 @@ import { ref, computed, watch } from 'vue'
 import { useAuth } from './useAuth'
 import { getDatabase, ref as dbRef, onValue, update, get, push, remove, set } from 'firebase/database'
 import { useFirebaseApp } from 'vuefire'
+import { useSecureLogger } from './useSecureLogger'
 
 export function useNotifications() {
   const { user, isAuthenticated } = useAuth()
   const firebaseApp = useFirebaseApp()
   const db = getDatabase(firebaseApp)
+  const { debug, warn, error: logError } = useSecureLogger()
 
   const notifications = ref<any[]>([])
   const unreadCount = ref<number>(0)
@@ -22,12 +24,7 @@ export function useNotifications() {
 
     try {
       // Defensive: log current auth/user info to help debug permission issues
-      try {
-        // eslint-disable-next-line no-console
-        console.debug('listenToNotifications: current user', { uid: user.value?.uid, isAuthenticated: isAuthenticated.value })
-      } catch (e) {
-        // ignore
-      }
+      debug('listenToNotifications: current user', { uid: user.value?.uid, isAuthenticated: isAuthenticated.value })
 
       const notificationsRef = dbRef(db, `notifications/${user.value.uid}`)
 
@@ -49,12 +46,14 @@ export function useNotifications() {
           const uid = user?.value?.uid || null
           const filtered = notificationsList.filter((n: any) => {
             if (!n.recipientId) {
-              console.warn('notification without recipientId received', n)
+              warn('notification without recipientId received', n)
+              // Auto-fix: add recipientId if missing (legacy notification migration)
+              n.recipientId = uid
               return true
             }
             const ok = uid && n.recipientId === uid
             if (!ok) {
-              console.warn('notification recipient mismatch — dropping item', { expected: uid, found: n.recipientId, id: n.id })
+              warn('notification recipient mismatch — dropping item', { expected: uid, found: n.recipientId, id: n.id })
             }
             return ok
           })
@@ -69,7 +68,7 @@ export function useNotifications() {
         loading.value = false
       }, (err: any) => {
         // Provide clearer message when rules block access
-        console.error('Error al cargar notificaciones:', err)
+        logError('Error al cargar notificaciones:', err)
         const errCode = (err && (err as any).code) ? (err as any).code : null
         if (errCode === 'permission_denied') {
           error.value = 'Permiso denegado al leer notificaciones. Revisa las reglas de Realtime Database y asegúrate de que estén desplegadas.'
@@ -79,7 +78,7 @@ export function useNotifications() {
         loading.value = false
       })
     } catch (err) {
-      console.error('Error al configurar listener de notificaciones:', err)
+      logError('Error al configurar listener de notificaciones:', err)
       error.value = 'Error al configurar notificaciones'
       loading.value = false
     }
@@ -92,7 +91,7 @@ export function useNotifications() {
       await update(notificationRef, { read: true })
       return true
     } catch (err) {
-      console.error('Error al marcar notificación como leída:', err)
+      logError('Error al marcar notificación como leída:', err)
       error.value = 'Error al actualizar notificación'
       return false
     }
@@ -115,7 +114,7 @@ export function useNotifications() {
 
       return true
     } catch (err) {
-      console.error('Error al marcar todas las notificaciones como leídas:', err)
+      logError('Error al marcar todas las notificaciones como leídas:', err)
       error.value = 'Error al actualizar notificaciones'
       return false
     }
@@ -128,14 +127,14 @@ export function useNotifications() {
       await remove(notificationRef)
       return true
     } catch (err) {
-      console.error('Error al eliminar notificación:', err)
+      logError('Error al eliminar notificación:', err)
       error.value = 'Error al eliminar notificación'
       return false
     }
   }
   const createNotification = async (userId: string, data: Record<string, any>) => {
     if (!userId) {
-      console.error('No se pudo crear notificación: userId es undefined o null')
+      logError('No se pudo crear notificación: userId es undefined o null')
       return false
     }
 
@@ -153,7 +152,7 @@ export function useNotifications() {
       await set(newNotificationRef, newNotification)
       return true
     } catch (err) {
-      console.error('Error al crear notificación:', err)
+      logError('Error al crear notificación:', err)
       return false
     }
   }

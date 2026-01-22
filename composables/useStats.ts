@@ -13,6 +13,7 @@ import { useFirebaseApp } from 'vuefire'
 import { addMonths, subMonths, subDays, subQuarters, startOfYear, format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { useAuth } from '~/composables/useAuth'
+import { useSecureLogger } from '~/composables/useSecureLogger'
 
 // Interfaces para los datos de estadísticas
 export interface Stats {
@@ -78,6 +79,7 @@ export function useStats() {
   
   // Usamos el composable de autenticación para verificar permisos de administrador
   const { isAdmin } = useAuth()
+  const { error: logError, warn } = useSecureLogger()
 
   /**
    * Verifica si el usuario actual tiene permisos de administrador
@@ -86,7 +88,7 @@ export function useStats() {
   function checkAdminPermission(): boolean {
     if (!isAdmin.value) {
       error.value = 'No tienes permisos para acceder a esta información. Se requiere rol de administrador.'
-      console.error('Intento de acceso a estadísticas administrativas sin permisos')
+      logError('Intento de acceso a estadísticas administrativas sin permisos')
       return false
     }
     return true
@@ -144,14 +146,14 @@ export function useStats() {
           }
           stats.value = publicStats
         } catch (writeErr) {
-          console.warn('No se pudieron guardar las estadísticas públicas:', writeErr)
+          warn('No se pudieron guardar las estadísticas públicas:', writeErr)
           // Continuamos aunque no podamos guardarlas
         }
       }
       
       return stats.value
     } catch (err: any) {
-      console.error('Error al obtener estadísticas públicas:', err)
+      logError('Error al obtener estadísticas públicas:', err)
       error.value = 'Error al cargar las estadísticas. Por favor, inténtalo de nuevo.'
       return stats.value
     } finally {
@@ -205,13 +207,13 @@ export function useStats() {
           await set(publicStatsRef, publicStats)
         }
       } catch (writeErr) {
-        console.warn('No se pudieron actualizar las estadísticas públicas:', writeErr)
+        warn('No se pudieron actualizar las estadísticas públicas:', writeErr)
         // Continuamos aunque no podamos guardarlas
       }
 
       return stats.value
     } catch (err: any) {
-      console.error('Error al obtener estadísticas:', err)
+      logError('Error al obtener estadísticas:', err)
       error.value = 'Error al cargar las estadísticas. Por favor, inténtalo de nuevo.'
       return stats.value
     } finally {
@@ -296,7 +298,7 @@ export function useStats() {
         stats.value.lostFoundRate = 0
       }
     } catch (e) {
-      console.warn('Error loading lost_pets stats', e)
+      warn('Error loading lost_pets stats', e)
       stats.value.totalLostPets = 0
       stats.value.highRewardCount = 0
       stats.value.lostFoundRate = 0
@@ -442,7 +444,7 @@ export function useStats() {
         }))
       }
     } catch (error) {
-      console.error('Error al obtener tendencias de adopción:', error)
+      logError('Error al obtener tendencias de adopción:', error)
       // Inicializar con datos vacíos en caso de error
       adoptionTrends.value = labels.map((label) => ({
         label,
@@ -507,7 +509,7 @@ export function useStats() {
         ]
       }
     } catch (error) {
-      console.error('Error al obtener distribución de mascotas:', error)
+      logError('Error al obtener distribución de mascotas:', error)
       // Inicializar con datos por defecto en caso de error
       petDistribution.value = [
         { type: 'Perros', count: 0, percentage: 0, color: '#10b981' },

@@ -4,8 +4,14 @@ import { getDatabase } from 'firebase/database'
 import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 import { defineNuxtPlugin, useRuntimeConfig } from '#app'
 import { useFirebaseApp } from 'vuefire'
+import { initializeDebugMode } from '~/utils/debugMode'
 
 export default defineNuxtPlugin((nuxtApp) => {
+  // Inicializar modo debug
+  if (typeof window !== 'undefined') {
+    initializeDebugMode()
+  }
+
   try {
     let firebaseApp
     try {

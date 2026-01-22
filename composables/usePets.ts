@@ -1,9 +1,11 @@
 import { ref } from 'vue'
 import { PetService } from '~/services/PetService'
 import type { Pet, PetFilters } from '~/models/Pet'
+import { useSecureLogger } from '~/composables/useSecureLogger'
 
 export function usePets() {
   const petService = new PetService()
+  const { error: logError } = useSecureLogger()
 
   const loading = ref(false)
   const error = ref<string | null>(null)
@@ -23,7 +25,7 @@ export function usePets() {
       pets.value = await petService.getAllPets()
       return pets.value
     } catch (err: any) {
-      console.error('Error al obtener mascotas:', err)
+      logError('Error al obtener mascotas:', err)
       error.value = 'Error al obtener las mascotas'
       return []
     } finally {
@@ -42,7 +44,7 @@ export function usePets() {
       pet.value = await petService.getPetById(id)
       return pet.value
     } catch (err: any) {
-      console.error(`Error al obtener la mascota ${id}:`, err)
+      logError(`Error al obtener la mascota ${id}:`, err)
       error.value = 'Error al obtener la información de la mascota'
       return null
     } finally {
@@ -61,7 +63,7 @@ export function usePets() {
       const petId = await petService.createPet(newPet)
       return petId
     } catch (err: any) {
-      console.error('Error al crear mascota:', err)
+      logError('Error al crear mascota:', err)
       error.value = 'Error al publicar la mascota'
       throw err
     } finally {
@@ -91,7 +93,7 @@ export function usePets() {
 
       return true
     } catch (err: any) {
-      console.error(`Error al actualizar la mascota ${id}:`, err)
+      logError(`Error al actualizar la mascota ${id}:`, err)
       error.value = 'Error al actualizar la información de la mascota'
       return false
     } finally {
@@ -124,7 +126,7 @@ export function usePets() {
       
       return success
     } catch (err: any) {
-      console.error(`Error al actualizar el estado de la mascota ${petId}:`, err)
+      logError(`Error al actualizar el estado de la mascota ${petId}:`, err)
       error.value = 'Error al actualizar el estado de la mascota'
       return false
     } finally {
@@ -152,7 +154,7 @@ export function usePets() {
 
       return true
     } catch (err: any) {
-      console.error(`Error al eliminar la mascota ${id}:`, err)
+      logError(`Error al eliminar la mascota ${id}:`, err)
       error.value = 'Error al eliminar la mascota'
       return false
     } finally {
@@ -172,7 +174,7 @@ export function usePets() {
       pets.value = results
       return results
     } catch (err: any) {
-      console.error('Error al buscar mascotas:', err)
+      logError('Error al buscar mascotas:', err)
       error.value = 'Error al buscar mascotas'
       return []
     } finally {
@@ -192,7 +194,7 @@ export function usePets() {
       pets.value = results
       return results
     } catch (err: any) {
-      console.error('Error al filtrar mascotas:', err)
+      logError('Error al filtrar mascotas:', err)
       error.value = 'Error al filtrar mascotas'
       return []
     } finally {
@@ -207,7 +209,7 @@ export function usePets() {
     try {
       return await petService.getSimilarPets(basePet, limit)
     } catch (err: any) {
-      console.error('Error al obtener mascotas similares:', err)
+      logError('Error al obtener mascotas similares:', err)
       return []
     }
   }
@@ -223,7 +225,7 @@ export function usePets() {
       const userPets = await petService.getPetsByUserId(userId)
       return userPets
     } catch (err: any) {
-      console.error(`Error al obtener mascotas del usuario ${userId}:`, err)
+      logError(`Error al obtener mascotas del usuario ${userId}:`, err)
       error.value = 'Error al obtener tus mascotas'
       return []
     } finally {
@@ -248,7 +250,7 @@ export function usePets() {
 
       return availablePets
     } catch (err: any) {
-      console.error(`Error al obtener mascotas de tipo ${category}:`, err)
+      logError(`Error al obtener mascotas de tipo ${category}:`, err)
       return []
     }
   }
@@ -286,7 +288,7 @@ export function usePets() {
 
       return result
     } catch (err: any) {
-      console.error('Error al obtener mascotas destacadas:', err)
+      logError('Error al obtener mascotas destacadas:', err)
       error.value = 'Error al obtener las mascotas destacadas'
       return []
     } finally {
@@ -312,7 +314,7 @@ export function usePets() {
       // Filtrar los resultados nulos (mascotas no encontradas)
       return petsResults.filter(pet => pet !== null) as Pet[]
     } catch (err: any) {
-      console.error('Error al obtener mascotas por IDs:', err)
+      logError('Error al obtener mascotas por IDs:', err)
       error.value = 'Error al obtener las mascotas favoritas'
       return []
     } finally {
@@ -365,7 +367,7 @@ export function usePets() {
 
       return stories.slice(0, limit)
     } catch (err: any) {
-      console.error('Error al obtener historias de adopción:', err)
+      logError('Error al obtener historias de adopción:', err)
       error.value = 'Error al obtener historias de adopción'
       return []
     } finally {

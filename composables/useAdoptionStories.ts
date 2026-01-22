@@ -13,12 +13,14 @@ import {
 } from 'firebase/database'
 import { useFirebaseApp } from 'vuefire'
 import type { AdoptionStory } from '@/models/AdoptionStory'
+import { useSecureLogger } from '~/composables/useSecureLogger'
 
 export function useAdoptionStories() {
   const stories = ref<AdoptionStory[]>([])
   const featuredStories = ref<AdoptionStory[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
+  const { error: logError } = useSecureLogger()
 
   /**
    * Obtiene todas las historias de adopción
@@ -70,7 +72,7 @@ export function useAdoptionStories() {
         return []
       }
     } catch (err: any) {
-      console.error('Error al obtener historias de adopción:', err)
+      logError('Error al obtener historias de adopción:', err)
       error.value = 'Error al cargar historias. Por favor, intenta de nuevo.'
       return []
     } finally {
@@ -145,7 +147,7 @@ export function useAdoptionStories() {
         return []
       }
     } catch (err: any) {
-      console.error('Error al obtener historias destacadas:', err)
+      logError('Error al obtener historias destacadas:', err)
       error.value = 'Error al cargar historias destacadas. Por favor, intenta de nuevo.'
       return []
     } finally {
@@ -254,7 +256,7 @@ export function useAdoptionStories() {
         return null
       }
     } catch (err: any) {
-      console.error(`Error al obtener historia (${storyId}):`, err)
+      logError(`Error al obtener historia (${storyId}):`, err)
       error.value = 'Error al cargar la historia. Por favor, intenta de nuevo.'
       return null
     } finally {
@@ -317,7 +319,7 @@ export function useAdoptionStories() {
 
       return storyId
     } catch (err: any) {
-      console.error('Error al crear historia de adopción:', err)
+      logError('Error al crear historia de adopción:', err)
       error.value = 'Error al crear la historia. Por favor, intenta de nuevo.'
       return null
     } finally {
@@ -361,7 +363,7 @@ export function useAdoptionStories() {
 
       return true
     } catch (err: any) {
-      console.error(`Error al actualizar historia (${storyId}):`, err)
+      logError(`Error al actualizar historia (${storyId}):`, err)
       error.value = 'Error al actualizar la historia. Por favor, intenta de nuevo.'
       return false
     } finally {
@@ -406,7 +408,7 @@ export function useAdoptionStories() {
         return false
       }
     } catch (err: any) {
-      console.error(`Error al dar like a historia (${storyId}):`, err)
+      logError(`Error al dar like a historia (${storyId}):`, err)
       error.value = 'Error al dar like. Por favor, intenta de nuevo.'
       return false
     } finally {
@@ -447,7 +449,7 @@ export function useAdoptionStories() {
 
       return true
     } catch (err: any) {
-      console.error(`Error al eliminar historia (${storyId}):`, err)
+      logError(`Error al eliminar historia (${storyId}):`, err)
       error.value = 'Error al eliminar la historia. Por favor, intenta de nuevo.'
       return false
     } finally {
@@ -504,7 +506,7 @@ export function useAdoptionStories() {
         return []
       }
     } catch (err: any) {
-      console.error(`Error al obtener historias del usuario (${userId}):`, err)
+      logError(`Error al obtener historias del usuario (${userId}):`, err)
       error.value = 'Error al cargar las historias. Por favor, intenta de nuevo.'
       return []
     } finally {
@@ -561,7 +563,7 @@ export function useAdoptionStories() {
         return []
       }
     } catch (err: any) {
-      console.error(`Error al obtener historias de la mascota (${petId}):`, err)
+      logError(`Error al obtener historias de la mascota (${petId}):`, err)
       error.value = 'Error al cargar las historias. Por favor, intenta de nuevo.'
       return []
     } finally {

@@ -125,5 +125,31 @@ export default defineNuxtConfig({
       fcp: 800,
       dcl: 1200
     }
+  },
+
+  // 🔒 Headers de Seguridad
+  nitro: {
+    compressPublicAssets: true,
+    headers: {
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'SAMEORIGIN',
+      'X-XSS-Protection': '1; mode=block',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
+      'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
+    }
+  },
+
+  // 🔒 Content Security Policy
+  app: {
+    head: {
+      meta: [
+        {
+          name: 'Content-Security-Policy',
+          content: process.env.NODE_ENV === 'production'
+            ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://firebaseio.com https://*.firebaseio.com https://www.google-analytics.com; frame-src 'self' https://www.paypal.com; object-src 'none';"
+            : "default-src 'self' 'unsafe-inline' 'unsafe-eval' *"
+        }
+      ]
+    }
   }
 })

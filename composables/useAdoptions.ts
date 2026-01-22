@@ -15,6 +15,7 @@ import {
 } from 'firebase/database'
 import { useFirebaseApp } from 'vuefire'
 import { useNotifications } from './useNotifications'
+import { useSecureLogger } from '~/composables/useSecureLogger'
 
 // Interfaz para una solicitud de adopción
 export interface Adoption {
@@ -65,6 +66,7 @@ export function useAdoptions() {
   const loading = ref(false)
   const error = ref<string | null>(null)
   const { createNotification } = useNotifications()
+  const { error: logError, warn } = useSecureLogger()
 
   // Sistema de caché mejorado para reducir consultas repetidas
   const CACHE_TTL = 5 * 60 * 1000; // 5 minutos
@@ -244,7 +246,7 @@ export function useAdoptions() {
 
         // Iniciamos prefetch de datos relacionados para todas las adopciones
         // mientras solo enriquecemos los datos de la página actual
-        prefetchRelatedData(petIds, userIds).catch(console.error);
+        prefetchRelatedData(petIds, userIds).catch(logError);
 
         // Enriquecemos los datos con información de mascotas y usuarios
         await enrichAdoptionsData(paginatedAdoptions);
@@ -259,7 +261,7 @@ export function useAdoptions() {
         return [];
       }
     } catch (err: any) {
-      console.error('Error al obtener adopciones:', err);
+      logError('Error al obtener adopciones:', err);
       error.value = 'Error al cargar adopciones. Por favor, intenta de nuevo.';
       return [];
     } finally {
@@ -396,10 +398,10 @@ export function useAdoptions() {
             // also cache it
             cache.users.set(adoption.userId, userProfile);
           } else {
-            console.warn(`useAdoptions: no user data found for userId=${adoption.userId}`);
+            warn(`useAdoptions: no user data found for userId=${adoption.userId}`);
           }
         } catch (err) {
-          console.warn(`useAdoptions: fallback fetchUserById failed for userId=${adoption.userId}`, err);
+          warn(`useAdoptions: fallback fetchUserById failed for userId=${adoption.userId}`, err);
         }
       }
     }
@@ -532,7 +534,7 @@ export function useAdoptions() {
 
       // Iniciamos prefetch de datos de usuario para todas las adopciones
       // mientras solo enriquecemos los datos de la página actual
-      prefetchRelatedData([], userIdsToFetch).catch(console.error);
+      prefetchRelatedData([], userIdsToFetch).catch(logError);
 
       // Enriquecemos los datos con información de mascotas y usuarios
       if (paginatedAdoptions.length > 0) {
@@ -544,7 +546,7 @@ export function useAdoptions() {
 
       return paginatedAdoptions;
     } catch (err: any) {
-      console.error('Error al obtener solicitudes de adopción para el propietario:', err);
+      logError('Error al obtener solicitudes de adopción para el propietario:', err);
       error.value = 'Error al cargar solicitudes. Por favor, intenta de nuevo.';
       return [];
     } finally {
@@ -649,7 +651,7 @@ export function useAdoptions() {
 
         // Iniciamos prefetch de datos relacionados para todas las adopciones
         // mientras solo enriquecemos los datos de la página actual
-        prefetchRelatedData(petIds, userIds).catch(console.error);
+        prefetchRelatedData(petIds, userIds).catch(logError);
 
         // Enriquecer datos de la página actual
         if (paginatedAdoptions.length > 0) {
@@ -664,7 +666,7 @@ export function useAdoptions() {
         return [];
       }
     } catch (err: any) {
-      console.error(`Error al obtener adopciones con estado ${status}:`, err);
+      logError(`Error al obtener adopciones con estado ${status}:`, err);
       error.value = 'Error al cargar solicitudes. Por favor, intenta de nuevo.';
       return [];
     } finally {
@@ -749,7 +751,7 @@ export function useAdoptions() {
 
       return true;
     } catch (err: any) {
-      console.error('Error al actualizar estado de adopción:', err);
+      logError('Error al actualizar estado de adopción:', err);
       error.value = 'Error al actualizar estado. Por favor, intenta de nuevo.';
       return false;
     } finally {

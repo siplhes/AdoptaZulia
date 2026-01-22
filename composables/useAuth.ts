@@ -5,6 +5,7 @@ import type { UserInfo } from 'firebase/auth'
 import { AuthService } from '~/services/AuthService'
 import { useNuxtApp } from '#app'
 import type { UserProfile, UserData } from '~/models/User'
+import { useSecureLogger } from '~/composables/useSecureLogger'
 
 type User = UserInfo & {
   uid: string | any
@@ -34,6 +35,7 @@ let isInitialized = false
 
 function initializeAuth() {
   if (isInitialized || !import.meta.client) return
+  const { error: logError } = useSecureLogger()
   try {
     const authService = new AuthService()
     unsubscribeAuth = authService.onAuthStateChanged(async (currentUser) => {
@@ -55,7 +57,7 @@ function initializeAuth() {
           }
           needsProfileCompletion.value = !userProfile.value.userName
         } catch (err) {
-          console.error('Error al cargar perfil completo:', err)
+          logError('Error al cargar perfil completo:', err)
           userProfile.value = {
             uid: currentUser.uid,
             displayName: currentUser.displayName,
@@ -74,12 +76,14 @@ function initializeAuth() {
     })
     isInitialized = true
   } catch (err) {
-    console.error('Error al inicializar autenticación:', err)
+    const { error: logError } = useSecureLogger()
+    logError('Error al inicializar autenticación:', err)
   }
 }
 
 export function useAuth() {
   const nuxtApp = useNuxtApp()
+  const { error: logError, warn } = useSecureLogger()
   // Initialize auth immediately on client so onAuthStateChanged is registered
   // before page components run their onMounted checks. The previous 100ms
   // delay could cause pages to redirect to /login before auth state was known.
@@ -114,7 +118,7 @@ export function useAuth() {
       }
       return true
     } catch (err: any) {
-      console.error('Error al iniciar sesión con Google:', err)
+      logError('Error al iniciar sesión con Google:', err)
       error.value = traducirErrorFirebase(err.code)
       return false
     } finally {
@@ -137,11 +141,11 @@ export function useAuth() {
         nuxtApp?.$router?.push('/')
       } catch (err) {
         // Ignore navigation errors in environments without router
-        console.warn('Logout: unable to navigate to home', err)
+        warn('Logout: unable to navigate to home', err)
       }
       return true
     } catch (err: any) {
-      console.error('Error al cerrar sesión:', err)
+      logError('Error al cerrar sesión:', err)
       error.value = 'Error al cerrar sesión'
       return false
     } finally {
@@ -175,7 +179,7 @@ export function useAuth() {
       }
       return true
     } catch (err: any) {
-      console.error('Error al actualizar perfil:', err)
+      logError('Error al actualizar perfil:', err)
       error.value = 'Error al actualizar el perfil'
       return false
     } finally {
@@ -232,7 +236,7 @@ export function useAuth() {
       }
       return null
     } catch (err: any) {
-      console.error('Error al buscar usuario por nombre de usuario:', err)
+      logError('Error al buscar usuario por nombre de usuario:', err)
       error.value = 'Error al buscar usuario'
       return null
     } finally {
@@ -273,7 +277,7 @@ export function useAuth() {
         createdAt: userData.createdAt || userProfile.value?.createdAt || '',
       }
     } catch (err: any) {
-      console.error('Error al obtener datos completos del usuario:', err)
+      logError('Error al obtener datos completos del usuario:', err)
       error.value = 'Error al recuperar información del usuario'
       return null
     } finally {

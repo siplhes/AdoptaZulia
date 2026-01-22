@@ -327,7 +327,7 @@ export class AuthService {
 
       return false
     } catch (error) {
-      console.error('Error al verificar si es admin:', error)
+    
       return false
     }
   }
