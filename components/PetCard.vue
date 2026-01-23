@@ -55,6 +55,7 @@
 
       <!-- Botón de favorito con feedback táctil -->
       <button
+        v-if="favoritesEnabled"
         type="button"
         class="absolute flex justify-center items-center left-2 top-2 rounded-full bg-white p-1.5 shadow-md transition-colors hover:bg-amber-50 active:scale-95 z-10"
         :class="{ 'text-red-500': isFavorite, 'text-gray-400': !isFavorite }"
@@ -170,14 +171,18 @@ import { ref, computed, onMounted } from "vue";
 import type { Pet } from "~/models/Pet";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
+import { useFeatures } from "~/composables/useFeatures";
 
 const { recordImpression, recordClick } = useABTesting();
+const { isFeatureEnabled } = useFeatures();
 
 const props = defineProps<{
   pet: Pet;
   isFavorite?: boolean;
   hasActiveAdoptionRequest?: boolean;
 }>();
+
+const favoritesEnabled = computed(() => isFeatureEnabled('favorites'));
 
 const imageLoading = ref(true);
 const timeAgo = computed(() => {

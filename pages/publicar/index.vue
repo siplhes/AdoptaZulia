@@ -37,11 +37,23 @@
         <!-- Barra de progreso -->
         <div class="mb-6">
           <div class="mb-2 flex items-center justify-between text-sm text-gray-600">
-            <div>Paso {{ currentStep }} de {{ steps.length }}</div>
+            <div class="font-medium">Paso {{ currentStep }} de {{ steps.length }}</div>
             <div class="font-medium text-emerald-700">{{ steps[currentStep-1].title }}</div>
           </div>
           <div class="h-2 w-full rounded-full bg-gray-200">
-            <div :style="{ width: `${Math.round((currentStep/steps.length)*100)}%` }" class="h-2 rounded-full bg-emerald-600" />
+            <div :style="{ width: `${Math.round((currentStep/steps.length)*100)}%` }" class="h-2 rounded-full bg-emerald-600 transition-all duration-300" />
+          </div>
+          
+          <!-- Indicador de campos requeridos en el paso actual -->
+          <div class="mt-3 flex gap-2">
+            <span v-for="(step, index) in steps" :key="index" class="flex items-center gap-1 text-xs">
+              <span
+                class="flex h-5 w-5 items-center justify-center rounded-full text-white text-xs font-medium"
+                :class="currentStep > index + 1 ? 'bg-emerald-600' : currentStep === index + 1 ? 'bg-emerald-500' : 'bg-gray-300'"
+              >
+                {{ index + 1 }}
+              </span>
+            </span>
           </div>
         </div>
         <!-- Error general -->
@@ -51,7 +63,53 @@
           aria-live="assertive"
           class="relative mb-6 rounded border border-red-200 bg-red-50 px-4 py-3 text-red-700"
         >
-          {{ error }}
+          <div class="flex gap-3">
+            <Icon name="mdi:alert-circle" class="h-5 w-5 flex-shrink-0 mt-0.5" />
+            <span>{{ error }}</span>
+          </div>
+        </div>
+
+        <!-- Información útil según el paso actual -->
+        <div
+          v-if="currentStep === 1"
+          class="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4"
+          role="note"
+        >
+          <div class="flex gap-3">
+            <Icon name="mdi:information" class="h-5 w-5 flex-shrink-0 text-blue-700 mt-0.5" />
+            <div class="text-sm text-blue-800">
+              <p class="font-medium mb-1">Información básica sobre la mascota</p>
+              <p>Completa todos los campos requeridos marcados con <span class="text-red-500">*</span> para continuar.</p>
+            </div>
+          </div>
+        </div>
+
+        <div
+          v-if="currentStep === 2"
+          class="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4"
+          role="note"
+        >
+          <div class="flex gap-3">
+            <Icon name="mdi:information" class="h-5 w-5 flex-shrink-0 text-blue-700 mt-0.5" />
+            <div class="text-sm text-blue-800">
+              <p class="font-medium mb-1">Fotos de la mascota</p>
+              <p>Sube al menos una foto principal de buena calidad. Las fotos adicionales ayudan a los potenciales adoptantes.</p>
+            </div>
+          </div>
+        </div>
+
+        <div
+          v-if="currentStep === 3"
+          class="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4"
+          role="note"
+        >
+          <div class="flex gap-3">
+            <Icon name="mdi:information" class="h-5 w-5 flex-shrink-0 text-blue-700 mt-0.5" />
+            <div class="text-sm text-blue-800">
+              <p class="font-medium mb-1">Información de contacto</p>
+              <p>Los potenciales adoptantes usarán estos datos para contactarte. Asegúrate de que sean correctos.</p>
+            </div>
+          </div>
         </div>
 
         <div v-show="currentStep === 1" class="mb-8">
@@ -63,7 +121,7 @@
             <!-- Nombre -->
             <div>
               <label for="name" class="mb-1 block text-sm font-medium text-gray-700">
-                Nombre de la mascota *
+                Nombre de la mascota <span class="text-red-500">*</span>
               </label>
               <input
                   id="name"
@@ -72,14 +130,16 @@
                   type="text"
                   required
                   :aria-invalid="invalidFields.name ? 'true' : 'false'"
-                  class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+                  class="w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-emerald-500"
+                  :class="invalidFields.name ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-gray-300 focus:border-emerald-500'"
                 >
+              <p v-if="invalidFields.name" class="mt-1 text-sm text-red-600">{{ fieldErrors.name }}</p>
             </div>
 
             <!-- Tipo de mascota -->
             <div>
               <label for="type" class="mb-1 block text-sm font-medium text-gray-700">
-                Tipo de mascota *
+                Tipo de mascota <span class="text-red-500">*</span>
               </label>
               <select
                 id="type"
@@ -87,7 +147,8 @@
                 v-model="petData.typeValue"
                 required
                 :aria-invalid="invalidFields.typeValue ? 'true' : 'false'"
-                class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+                class="w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-emerald-500"
+                :class="invalidFields.typeValue ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-gray-300 focus:border-emerald-500'"
                 @change="updateTypeLabel"
               >
                 <option value="" disabled>Seleccionar tipo</option>
@@ -97,6 +158,7 @@
                 <option value="conejo">Conejo</option>
                 <option value="otro">Otro</option>
               </select>
+              <p v-if="invalidFields.typeValue" class="mt-1 text-sm text-red-600">{{ fieldErrors.typeValue }}</p>
             </div>
 
             <!-- Raza -->
@@ -113,7 +175,7 @@
 
             <!-- Género -->
             <div>
-              <label class="mb-1 block text-sm font-medium text-gray-700">Género *</label>
+              <label class="mb-1 block text-sm font-medium text-gray-700">Género <span class="text-red-500">*</span></label>
               <div class="flex space-x-4" role="radiogroup" aria-labelledby="gender-label">
                 <label class="inline-flex items-center">
                   <input
@@ -137,12 +199,13 @@
                   <span class="ml-2 text-gray-700">Hembra</span>
                 </label>
               </div>
+              <p v-if="invalidFields.gender" class="mt-1 text-sm text-red-600">{{ fieldErrors.gender }}</p>
             </div>
 
             <!-- Edad -->
             <div>
               <label for="age" class="mb-1 block text-sm font-medium text-gray-700">
-                Edad aproximada *
+                Edad aproximada <span class="text-red-500">*</span>
               </label>
               <input
                 id="age"
@@ -151,15 +214,17 @@
                 type="text"
                 required
                 :aria-invalid="invalidFields.age ? 'true' : 'false'"
-                class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+                class="w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-emerald-500"
+                :class="invalidFields.age ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-gray-300 focus:border-emerald-500'"
                 placeholder="Por ejemplo: 2 años, 6 meses..."
               >
+              <p v-if="invalidFields.age" class="mt-1 text-sm text-red-600">{{ fieldErrors.age }}</p>
             </div>
 
             <!-- Rango de edad -->
             <div>
               <label for="age-range" class="mb-1 block text-sm font-medium text-gray-700">
-                Rango de edad *
+                Rango de edad <span class="text-red-500">*</span>
               </label>
               <select
                 id="age-range"
@@ -167,7 +232,8 @@
                 v-model="petData.ageValue"
                 required
                 :aria-invalid="invalidFields.ageValue ? 'true' : 'false'"
-                class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+                class="w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-emerald-500"
+                :class="invalidFields.ageValue ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-gray-300 focus:border-emerald-500'"
               >
                 <option value="" disabled>Seleccionar rango</option>
                 <option value="cachorro">Cachorro</option>
@@ -175,12 +241,13 @@
                 <option value="adulto">Adulto</option>
                 <option value="senior">Senior</option>
               </select>
+              <p v-if="invalidFields.ageValue" class="mt-1 text-sm text-red-600">{{ fieldErrors.ageValue }}</p>
             </div>
 
             <!-- Tamaño -->
             <div>
               <label for="size" class="mb-1 block text-sm font-medium text-gray-700">
-                Tamaño *
+                Tamaño <span class="text-red-500">*</span>
               </label>
               <select
                 id="size"
@@ -188,7 +255,8 @@
                 v-model="petData.sizeValue"
                 required
                 :aria-invalid="invalidFields.sizeValue ? 'true' : 'false'"
-                class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+                class="w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-emerald-500"
+                :class="invalidFields.sizeValue ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-gray-300 focus:border-emerald-500'"
                 @change="updateSizeLabel"
               >
                 <option value="" disabled>Seleccionar tamaño</option>
@@ -196,12 +264,13 @@
                 <option value="mediano">Mediano</option>
                 <option value="grande">Grande</option>
               </select>
+              <p v-if="invalidFields.sizeValue" class="mt-1 text-sm text-red-600">{{ fieldErrors.sizeValue }}</p>
             </div>
 
             <!-- Ubicación -->
             <div>
               <label for="location" class="mb-1 block text-sm font-medium text-gray-700">
-                Ubicación *
+                Ubicación <span class="text-red-500">*</span>
               </label>
               <input
                 id="location"
@@ -210,16 +279,18 @@
                 type="text"
                 required
                 :aria-invalid="invalidFields.location ? 'true' : 'false'"
-                class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+                class="w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-emerald-500"
+                :class="invalidFields.location ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-gray-300 focus:border-emerald-500'"
                 placeholder="Ciudad o municipio"
               >
+              <p v-if="invalidFields.location" class="mt-1 text-sm text-red-600">{{ fieldErrors.location }}</p>
             </div>
           </div>
 
           <!-- Descripción -->
           <div class="mt-6">
             <label for="description" class="mb-1 block text-sm font-medium text-gray-700">
-              Descripción *
+              Descripción <span class="text-red-500">*</span>
             </label>
             <textarea
               id="description"
@@ -228,12 +299,16 @@
               rows="4"
               required
               :aria-invalid="invalidFields.description ? 'true' : 'false'"
-              class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+              class="w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-emerald-500"
+              :class="invalidFields.description ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-gray-300 focus:border-emerald-500'"
               placeholder="Describe la personalidad, hábitos, por qué está en adopción y cualquier otra información relevante..."
             />
-            <p class="mt-1 text-sm text-gray-500">
-              {{ petData.description.length }}/500 caracteres
-            </p>
+            <div class="mt-1 flex justify-between">
+              <p v-if="invalidFields.description" class="text-sm text-red-600">{{ fieldErrors.description }}</p>
+              <p :class="petData.description.length > 450 ? 'text-orange-600' : 'text-gray-500'" class="text-sm">
+                {{ petData.description.length }}/500 caracteres
+              </p>
+            </div>
           </div>
 
           <!-- Características de salud -->
@@ -347,11 +422,11 @@
 
           <!-- Imagen principal -->
           <div class="mb-4">
-            <label class="mb-2 block text-sm font-medium text-gray-700">Foto principal *</label>
+            <label class="mb-2 block text-sm font-medium text-gray-700">Foto principal <span class="text-red-500">*</span></label>
             <div class="flex items-center">
               <div
-                class="mr-4 flex h-24 w-24 items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-gray-300"
-                :class="{ 'border-solid border-emerald-500': mainImagePreview }"
+                class="mr-4 flex h-24 w-24 items-center justify-center overflow-hidden rounded-lg border-2"
+                :class="invalidFields.mainImage ? 'border-red-400 bg-red-50' : mainImagePreview ? 'border-solid border-emerald-500' : 'border-dashed border-gray-300'"
               >
                 <NuxtImg
                   v-if="mainImagePreview"
@@ -379,6 +454,7 @@
                 >
                   Seleccionar imagen
                 </button>
+                <p v-if="invalidFields.mainImage" class="mt-1 text-sm text-red-600">{{ fieldErrors.mainImage }}</p>
                 <p class="mt-1 text-xs text-gray-500">Formato: JPG, PNG. Max: 5MB</p>
               </div>
             </div>
@@ -441,7 +517,7 @@
             <!-- Nombre de contacto -->
             <div>
               <label for="contact-name" class="mb-1 block text-sm font-medium text-gray-700">
-                Nombre de contacto *
+                Nombre de contacto <span class="text-red-500">*</span>
               </label>
               <input
                 id="contact-name"
@@ -450,8 +526,10 @@
                 type="text"
                 required
                 :aria-invalid="invalidFields.contactName ? 'true' : 'false'"
-                class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+                class="w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-emerald-500"
+                :class="invalidFields.contactName ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-gray-300 focus:border-emerald-500'"
               >
+              <p v-if="invalidFields.contactName" class="mt-1 text-sm text-red-600">{{ fieldErrors.contactName }}</p>
             </div>
 
             <!-- Tipo de contacto -->
@@ -475,7 +553,7 @@
             <!-- Email de contacto -->
             <div>
               <label for="contact-email" class="mb-1 block text-sm font-medium text-gray-700">
-                Email de contacto *
+                Email de contacto <span class="text-red-500">*</span>
               </label>
               <input
                 id="contact-email"
@@ -484,14 +562,16 @@
                 type="email"
                 required
                 :aria-invalid="invalidFields.contactEmail ? 'true' : 'false'"
-                class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+                class="w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-emerald-500"
+                :class="invalidFields.contactEmail ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-gray-300 focus:border-emerald-500'"
               >
+              <p v-if="invalidFields.contactEmail" class="mt-1 text-sm text-red-600">{{ fieldErrors.contactEmail }}</p>
             </div>
 
             <!-- Teléfono de contacto -->
             <div>
               <label for="contact-phone" class="mb-1 block text-sm font-medium text-gray-700">
-                Teléfono de contacto *
+                Teléfono de contacto <span class="text-red-500">*</span>
               </label>
               <input
                 id="contact-phone"
@@ -500,8 +580,10 @@
                 type="tel"
                 required
                 :aria-invalid="invalidFields.contactPhone ? 'true' : 'false'"
-                class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+                class="w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-emerald-500"
+                :class="invalidFields.contactPhone ? 'border-red-400 bg-red-50 focus:border-red-500' : 'border-gray-300 focus:border-emerald-500'"
               >
+              <p v-if="invalidFields.contactPhone" class="mt-1 text-sm text-red-600">{{ fieldErrors.contactPhone }}</p>
             </div>
           </div>
           
@@ -773,6 +855,22 @@ const invalidFields = reactive({
   mainImage: false
 })
 
+// Field error messages
+const fieldErrors = reactive({
+  name: '',
+  typeValue: '',
+  gender: '',
+  age: '',
+  ageValue: '',
+  sizeValue: '',
+  location: '',
+  description: '',
+  contactName: '',
+  contactEmail: '',
+  contactPhone: '',
+  mainImage: ''
+})
+
 // Wizard: pasos y estado
 const steps = [
   { title: 'Datos básicos' },
@@ -786,6 +884,7 @@ const validateStep = () => {
   // Reset invalid fields map
   for (const k in invalidFields) {
     invalidFields[k] = false
+    fieldErrors[k] = ''
   }
 
   const errors = []
@@ -793,45 +892,57 @@ const validateStep = () => {
   if (currentStep.value === 1) {
     if (!petData.name) {
       errors.push({ field: 'name', msg: 'Nombre de la mascota es obligatorio.' })
+      fieldErrors.name = 'Campo requerido'
     }
     if (!petData.typeValue) {
       errors.push({ field: 'typeValue', msg: 'Selecciona el tipo de mascota.' })
+      fieldErrors.typeValue = 'Campo requerido'
     }
     if (!petData.gender) {
       errors.push({ field: 'gender', msg: 'Selecciona el género.' })
+      fieldErrors.gender = 'Campo requerido'
     }
     if (!petData.age) {
       errors.push({ field: 'age', msg: 'Indica la edad aproximada.' })
+      fieldErrors.age = 'Campo requerido'
     }
     if (!petData.ageValue) {
       errors.push({ field: 'ageValue', msg: 'Selecciona un rango de edad.' })
+      fieldErrors.ageValue = 'Campo requerido'
     }
     if (!petData.sizeValue) {
       errors.push({ field: 'sizeValue', msg: 'Selecciona el tamaño.' })
+      fieldErrors.sizeValue = 'Campo requerido'
     }
     if (!petData.location) {
       errors.push({ field: 'location', msg: 'Indica la ubicación (ciudad o municipio).' })
+      fieldErrors.location = 'Campo requerido'
     }
     if (!(petData.description || '').trim() || petData.description.trim().length < 10) {
       errors.push({ field: 'description', msg: 'Describe la mascota con al menos 10 caracteres.' })
+      fieldErrors.description = 'Se requieren mínimo 10 caracteres'
     }
   }
 
   if (currentStep.value === 2) {
     if (!mainImagePreview.value && !mainImageFile.value) {
       errors.push({ field: 'mainImage', msg: 'Sube al menos una foto principal.' })
+      fieldErrors.mainImage = 'Campo requerido'
     }
   }
 
   if (currentStep.value === 3) {
     if (!petData.contact.name) {
       errors.push({ field: 'contactName', msg: 'Nombre de contacto obligatorio.' })
+      fieldErrors.contactName = 'Campo requerido'
     }
     if (!petData.contact.email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(petData.contact.email)) {
       errors.push({ field: 'contactEmail', msg: 'Proporciona un email válido.' })
+      fieldErrors.contactEmail = 'Email inválido'
     }
     if (!petData.contact.phone || !/^[0-9()+\-\s]{6,20}$/.test(petData.contact.phone)) {
       errors.push({ field: 'contactPhone', msg: 'Proporciona un teléfono válido (6-20 dígitos).' })
+      fieldErrors.contactPhone = 'Teléfono inválido'
     }
   }
 
@@ -843,7 +954,7 @@ const validateStep = () => {
 
     // Build message list
     const list = errors.map(e => `• ${e.msg}`).join('\n')
-    showModalAlert('warning', 'Faltan datos', `Corrige los siguientes puntos:\n${list}`)
+    showModalAlert('warning', 'Completa todos los campos requeridos', `Por favor, corrige los siguientes campos:\n${list}`)
 
     // Focus first invalid field
     const first = errors[0].field
@@ -1176,6 +1287,18 @@ const saveAsDraft = async () => {
 // Enviar formulario
 const submitForm = async () => {
   try {
+    // Verificar campos incompletos
+    const incompleteFields = getIncompleteFieldsSummary()
+    if (incompleteFields.length > 0) {
+      const fieldsList = incompleteFields.map(f => `• ${f}`).join('\n')
+      showModalAlert(
+        'warning',
+        'Completa todos los campos requeridos',
+        `Faltan los siguientes campos:\n\n${fieldsList}\n\nRevisa cada sección del formulario.`
+      )
+      return
+    }
+
     // Sanitizar datos antes de enviar
     sanitizePetData()
 
@@ -1223,6 +1346,31 @@ const modalTitle = ref('')
 const modalMessage = ref('')
 const modalConfirmText = ref('Aceptar')
 const modalCallback = ref(null)
+
+// Función para obtener un resumen de campos incompletos
+const getIncompleteFieldsSummary = () => {
+  const incomplete = []
+
+  // Step 1 validations
+  if (!petData.name) incomplete.push('Nombre de la mascota')
+  if (!petData.typeValue) incomplete.push('Tipo de mascota')
+  if (!petData.gender) incomplete.push('Género')
+  if (!petData.age) incomplete.push('Edad aproximada')
+  if (!petData.ageValue) incomplete.push('Rango de edad')
+  if (!petData.sizeValue) incomplete.push('Tamaño')
+  if (!petData.location) incomplete.push('Ubicación')
+  if (!(petData.description || '').trim() || petData.description.trim().length < 10) incomplete.push('Descripción')
+
+  // Step 2 validations
+  if (!mainImagePreview.value && !mainImageFile.value) incomplete.push('Foto principal')
+
+  // Step 3 validations
+  if (!petData.contact.name) incomplete.push('Nombre de contacto')
+  if (!petData.contact.email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(petData.contact.email)) incomplete.push('Email de contacto válido')
+  if (!petData.contact.phone || !/^[0-9()+\-\s]{6,20}$/.test(petData.contact.phone)) incomplete.push('Teléfono de contacto válido')
+
+  return incomplete
+}
 
 // Cerrar el modal
 const closeModal = () => {

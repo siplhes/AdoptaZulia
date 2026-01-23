@@ -174,6 +174,7 @@ import { useAuth } from '~/composables/useAuth'
 import { usePets } from '~/composables/usePets'
 import { useAdoptionStories } from '~/composables/useAdoptionStories'
 import { useLostPets } from '~/composables/useLostPets'
+import { useFeatures } from '~/composables/useFeatures'
 import PetCard from '~/components/PetCard.vue'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
@@ -214,6 +215,7 @@ const mappedUserLost = computed(() => {
 const { getUserByUsername, user, isAuthenticated } = useAuth()
 const { fetchUserPets, fetchPetsByIds } = usePets()
 const { fetchUserStories } = useAdoptionStories()
+const { isFeatureEnabled } = useFeatures()
 
 // Verificar si es el propio perfil del usuario
 const isOwnProfile = computed(() => {
@@ -229,8 +231,8 @@ const tabs = computed(() => {
     { id: 'stories', label: 'Historias de adopción' },
   ]
 
-  // Solo mostrar pestaña de favoritos si el usuario está viendo su propio perfil
-  if (isOwnProfile.value) {
+  // Solo mostrar pestaña de favoritos si el usuario está viendo su propio perfil y la característica está habilitada
+  if (isOwnProfile.value && isFeatureEnabled('favorites')) {
     baseTabs.push({ id: 'favorites', label: 'Favoritos' })
   }
 

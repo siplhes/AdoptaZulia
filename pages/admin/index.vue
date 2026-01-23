@@ -6,12 +6,21 @@
           <h1 class="text-3xl font-bold text-emerald-800">Panel de Administración</h1>
           <p class="text-gray-600">Gestiona las mascotas, usuarios y configuraciones del sitio</p>
         </div>
-        <NuxtLink
-          to="/"
-          class="rounded-lg border border-emerald-600 px-4 py-2 text-emerald-600 transition-colors hover:bg-emerald-50"
-        >
-          Volver al sitio
-        </NuxtLink>
+        <div class="flex gap-3">
+          <NuxtLink
+            to="/admin/features"
+            class="rounded-lg bg-indigo-600 px-4 py-2 text-white transition-colors hover:bg-indigo-700 flex items-center gap-2"
+          >
+            <Icon name="mdi:cog" class="h-5 w-5" />
+            Características
+          </NuxtLink>
+          <NuxtLink
+            to="/"
+            class="rounded-lg border border-emerald-600 px-4 py-2 text-emerald-600 transition-colors hover:bg-emerald-50"
+          >
+            Volver al sitio
+          </NuxtLink>
+        </div>
       </div>
 
       <!-- Loading indicator -->
@@ -99,9 +108,21 @@
             Visualiza métricas y analíticas de la plataforma
           </p>
         </NuxtLink>
-      </div>
+
+        <NuxtLink
+          to="/admin/features"
+          class="flex flex-col items-center rounded-lg bg-white p-6 shadow-md transition-transform hover:scale-105"
+        >
+          <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100">
+            <Icon name="mdi:toggle-multiple" class="h-8 w-8 text-indigo-600" />
+          </div>
+          <h3 class="mb-2 text-xl font-semibold text-emerald-800">Características</h3>
+          <p class="text-center text-sm text-gray-600">
+            Activa o desactiva funcionalidades de la plataforma
+          </p>
+        </NuxtLink>
     </div>
-  </div>
+  </div>  </div>
 </template>
 
 <script setup>

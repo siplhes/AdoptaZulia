@@ -124,85 +124,95 @@
             </div>
             <!-- Botones de acción -->
             <div class="mt-6">
-              <!-- Versión móvil (botones con íconos) -->
+              <!-- Versión móvil (botones con íconos y texto) -->
               <div class="flex flex-wrap gap-2 lg:hidden">
               <!-- Botones para usuarios no propietarios -->
               <div v-if="!isOwner" class="flex flex-wrap gap-2">
                 <button
                 v-if="canAdopt && !hasApplied && pet.status !== 'adopted'"
-                class="flex items-center justify-center rounded-full bg-emerald-600 p-2 text-white hover:bg-emerald-700"
+                class="flex flex-col items-center justify-center rounded-lg bg-emerald-600 px-3 py-2 text-xs text-white hover:bg-emerald-700"
                 @click="openAdoptionModal"
-                >Adoptar a {{ pet.name }}
-                <Icon name="heroicons:heart" class="h-6 w-6" />
+                >
+                <Icon name="heroicons:heart" class="mb-1 h-5 w-5" />
+                <span>Adoptar</span>
                 </button>
 
                 <button
                 v-if="hasApplied"
-                class="flex items-center justify-center rounded-full bg-blue-600 p-3 text-white hover:bg-blue-700"
+                class="flex flex-col items-center justify-center rounded-lg bg-blue-600 px-3 py-2 text-xs text-white hover:bg-blue-700"
                 @click="viewUserAdoption"
                 >
-                <Icon name="heroicons:document-text" class="h-6 w-6" />
+                <Icon name="heroicons:document-text" class="mb-1 h-5 w-5" />
+                <span>Mi solicitud</span>
                 </button>
 
                 <button
                 v-if="adoptionStatus === 'approved'"
-                class="flex items-center justify-center rounded-full bg-amber-600 p-3 text-white hover:bg-amber-700"
+                class="flex flex-col items-center justify-center rounded-lg bg-amber-600 px-3 py-2 text-xs text-white hover:bg-amber-700"
                 @click="contactOwner"
                 >
-                <Icon name="heroicons:phone" class="h-6 w-6" />
+                <Icon name="heroicons:phone" class="mb-1 h-5 w-5" />
+                <span>Llamar</span>
                 </button>
 
                 <button
                 v-if="adoptionStatus === 'approved'"
-                class="flex items-center justify-center rounded-full bg-green-600 p-3 text-white hover:bg-green-700"
+                class="flex flex-col items-center justify-center rounded-lg bg-green-600 px-3 py-2 text-xs text-white hover:bg-green-700"
                 @click="contactWhatsapp"
                 >
-                <Icon name="heroicons:chat-bubble-left-right" class="h-6 w-6" />
+                <Icon name="heroicons:chat-bubble-left-right" class="mb-1 h-5 w-5" />
+                <span>WhatsApp</span>
                 </button>
               </div>
 
               <!-- Botones para propietarios -->
               <div v-if="isOwner" class="flex flex-wrap gap-2">
                 <button
-                class="flex items-center justify-center rounded-full bg-blue-600 p-3 text-white hover:bg-blue-700"
+                class="flex flex-col items-center justify-center rounded-lg bg-blue-600 px-3 py-2 text-xs text-white hover:bg-blue-700"
                 @click="viewAdoptionRequests"
                 >
-                <Icon name="heroicons:document-text" class="h-6 w-6" />
+                <Icon name="heroicons:document-text" class="mb-1 h-5 w-5" />
+                <span>Solicitudes</span>
                 </button>
 
                 <NuxtLink
                 to="/mis-publicaciones"
-                class="flex items-center justify-center rounded-full bg-purple-600 p-3 text-white hover:bg-purple-700"
+                class="flex flex-col items-center justify-center rounded-lg bg-purple-600 px-3 py-2 text-xs text-white hover:bg-purple-700"
                 >
-                <Icon name="heroicons:photo" class="h-6 w-6" />
+                <Icon name="heroicons:photo" class="mb-1 h-5 w-5" />
+                <span>Mis posts</span>
                 </NuxtLink>
 
                 <button
-                class="flex items-center justify-center rounded-full bg-amber-600 p-3 text-white hover:bg-amber-700"
+                class="flex flex-col items-center justify-center rounded-lg bg-amber-600 px-3 py-2 text-xs text-white hover:bg-amber-700"
                 @click="editPet"
                 >
-                <Icon name="heroicons:pencil-square" class="h-6 w-6" />
+                <Icon name="heroicons:pencil-square" class="mb-1 h-5 w-5" />
+                <span>Editar</span>
                 </button>
 
                 <button
-                class="flex items-center justify-center rounded-full bg-red-600 p-3 text-white hover:bg-red-700"
+                class="flex flex-col items-center justify-center rounded-lg bg-red-600 px-3 py-2 text-xs text-white hover:bg-red-700"
                 @click="deletePet"
                 >
-                <Icon name="heroicons:trash" class="h-6 w-6" />
+                <Icon name="heroicons:trash" class="mb-1 h-5 w-5" />
+                <span>Eliminar</span>
                 </button>
               </div>
 
               <!-- Botones comunes -->
               <div class="flex flex-wrap gap-2">
                 <button
-                class="flex items-center justify-center rounded-full border border-gray-300 bg-white p-3 text-gray-700 hover:bg-gray-50"
+                class="flex flex-col items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs text-gray-700 hover:bg-gray-50"
                 @click="sharePet"
                 >
-                <Icon name="heroicons:share" class="h-6 w-6" />
+                <Icon name="heroicons:share" class="mb-1 h-5 w-5" />
+                <span>Compartir</span>
                 </button>
 
                 <button
-                class="flex items-center justify-center rounded-full border p-3"
+                v-if="favoritesEnabled"
+                class="flex flex-col items-center justify-center rounded-lg border px-3 py-2 text-xs"
                 :class="[
                   isFavorite
                   ? 'border-red-300 bg-red-50 text-red-700 hover:bg-red-100'
@@ -212,17 +222,20 @@
                 >
                 <Icon
                   :name="isFavorite ? 'heroicons:heart' : 'mdi:heart-outline'"
-                  class="h-6 w-6"
+                  class="mb-1 h-5 w-5"
                   :class="{ 'text-red-500': isFavorite }"
                 />
+                <span>Favorito</span>
                 </button>
 
                 <button
-                class="flex items-center justify-center rounded-full border border-emerald-300 bg-emerald-50 p-3 text-emerald-700 hover:bg-emerald-100"
+                v-if="imageGenerationEnabled"
+                class="flex flex-col items-center justify-center rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs text-emerald-700 hover:bg-emerald-100"
                 :disabled="generatingImage"
                 @click="generateShareImage"
                 >
-                <Icon :name="generatingImage ? 'heroicons:arrow-path' : 'heroicons:photo'" class="h-6 w-6" :class="{ 'animate-spin': generatingImage }" />
+                <Icon :name="generatingImage ? 'heroicons:arrow-path' : 'heroicons:photo'" class="mb-1 h-5 w-5" :class="{ 'animate-spin': generatingImage }" />
+                <span>Compartir</span>
                 </button>
               </div>
               </div>
@@ -314,6 +327,7 @@
                 </button>
 
                 <button
+                v-if="favoritesEnabled"
                 class="flex items-center justify-center gap-2 rounded-md border px-4 py-2"
                 :class="[
                   isFavorite
@@ -331,6 +345,7 @@
                 </button>
 
                 <button
+                v-if="imageGenerationEnabled"
                 class="flex items-center justify-center gap-2 rounded-md border border-emerald-300 bg-emerald-50 px-4 py-2 text-emerald-700 hover:bg-emerald-100"
                 :disabled="generatingImage"
                 @click="generateShareImage"
@@ -785,7 +800,7 @@
       </div>
 
       <!-- Sistema de comentarios -->
-      <div v-if="pet" class="mt-12">
+      <div v-if="pet && commentsEnabled" class="mt-12">
         <PetComments :pet-id="petId" />
       </div>
     </div>
@@ -800,6 +815,7 @@ import { useAuth } from "~/composables/useAuth";
 import { useToast } from "~/composables/useToast";
 import { useAdoptions } from "~/composables/useAdoptions";
 import { useImageGen2 } from "~/composables/useImageGen2";
+import { useFeatures } from "~/composables/useFeatures";
 import {
   getDatabase,
   ref as dbRef,
@@ -821,6 +837,9 @@ const { fetchSimilarPets } = usePets();
 
 // Usar el composable de adopciones
 const { createAdoptionRequest } = useAdoptions();
+
+// Usar el composable de features
+const { isFeatureEnabled } = useFeatures();
 
 // Estado para la galería de fotos
 const currentPhoto = ref(null);
@@ -850,6 +869,11 @@ const ownerAdoptionCount = ref(0);
 
 // Estado para generar imagen compartible
 const generatingImage = ref(false);
+
+// Feature flags
+const favoritesEnabled = computed(() => isFeatureEnabled('favorites'));
+const commentsEnabled = computed(() => isFeatureEnabled('comments'));
+const imageGenerationEnabled = computed(() => isFeatureEnabled('imageGeneration'));
 
 // Estado para el modal de imagen ampliada
 const showImageModal = ref(false);
