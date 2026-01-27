@@ -15,7 +15,7 @@ import {
 } from 'firebase/database'
 import { useFirebaseApp } from 'vuefire'
 import { useNotifications } from './useNotifications'
-import { useSecureLogger } from '~/composables/useSecureLogger'
+import { useSecureLogger } from './useSecureLogger'
 
 // Interfaz para una solicitud de adopción
 export interface Adoption {
@@ -675,9 +675,7 @@ export function useAdoptions() {
     }
   }
 
-  /**
-   * Actualiza el estado de una solicitud de adopción
-   */
+
   async function updateAdoptionStatus(
     adoptionId: string,
     status: 'pending' | 'approved' | 'rejected' | 'completed',
@@ -691,21 +689,15 @@ export function useAdoptions() {
       const db = getDatabase(firebaseApp);
       const adoptionRef = dbRef(db, `adoptions/${adoptionId}`);
 
-      // Objeto con los datos a actualizar
       const updateData: any = {
         status,
         updatedAt: Date.now()
       };
-
-      // Si hay notas, las incluimos en la actualización
       if (notes !== undefined) {
         updateData.notes = notes;
       }
-
-      // Actualizar en Firebase
       await update(adoptionRef, updateData);
 
-      // Actualizar en caché local
       if (cache.adoptions.has(adoptionId)) {
         const adoption = cache.adoptions.get(adoptionId)!;
         adoption.status = status;
@@ -714,8 +706,6 @@ export function useAdoptions() {
           adoption.notes = notes;
         }
       }
-
-      // Notificar al usuario sobre el cambio de estado
       const statusMessages = {
         approved: 'Tu solicitud de adopción ha sido aprobada.',
         rejected: 'Tu solicitud de adopción ha sido rechazada.',
@@ -723,7 +713,7 @@ export function useAdoptions() {
         pending: 'Tu solicitud de adopción está pendiente de revisión.'
       };
 
-      // Creamos una notificación para el usuario solicitante
+
       try {
         const adoption = cache.adoptions.get(adoptionId);
         if (adoption) {

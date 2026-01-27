@@ -624,7 +624,7 @@
             <!-- Información de contacto -->
          
               <div
-                v-if="adoptionStatus === 'approved' || !pet.status === 'adopted' "
+                v-if="adoptionStatus === 'pending' || adoptionStatus === 'approved' || isOwner || pet.status === 'adopted'"
                 class="rounded-lg bg-gray-50 p-4"
               >
                 <h2 class="mb-2 text-xl font-semibold text-emerald-800">
@@ -679,29 +679,167 @@
                 </div>
               </div>
          
-            <!-- Mensaje para usuarios sin solicitud o con solicitud pendiente -->
+            <!-- Mensaje para usuarios sin solicitud -->
             <div
-              v-else-if="!isOwner && adoptionStatus !== 'approved'"
+              v-else-if="!isOwner && !hasApplied"
               class="rounded-lg bg-amber-50 p-4"
             >
               <h2 class="mb-2 text-xl font-semibold text-emerald-800">
                 Información de contacto
               </h2>
               <p class="text-amber-700">
-                <span v-if="adoptionStatus === 'pending'">
-                    Por temas de seguridad y privacidad, para acceder a la información de contacto del publicador, debes enviar
-                  una solicitud de adopción.
-                </span>
-                <span v-else-if="adoptionStatus === 'rejected'">
-                  Tu solicitud de adopción fue rechazada. Si crees que ha sido un error,
-                  por favor comunícate con nosotros.
-                </span>
-                <span v-else>
-                  Por temas de seguridad y privacidad, para acceder a la información de contacto del publicador, debes enviar
-                  una solicitud de adopción.
-                </span>
+                Por temas de seguridad y privacidad, para acceder a la información de contacto del publicador, debes enviar
+                una solicitud de adopción.
               </p>
             </div>
+
+            <!-- Mensaje para solicitud rechazada -->
+            <div
+              v-else-if="adoptionStatus === 'rejected'"
+              class="rounded-lg bg-red-50 p-4"
+            >
+              <h2 class="mb-2 text-xl font-semibold text-emerald-800">
+                Información de contacto
+              </h2>
+              <p class="text-red-700">
+                Tu solicitud de adopción fue rechazada. Si crees que ha sido un error,
+                por favor comunícate con nosotros.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Solicitudes de adopción recibidas (para propietarios) -->
+      <div v-if="isOwner && pet" class="mt-12">
+        <div class="rounded-lg bg-white p-6 shadow-md">
+          <div class="mb-6 flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-emerald-800">
+              Solicitudes de adopción recibidas
+            </h2>
+            <span v-if="ownerAdoptionCount > 0" class="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-sm font-medium text-emerald-800">
+              {{ ownerAdoptionCount }}
+            </span>
+          </div>
+
+          <div v-if="loadingOwnerAdoptions" class="flex justify-center py-8">
+            <div class="h-8 w-8 animate-spin rounded-full border-b-2 border-emerald-700" />
+          </div>
+
+          <div v-else-if="ownerAdoptions.length === 0" class="rounded-lg border border-gray-200 bg-gray-50 p-6 text-center">
+            <Icon name="heroicons:inbox" class="mx-auto mb-3 h-12 w-12 text-gray-400" />
+            <p class="text-gray-600">Aún no hay solicitudes de adopción para esta mascota</p>
+          </div>
+
+          <div v-else class="grid gap-4">
+            <div 
+              v-for="request in ownerAdoptions"
+              :key="request.id"
+              class="rounded-lg border border-gray-200 p-4 hover:bg-gray-50 transition"
+            >
+              <div class="flex items-start justify-between">
+                <div class="flex items-start gap-4 flex-1">
+                  <!-- Avatar del solicitante -->
+                  <div class="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full bg-emerald-100">
+                    <img 
+                      v-if="request.user?.photoURL" 
+                      :src="request.user.photoURL" 
+                      :alt="request.user?.name || 'Solicitante'" 
+                      class="h-full w-full object-cover"
+                    >
+                    <div v-else class="flex h-full w-full items-center justify-center font-bold text-emerald-700">
+                      {{ getInitials(request.user?.name || request.user?.email || 'S') }}
+                    </div>
+                  </div>
+
+                  <!-- Información del solicitante -->
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                      <h3 class="font-semibold text-gray-900">
+                        {{ request.user?.name || request.user?.email || 'Usuario' }}
+                      </h3>
+                      <span 
+                        class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium"
+                        :class="{
+                          'bg-yellow-100 text-yellow-800': request.status === 'pending',
+                          'bg-green-100 text-green-800': request.status === 'approved',
+                          'bg-red-100 text-red-800': request.status === 'rejected',
+                        }"
+                      >
+                        {{
+                          request.status === 'pending' ? 'Pendiente' :
+                          request.status === 'approved' ? 'Aprobada' :
+                          'Rechazada'
+                        }}
+                      </span>
+                    </div>
+
+                    <p class="text-sm text-gray-500 mb-3">
+                      Solicitud enviada {{ formatDate(request.createdAt) }}
+                    </p>
+
+                    <!-- Datos de contacto del solicitante -->
+                    <div class="flex flex-wrap gap-3 mb-3">
+                      <div class="flex items-center gap-2">
+                        <Icon name="heroicons:envelope" class="h-4 w-4 text-gray-400 flex-shrink-0" />
+                        <a 
+                          :href="`mailto:${request.user?.email}`" 
+                          class="text-sm text-emerald-600 hover:text-emerald-800 break-all"
+                        >
+                          {{ request.user?.email || 'No disponible' }}
+                        </a>
+                      </div>
+                      <div v-if="request.user?.phone" class="flex items-center gap-2">
+                        <Icon name="heroicons:phone" class="h-4 w-4 text-gray-400 flex-shrink-0" />
+                        <a 
+                          :href="`tel:${request.user.phone}`" 
+                          class="text-sm text-emerald-600 hover:text-emerald-800"
+                        >
+                          {{ request.user.phone }}
+                        </a>
+                      </div>
+                    </div>
+
+                    <!-- Mensaje del solicitante -->
+                    <div v-if="request.message" class="mb-3 rounded-lg bg-gray-50 p-2">
+                      <p class="text-sm text-gray-600 italic">{{ request.message }}</p>
+                    </div>
+
+                    <!-- Botón para ver detalles -->
+                    <NuxtLink 
+                      :to="`/adopciones/${pet.id}`"
+                      class="text-sm text-emerald-600 hover:text-emerald-800 font-medium"
+                    >
+                      Ver más detalles →
+                    </NuxtLink>
+                  </div>
+                </div>
+
+                <!-- Icono de contacto WhatsApp -->
+                <div v-if="request.user?.phone" class="flex-shrink-0 ml-2">
+                  <a 
+                    :href="`https://wa.me/${request.user.phone.replace(/[^0-9]/g, '')}`"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center justify-center h-10 w-10 rounded-full bg-green-100 text-green-600 hover:bg-green-200 transition"
+                    title="Contactar por WhatsApp"
+                  >
+                    <Icon name="mdi:whatsapp" class="h-5 w-5" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botón para ver todas las solicitudes -->
+          <div v-if="ownerAdoptionCount > 0" class="mt-4 text-center">
+            <button 
+              @click="viewAdoptionRequests"
+              class="inline-flex items-center gap-2 rounded-lg border border-emerald-600 px-4 py-2 text-emerald-600 hover:bg-emerald-50"
+            >
+              <Icon name="heroicons:document-text" class="h-5 w-5" />
+              Ver todas las solicitudes
+            </button>
           </div>
         </div>
       </div>
@@ -866,6 +1004,8 @@ const submittingAdoption = ref(false);
 
 // Estado para solicitudes de adopción del propietario
 const ownerAdoptionCount = ref(0);
+const ownerAdoptions = ref([]);
+const loadingOwnerAdoptions = ref(false);
 
 // Estado para generar imagen compartible
 const generatingImage = ref(false);
@@ -1019,6 +1159,8 @@ const checkUserAdoption = async () => {
 const checkOwnerAdoptions = async () => {
   if (!isOwner.value || !petId) return;
 
+  loadingOwnerAdoptions.value = true;
+
   try {
     const firebaseApp = useFirebaseApp();
     const db = getDatabase(firebaseApp);
@@ -1035,12 +1177,17 @@ const checkOwnerAdoptions = async () => {
         ...data,
       }));
       ownerAdoptionCount.value = adoptions.length;
+      ownerAdoptions.value = adoptions;
     } else {
       ownerAdoptionCount.value = 0;
+      ownerAdoptions.value = [];
     }
   } catch (err) {
     console.error("Error al verificar solicitudes de adopción del propietario:", err);
     ownerAdoptionCount.value = 0;
+    ownerAdoptions.value = [];
+  } finally {
+    loadingOwnerAdoptions.value = false;
   }
 };
 
@@ -1449,5 +1596,12 @@ const formatPreferredMethod = (method) => {
     default:
       return method;
   }
+};
+
+// Obtener iniciales del nombre
+const getInitials = (name) => {
+  if (!name) return "?";
+  const words = name.split(' ');
+  return words.map(word => word.charAt(0).toUpperCase()).join('');
 };
 </script>

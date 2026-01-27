@@ -540,11 +540,11 @@ const loadPetOwner = async () => {
   }
 }
 
-// Actualizar el estado de la solicitud
+
 const updateStatus = async (newStatus) => {
   if (!adoption.value || !adoption.value.id) return
   
-  // Confirmar las acciones importantes
+
   if (newStatus === 'rejected' && !confirm('¿Estás seguro de que deseas rechazar esta solicitud?')) {
     return
   } else if (newStatus === 'completed' && !confirm('¿Estás seguro de que deseas marcar esta adopción como completada? Esto indicará que la mascota ha sido entregada al adoptante.')) {
@@ -561,7 +561,7 @@ const updateStatus = async (newStatus) => {
       adoption.value.status = newStatus
       adoption.value.updatedAt = Date.now()
       
-      // Si se completa la adopción, actualizar el estado de la mascota
+
       if (newStatus === 'completed') {
         const firebaseApp = useFirebaseApp()
         const db = getDatabase(firebaseApp)

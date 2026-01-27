@@ -176,8 +176,70 @@
                   
                   <!-- Acciones según el estado -->
                   <div class="mt-8">
+                    <!-- Solicitud pendiente - Mostrar datos de contacto para agilizar proceso -->
+                    <div v-if="adoption.status === 'pending' && pet.contact" class="space-y-3">
+                      <div class="rounded-lg border border-amber-200 bg-amber-50 p-4 mb-4">
+                        <div class="flex items-start">
+                          <Icon name="heroicons:information-circle" class="mr-2 h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                          <p class="text-sm text-amber-700">
+                            Puedes contactar directamente con el propietario sin esperar a que acepte tu solicitud. ¡Esto acelera el proceso de adopción!
+                          </p>
+                        </div>
+                      </div>
+
+                      <h3 class="text-lg font-semibold text-gray-900">Datos de contacto del propietario</h3>
+                      
+                      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <a 
+                          :href="`tel:${pet.contact.phone}`" 
+                          class="flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-3 text-white hover:bg-emerald-700"
+                        >
+                          <Icon name="heroicons:phone" class="mr-2 h-5 w-5" />
+                          Llamar
+                        </a>
+                        
+                        <button 
+                          class="flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-3 text-white hover:bg-emerald-700"
+                          @click="contactWhatsapp"
+                        >
+                          <Icon name="mdi:whatsapp" class="mr-2 h-5 w-5" />
+                          WhatsApp
+                        </button>
+                        
+                        <a 
+                          :href="`mailto:${pet.contact.email}`" 
+                          class="flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-3 text-white hover:bg-emerald-700"
+                        >
+                          <Icon name="heroicons:envelope" class="mr-2 h-5 w-5" />
+                          Email
+                        </a>
+                      </div>
+                      
+                      <!-- Detalles del contacto -->
+                      <div class="mt-4 rounded-lg bg-gray-50 p-4">
+                        <h4 class="font-medium text-gray-900">{{ pet.contact.name }}</h4>
+                        <p class="mt-1 text-sm text-gray-500">{{ formatContactType(pet.contact.type) }}</p>
+                        
+                        <div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                          <div class="flex items-center">
+                            <Icon name="heroicons:phone" class="mr-2 h-5 w-5 text-gray-400" />
+                            <span class="text-gray-700">{{ pet.contact.phone }}</span>
+                          </div>
+                          
+                          <div class="flex items-center">
+                            <Icon name="heroicons:envelope" class="mr-2 h-5 w-5 text-gray-400" />
+                            <span class="text-gray-700">{{ pet.contact.email }}</span>
+                          </div>
+                        </div>
+                        
+                        <div v-if="pet.contact.notes" class="mt-3 border-t border-gray-200 pt-3">
+                          <p class="text-sm text-gray-600">{{ pet.contact.notes }}</p>
+                        </div>
+                      </div>
+                    </div>
+
                     <!-- Solicitud aprobada - Botones de contacto -->
-                    <div v-if="adoption.status === 'approved' && pet.contact" class="space-y-3">
+                    <div v-else-if="adoption.status === 'approved' && pet.contact" class="space-y-3">
                       <h3 class="text-lg font-semibold text-gray-900">Información de contacto</h3>
                       
                       <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -269,16 +331,6 @@
                       </div>
                     </div>
                     
-                    <!-- Solicitud pendiente -->
-                    <div v-else-if="adoption.status === 'pending'" class="space-y-3">
-                      <div class="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
-                        <p class="text-sm text-yellow-700">
-                          Tu solicitud está siendo revisada por el propietario de la mascota. 
-                          Recibirás una notificación cuando se actualice el estado de tu solicitud.
-                        </p>
-                      </div>
-                    </div>
-                    
                     <!-- Solicitud rechazada -->
                     <div v-else-if="adoption.status === 'rejected'" class="space-y-3">
                       <div class="rounded-lg border border-red-200 bg-red-50 p-4">
@@ -304,6 +356,13 @@
             <!-- Sección de información del propietario -->
             <div class="mt-6 rounded-lg bg-white p-6 shadow-md">
               <h2 class="mb-4 text-xl font-bold text-emerald-800">Información del propietario</h2>
+              
+              <div v-if="adoption.status === 'pending'" class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3">
+                <p class="text-sm text-emerald-700">
+                  <Icon name="heroicons:information-circle" class="inline-block mr-1 h-4 w-4" />
+                  Puedes contactar directamente con el propietario sin esperar a que acepte tu solicitud.
+                </p>
+              </div>
               
               <div>
                 <div class="flex items-start">
@@ -516,7 +575,7 @@ const getStatusTitle = (status) => {
 const getStatusDescription = (status) => {
   switch (status) {
     case 'pending':
-      return 'Tu solicitud está siendo revisada por el propietario de la mascota'
+      return 'Tu solicitud está siendo revisada por el propietario. Mientras tanto, ¡puedes contactar directamente con el propietario para agilizar el proceso de adopción!'
     case 'approved':
       return '¡Felicidades! Tu solicitud ha sido aprobada. Ahora puedes contactar al propietario.'
     case 'rejected':
