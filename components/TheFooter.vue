@@ -42,7 +42,7 @@ function handleImageError(event:any) {
 </script>
 <template>
   <footer class="bg-emerald-700 pt-12 text-[#FEFFFA]">
-    <div class="container mx-auto px-4 sm:px-8">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
         <!-- Columna 1: Información de contacto -->
         <div class="flex flex-col items-center lg:items-start">

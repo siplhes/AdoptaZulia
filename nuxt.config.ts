@@ -1,28 +1,16 @@
-// nuxt.config.ts - Optimizado para Nuxt 4
-
 import { defineNuxtConfig } from 'nuxt/config'
 
 export default defineNuxtConfig({
-  // ✨ 1. Alineación con Nuxt 4
-  // La fecha de compatibilidad debería ser '2024-11-01' para alinearse con Nuxt 4
   compatibilityDate: '2024-11-01',
 
   devtools: { enabled: false },
-  // **Nota sobre ssr: false:** Si buscas el máximo rendimiento (Modo Turbo) para renderizado
-  // en el servidor o pre-renderizado, ssr debe ser true. ssr: false (SPA) evita muchas
-  // de las optimizaciones de Nuxt en el servidor. Lo mantengo como lo tenías.
   ssr: false,
 
-  // --- Optimizaciones de Rendimiento y DX (Modo Turbo) ---
   experimental: {
-    // Activa el plugin de TypeScript mejorado para la Experiencia de Desarrollo (DX)
     typescriptPlugin: true,
-
-    // Si usaras ssr: true, esto reduciría el bundle del cliente al extraer los handlers de datos:
-    // extractAsyncDataHandlers: true, 
+    extractAsyncDataHandlers: true, 
   },
 
-  // --- Configuraciones Existentes ---
   modules: [
     '@nuxt/eslint',
     '@nuxt/fonts',
@@ -30,7 +18,6 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxt/scripts',
     '@nuxt/test-utils',
-    // "@pinia/nuxt",
     '@nuxtjs/tailwindcss',
     '@nuxtjs/color-mode',
     'nuxt-vuefire',
@@ -78,11 +65,7 @@ export default defineNuxtConfig({
     admin: false,
   },
 
-  // 3. Optimizaciones de 'nitro' (Core del Modo Turbo)
-  nitro: {
-    // Esta es una buena práctica y ya está incluida:
-    compressPublicAssets: true,
-  },
+
 
   plugins: ['~/plugins/firebase.ts'],
   tailwindcss: {
@@ -94,18 +77,24 @@ export default defineNuxtConfig({
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        {
+          name: 'Content-Security-Policy',
+          content: process.env.NODE_ENV === 'production'
+            ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://firebaseio.com https://*.firebaseio.com https://www.google-analytics.com; frame-src 'self' https://www.paypal.com; object-src 'none';"
+            : "default-src 'self' 'unsafe-inline' 'unsafe-eval' *"
+        }
       ],
       link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
     },
   },
   image: {
     domains: [
-      process.env.AWS_S3_BUCKET_DOMAIN || 'nsfwclothesmaracaibo.s3.us-east-2.amazonaws.com'
+      process.env.AWS_S3_BUCKET_DOMAIN || 's1bckt.s3.us-east-2.amazonaws.com'
     ],
     ipx: {
       remote: {
         domains: [
-          process.env.AWS_S3_BUCKET_DOMAIN || 'nsfwclothesmaracaibo.s3.us-east-2.amazonaws.com'
+          process.env.AWS_S3_BUCKET_DOMAIN || 's1bckt.s3.us-east-2.amazonaws.com'
         ]
       }
     }
@@ -127,29 +116,20 @@ export default defineNuxtConfig({
     }
   },
 
-  // 🔒 Headers de Seguridad
   nitro: {
     compressPublicAssets: true,
-    headers: {
-      'X-Content-Type-Options': 'nosniff',
-      'X-Frame-Options': 'SAMEORIGIN',
-      'X-XSS-Protection': '1; mode=block',
-      'Referrer-Policy': 'strict-origin-when-cross-origin',
-      'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
+    routeRules: {
+      '/**': {
+        headers: {
+          'X-Content-Type-Options': 'nosniff',
+          'X-Frame-Options': 'SAMEORIGIN',
+          'X-XSS-Protection': '1; mode=block',
+          'Referrer-Policy': 'strict-origin-when-cross-origin',
+          'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
+        }
+      }
     }
   },
 
-  // 🔒 Content Security Policy
-  app: {
-    head: {
-      meta: [
-        {
-          name: 'Content-Security-Policy',
-          content: process.env.NODE_ENV === 'production'
-            ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://firebaseio.com https://*.firebaseio.com https://www.google-analytics.com; frame-src 'self' https://www.paypal.com; object-src 'none';"
-            : "default-src 'self' 'unsafe-inline' 'unsafe-eval' *"
-        }
-      ]
-    }
-  }
+
 })

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex min-h-screen flex-col justify-center bg-amber-50 py-12 sm:px-6 lg:px-8">
+  <div>
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <h2 class="mt-6 text-center text-3xl font-extrabold text-emerald-800">Iniciar sesión</h2>
       <p class="mt-2 text-center text-sm text-gray-600">

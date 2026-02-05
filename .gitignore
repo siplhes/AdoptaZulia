@@ -8,28 +8,88 @@ dist
 
 # Node dependencies
 node_modules
+jspm_packages
 
 # Logs
 logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
 
-# Misc
-.DS_Store
-.fleet
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Test coverage
+lib-cov
+coverage
+.nyc_output
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/settings.json
 .idea
+.fleet
+.DS_Store
+.history
+.svn
+.hg
+*.swp
+*.swo
+*.swn
+*.sublime-project
+*.sublime-workspace
+Thumbs.db
+ehthumbs.db
+Desktop.ini
 
-# Local env files
+# Environment keys and secrets
 .env
 .env.*
 !.env.example
-.github
-pages/nosotros/index.vue
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# Firebase service account keys
-*firebase*.json
-*firebase*-service-account*.json
-*-service-account*.json
-*service-account*.json
+# SSL
+*.pem
+*.crt
+*.key
+
+# Firebase
+.firebase/
+# Explicitly ignore service account keys but NOT firebase.json
+*-service-account.json
+service-account.json
+# Specific key file found in previous gitignore
 CW1hZvYcYm8CG9jWnEejyrWgtgby51P7UVdz1Mg2CWe5SGs.json
-# Exception for Firebase rules which should be tracked
-!firebase.rules.json
+
+# Exclude all json files that start with firebase EXCEPT firebase.json and rules
+# (Refined from previous *firebase*.json which was too broad)
+firebase-adminsdk-*.json
+
+# Nuxt/Vue specifics
+*.nuxtrc
+
+# Lockfiles (optional, usually you want these but sometimes people ignore them)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Project specific
+pages/nosotros/index.vue
