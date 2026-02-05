@@ -79,6 +79,18 @@ service-account.json
 # Specific key file found in previous gitignore
 CW1hZvYcYm8CG9jWnEejyrWgtgby51P7UVdz1Mg2CWe5SGs.json
 
+# Firebase Rules (Local only, managed in console)
+firebase.rules
+firebase.rules.json
+firebase.rules.fixed.json
+firestore.rules
+storage.rules
+database.rules.json
+*.rules
+
+# Temporary/Junk files
+aaaa.webp
+
 # Exclude all json files that start with firebase EXCEPT firebase.json and rules
 # (Refined from previous *firebase*.json which was too broad)
 firebase-adminsdk-*.json
