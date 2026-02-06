@@ -45,8 +45,7 @@
         :alt="pet.name"
         class="h-full w-full object-cover transition-transform duration-300"
         loading="lazy"
-        sizes="sm:100vw md:50vw lg:33vw xl:25vw"
-        placeholder
+        sizes="320px sm:640px md:768px lg:1024px"
         :quality="70"
         format="webp"
         @error="onImageError"

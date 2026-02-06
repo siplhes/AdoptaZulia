@@ -1,276 +1,183 @@
 <template>
-  <div class="min-h-screen bg-amber-50 py-8">
-    <div class="container mx-auto max-w-3xl px-4">
-      <!-- Título de la página -->
-      <h1 class="mb-6 text-2xl font-bold text-emerald-800">Configuración de perfil</h1>
+  <div class="min-h-screen bg-amber-50 py-12">
+    <div class="container mx-auto max-w-4xl px-4">
+      <!-- Header -->
+      <div class="mb-8 flex items-center justify-between">
+        <div>
+           <h1 class="text-3xl font-bold text-emerald-800">Configuración de Perfil</h1>
+           <p class="text-gray-600 mt-1">Administra tu información personal y preferencias.</p>
+        </div>
+        <NuxtLink to="/perfil" class="text-emerald-600 hover:text-emerald-700 font-medium flex items-center">
+            <Icon name="heroicons:arrow-left" class="w-5 h-5 mr-1" />
+            Volver
+        </NuxtLink>
+      </div>
 
-      <!-- Formulario de configuración -->
-      <div class="overflow-hidden rounded-lg bg-white shadow-lg">
-        <!-- Estado de carga -->
-        <div v-if="loading" class="flex justify-center p-8">
-          <div
-            class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-emerald-600 border-r-transparent align-[-0.125em]"
-          />
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        
+        <!-- Loading State -->
+        <div v-if="loading" class="p-12 flex justify-center">
+           <div class="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></div>
         </div>
 
-        <!-- Error general -->
-        <div v-else-if="error" class="m-6 border-l-4 border-red-500 bg-red-50 p-4">
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <Icon name="heroicons:exclamation-triangle" class="h-5 w-5 text-red-500" />
+        <div v-else class="flex flex-col md:flex-row">
+            <!-- Sidebar / Photo Section -->
+            <div class="md:w-1/3 border-r border-gray-100 bg-gray-50 p-6 md:p-8 flex flex-col items-center">
+                <div class="relative group mb-6">
+                    <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-md bg-emerald-100 flex items-center justify-center">
+                         <NuxtImg
+                            v-if="photoPreview || profileData.photoURL"
+                            :src="photoPreview || profileData.photoURL"
+                            class="w-full h-full object-cover"
+                            fit="cover"
+                         />
+                         <span v-else class="text-4xl text-emerald-600 font-bold">
+                            {{ profileData.displayName?.charAt(0).toUpperCase() || 'U' }}
+                         </span>
+                    </div>
+                    
+                    <!-- Edit Overlay -->
+                    <label class="absolute inset-0 flex items-center justify-center bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
+                        <Icon name="heroicons:camera" class="w-8 h-8" />
+                        <input type="file" ref="fileInput" accept="image/*" class="hidden" @change="handlePhotoChange" />
+                    </label>
+                </div>
+                
+                <h2 class="text-lg font-bold text-gray-900 text-center">{{ profileData.displayName || 'Usuario' }}</h2>
+                <p class="text-sm text-gray-500 mb-6">@{{ profileData.userName || 'username' }}</p>
+
+                <div class="w-full space-y-3">
+                   <button 
+                     @click="$refs.fileInput.click()"
+                     type="button" 
+                     class="w-full py-2 px-4 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
+                   >
+                     Cambiar foto
+                   </button>
+                   <button 
+                     v-if="profileData.photoURL || photoPreview"
+                     @click="removePhoto"
+                     type="button" 
+                     class="w-full py-2 px-4 bg-white border border-red-200 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+                   >
+                     Eliminar foto
+                   </button>
+                </div>
+
+                 <p v-if="photoError" class="mt-3 text-xs text-red-600 text-center">{{ photoError }}</p>
+                 <p class="mt-2 text-xs text-center text-gray-400">JPG, PNG máx 2MB</p>
+
             </div>
-            <div class="ml-3">
-              <p class="text-sm text-red-700">{{ error }}</p>
+
+            <!-- Main Form Section -->
+            <div class="md:w-2/3 p-6 md:p-8">
+               <form @submit.prevent="saveChanges" class="space-y-6">
+                  
+                  <!-- Success Banner -->
+                   <div v-if="successMessage" class="bg-green-50 text-green-700 p-4 rounded-lg flex items-center text-sm border border-green-100">
+                      <Icon name="heroicons:check-circle" class="w-5 h-5 mr-2 text-green-500" />
+                      {{ successMessage }}
+                   </div>
+                   <!-- Error Banner -->
+                   <div v-if="error" class="bg-red-50 text-red-700 p-4 rounded-lg flex items-center text-sm border border-red-100">
+                      <Icon name="heroicons:exclamation-circle" class="w-5 h-5 mr-2 text-red-500" />
+                      {{ error }}
+                   </div>
+
+                   <!-- Basic Info Grid -->
+                   <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                       <div class="col-span-2 md:col-span-2">
+                           <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
+                           <input 
+                             v-model="profileData.displayName"
+                             type="text" 
+                             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 py-2.5"
+                             placeholder="Tu nombre legal"
+                           />
+                       </div>
+
+                       <div>
+                           <label class="block text-sm font-medium text-gray-700 mb-1">Nombre de Usuario</label>
+                           <div class="relative">
+                               <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">@</span>
+                               <input 
+                                 v-model="profileData.userName"
+                                 type="text" 
+                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 py-2.5 pl-8"
+                                 placeholder="username"
+                               />
+                           </div>
+                       </div>
+                       
+                        <div>
+                           <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                           <input 
+                             v-model="profileData.phoneNumber"
+                             type="tel" 
+                             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 py-2.5"
+                             placeholder="+58 412 1234567"
+                           />
+                       </div>
+
+                       <div class="col-span-2">
+                           <label class="block text-sm font-medium text-gray-700 mb-1">Biografía</label>
+                           <textarea 
+                             v-model="profileData.bio"
+                             rows="3" 
+                             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 py-2.5"
+                             placeholder="Cuenta algo sobre ti y tus mascotas..."
+                           ></textarea>
+                           <p class="text-xs text-gray-500 text-right mt-1">{{ profileData.bio ? profileData.bio.length : 0 }}/500</p>
+                       </div>
+
+                       <div class="col-span-2">
+                           <label class="block text-sm font-medium text-gray-700 mb-1">Email <span class="text-xs font-normal text-gray-500">(No modificable)</span></label>
+                           <input 
+                             :value="profileData.email"
+                             type="email" 
+                             disabled
+                             class="w-full rounded-lg border-gray-200 bg-gray-50 text-gray-500 shadow-sm py-2.5 cursor-not-allowed"
+                           />
+                       </div>
+                   </div>
+
+                   <hr class="border-gray-100" />
+
+                   <!-- Notifications -->
+                   <div>
+                       <h3 class="text-lg font-medium text-gray-900 mb-4">Notificaciones</h3>
+                       <div class="space-y-3">
+                           <label class="flex items-center space-x-3 cursor-pointer">
+                               <input v-model="profileData.preferences.emailNotifications" type="checkbox" class="h-5 w-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500" />
+                               <span class="text-gray-700">Recibir correos electrónicos</span>
+                           </label>
+                           <label class="flex items-center space-x-3 cursor-pointer">
+                               <input v-model="profileData.preferences.newPets" type="checkbox" class="h-5 w-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500" />
+                               <span class="text-gray-700">Avisos de nuevas mascotas</span>
+                           </label>
+                           <label class="flex items-center space-x-3 cursor-pointer">
+                               <input v-model="profileData.preferences.adoptionUpdates" type="checkbox" class="h-5 w-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500" />
+                               <span class="text-gray-700">Actualizaciones de mis adopciones</span>
+                           </label>
+                       </div>
+                   </div>
+
+                   <div class="pt-4 flex items-center justify-end space-x-4">
+                       <button type="button" @click="cancel" class="text-gray-600 hover:text-gray-900 font-medium px-4">Cancelar</button>
+                       <LoadingButton 
+                         type="submit" 
+                         variant="primary" 
+                         :loading="isSaving" 
+                         loadingLabel="Guardando..."
+                         class="px-8"
+                       >
+                         Guardar Cambios
+                       </LoadingButton>
+                   </div>
+
+               </form>
             </div>
-          </div>
         </div>
-
-        <!-- Formulario -->
-        <form v-else class="p-6 md:p-8" @submit.prevent="saveChanges" >
-          <!-- Mensaje de éxito -->
-          <div v-if="successMessage" class="mb-6 border-l-4 border-green-500 bg-green-50 p-4">
-            <div class="flex">
-              <div class="flex-shrink-0">
-                <Icon name="heroicons:check-circle" class="h-5 w-5 text-green-500" />
-              </div>
-              <div class="ml-3">
-                <p class="text-sm text-green-700">{{ successMessage }}</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Foto de perfil -->
-          <div class="mb-8">
-            <label class="mb-2 block text-sm font-medium text-gray-700">Foto de perfil</label>
-            <div class="flex items-center space-x-6">
-              <!-- Vista previa de la foto -->
-              <div class="h-24 w-24 overflow-hidden rounded-full border border-gray-200">
-                <NuxtImg
-                  v-if="photoPreview || profileData.photoURL"
-                  :src="photoPreview || profileData.photoURL"
-                  alt="Foto de perfil"
-                  class="h-full w-full object-cover"
-                  loading="lazy"
-                />
-                <div v-else class="flex h-full w-full items-center justify-center bg-emerald-100">
-                  <span class="text-3xl font-bold text-emerald-600">
-                    {{ profileData.displayName?.charAt(0).toUpperCase() || 'U' }}
-                  </span>
-                </div>
-              </div>
-
-              <!-- Botones para la foto -->
-              <div class="flex flex-col space-y-2">
-                <label
-                  class="inline-flex cursor-pointer items-center rounded-md bg-emerald-500 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600"
-                >
-                  <Icon name="heroicons:arrow-up-tray" class="mr-2 h-4 w-4" />
-                  Cambiar foto
-                  <input
-                     ref="fileInput"
-                    type="file"
-                    accept="image/*"
-                    class="hidden"
-                    @change="handlePhotoChange"
-                  >
-                </label>
-                <button
-                  v-if="photoPreview || profileData.photoURL"
-                  type="button"
-                  class="rounded-md border border-red-500 px-4 py-2 text-sm font-medium text-red-500 hover:bg-red-50"
-                  @click="removePhoto"
-                >
-                  <Icon name="heroicons:trash" class="mr-2 inline-block h-4 w-4" />
-                  Eliminar foto
-                </button>
-              </div>
-            </div>
-            <p v-if="photoError" class="mt-1 text-sm text-red-600">{{ photoError }}</p>
-            <p class="mt-1 text-xs text-gray-500">
-              Formatos permitidos: JPG, PNG. Tamaño máximo: 2MB.
-            </p>
-          </div>
-
-          <!-- Información básica -->
-          <div class="border-t border-gray-200 pt-6">
-            <h2 class="mb-4 text-lg font-medium text-gray-900">Información básica</h2>
-
-            <!-- Nombre completo -->
-            <div class="mb-4">
-              <label for="displayName" class="mb-1 block text-sm font-medium text-gray-700">
-                Nombre completo
-              </label>
-              <input
-                id="displayName"
-                v-model="profileData.displayName"
-                type="text"
-                class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-                placeholder="Tu nombre y apellido"
-              >
-            </div>
-
-            <!-- Nombre de usuario -->
-            <div class="mb-4">
-              <label for="userName" class="mb-1 block text-sm font-medium text-gray-700">
-                Nombre de usuario
-              </label>
-              <div class="relative rounded-md shadow-sm">
-                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <span class="text-gray-500 sm:text-sm">@</span>
-                </div>
-                <input
-                  id="userName"
-                  v-model="profileData.userName"
-                  type="text"
-                  class="w-full rounded-md border border-gray-300 py-2 pl-8 pr-3 focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-                  placeholder="username"
-                >
-              </div>
-              <p class="mt-1 text-xs text-gray-500">
-                Este nombre de usuario será utilizado para tu perfil público: adoptazulia.com/{{
-                  profileData.userName
-                }}
-              </p>
-            </div>
-
-            <!-- Email (solo lectura) -->
-            <div class="mb-4">
-              <label for="email" class="mb-1 block text-sm font-medium text-gray-700">
-                Correo electrónico
-              </label>
-              <input
-                id="email"
-                :value="profileData.email"
-                type="email"
-                readonly
-                disabled
-                class="w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 shadow-sm"
-              >
-              <p class="mt-1 text-xs text-gray-500">
-                Para cambiar tu correo electrónico, contacta con soporte.
-              </p>
-            </div>
-
-            <!-- Teléfono -->
-            <div class="mb-4">
-              <label for="phoneNumber" class="mb-1 block text-sm font-medium text-gray-700">
-                Teléfono
-              </label>
-              <input
-                id="phoneNumber"
-                v-model="profileData.phoneNumber"
-                type="tel"
-                class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-                placeholder="+58 412 1234567"
-              >
-              <p class="mt-1 text-xs text-gray-500">
-                Se mostrará solo en tu perfil si estás autenticado.
-              </p>
-            </div>
-
-            <!-- Biografía -->
-            <div class="mb-4">
-              <label for="bio" class="mb-1 block text-sm font-medium text-gray-700">
-                Biografía
-              </label>
-              <textarea
-                id="bio"
-                v-model="profileData.bio"
-                rows="4"
-                class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-                placeholder="Cuéntanos un poco sobre ti..."
-              />
-              <p class="mt-1 text-xs text-gray-500">
-                {{ profileData.bio ? profileData.bio.length : 0 }}/500 caracteres
-              </p>
-            </div>
-          </div>
-
-          <!-- Preferencias de notificaciones (para futura implementación) -->
-          <div class="border-t border-gray-200 pt-6">
-            <h2 class="mb-4 text-lg font-medium text-gray-900">Preferencias de notificaciones</h2>
-
-            <div class="space-y-3">
-              <div class="flex items-center">
-                <input
-                  id="emailNotifications"
-                  v-model="profileData.preferences.emailNotifications"
-                  type="checkbox"
-                  class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                >
-                <label for="emailNotifications" class="ml-3 text-sm text-gray-700">
-                  Recibir notificaciones por correo electrónico
-                </label>
-              </div>
-
-              <div class="flex items-center">
-                <input
-                  id="newPets"
-                  v-model="profileData.preferences.newPets"
-                  type="checkbox"
-                  class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                >
-                <label for="newPets" class="ml-3 text-sm text-gray-700">
-                  Notificarme sobre nuevas mascotas en adopción
-                </label>
-              </div>
-
-              <div class="flex items-center">
-                <input
-                  id="adoptionUpdates"
-                  v-model="profileData.preferences.adoptionUpdates"
-                  type="checkbox"
-                  class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                >
-                <label for="adoptionUpdates" class="ml-3 text-sm text-gray-700">
-                  Notificarme sobre actualizaciones de mis adopciones
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <!-- Botones de acción -->
-          <div class="mt-6 flex justify-end space-x-3 border-t border-gray-200 pt-6">
-            <button
-              type="button"
-            
-              class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
-                @click="cancel"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              class="rounded-md border border-transparent bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 disabled:opacity-70"
-              :disabled="loading"
-            >
-              <span v-if="loading">
-                <svg
-                  class="-ml-1 mr-2 inline-block h-4 w-4 animate-spin text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                 />
-                  <path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-                </svg>
-                Guardando...
-              </span>
-              <span v-else>Guardar cambios</span>
-            </button>
-          </div>
-        </form>
       </div>
     </div>
   </div>
@@ -281,21 +188,15 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '~/composables/useAuth'
 import { useS3 } from '~/composables/useS3'
+import LoadingButton from '~/components/ui/LoadingButton.vue'
 
-// Composables
 const router = useRouter()
-const {
-  user,
-  userProfile,
-  updateProfile,
-  loading: authLoading,
-  error: authError,
-  isAuthenticated,
-} = useAuth()
-const { uploadFile } = useS3() // Corregido: desestructurar uploadFile en lugar de uploadImage
+const { user, userProfile, updateProfile, isAuthenticated } = useAuth()
+const { uploadFile } = useS3()
 
-// Estado local
-const loading = ref(false)
+// State
+const loading = ref(true)
+const isSaving = ref(false)
 const error = ref(null)
 const successMessage = ref(null)
 const photoPreview = ref(null)
@@ -303,7 +204,6 @@ const photoError = ref(null)
 const fileInput = ref(null)
 const photoFile = ref(null)
 
-// Datos del perfil
 const profileData = reactive({
   displayName: '',
   userName: '',
@@ -318,128 +218,96 @@ const profileData = reactive({
   },
 })
 
-// Cargar datos del perfil al montar el componente
+// Initialize
 onMounted(async () => {
-  // Verificar si el usuario está autenticado
   if (!isAuthenticated.value) {
     router.push('/login')
     return
   }
-
+  
   try {
-    loading.value = true
-
-    // Cargar datos del perfil desde userProfile
-    if (userProfile.value) {
-      profileData.displayName = userProfile.value.displayName || ''
-      profileData.userName = userProfile.value.userName || ''
-      profileData.email = userProfile.value.email || ''
-      profileData.phoneNumber = userProfile.value.phoneNumber || ''
-      profileData.bio = userProfile.value.bio || ''
-      profileData.photoURL = userProfile.value.photoURL || ''
-
-      // Cargar preferencias de notificaciones (si existen)
-      if (userProfile.value.preferences) {
-        profileData.preferences = {
-          ...profileData.preferences,
-          ...userProfile.value.preferences,
-        }
-      }
-    }
-  } catch (err) {
-    console.error('Error al cargar perfil:', err)
-    error.value = 'Error al cargar la información del perfil'
+     if (userProfile.value) {
+        Object.assign(profileData, {
+           displayName: userProfile.value.displayName || '',
+           userName: userProfile.value.userName || '',
+           email: userProfile.value.email || '',
+           phoneNumber: userProfile.value.phoneNumber || '',
+           bio: userProfile.value.bio || '',
+           photoURL: userProfile.value.photoURL || '',
+           preferences: { ...profileData.preferences, ...(userProfile.value.preferences || {}) }
+        })
+     }
+  } catch (e) {
+     error.value = 'Error cargando datos del perfil.'
   } finally {
-    loading.value = false
+     loading.value = false
   }
 })
 
-// Manejar cambio de foto
-const handlePhotoChange = (event) => {
-  const file = event.target.files[0]
-  photoError.value = null
-
-  if (!file) return
-
-  // Validar tipo de archivo
-  const validTypes = ['image/jpeg', 'image/png', 'image/jpg']
-  if (!validTypes.includes(file.type)) {
-    photoError.value = 'El archivo debe ser una imagen (JPG o PNG)'
-    return
-  }
-
-  // Validar tamaño (2MB)
-  if (file.size > 2 * 1024 * 1024) {
-    photoError.value = 'La imagen no debe superar los 2MB'
-    return
-  }
-
-  // Crear preview
-  photoFile.value = file
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    photoPreview.value = e.target.result
-  }
-  reader.readAsDataURL(file)
+// Photo Logic
+const handlePhotoChange = (e) => {
+   const file = e.target.files[0]
+   if (!file) return
+   
+   if (!['image/jpeg', 'image/png'].includes(file.type)) {
+      photoError.value = 'Formato no válido (Solo JPG/PNG)'
+      return
+   }
+   if (file.size > 2 * 1024 * 1024) {
+      photoError.value = 'La imagen excede 2MB'
+      return
+   }
+   
+   photoError.value = null
+   photoFile.value = file
+   
+   const reader = new FileReader()
+   reader.onload = (ev) => photoPreview.value = ev.target.result
+   reader.readAsDataURL(file)
 }
 
-// Eliminar foto
 const removePhoto = () => {
-  photoPreview.value = null
-  photoFile.value = null
-  profileData.photoURL = ''
-  if (fileInput.value) {
-    fileInput.value.value = ''
-  }
+    photoPreview.value = null
+    photoFile.value = null
+    profileData.photoURL = ''
+    if(fileInput.value) fileInput.value.value = ''
 }
 
-// Cancelar cambios
-const cancel = () => {
-  router.back()
-}
+// Actions
+const cancel = () => router.back()
 
-// Guardar cambios
 const saveChanges = async () => {
-  try {
-    loading.value = true
+    isSaving.value = true
     error.value = null
     successMessage.value = null
-
-    let photoURL = profileData.photoURL
-
-    // Si hay una nueva foto, subirla primero
-    if (photoFile.value) {
-      photoURL = await uploadFile(photoFile.value, 'profile-photos', `profile_${Date.now()}.jpg`)
+    
+    try {
+        let currentPhotoURL = profileData.photoURL
+        
+        if (photoFile.value) {
+            currentPhotoURL = await uploadFile(photoFile.value, 'profile-photos', `profile_${user.value.uid}_${Date.now()}.jpg`)
+        }
+        
+        await updateProfile(
+            profileData.displayName,
+            currentPhotoURL,
+            profileData.bio,
+            profileData.phoneNumber,
+            profileData.userName
+        )
+        
+        // Update local state if needed for immediate feedback logic
+        profileData.photoURL = currentPhotoURL
+        photoFile.value = null
+        photoPreview.value = null
+        
+        successMessage.value = '¡Perfil actualizado correctamente!'
+        
+    } catch (e) {
+        console.error(e)
+        error.value = 'No se pudieron guardar los cambios.'
+    } finally {
+        isSaving.value = false
     }
-
-    // Actualizar perfil
-    await updateProfile(
-      profileData.displayName,
-      photoURL,
-      profileData.bio,
-      profileData.phoneNumber,
-      profileData.userName
-    )
-
-    // Mostrar mensaje de éxito
-    successMessage.value = 'Perfil actualizado correctamente'
-
-    // Limpiar el file input
-    if (fileInput.value) {
-      fileInput.value.value = ''
-    }
-
-    // Reset de la foto temporal
-    photoFile.value = null
-    photoPreview.value = null
-
-    // Actualizamos la URL de la foto en el perfil local
-    profileData.photoURL = photoURL
-  } catch (err) {
-    console.error('Error al actualizar perfil:', err)
-    error.value = 'Error al guardar los cambios. Por favor, inténtalo de nuevo.'
-  } finally {
-    loading.value = false
-  }
 }
 </script>

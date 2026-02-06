@@ -110,8 +110,6 @@ const loadFeaturedPets = async () => {
     
     if (featured && featured.length > 0) {
       featuredPets.value = featured
-    } else {
-      console.warn('No se encontraron mascotas destacadas')
     }
   } catch (err) {
     console.error('Error al cargar mascotas destacadas:', err)

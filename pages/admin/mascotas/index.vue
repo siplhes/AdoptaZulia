@@ -300,58 +300,15 @@
         </div>
       </div>
 
-      <!-- Delete Confirmation Modal -->
-      <div
-        v-if="showDeleteModal"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
-      >
-        <div class="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
-          <div class="mb-4 flex items-start justify-between">
-            <h3 class="text-xl font-semibold text-gray-900">Confirmar eliminación</h3>
-            <button
-              type="button"
-              class="ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900"
-              @click="showDeleteModal = false"
-            >
-              <XIcon class="h-5 w-5" />
-            </button>
-          </div>
-          <div class="flex items-center space-x-4">
-            <div class="flex-shrink-0">
-              <NuxtImg
-                :src="petToDelete?.image"
-                :alt="petToDelete?.name"
-                class="h-14 w-14 rounded-full object-cover"
-                @error="handleImageError"
-              />
-            </div>
-            <div>
-              <p class="text-sm text-gray-500">
-                ¿Estás seguro de que deseas eliminar a
-                <span class="font-semibold">{{ petToDelete?.name }}</span>
-                ?
-              </p>
-              <p class="text-sm text-red-500">Esta acción no se puede deshacer.</p>
-            </div>
-          </div>
-          <div class="mt-6 flex justify-end space-x-4">
-            <button
-              type="button"
-              class="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-              @click="showDeleteModal = false"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              class="rounded-lg bg-red-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-700"
-              @click="deletePet"
-            >
-              Eliminar
-            </button>
-          </div>
-        </div>
-      </div>
+      <!-- Modal para confirmación/alertas -->
+      <ModalAlert
+        :show="showModal"
+        :type="modalType"
+        :title="modalTitle"
+        :message="modalMessage"
+        :confirm-button-text="modalConfirmText"
+        @confirm="confirmAction"
+      />
     </div>
   </div>
 </template>
@@ -360,7 +317,6 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import {
-  AlertCircleIcon,
   RefreshCwIcon,
   FilterIcon,
   SearchIcon,
@@ -369,9 +325,10 @@ import {
   TrashIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  XIcon,
+  AlertCircleIcon,
 } from 'lucide-vue-next'
 import { usePets } from '~/composables/usePets'
+import ModalAlert from '~/components/common/ModalAlert.vue'
 
 // Verificar si el usuario es administrador
 definePageMeta({
@@ -393,9 +350,13 @@ const filters = ref({
 const currentPage = ref(1)
 const pageSize = 10
 
-// Estado para modal de eliminación
-const showDeleteModal = ref(false)
-const petToDelete = ref(null)
+// Estado para el modal global
+const showModal = ref(false)
+const modalType = ref('')
+const modalTitle = ref('')
+const modalMessage = ref('')
+const modalConfirmText = ref('')
+let confirmAction = () => {}
 
 // Computar mascotas filtradas
 const filteredPets = computed(() => {
@@ -492,23 +453,25 @@ function editPet(petId) {
 }
 
 function confirmDelete(pet) {
-  petToDelete.value = pet
-  showDeleteModal.value = true
-}
-
-async function deletePet() {
-  if (!petToDelete.value) return
-
-  try {
-    await deletePetById(petToDelete.value.id)
-    showDeleteModal.value = false
-    petToDelete.value = null
-
-    // Recargar la lista después de eliminar
-    await loadPets()
-  } catch (err) {
-    console.error('Error al eliminar mascota:', err)
+  modalType.value = 'delete'
+  modalTitle.value = 'Confirmar eliminación'
+  modalMessage.value = `¿Estás seguro de que deseas eliminar a ${pet.name}? Esta acción no se puede deshacer.`
+  modalConfirmText.value = 'Eliminar'
+  
+  confirmAction = async () => {
+    showModal.value = false
+    try {
+      loading.value = true // Manually set loading if needed, or rely on composable
+      await deletePetById(pet.id)
+      await loadPets()
+    } catch (err) {
+      console.error('Error al eliminar mascota:', err)
+      // Show error modal if needed
+    } finally {
+      loading.value = false
+    }
   }
+  showModal.value = true
 }
 
 async function updatePetStatus(pet) {

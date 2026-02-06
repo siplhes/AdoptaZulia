@@ -1467,8 +1467,66 @@ export function useAdoptions() {
     }
   }
 
+  /**
+   * Obtiene los datos de una verificación de adopción por su ID
+   */
+  async function fetchVerification(vid: string): Promise<any | null> {
+    loading.value = true
+    error.value = null
+    try {
+      const firebaseApp = useFirebaseApp()
+      const db = getDatabase(firebaseApp)
+      const snap = await get(dbRef(db, `adoptionVerifications/${vid}`))
+      
+      if (!snap.exists()) return null
+      
+      return snap.val()
+    } catch (e: any) {
+      console.error('Error fetching verification:', e)
+      error.value = 'Error al cargar la verificación'
+      return null
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
+   * Obtiene la solicitud de adopción de un usuario para una mascota específica
+   */
+  async function getAdoptionByPetAndUser(petId: string, userId: string): Promise<Adoption | null> {
+    loading.value = true
+    try {
+       // Check cache first
+       const cached = Array.from(cache.adoptions.values()).find(a => a.petId === petId && a.userId === userId)
+       if (cached) return cached
+
+       const firebaseApp = useFirebaseApp()
+       const db = getDatabase(firebaseApp)
+       const adoptionsRef = dbRef(db, 'adoptions')
+       const q = query(adoptionsRef, orderByChild('userId'), equalTo(userId))
+       const snapshot = await get(q)
+       
+       if (snapshot.exists()) {
+           const val = snapshot.val()
+           const key = Object.keys(val).find(k => val[k].petId === petId)
+           if (key) {
+               const adoption = { id: key, ...val[key] } as Adoption
+               cache.adoptions.set(key, adoption)
+               return adoption
+           }
+       }
+       return null
+    } catch (e) {
+        console.warn(e)
+        return null 
+    } finally { loading.value = false }
+  }
+
+
+
   // Exportar funciones y valores reactivos
   return {
+    getAdoptionByPetAndUser,
     adoptions,
     loading,
     error,
@@ -1485,6 +1543,7 @@ export function useAdoptions() {
     checkAdoptionRequestForPet,
     findAdoptionsByPetId,
     confirmAdoptionAndVerify,
+    fetchVerification,
     hasUserRequestedAdoption,
     getOwnerAdoptionStats
   }

@@ -12,7 +12,8 @@
     "analyze": "nuxt analyze",
     "lint": "eslint --ext .js,.ts,.vue .gitignore .",
     "lint:fix": "eslint --fix ./",
-    "format": "prettier --write \"**/*.{html,vue,svelte,astro,js,jsx,cjs,mjs,ts,tsx,cts,mts,css,md,mdx,json}\" !public --ignore-path .gitignore"
+    "format": "prettier --write \"**/*.{html,vue,svelte,astro,js,jsx,cjs,mjs,ts,tsx,cts,mts,css,md,mdx,json}\" !public --ignore-path .gitignore",
+    "test": "vitest"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.782.0",
@@ -46,12 +47,15 @@
     "vuefire": "^3.2.1"
   },
   "devDependencies": {
+    "@iconify-json/heroicons": "^1.2.3",
     "@iconify-json/logos": "^1.2.4",
     "@iconify-json/mdi": "^1.2.3",
     "@nuxtjs/color-mode": "^3.5.2",
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@pinia/nuxt": "^0.10.1",
+    "happy-dom": "^20.5.0",
     "prettier": "^3.5.3",
-    "prettier-plugin-tailwindcss": "^0.6.11"
+    "prettier-plugin-tailwindcss": "^0.6.11",
+    "vitest": "^3.2.4"
   }
 }

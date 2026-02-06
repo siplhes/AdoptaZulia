@@ -111,178 +111,16 @@
         </div>
 
         <!-- Listado de mascotas -->
+        <!-- Listado de mascotas -->
         <div v-if="filteredPets.length > 0" class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          <div
+          <UserPetCard
             v-for="pet in filteredPets"
             :key="pet.id"
-            class="overflow-hidden rounded-lg bg-white shadow-md"
-          >
-            <div class="relative">
-              <NuxtImg
-                :src="pet.image"
-                :alt="pet.name"
-                class="h-44 sm:h-48 md:h-48 lg:h-56 w-full object-cover"
-                sizes="sm:100vw md:50vw lg:33vw"
-                placeholder
-                @error="handleImageError"
-              />
-              <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"/>
-              <div class="absolute bottom-3 left-3">
-                <h3 class="font-medium text-white">{{ pet.name }}</h3>
-                <p class="text-sm text-gray-200">{{ formatType(pet.type) }}</p>
-              </div>
-              
-              <!-- Etiqueta de estado -->
-              <div class="absolute right-3 top-3">
-                <span
-                  class="rounded-full px-3 py-1 text-xs font-semibold"
-                  :class="{
-                    'bg-emerald-100 text-emerald-800': !pet.status || pet.status === 'available',
-                    'bg-amber-100 text-amber-800': pet.status === 'pending',
-                    'bg-blue-100 text-blue-800': pet.status === 'adopted',
-                    'bg-red-100 text-red-800': pet.status === 'unavailable'
-                  }"
-                >
-                  {{ getStatusText(pet.status) }}
-                </span>
-              </div>
-            </div>
-            
-            <div class="p-4">
-              <div class="mb-4 flex items-center justify-between">
-                <span class="text-sm text-gray-500">Publicado: {{ formatDate(pet.createdAt) }}</span>
-                <span class="flex items-center text-sm text-gray-500">
-                  <Icon name="heroicons:eye" class="mr-1 h-4 w-4" />
-                  {{ pet.views || 0 }}
-                </span>
-              </div>
-
-              <!-- Solicitudes de adopción (preview + ver más) -->
-              <div class="mb-4">
-                <div class="flex items-center justify-between">
-                  <span class="text-sm text-gray-700">{{ pet.adoptionRequestsCount || 0 }} solicitudes</span>
-                  <div class="flex items-center gap-3">
-                    <button
-                      :aria-expanded="showRequestsFor === pet.id ? 'true' : 'false'"
-                      :aria-controls="`requests-${pet.id}`"
-                      class="text-sm text-emerald-600 hover:text-emerald-800"
-                      @click="toggleRequests(pet.id)"
-                    >
-                      {{ showRequestsFor === pet.id ? 'Ocultar solicitudes' : 'Ver solicitudes' }}
-                    </button>
-                    <NuxtLink
-                      :to="`/adopciones/${pet.id}`"
-                      class="hidden sm:inline-block text-sm text-emerald-600 hover:text-emerald-800"
-                    >
-                      Ver en página
-                    </NuxtLink>
-                  </div>
-                </div>
-
-                <!-- Collapsible preview -->
-                <div
-                  v-if="showRequestsFor === pet.id"
-                  :id="`requests-${pet.id}`"
-                  class="mt-3 rounded-md border border-gray-100 bg-gray-50 p-3"
-                >
-                  <div v-if="requestsCache[pet.id] && requestsCache[pet.id].length > 0">
-                    <div
-                      v-for="req in requestsCache[pet.id].slice(0,5)"
-                      :key="req.id"
-                      class="flex items-center justify-between py-2"
-                    >
-                      <div class="flex items-center">
-                        <div class="h-8 w-8 overflow-hidden rounded-full bg-emerald-100">
-                          <img v-if="req.user?.photoURL" :src="req.user.photoURL" :alt="req.user?.name || 'Usuario'" class="h-full w-full object-cover" />
-                          <div v-else class="flex h-full w-full items-center justify-center font-bold text-emerald-700">{{ getInitials(req.user?.name || req.user?.email || 'U') }}</div>
-                        </div>
-                        <div class="ml-3">
-                          <p class="text-sm font-medium text-gray-900">{{ req.user?.name || req.user?.email || 'Usuario' }}</p>
-                          <p class="text-xs text-gray-500">{{ formatShortDate(req.createdAt) }} — <span class="capitalize">{{ req.status }}</span></p>
-                        </div>
-                      </div>
-                      <div class="text-sm text-gray-500">
-                        <NuxtLink :to="`/mi-solicitud/${req.id}`" class="text-emerald-600 hover:text-emerald-800">Ver solicitud</NuxtLink>
-                      </div>
-                    </div>
-                    <div v-if="requestsCache[pet.id].length > 5" class="mt-2 text-xs text-gray-500">Mostrando 5 de {{ requestsCache[pet.id].length }} solicitudes</div>
-                  </div>
-                  <div v-else class="text-sm text-gray-500">No hay solicitudes aún.</div>
-                </div>
-              </div>
-
-              <!-- Acciones -->
-              <div class="grid grid-cols-2 gap-2">
-                <NuxtLink
-                  :to="`/mascotas/${pet.id}`"
-                  class="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50"
-                >
-                  <Icon name="heroicons:eye" class="mr-1 h-4 w-4" />
-                  Ver
-                </NuxtLink>
-                
-                <button
-                  :aria-expanded="showMenuFor === pet.id ? 'true' : 'false'"
-                  aria-controls="menu-{{pet.id}}"
-                  class="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-700 hover:bg-gray-50"
-                  @click="showMenuFor = pet.id === showMenuFor ? null : pet.id"
-                >
-                  <Icon name="heroicons:ellipsis-horizontal" class="h-5 w-5" aria-hidden="true" />
-                  <span class="sr-only">Más opciones</span>
-                </button>
-              </div>
-              
-              <!-- Menú desplegable de opciones -->
-                <div
-                v-if="showMenuFor === pet.id"
-                :id="`menu-${pet.id}`"
-                class="mt-2 divide-y divide-gray-100 rounded-md border border-gray-200 bg-white"
-              >
-                <NuxtLink
-                  :to="`/publicar/editar/${pet.id}`"
-                  class="flex w-full items-center px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
-                >
-                  <Icon name="heroicons:pencil-square" class="mr-2 h-4 w-4" />
-                  Editar
-                </NuxtLink>
-                
-                <button
-                  v-if="!pet.status || pet.status === 'available'"
-                  class="flex w-full items-center px-4 py-2 text-left text-sm text-yellow-700 hover:bg-gray-50"
-                  @click="updatePetStatus(pet.id, 'unavailable')"
-                >
-                  <Icon name="heroicons:pause" class="mr-2 h-4 w-4" />
-                  Pausar publicación
-                </button>
-                
-                <button
-                  v-if="pet.status === 'unavailable'"
-                  class="flex w-full items-center px-4 py-2 text-left text-sm text-emerald-700 hover:bg-gray-50"
-                  @click="updatePetStatus(pet.id, 'available')"
-                >
-                  <Icon name="heroicons:play" class="mr-2 h-4 w-4" />
-                  Reactivar publicación
-                </button>
-                
-                <button
-                  v-if="!pet.status || pet.status !== 'adopted'"
-                  class="flex w-full items-center px-4 py-2 text-left text-sm text-blue-700 hover:bg-gray-50"
-                  @click="markAsAdopted(pet)"
-                >
-                  <Icon name="heroicons:check-badge" class="mr-2 h-4 w-4" />
-                  Marcar como adoptada
-                </button>
-                
-                <button
-                  class="flex w-full items-center px-4 py-2 text-left text-sm text-red-700 hover:bg-gray-50"
-                  @click="confirmDeletePet(pet.id)"
-                >
-                  <Icon name="heroicons:trash" class="mr-2 h-4 w-4" />
-                  Eliminar
-                </button>
-              </div>
-            </div>
-          </div>
+            :pet="pet"
+            @delete="confirmDeletePet"
+            @update-status="handleStatusUpdate"
+            @mark-adopted="markAsAdopted"
+          />
         </div>
         
         <!-- Mensaje cuando no hay resultados con el filtro actual -->
@@ -460,7 +298,7 @@ import { useAdoptions } from '~/composables/useAdoptions'
 import { useAuth } from '~/composables/useAuth'
 import { useFirebaseApp } from 'vuefire'
 import { getDatabase, ref as dbRef, update } from 'firebase/database'
-import ModalAlert from '~/components/common/ModalAlert'
+import UserPetCard from '~/components/user/UserPetCard.vue'
 
 // Rutas y autenticación
 const router = useRouter()
@@ -564,74 +402,6 @@ onMounted(async () => {
   }
 })
 
-// Funciones auxiliares
-const formatDate = (timestamp) => {
-  if (!timestamp) return 'Fecha desconocida'
-  
-  const date = new Date(timestamp)
-  const now = new Date()
-  const diffMs = now - date
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-  
-  if (diffDays === 0) {
-    return 'hoy'
-  } else if (diffDays === 1) {
-    return 'ayer'
-  } else if (diffDays < 7) {
-    return `hace ${diffDays} días`
-  } else if (diffDays < 30) {
-    const weeks = Math.floor(diffDays / 7)
-    return `hace ${weeks} ${weeks === 1 ? 'semana' : 'semanas'}`
-  } else if (diffDays < 365) {
-    const months = Math.floor(diffDays / 30)
-    return `hace ${months} ${months === 1 ? 'mes' : 'meses'}`
-  } else {
-    const years = Math.floor(diffDays / 365)
-    return `hace ${years} ${years === 1 ? 'año' : 'años'}`
-  }
-}
-
-const formatShortDate = (timestamp) => {
-  if (!timestamp) return ''
-  
-  const date = new Date(timestamp)
-  return date.toLocaleDateString('es-ES', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric'
-  })
-}
-
-const formatType = (type) => {
-  switch (type) {
-    case 'perro':
-      return 'Perro'
-    case 'gato':
-      return 'Gato'
-    case 'ave':
-      return 'Ave'
-    case 'conejo':
-      return 'Conejo'
-    default:
-      return type?.charAt(0).toUpperCase() + type?.slice(1) || 'No especificado'
-  }
-}
-
-const getStatusText = (status) => {
-  switch (status) {
-    case 'available':
-      return 'Disponible'
-    case 'pending':
-      return 'Reservada'
-    case 'adopted':
-      return 'Adoptada'
-    case 'unavailable':
-      return 'Pausada'
-    default:
-      return 'Disponible'
-  }
-}
-
 const getInitials = (name) => {
   if (!name) return 'U'
   return name
@@ -640,10 +410,6 @@ const getInitials = (name) => {
     .join('')
     .toUpperCase()
     .substring(0, 2)
-}
-
-const handleImageError = (event) => {
-  event.target.src = '/placeholder.webp'
 }
 
 // Funciones de gestión de publicaciones
@@ -673,26 +439,6 @@ const confirmDeletePet = (petId) => {
   showModal.value = true
 }
 
-// Toggle showing requests inline and fetch if not cached
-const toggleRequests = async (petId) => {
-  if (showRequestsFor.value === petId) {
-    showRequestsFor.value = null
-    return
-  }
-
-  // Open and ensure cached
-  showRequestsFor.value = petId
-  if (!requestsCache.value[petId]) {
-    try {
-      const requests = await findAdoptionsByPetId(petId)
-      requestsCache.value[petId] = requests
-    } catch (err) {
-      console.error('Error al cargar solicitudes inline:', err)
-      requestsCache.value[petId] = []
-    }
-  }
-}
-
 const showAlert = (title, message) => {
   modalType.value = 'alert'
   modalTitle.value = title
@@ -704,18 +450,17 @@ const showAlert = (title, message) => {
   showModal.value = true
 }
 
-const updatePetStatus = async (petId, status) => {
+const handleStatusUpdate = async ({ id, status }) => {
   try {
     loading.value = true
-    const success = await updatePetStatusAction(petId, status)
+    const success = await updatePetStatusAction(id, status)
     
     if (success) {
       // Actualizar el estado en la UI
-      const index = userPets.value.findIndex(p => p.id === petId)
+      const index = userPets.value.findIndex(p => p.id === id)
       if (index !== -1) {
         userPets.value[index].status = status
       }
-      showMenuFor.value = null
     } else {
       showAlert('Error', 'No se pudo actualizar el estado de la publicación. Por favor, intenta de nuevo.')
     }

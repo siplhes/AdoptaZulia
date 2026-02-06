@@ -1,192 +1,160 @@
 <template>
   <div class="min-h-screen bg-amber-50 py-8">
-    <div class="container mx-auto max-w-4xl px-4">
+    <div class="container mx-auto max-w-5xl px-4">
       <!-- Navegación de regreso -->
-      <div class="mb-8">
+      <div class="mb-6">
         <NuxtLink
           to="/historias"
-          class="inline-flex items-center text-emerald-600 hover:text-emerald-700"
+          class="inline-flex items-center text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
         >
-          <Icon name="heroicons:arrow-left" class="mr-1 h-5 w-5" />
+          <Icon name="heroicons:arrow-left" class="mr-2 h-5 w-5" />
           <span>Volver a historias</span>
         </NuxtLink>
       </div>
 
-      <!-- Mensaje de carga -->
-      <div v-if="isCheckingAdoptions" class="rounded-lg bg-white p-6 text-center shadow-lg md:p-8">
-        <div
-          class="mb-4 inline-block h-10 w-10 animate-spin rounded-full border-4 border-solid border-emerald-600 border-r-transparent align-[-0.125em]"
-        />
-        <p class="text-gray-700">Verificando tus adopciones...</p>
+      <!-- Título Principal -->
+      <div class="mb-8 text-center sm:text-left">
+        <h1 class="text-3xl font-bold text-emerald-800">Comparte tu historia</h1>
+        <p class="text-gray-600 mt-2">Inspira a otros compartiendo tu experiencia de adopción.</p>
       </div>
 
-      <!-- Mensaje si no hay adopciones -->
-      <div v-else-if="!hasAdoptions" class="rounded-lg bg-white p-6 shadow-lg md:p-8">
-        <h1 class="mb-4 text-2xl font-bold text-emerald-800">¡Necesitas adoptar primero!</h1>
-
-        <div class="mb-6 border-l-4 border-amber-500 bg-amber-50 p-4">
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <Icon name="heroicons:information-circle" class="h-5 w-5 text-amber-500" />
-            </div>
-            <div class="ml-3">
-              <p class="text-sm text-amber-700">
-                Para compartir una historia de adopción, primero debes haber adoptado una mascota a
-                través de nuestra plataforma.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <p class="mb-6 text-gray-600">
-          Las historias de adopción son experiencias compartidas por usuarios que han adoptado
-          mascotas. Estas historias inspiran a otros a considerar la adopción y muestran el impacto
-          positivo que las mascotas tienen en nuestras vidas.
-        </p>
-
-        <div class="flex justify-center">
-          <NuxtLink
-            to="/mascotas"
-            class="inline-flex items-center rounded-md border border-transparent bg-emerald-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-emerald-700"
-          >
-            <Icon name="heroicons:heart" class="mr-2" size="20px" />
-            Explora mascotas en adopción
-          </NuxtLink>
-        </div>
+      <!-- Loading State -->
+      <div v-if="isCheckingAdoptions" class="flex flex-col items-center justify-center py-20 bg-white rounded-xl shadow-sm border border-emerald-100">
+        <div class="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mb-4"></div>
+        <p class="text-gray-500 font-medium">Verificando tus adopciones...</p>
       </div>
 
-      <!-- Formulario de creación -->
-      <div v-else class="rounded-lg bg-white p-6 shadow-lg md:p-8">
-        <h1 class="mb-6 text-2xl font-bold text-emerald-800">Comparte tu historia de adopción</h1>
+      <!-- No Adoptions State -->
+      <div v-else-if="!hasAdoptions" class="bg-white rounded-xl shadow-sm border border-amber-200 p-8 text-center max-w-3xl mx-auto">
+         <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Icon name="heroicons:heart" class="w-8 h-8 text-amber-600" />
+         </div>
+         <h2 class="text-2xl font-bold text-gray-900 mb-2">¡Primero necesitas adoptar!</h2>
+         <p class="text-gray-600 mb-6 max-w-lg mx-auto">
+           Para escribir una historia, debes haber completado un proceso de adopción a través de nuestra plataforma. ¡Tu futura mascota te está esperando!
+         </p>
+         <NuxtLink to="/mascotas" class="inline-flex items-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors">
+            Ver mascotas en adopción
+         </NuxtLink>
+      </div>
 
-        <!-- Instrucciones -->
-        <div class="mb-8 border-l-4 border-blue-500 bg-blue-50 p-4">
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <Icon name="heroicons:information-circle" class="h-5 w-5 text-blue-500" />
-            </div>
-            <div class="ml-3">
-              <p class="text-sm text-blue-700">
-                Comparte tu experiencia de adopción para inspirar a otros a adoptar mascotas. Cuenta
-                cómo conociste a tu mascota, cómo ha sido el proceso de adaptación y qué ha
-                significado para ti.
-              </p>
-            </div>
-          </div>
+      <!-- Formulario -->
+      <div v-else class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        
+        <!-- Info Banner -->
+        <div class="bg-emerald-50 p-6 border-b border-emerald-100 flex gap-4 items-start">
+           <Icon name="heroicons:sparkles" class="w-6 h-6 text-emerald-600 shrink-0 mt-0.5" />
+           <div>
+              <h3 class="font-semibold text-emerald-900">¿Qué hace una buena historia?</h3>
+              <p class="text-sm text-emerald-800 mt-1">Cuenta detalles sobre cómo se conocieron, el proceso de adaptación y los momentos divertidos. ¡Las fotos del "antes y después" son muy populares!</p>
+           </div>
         </div>
 
-        <!-- Formulario de creación -->
-        <form @submit.prevent="submitStory">
-          <!-- Título de la historia -->
-          <div class="mb-6">
-            <label for="title" class="mb-1 block text-sm font-medium text-gray-700">
-              Título de tu historia *
-            </label>
-            <input
-              id="title"
-              v-model="storyData.title"
-              type="text"
-              required
-              maxlength="100"
-              class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-              placeholder="Ej: 'Cómo Luna cambió nuestras vidas' o 'Mi aventura con Max'"
-            >
-            <p class="mt-1 text-xs text-gray-500">{{ storyData.title.length }}/100 caracteres</p>
-          </div>
-
-          <!-- Selección de mascota -->
-          <div class="mb-6">
-            <label for="pet" class="mb-1 block text-sm font-medium text-gray-700">
-              Mascota adoptada
-            </label>
-            <select
-              id="pet"
-              v-model="storyData.petId"
-              @change="() => checkSelectedPetStory(storyData.petId)"
-              class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-            >
-              <option value="" selected>Sin mascota asociada</option>
-              <option v-for="pet in adoptedPets" :key="pet.id" :value="pet.id">
-                {{ pet.name }} ({{ formatType(pet.type) }})
-              </option>
-            </select>
-            <p class="mt-1 text-xs text-gray-500">
-              Selecciona la mascota sobre la que trata esta historia
-            </p>
-            <div v-if="selectedPetHasStory" class="mt-2 rounded-md border-l-4 border-amber-500 bg-amber-50 p-3 text-sm text-amber-800">
-              Ya existe una historia publicada para esta mascota. Solo el adoptante, el dueño anterior o un administrador pueden editarla.
+        <form @submit.prevent="submitStory" class="p-6 md:p-8 space-y-6">
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Título -->
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Título de tu historia <span class="text-red-500">*</span></label>
+              <input
+                v-model="storyData.title"
+                type="text"
+                required
+                maxlength="100"
+                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 py-2.5"
+                placeholder="Ej: Un nuevo comienzo para Luna"
+              >
             </div>
-          </div>
 
-          <!-- Contenido de la historia -->
-          <div class="mb-6">
-            <label for="content" class="mb-1 block text-sm font-medium text-gray-700">
-              Tu historia *
-            </label>
-            <textarea
-              id="content"
-              v-model="storyData.content"
-              rows="10"
-              required
-              maxlength="5000"
-              class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-              placeholder="Comparte tu experiencia de adopción. ¿Cómo conociste a tu mascota? ¿Cómo ha sido la adaptación? ¿Qué ha significado para ti?"
-            />
-            <p class="mt-1 text-xs text-gray-500">{{ storyData.content.length }}/5000 caracteres</p>
-          </div>
-
-          <!-- Imágenes -->
-          <div class="mb-8">
-            <label class="mb-1 block text-sm font-medium text-gray-700">Imágenes</label>
-
-            <!-- Botón de carga -->
-            <div class="mb-2 flex flex-wrap gap-4">
-              <label
-                class="flex h-32 w-32 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 hover:border-emerald-500 hover:bg-emerald-50"
+            <!-- Mascota -->
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Mascota protagonista <span class="text-red-500">*</span></label>
+              <select
+                v-model="storyData.petId"
+                @change="() => checkSelectedPetStory(storyData.petId)"
+                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 py-2.5"
               >
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  class="hidden"
-                  @change="handleImageUpload"
-                >
-                <div class="flex flex-col items-center">
-                  <Icon name="heroicons:plus" class="h-8 w-8 text-gray-400" />
-                  <span class="mt-1 text-xs text-gray-500">Añadir imágenes</span>
-                </div>
-              </label>
+                <option value="" disabled>Selecciona una mascota</option>
+                <option v-for="pet in adoptedPets" :key="pet.id" :value="pet.id">
+                  {{ pet.name }} ({{ formatType(pet.type) }})
+                </option>
+              </select>
 
-              <!-- Vista previa de imágenes -->
-              <div
-                v-for="(image, index) in previews"
-                :key="index"
-                class="relative h-32 w-32 overflow-hidden rounded-lg border border-gray-200"
-              >
-                <NuxtImg
-                  :src="image"
-                  class="h-full w-full object-cover"
-                  :alt="`Vista previa ${index + 1}`"
-                />
-                <button
-                  type="button"
-                  class="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-white"
-                  @click="removeImage(index)"
-                >
-                  <Icon name="heroicons:x-mark" class="h-4 w-4" />
-                </button>
+              <!-- Warning if story exists -->
+              <div v-if="selectedPetHasStory" class="mt-3 p-3 bg-amber-50 text-amber-800 text-sm rounded-lg border border-amber-200 flex items-center gap-2">
+                <Icon name="heroicons:exclamation-triangle" class="w-5 h-5 text-amber-500" />
+                <span>Ya existe una historia para esta mascota.</span>
               </div>
             </div>
-            <p class="text-xs text-gray-500">
-              Puedes añadir hasta 5 imágenes (JPG, PNG). Máximo 5MB por imagen.
-            </p>
+
+            <!-- Contenido -->
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Tu Historia <span class="text-red-500">*</span></label>
+              <textarea
+                v-model="storyData.content"
+                rows="12"
+                required
+                maxlength="5000"
+                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+                placeholder="Escribe aquí tu experiencia..."
+              ></textarea>
+              <p class="text-xs text-gray-500 text-right mt-1">{{ storyData.content.length }}/5000 caracteres</p>
+            </div>
+
+            <!-- Imágenes -->
+            <div class="md:col-span-2">
+               <label class="block text-sm font-medium text-gray-700 mb-2">Fotos de la historia (Máx 5)</label>
+               
+               <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                  <!-- Upload Button -->
+                  <div 
+                    v-if="previews.length < 5"
+                    class="aspect-square rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center cursor-pointer hover:border-emerald-500 hover:bg-emerald-50 transition-colors bg-gray-50 bg-opacity-50"
+                    @click="$refs.fileInput.click()"
+                  >
+                     <Icon name="heroicons:camera" class="w-8 h-8 text-gray-400 mb-1" />
+                     <span class="text-xs text-gray-500 font-medium">Añadir foto</span>
+                  </div>
+                  <input
+                    ref="fileInput"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    class="hidden"
+                    @change="handleImageUpload"
+                  >
+
+                  <!-- Previews -->
+                  <div 
+                    v-for="(image, index) in previews"
+                    :key="index"
+                    class="relative aspect-square rounded-xl overflow-hidden border border-gray-200 group shadow-sm"
+                  >
+                    <img :src="image" class="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      class="absolute top-1 right-1 bg-white/90 text-red-500 p-1.5 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110"
+                      @click="removeImage(index)"
+                    >
+                      <Icon name="heroicons:trash" class="w-4 h-4" />
+                    </button>
+                    
+                     <!-- Upload Progress Overlay (Simulated for this form structure) -->
+                    <div v-if="uploadProgress[index] !== undefined && uploadProgress[index] < 100" class="absolute inset-0 bg-black/50 flex items-center justify-center">
+                       <span class="text-white text-xs font-bold">{{ uploadProgress[index] }}%</span>
+                    </div>
+                  </div>
+               </div>
+            </div>
           </div>
 
-          <!-- Botones de acción -->
-          <div class="flex justify-end space-x-3">
+          <hr class="border-gray-100" />
+
+          <!-- Actions -->
+          <div class="flex items-center justify-end gap-3 pt-2">
             <NuxtLink
               to="/historias"
-              class="rounded-md border border-gray-300 bg-white px-6 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+              class="px-6 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
             >
               Cancelar
             </NuxtLink>
@@ -195,11 +163,12 @@
               :loading="loading"
               :disabled="!isFormValid || selectedPetHasStory"
               variant="primary"
-              loadingLabel="Guardando..."
+              class="px-8 py-2.5"
             >
-              Publicar historia
+              Publicar Historia
             </LoadingButton>
           </div>
+
         </form>
       </div>
     </div>
@@ -213,20 +182,40 @@ import { useAuth } from '~/composables/useAuth'
 import { useAdoptionStories } from '~/composables/useAdoptionStories'
 import { usePets } from '~/composables/usePets'
 import { useS3 } from '~/composables/useS3'
-import LoadingButton from '~/components/LoadingButton.vue'
+import LoadingButton from '~/components/ui/LoadingButton.vue'
 import { useToast } from '~/composables/useToast'
 import { useFirebaseApp } from 'vuefire'
 import { getDatabase, ref as dbRef, query, orderByChild, equalTo, get } from 'firebase/database'
 
-// Router y composables
+// Router & Composables
 const router = useRouter()
 const { user, isAuthenticated } = useAuth()
 const { createStory } = useAdoptionStories()
 const { fetchUserPets } = usePets()
-const { uploadImage } = useS3()
+const { uploadFileWithProgress } = useS3() // Updated to use progress capable uploader
 const { success: toastSuccess, error: toastError } = useToast()
 
-// Redireccionar si no está autenticado
+// State
+const loading = ref(false)
+const isCheckingAdoptions = ref(true)
+const hasAdoptions = ref(false)
+const adoptedPets = ref([])
+const error = ref(null)
+const selectedPetHasStory = ref(false)
+
+// Form Data
+const storyData = ref({
+  title: '',
+  content: '',
+  petId: '',
+})
+
+// Images
+const images = ref([])
+const previews = ref([])
+const uploadProgress = ref([]) // Track progress per image
+
+// Auth Check
 onMounted(() => {
   if (!isAuthenticated.value) {
     router.push('/login')
@@ -235,218 +224,133 @@ onMounted(() => {
   }
 })
 
-// Estados
-const loading = ref(false)
-const isCheckingAdoptions = ref(true)
-const hasAdoptions = ref(false)
-const adoptedPets = ref([])
-const userPets = ref([])
-const error = ref(null)
-
-// Datos del formulario
-const storyData = ref({
-  title: '',
-  content: '',
-  petId: '',
-  images: [],
-})
-
-// UX: comprobar si la mascota seleccionada ya tiene una historia
-const selectedPetHasStory = ref(false)
-
+// Check if story exists for pet
 async function checkSelectedPetStory(petId) {
   selectedPetHasStory.value = false
   if (!petId) return
   try {
-    const firebaseApp = useFirebaseApp()
-    const db = getDatabase(firebaseApp)
+    const db = getDatabase(useFirebaseApp())
     const snap = await get(dbRef(db, `petStories/${petId}`))
     if (snap.exists()) selectedPetHasStory.value = true
   } catch (e) {
-    console.warn('Error checking pet story:', e)
+    console.warn(e)
   }
 }
 
-// Imágenes
-const images = ref([])
-const previews = ref([])
-
-// Comprobar si el usuario ha adoptado alguna mascota
+// Fetch User Adoptions
 const checkUserAdoptions = async () => {
   if (!user.value) return
-
   isCheckingAdoptions.value = true
 
   try {
-    const firebaseApp = useFirebaseApp()
-    const db = getDatabase(firebaseApp)
-    const adoptionsRef = dbRef(db, 'adoptions')
-
-    // Buscar adopciones completadas del usuario
-    const adoptionsQuery = query(
-      adoptionsRef,
-      orderByChild('userId'),
-      equalTo(user.value.uid)
-    )
-
+    const db = getDatabase(useFirebaseApp())
+    const adoptionsQuery = query(dbRef(db, 'adoptions'), orderByChild('userId'), equalTo(user.value.uid))
     const snapshot = await get(adoptionsQuery)
     const completedAdoptions = []
 
     if (snapshot.exists()) {
-      snapshot.forEach((childSnapshot) => {
-        const adoption = childSnapshot.val()
+      snapshot.forEach((child) => {
+        const adoption = child.val()
         if (adoption.status === 'completed') {
-          completedAdoptions.push({
-            id: childSnapshot.key,
-            ...adoption
-          })
+          completedAdoptions.push({ id: child.key, ...adoption })
         }
       })
     }
 
-    // Obtener los detalles de las mascotas adoptadas
     if (completedAdoptions.length > 0) {
       const pets = []
       for (const adoption of completedAdoptions) {
-        const petRef = dbRef(db, `pets/${adoption.petId}`)
-        const petSnapshot = await get(petRef)
+        const petSnapshot = await get(dbRef(db, `pets/${adoption.petId}`))
         if (petSnapshot.exists()) {
-          const petData = petSnapshot.val()
-          pets.push({
-            id: adoption.petId,
-            adoptionId: adoption.id,
-            ...petData
-          })
+          pets.push({ id: adoption.petId, adoptionId: adoption.id, ...petSnapshot.val() })
         }
       }
       adoptedPets.value = pets
     } else {
       adoptedPets.value = []
     }
-
-    // Actualizar el estado de adopciones
     hasAdoptions.value = adoptedPets.value.length > 0
-
   } catch (err) {
-    console.error('Error al verificar adopciones del usuario:', err)
-    error.value = 'Error al verificar tus adopciones'
+    console.error(err)
+    error.value = 'Error verificando adopciones'
   } finally {
     isCheckingAdoptions.value = false
   }
 }
 
-// Cargar mascotas del usuario
-onMounted(async () => {
-  if (isAuthenticated.value && user.value) {
-    try {
-      loading.value = true
-
-      // Obtener mascotas del usuario, pero solo aquellas que han sido adoptadas
-      const allUserPets = await fetchUserPets(user.value.uid)
-      userPets.value = allUserPets.filter((pet) => pet.status === 'adopted')
-
-      if (userPets.value.length === 0) {
-        error.value =
-          "Para crear una historia de adopción, debes haber adoptado previamente una mascota. Puedes adoptar mascotas desde la sección 'Mascotas'."
-      }
-    } catch (err) {
-      console.error('Error al cargar mascotas del usuario:', err)
-      error.value = 'No se pudieron cargar las mascotas adoptadas'
-    } finally {
-      loading.value = false
-    }
-  }
-})
-
-// Manejo de imágenes
+// Image Handling
 const handleImageUpload = (event) => {
   const files = Array.from(event.target.files)
-
-  // Validar límite de 5 imágenes
   if (images.value.length + files.length > 5) {
-    alert('Solo puedes subir hasta 5 imágenes.')
+    toastError('Límite excedido', 'Máximo 5 imágenes permitidas')
     return
   }
 
-  // Validar tamaño (5MB máximo por imagen)
-  const invalidFiles = files.filter((file) => file.size > 5 * 1024 * 1024)
-  if (invalidFiles.length > 0) {
-    alert('Algunas imágenes exceden el límite de 5MB.')
-    return
-  }
-
-  // Agregar archivos y crear vistas previas
-  files.forEach((file) => {
-    images.value.push(file)
-
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      previews.value.push(e.target.result)
+  files.forEach(file => {
+    if (file.size > 5 * 1024 * 1024) {
+       toastError('Archivo muy grande', `${file.name} excede 5MB`)
+       return
     }
+    images.value.push(file)
+    const reader = new FileReader()
+    reader.onload = (e) => previews.value.push(e.target.result)
     reader.readAsDataURL(file)
   })
 }
 
-// Remover imagen
 const removeImage = (index) => {
   images.value.splice(index, 1)
   previews.value.splice(index, 1)
 }
 
-// Formatear tipo de mascota
 const formatType = (type) => {
-  const types = {
-    dog: 'Perro',
-    cat: 'Gato',
-    bird: 'Ave',
-    rabbit: 'Conejo',
-    hamster: 'Hámster',
-    fish: 'Pez',
-    reptile: 'Reptil',
-    other: 'Otro',
-  }
-
-  return types[type] || type
+  const types = { dog: 'Perro', cat: 'Gato', bird: 'Ave', rabbit: 'Conejo' }
+  return types[type] || 'Mascota'
 }
 
-// Validar formulario
 const isFormValid = computed(() => {
-  return storyData.value.title.trim() !== '' && storyData.value.content.trim() !== ''
+  return storyData.value.title.trim().length > 3 && 
+         storyData.value.content.trim().length > 20 &&
+         storyData.value.petId
 })
 
-// Enviar formulario
+// Submission
 const submitStory = async () => {
   if (!isFormValid.value) return
-
   loading.value = true
+  uploadProgress.value = new Array(images.value.length).fill(0)
 
   try {
-    // Subir imágenes si hay
     const imageUrls = []
-
-    if (images.value.length > 0) {
-      for (const image of images.value) {
-        const url = await uploadImage(image, 'stories')
-        imageUrls.push(url)
-      }
+    
+    // Upload images with progress
+    for (let i = 0; i < images.value.length; i++) {
+       const file = images.value[i]
+       const ext = file.name.split('.').pop()
+       const fileName = `story-${user.value.uid}-${Date.now()}-${i}.${ext}`
+       
+       const url = await uploadFileWithProgress(file, 'stories', fileName, (p) => {
+          uploadProgress.value[i] = p
+       }, { optimize: true, quality: 0.8 })
+       
+       imageUrls.push(url)
     }
 
-    // Crear historia
     const storyId = await createStory({
       title: storyData.value.title,
       content: storyData.value.content,
       userId: user.value.uid,
-      petId: storyData.value.petId || null,
+      petId: storyData.value.petId,
       images: imageUrls,
       createdAt: Date.now(),
     })
 
-    // Redirigir a la historia creada
-    toastSuccess('Historia publicada', 'Tu historia se publicó correctamente')
+    toastSuccess('¡Historia Publicada!', 'Gracias por compartir tu experiencia.')
     router.push(`/historias/${storyId}`)
-  } catch (error) {
-    console.error('Error al crear historia:', error)
-    toastError('Error', 'Ocurrió un error al crear la historia. Por favor, intenta de nuevo.')
+
+  } catch (err) {
+    console.error(err)
+    toastError('Error', 'No se pudo publicar la historia')
   } finally {
     loading.value = false
   }

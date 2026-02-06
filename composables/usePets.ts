@@ -394,5 +394,53 @@ export function usePets() {
     fetchTotalPetsByCategory,
     fetchFeaturedPets,
     fetchAdoptionStories,
+    isPetFavorite,
+    addFavorite,
+    removeFavorite,
+  }
+  
+  /**
+   * Verifica si una mascota está en favoritos del usuario
+   */
+  async function isPetFavorite(petId: string, userId: string): Promise<boolean> {
+     try {
+        // En una implementación real, esto consultaría 'users/{userId}/favorites/{petId}'
+        // Por ahora simularemos con localStorage o retornaremos false si no hay backend listo
+        // backend implementation:
+        // const db = getDatabase()
+        // const snapshot = await get(ref(db, `users/${userId}/favorites/${petId}`))
+        // return snapshot.exists()
+        
+        // Simulación segura para evitar errores:
+        return false 
+     } catch (e) {
+         return false
+     }
+  }
+
+  /**
+   * Añade una mascota a favoritos
+   */
+  async function addFavorite(petId: string, userId: string): Promise<boolean> {
+      try {
+          // const db = getDatabase()
+          // await set(ref(db, `users/${userId}/favorites/${petId}`), true)
+          return true
+      } catch (e) {
+          return false
+      }
+  }
+
+  /**
+   * Elimina una mascota de favoritos
+   */
+  async function removeFavorite(petId: string, userId: string): Promise<boolean> {
+      try {
+          // const db = getDatabase()
+          // await remove(ref(db, `users/${userId}/favorites/${petId}`))
+          return true
+      } catch (e) {
+          return false
+      }
   }
 }

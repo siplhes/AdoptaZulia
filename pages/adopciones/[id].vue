@@ -321,6 +321,16 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal para confirmación/alertas -->
+    <ModalAlert
+      :show="showModal"
+      :type="modalType"
+      :title="modalTitle"
+      :message="modalMessage"
+      :confirm-button-text="modalConfirmText"
+      @confirm="confirmAction"
+    />
   </div>
 </template>
 
@@ -330,8 +340,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAdoptions } from '~/composables/useAdoptions'
 import { usePets } from '~/composables/usePets'
 import { useAuth } from '~/composables/useAuth'
-import { useFirebaseApp } from 'vuefire'
-import { getDatabase, ref as dbRef, update } from 'firebase/database'
+import ModalAlert from '~/components/common/ModalAlert.vue'
 
 // Obtener parámetros de ruta
 const route = useRoute()
@@ -340,7 +349,7 @@ const petId = route.params.id
 
 // Composables
 const { fetchAdoptionsForOwner, updateAdoptionStatus, updateAdoptionNotes, getAdoptionById, confirmAdoptionAndVerify } = useAdoptions()
-const { fetchPetById, updatePetStatus } = usePets()
+const { fetchPetById } = usePets()
 const { isAuthenticated, user } = useAuth()
 
 // Estado
@@ -353,6 +362,14 @@ const error = ref(null)
 const showNotesModal = ref(false)
 const notesText = ref('')
 const currentAdoption = ref(null)
+
+// Estados para el modal global
+const showModal = ref(false)
+const modalType = ref('')
+const modalTitle = ref('')
+const modalMessage = ref('')
+const modalConfirmText = ref('')
+let confirmAction = () => {}
 
 // Cargar datos
 onMounted(async () => {
@@ -457,78 +474,95 @@ const getInitials = (name) => {
     .substring(0, 2)
 }
 
-// Actualizar estado de una solicitud
-const updateStatus = async (adoptionId, status) => {
-  try {
-    loading.value = true
-    
-    // Confirmar la acción
-    const action = status === 'approved' ? 'aprobar' : 'rechazar'
-    if (!confirm(`¿Estás seguro de que quieres ${action} esta solicitud?`)) {
-      loading.value = false
-      return
-    }
-    
-    const success = await updateAdoptionStatus(adoptionId, status)
-    
-    if (success) {
-      // Actualizar el estado en la UI
-      const index = adoptionRequests.value.findIndex(a => a.id === adoptionId)
-      if (index !== -1) {
-        adoptionRequests.value[index].status = status
-        adoptionRequests.value[index].updatedAt = Date.now()
-      }
-    } else {
-      error.value = `Error al ${action} la solicitud`
-    }
-  } catch (err) {
-    console.error(`Error al actualizar estado:`, err)
-    error.value = 'Error al actualizar el estado. Por favor, intenta de nuevo.'
-  } finally {
-    loading.value = false
+const showAlert = (title, message) => {
+  modalType.value = 'alert'
+  modalTitle.value = title
+  modalMessage.value = message
+  modalConfirmText.value = 'Aceptar'
+  confirmAction = () => {
+    showModal.value = false
   }
+  showModal.value = true
+}
+
+// Actualizar estado de una solicitud
+const updateStatus = (adoptionId, status) => {
+  const action = status === 'approved' ? 'aprobar' : 'rechazar'
+  
+  modalType.value = 'confirm'
+  modalTitle.value = `Confirmar ${action}`
+  modalMessage.value = `¿Estás seguro de que quieres ${action} esta solicitud?`
+  modalConfirmText.value = 'Confirmar'
+  
+  confirmAction = async () => {
+    showModal.value = false
+    try {
+      loading.value = true
+      const success = await updateAdoptionStatus(adoptionId, status)
+      
+      if (success) {
+        // Actualizar el estado en la UI
+        const index = adoptionRequests.value.findIndex(a => a.id === adoptionId)
+        if (index !== -1) {
+          adoptionRequests.value[index].status = status
+          adoptionRequests.value[index].updatedAt = Date.now()
+        }
+      } else {
+        error.value = `Error al ${action} la solicitud`
+      }
+    } catch (err) {
+      console.error(`Error al actualizar estado:`, err)
+      error.value = 'Error al actualizar el estado. Por favor, intenta de nuevo.'
+    } finally {
+      loading.value = false
+    }
+  }
+  showModal.value = true
 }
 
 // Completar adopción y generar certificado
-const completeAdoption = async (adoption) => {
-  try {
-    loading.value = true
-    
-    // Confirmar la acción
-    if (!confirm(`¿Estás seguro de que quieres confirmar que ${pet.value.name} ha sido adoptado por ${adoption.user?.name || 'este usuario'}? Esto marcará la mascota como adoptada y generará un certificado de adopción.`)) {
+const completeAdoption = (adoption) => {
+  modalType.value = 'confirm'
+  modalTitle.value = 'Confirmar adopción'
+  modalMessage.value = `¿Estás seguro de que quieres confirmar que ${pet.value.name} ha sido adoptado por ${adoption.user?.name || 'este usuario'}? Esto marcará la mascota como adoptada y generará un certificado de adopción.`
+  modalConfirmText.value = 'Confirmar'
+  
+  confirmAction = async () => {
+    showModal.value = false
+    try {
+      loading.value = true
+      
+      // Completar la adopción y crear verificación
+      const verificationId = await confirmAdoptionAndVerify(adoption.id, null, false)
+
+      if (verificationId) {
+        // Actualizar el estado en la UI
+        const index = adoptionRequests.value.findIndex(a => a.id === adoption.id)
+        if (index !== -1) {
+          adoptionRequests.value[index].status = 'completed'
+          adoptionRequests.value[index].updatedAt = Date.now()
+        }
+        // Actualizar el estado de la mascota en la UI
+        if (pet.value) {
+          pet.value.status = 'adopted'
+          pet.value.adoptedBy = adoption.userId
+          pet.value.adoptionId = adoption.id
+          pet.value.adoptionDate = Date.now()
+        }
+
+        // Redirigir al certificado de adopción
+        router.push(`/certificados/${adoption.id}`)
+      } else {
+        error.value = 'Error al completar la adopción'
+      }
+    } catch (err) {
+      console.error('Error al completar adopción:', err)
+      error.value = 'Error al completar la adopción. Por favor, intenta de nuevo.'
+    } finally {
       loading.value = false
-      return
     }
-    
-    // Completar la adopción y crear verificación
-    const verificationId = await confirmAdoptionAndVerify(adoption.id, null, false)
-
-    if (verificationId) {
-      // Actualizar el estado en la UI
-      const index = adoptionRequests.value.findIndex(a => a.id === adoption.id)
-      if (index !== -1) {
-        adoptionRequests.value[index].status = 'completed'
-        adoptionRequests.value[index].updatedAt = Date.now()
-      }
-      // Actualizar el estado de la mascota en la UI
-      if (pet.value) {
-        pet.value.status = 'adopted'
-        pet.value.adoptedBy = adoption.userId
-        pet.value.adoptionId = adoption.id
-        pet.value.adoptionDate = Date.now()
-      }
-
-      // Redirigir al certificado de adopción
-      router.push(`/certificados/${adoption.id}`)
-    } else {
-      error.value = 'Error al completar la adopción'
-    }
-  } catch (err) {
-    console.error('Error al completar adopción:', err)
-    error.value = 'Error al completar la adopción. Por favor, intenta de nuevo.'
-  } finally {
-    loading.value = false
   }
+  showModal.value = true
 }
 
 // Abrir modal de notas

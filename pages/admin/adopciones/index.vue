@@ -416,6 +416,16 @@
           </div>
         </div>
       </div>
+
+      <!-- Modal para confirmación/alertas -->
+      <ModalAlert
+        :show="showModal"
+        :type="modalType"
+        :title="modalTitle"
+        :message="modalMessage"
+        :confirm-button-text="modalConfirmText"
+        @confirm="confirmAction"
+      />
     </div>
   </div>
 </template>
@@ -424,6 +434,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 import { useAdoptions } from '~/composables/useAdoptions'
+import ModalAlert from '~/components/common/ModalAlert.vue'
 
 // Verificar si el usuario es administrador
 definePageMeta({
@@ -453,6 +464,14 @@ const pageSize = 10
 // Estado para modal de detalles
 const selectedAdoption = ref(null)
 const adminNotes = ref('')
+
+// Estado para el modal global
+const showModal = ref(false)
+const modalType = ref('')
+const modalTitle = ref('')
+const modalMessage = ref('')
+const modalConfirmText = ref('')
+let confirmAction = () => {}
 
 // Métodos para cargar datos
 const loadAdoptions = async () => {
@@ -524,27 +543,54 @@ const prevPage = () => {
 
 // Acciones sobre las adopciones
 const approveAdoption = async (adoption) => {
-  try {
-    await updateAdoptionStatus(adoption.id, 'approved')
-  } catch (err) {
-    console.error('Error approving adoption:', err)
+  modalType.value = 'confirm'
+  modalTitle.value = 'Aprobar adopción'
+  modalMessage.value = `¿Estás seguro de que quieres aprobar la solicitud de adopción de ${adoption.pet?.name} para ${adoption.user?.name || 'este usuario'}?`
+  modalConfirmText.value = 'Aprobar'
+  
+  confirmAction = async () => {
+    showModal.value = false
+    try {
+      await updateAdoptionStatus(adoption.id, 'approved')
+    } catch (err) {
+      console.error('Error approving adoption:', err)
+    }
   }
+  showModal.value = true
 }
 
 const rejectAdoption = async (adoption) => {
-  try {
-    await updateAdoptionStatus(adoption.id, 'rejected')
-  } catch (err) {
-    console.error('Error rejecting adoption:', err)
+  modalType.value = 'delete' // Using delete type for rejection (usually red)
+  modalTitle.value = 'Rechazar adopción'
+  modalMessage.value = `¿Estás seguro de que quieres rechazar esta solicitud?`
+  modalConfirmText.value = 'Rechazar'
+  
+  confirmAction = async () => {
+    showModal.value = false
+    try {
+      await updateAdoptionStatus(adoption.id, 'rejected')
+    } catch (err) {
+      console.error('Error rejecting adoption:', err)
+    }
   }
+  showModal.value = true
 }
 
 const completeAdoption = async (adoption) => {
-  try {
-    await updateAdoptionStatus(adoption.id, 'completed')
-  } catch (err) {
-    console.error('Error completing adoption:', err)
+  modalType.value = 'confirm'
+  modalTitle.value = 'Completar adopción'
+  modalMessage.value = `¿Estás seguro de que quieres marcar esta adopción como completada?`
+  modalConfirmText.value = 'Completar'
+  
+  confirmAction = async () => {
+    showModal.value = false
+    try {
+      await updateAdoptionStatus(adoption.id, 'completed')
+    } catch (err) {
+      console.error('Error completing adoption:', err)
+    }
   }
+  showModal.value = true
 }
 
 const viewDetails = (adoption) => {

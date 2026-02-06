@@ -1,10 +1,11 @@
 import { defineNuxtConfig } from 'nuxt/config'
+import 'dotenv/config'
 
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
 
   devtools: { enabled: false },
-  ssr: false,
+  ssr: true,
 
   experimental: {
     typescriptPlugin: true,
@@ -62,21 +63,27 @@ export default defineNuxtConfig({
       measurementId: process.env.FIREBASE_MEASUREMENT_ID,
       databaseURL: process.env.FIREBASE_DATABASE_URL,
     },
-    admin: false,
-  },
-
-
-
-  plugins: ['~/plugins/firebase.ts'],
-  tailwindcss: {
-    exposeConfig: true,
-  },
-  app: {
-    head: {
-      title: 'Adopta Zulia',
-      meta: [
-        { charset: 'utf-8' },
-        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+ admin: {
+      // AQUÍ ESTÁ LA CLAVE:
+      // Si existe la variable, la parseamos. Si no, undefined (para evitar error en build)
+       serviceAccount: process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON 
+         ? JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) 
+         : undefined,
+     },
+   },
+ 
+ 
+ 
+   plugins: ['~/plugins/firebase.ts'],
+   tailwindcss: {
+     exposeConfig: true,
+   },
+   app: {
+     head: {
+       title: 'Adopta Zulia',
+       meta: [
+         { charset: 'utf-8' },
+         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         {
           name: 'Content-Security-Policy',
           content: process.env.NODE_ENV === 'production'

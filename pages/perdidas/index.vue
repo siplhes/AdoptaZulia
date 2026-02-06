@@ -39,13 +39,19 @@
               Buscar
             </button>
           </div>
-        </div>
+   
+        </div>   
       </div>
 
       <div class="flex flex-col gap-8 lg:flex-row">
         <!-- Filters Sidebar -->
         <div class="w-full lg:w-1/4">
-          <div class="sticky top-24 rounded-lg bg-white p-6 shadow-sm">
+          <div class="sticky top-24 rounded-lg bg-white p-6 shadow-sm">     <button
+              class="my-2 rounded-md bg-red-600 px-6 py-2 text-white transition-colors hover:bg-red-700 md:mt-0"
+              @click="$router.push('/perdidas/crear')"
+            >
+              Publicar mascota perdida
+            </button>
             <div class="mb-6 flex items-center justify-between">
               <h2 class="text-xl font-semibold text-emerald-800">Filtros</h2>
               <button

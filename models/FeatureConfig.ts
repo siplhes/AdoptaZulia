@@ -7,6 +7,7 @@ export interface FeatureConfig {
   favorites: boolean
   comments: boolean
   imageGeneration: boolean
+  adoption: boolean
   createdAt?: number
   updatedAt?: number
 }
@@ -15,4 +16,5 @@ export const DEFAULT_FEATURES: FeatureConfig = {
   favorites: false,
   comments: false,
   imageGeneration: false,
+  adoption: true,
 }

@@ -450,6 +450,16 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal para confirmación/alertas -->
+    <ModalAlert
+      :show="showModal"
+      :type="modalType"
+      :title="modalTitle"
+      :message="modalMessage"
+      :confirm-button-text="modalConfirmText"
+      @confirm="confirmAction"
+    />
   </div>
 </template>
 
@@ -459,8 +469,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAdoptions } from '~/composables/useAdoptions'
 import { usePets } from '~/composables/usePets'
 import { useAuth } from '~/composables/useAuth'
-import { useFirebaseApp } from 'vuefire'
-import { getDatabase, ref as dbRef, update } from 'firebase/database'
+import ModalAlert from '~/components/common/ModalAlert.vue'
 
 // Obtener parámetros de ruta
 const route = useRoute()
@@ -468,8 +477,8 @@ const router = useRouter()
 const adoptionId = route.params.id
 
 // Composables
-const { getAdoptionById, updateAdoptionStatus, confirmAdoptionAndVerify } = useAdoptions()
-const { fetchPetById, updatePetStatus } = usePets()
+const { getAdoptionById, confirmAdoptionAndVerify } = useAdoptions()
+const { fetchPetById } = usePets()
 const { isAuthenticated, user } = useAuth()
 
 // Estado
@@ -477,6 +486,14 @@ const adoption = ref(null)
 const pet = ref(null)
 const loading = ref(true)
 const error = ref(null)
+
+// Estados para el modal
+const showModal = ref(false)
+const modalType = ref('')
+const modalTitle = ref('')
+const modalMessage = ref('')
+const modalConfirmText = ref('')
+let confirmAction = () => {}
 
 // Cargar datos
 onMounted(async () => {
@@ -553,7 +570,7 @@ const formatType = (type) => {
     case 'conejo':
       return 'Conejo'
     default:
-      return type.charAt(0).toUpperCase() + type.slice(1)
+      return type?.charAt(0).toUpperCase() + type?.slice(1) || 'No especificado'
   }
 }
 
@@ -635,49 +652,59 @@ const goBack = () => {
 
 // Obtener iniciales
 const getInitials = (name) => {
-  const words = name.split(' ')
-  return words.map(word => word.charAt(0).toUpperCase()).join('')
+  if (!name) return 'U'
+  return name.split(' ').map(word => word.charAt(0).toUpperCase()).join('').substring(0, 2)
+}
+
+const showAlert = (title, message) => {
+  modalType.value = 'alert'
+  modalTitle.value = title
+  modalMessage.value = message
+  modalConfirmText.value = 'Aceptar'
+  confirmAction = () => {
+    showModal.value = false
+  }
+  showModal.value = true
 }
 
 // Confirmar adopción completada
-const confirmAdoption = async () => {
-  try {
-    loading.value = true;
-    
-    // Confirmar la acción
-    if (!confirm(`¿Estás seguro de que quieres confirmar la adopción de ${pet.value.name}? Esto marcará la mascota como adoptada y generará un certificado de adopción.`)) {
-      loading.value = false;
-      return;
-    }
-    
-    // Importamos lo necesario para actualizar Firebase
-    const firebaseApp = useFirebaseApp();
-    const db = getDatabase(firebaseApp);
-    
-    // Completar la adopción y crear verificación
-    const verificationId = await confirmAdoptionAndVerify(adoptionId, null, false)
+const confirmAdoption = () => {
+  modalType.value = 'confirm'
+  modalTitle.value = 'Confirmar adopción'
+  modalMessage.value = `¿Estás seguro de que quieres confirmar la adopción de ${pet.value.name}? Esto marcará la mascota como adoptada y generará un certificado de adopción.`
+  modalConfirmText.value = 'Confirmar'
+  
+  confirmAction = async () => {
+    try {
+      loading.value = true
+      showModal.value = false
+      
+      // Completar la adopción y crear verificación
+      const verificationId = await confirmAdoptionAndVerify(adoptionId, null, false)
 
-    if (verificationId) {
-      // Actualizar estado local similar a antes
-      adoption.value.status = 'completed';
-      adoption.value.updatedAt = Date.now();
+      if (verificationId) {
+        // Actualizar estado local
+        adoption.value.status = 'completed'
+        adoption.value.updatedAt = Date.now()
 
-      if (pet.value) {
-        pet.value.status = 'adopted';
-        pet.value.adoptedBy = user.value.uid;
-        pet.value.adoptionId = adoptionId;
-        pet.value.adoptionDate = Date.now();
+        if (pet.value) {
+          pet.value.status = 'adopted'
+          pet.value.adoptedBy = user.value.uid
+          pet.value.adoptionId = adoptionId
+          pet.value.adoptionDate = Date.now()
+        }
+
+        showAlert('¡Felicidades!', 'La adopción ha sido completada y verificada. Ahora puedes acceder al certificado de adopción.')
+      } else {
+        error.value = 'Error al completar la adopción'
       }
-
-      alert('¡Felicidades! La adopción ha sido completada y verificada. Ahora puedes acceder al certificado de adopción.');
-    } else {
-      error.value = 'Error al completar la adopción';
+    } catch (err) {
+      console.error('Error al completar adopción:', err)
+      error.value = 'Error al completar la adopción. Por favor, intenta de nuevo.'
+    } finally {
+      loading.value = false
     }
-  } catch (err) {
-    console.error('Error al completar adopción:', err);
-    error.value = 'Error al completar la adopción. Por favor, intenta de nuevo.';
-  } finally {
-    loading.value = false;
   }
+  showModal.value = true
 }
 </script>

@@ -1,10 +1,10 @@
 <template>
   <div class="flex min-h-screen flex-col bg-gray-50">
-    <TheHeader />
+    <LayoutTheHeader />
     <main class="flex-grow">
       <slot />
     </main>
-    <TheFooter />
+    <LayoutTheFooter />
   </div>
 </template>
 

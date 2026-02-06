@@ -25,7 +25,7 @@
             <h3 class="text-lg font-semibold text-gray-800">Mascota</h3>
             <div class="mt-2 flex items-center">
               <div class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md bg-gray-100">
-                <img v-if="pet?.image" :src="pet.image" class="h-full w-full object-cover" />
+                <img v-if="pet?.image" :src="pet.image" class="h-full w-full object-cover" >
                 <div v-else class="flex h-full w-full items-center justify-center">
                   <Icon name="heroicons:paw-print" class="h-6 w-6 text-gray-400" />
                 </div>
@@ -61,8 +61,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { useFirebaseApp } from 'vuefire'
-import { getDatabase, ref as dbRef, get } from 'firebase/database'
+import { useAdoptions } from '~/composables/useAdoptions'
+import { usePets } from '~/composables/usePets'
+import { useUsers } from '~/composables/useUsers'
 
 const route = useRoute()
 const vid = route.query.vid || route.params.vid || null
@@ -73,32 +74,39 @@ const pet = ref(null)
 const adopter = ref(null)
 const certificateLink = ref(null)
 
+const { fetchVerification } = useAdoptions()
+const { fetchPetById } = usePets()
+const { fetchUserById } = useUsers()
+
 onMounted(async () => {
   try {
-    if (!vid) return
-    const firebaseApp = useFirebaseApp()
-    const db = getDatabase(firebaseApp)
-    const snap = await get(dbRef(db, `adoptionVerifications/${vid}`))
-    if (!snap.exists()) {
+    if (!vid) {
       loading.value = false
       return
     }
 
-    verification.value = snap.val()
+    // 1. Obtener verificación
+    verification.value = await fetchVerification(vid)
+    
+    if (!verification.value) {
+      loading.value = false
+      return
+    }
 
-    // Load pet
+    // 2. Cargar mascota y adoptante en paralelo
+    const promises = []
+    
     if (verification.value.petId) {
-      const petSnap = await get(dbRef(db, `pets/${verification.value.petId}`))
-      if (petSnap.exists()) pet.value = petSnap.val()
+      promises.push(fetchPetById(verification.value.petId).then(p => pet.value = p))
     }
-
-    // Load adopter
+    
     if (verification.value.adopterId) {
-      const userSnap = await get(dbRef(db, `users/${verification.value.adopterId}`))
-      if (userSnap.exists()) adopter.value = userSnap.val()
+      promises.push(fetchUserById(verification.value.adopterId).then(u => adopter.value = u))
     }
 
-    // If we have an adoptionId, set certificate link
+    await Promise.allSettled(promises)
+
+    // 3. Configurar enlace
     if (verification.value.adoptionId) {
       certificateLink.value = `/certificados/${verification.value.adoptionId}`
     }

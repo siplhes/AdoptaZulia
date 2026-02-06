@@ -411,45 +411,15 @@
         </div>
       </div>
 
-      <!-- Confirmation Modal -->
-      <div
-        v-if="showConfirmationModal"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
-      >
-        <div class="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
-          <div class="mb-4 text-center">
-            <div
-              class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100"
-            >
-              <Icon name="heroicons:exclamation-triangle" class="h-6 w-6 text-red-600" />
-            </div>
-            <h3 class="text-lg font-medium text-gray-900">{{ confirmationTitle }}</h3>
-            <p class="mt-2 text-sm text-gray-500">{{ confirmationMessage }}</p>
-          </div>
-
-          <div class="mt-6 flex justify-center space-x-3">
-            <button
-              class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-              @click="cancelConfirmation"
-            >
-              Cancelar
-            </button>
-            <button
-              :class="[
-                'rounded-md px-4 py-2 text-sm font-medium text-white',
-                confirmationType === 'delete'
-                  ? 'bg-red-600 hover:bg-red-700'
-                  : confirmationType === 'suspend'
-                    ? 'bg-amber-600 hover:bg-amber-700'
-                    : 'bg-emerald-600 hover:bg-emerald-700',
-              ]"
-              @click="confirmAction"
-            >
-              {{ confirmationButtonText }}
-            </button>
-          </div>
-        </div>
-      </div>
+      <!-- Modal para confirmación/alertas -->
+      <ModalAlert
+        :show="showModal"
+        :type="modalType"
+        :title="modalTitle"
+        :message="modalMessage"
+        :confirm-button-text="modalConfirmText"
+        @confirm="confirmAction"
+      />
     </div>
   </div>
 </template>
@@ -458,6 +428,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 import { useUsers } from '~/composables/useUsers'
+import ModalAlert from '~/components/common/ModalAlert.vue'
 
 // Verificar si el usuario es administrador
 definePageMeta({
@@ -489,7 +460,6 @@ const pageSize = 10
 
 // Estado para modales
 const showEditModal = ref(false)
-const showConfirmationModal = ref(false)
 const selectedUser = ref(null)
 const userForm = ref({
   displayName: '',
@@ -501,12 +471,13 @@ const userForm = ref({
   address: '',
 })
 
-// Estado para confirmación de acciones
-const confirmationType = ref('')
-const confirmationTitle = ref('')
-const confirmationMessage = ref('')
-const confirmationButtonText = ref('')
-const confirmationCallback = ref(null)
+// Estado para el modal global
+const showModal = ref(false)
+const modalType = ref('')
+const modalTitle = ref('')
+const modalMessage = ref('')
+const modalConfirmText = ref('')
+let confirmAction = () => {}
 
 // Cargar usuarios
 const loadUsers = async () => {
@@ -647,54 +618,54 @@ const saveUser = async () => {
 
 // Métodos para confirmación
 const confirmSuspendUser = (user) => {
-  confirmationType.value = 'suspend'
-  confirmationTitle.value = 'Suspender usuario'
-  confirmationMessage.value = `¿Estás seguro de que deseas suspender al usuario ${user.displayName || user.email}? El usuario no podrá acceder a su cuenta mientras esté suspendido.`
-  confirmationButtonText.value = 'Suspender'
-  confirmationCallback.value = () => suspendUser(user)
-  showConfirmationModal.value = true
+  modalType.value = 'confirm'
+  modalTitle.value = 'Suspender usuario'
+  modalMessage.value = `¿Estás seguro de que deseas suspender al usuario ${user.displayName || user.email}? El usuario no podrá acceder a su cuenta mientras esté suspendido.`
+  modalConfirmText.value = 'Suspender'
+  
+  confirmAction = async () => {
+    showModal.value = false
+    try {
+      await updateUserStatus(user.id, 'suspended')
+    } catch (err) {
+      console.error('Error suspending user:', err)
+    }
+  }
+  showModal.value = true
 }
 
 const confirmDeleteUser = (user) => {
-  confirmationType.value = 'delete'
-  confirmationTitle.value = 'Eliminar usuario'
-  confirmationMessage.value = `¿Estás seguro de que deseas eliminar al usuario ${user.displayName || user.email}? Esta acción no se puede deshacer.`
-  confirmationButtonText.value = 'Eliminar'
-  confirmationCallback.value = () => deleteUser(user.id)
-  showConfirmationModal.value = true
-}
-
-const cancelConfirmation = () => {
-  showConfirmationModal.value = false
-  confirmationType.value = ''
-  confirmationTitle.value = ''
-  confirmationMessage.value = ''
-  confirmationButtonText.value = ''
-  confirmationCallback.value = null
-}
-
-const confirmAction = () => {
-  if (confirmationCallback.value) {
-    confirmationCallback.value()
+  modalType.value = 'delete'
+  modalTitle.value = 'Eliminar usuario'
+  modalMessage.value = `¿Estás seguro de que deseas eliminar al usuario ${user.displayName || user.email}? Esta acción no se puede deshacer.`
+  modalConfirmText.value = 'Eliminar'
+  
+  confirmAction = async () => {
+    showModal.value = false
+    try {
+      await deleteUser(user.id)
+    } catch (err) {
+      console.error('Error deleting user:', err)
+    }
   }
-  cancelConfirmation()
-}
-
-// Acciones con usuarios
-const suspendUser = async (user) => {
-  try {
-    await updateUserStatus(user.id, 'suspended')
-  } catch (err) {
-    console.error('Error suspending user:', err)
-  }
+  showModal.value = true
 }
 
 const reactivateUser = async (user) => {
-  try {
-    await updateUserStatus(user.id, 'active')
-  } catch (err) {
-    console.error('Error reactivating user:', err)
+  modalType.value = 'confirm'
+  modalTitle.value = 'Reactivar usuario'
+  modalMessage.value = `¿Estás seguro de que deseas reactivar al usuario ${user.displayName || user.email}?`
+  modalConfirmText.value = 'Reactivar'
+  
+  confirmAction = async () => {
+    showModal.value = false
+    try {
+      await updateUserStatus(user.id, 'active')
+    } catch (err) {
+      console.error('Error reactivating user:', err)
+    }
   }
+  showModal.value = true
 }
 
 // Utilidades
