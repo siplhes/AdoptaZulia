@@ -219,6 +219,53 @@ const story = ref(null)
 const hasLiked = ref(false)
 const storyId = route.params.id
 
+// SEO Meta Tags
+useSeoMeta({
+  title: computed(() => story.value ? `${story.value.title} | Historias Adopta Zulia` : 'Historia de Adopción | Adopta Zulia'),
+  description: computed(() => story.value ? `${story.value.content?.substring(0, 150)}...` : 'Lee esta inspiradora historia de adopción.'),
+  ogTitle: computed(() => story.value?.title || 'Historia de Adopción'),
+  ogDescription: computed(() => story.value ? `Historia de adopción de ${story.value.pet?.name || 'una mascota'}. ${story.value.content?.substring(0, 100)}...` : 'Historia de adopción'),
+  ogImage: computed(() => useOgImage(story.value?.images?.[0] || story.value?.pet?.image)),
+  ogUrl: computed(() => useCanonicalUrl(`/historias/${storyId}`)),
+  ogType: 'article',
+  twitterTitle: computed(() => story.value?.title || 'Historia de Adopción'),
+  twitterDescription: computed(() => story.value ? `Historia de adopción de ${story.value.pet?.name || 'una mascota'}.` : 'Historia de adopción'),
+  twitterImage: computed(() => useOgImage(story.value?.images?.[0] || story.value?.pet?.image)),
+  twitterCard: 'summary_large_image',
+  articlePublishedTime: computed(() => story.value?.createdAt),
+  articleAuthor: computed(() => story.value?.user?.displayName || 'Adopta Zulia'),
+})
+
+useHead({
+  link: [
+    {
+      rel: 'canonical',
+      href: computed(() => useCanonicalUrl(`/historias/${storyId}`)),
+    }
+  ],
+  script: [
+    computed(() => {
+      if (!story.value) return {}
+      return useStructuredData({
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: story.value.title,
+        image: story.value.images?.length ? [useOgImage(story.value.images[0])] : [],
+        datePublished: story.value.createdAt ? new Date(story.value.createdAt).toISOString() : undefined,
+        author: {
+          '@type': 'Person',
+          name: story.value.user?.displayName || 'Usuario'
+        }
+      })
+    }),
+    useStructuredData(createBreadcrumbSchema([
+      { name: 'Inicio', url: useCanonicalUrl('/') },
+      { name: 'Historias', url: useCanonicalUrl('/historias') },
+      { name: story.value?.title || 'Historia', url: useCanonicalUrl(`/historias/${storyId}`) }
+    ])),
+  ]
+})
+
 // Verificar si el usuario actual es propietario de la historia
 const isOwner = computed(() => {
   if (!isAuthenticated.value || !story.value) return false

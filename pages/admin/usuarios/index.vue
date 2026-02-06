@@ -1,417 +1,332 @@
 <template>
-  <div class="min-h-screen bg-amber-50 py-8">
+  <div class="min-h-screen bg-slate-50 py-8">
     <div class="container mx-auto px-4">
+      <!-- Header -->
       <div class="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 class="text-3xl font-bold text-emerald-800">Gestión de Usuarios</h1>
-          <p class="text-gray-600">Administrar usuarios y permisos de la plataforma</p>
+          <h1 class="text-3xl font-bold text-slate-800">Gestión de Usuarios</h1>
+          <p class="text-slate-600">Administra usuarios, permisos y roles de la plataforma</p>
         </div>
         <div class="flex gap-3">
           <NuxtLink
             to="/admin"
-            class="rounded-lg border border-emerald-600 px-4 py-2 text-emerald-600 transition-colors hover:bg-emerald-50"
+            class="flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-slate-600 transition-colors hover:bg-white hover:text-emerald-600"
           >
             Volver al panel
           </NuxtLink>
-        </div>
-      </div>
-
-      <!-- Filters & Search -->
-      <div
-        class="mb-6 flex flex-col gap-4 rounded-lg bg-white p-6 shadow-md lg:flex-row lg:items-center lg:justify-between"
-      >
-        <div class="flex flex-1 flex-col gap-4 sm:flex-row sm:items-center">
-          <div class="flex-1">
-            <label class="mb-1 block text-sm font-medium text-gray-700">Buscar</label>
-            <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Buscar por nombre, email..."
-              class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-              @input="applyFilters"
-            >
-          </div>
-
-          <div class="w-40">
-            <label class="mb-1 block text-sm font-medium text-gray-700">Rol</label>
-            <select
-              v-model="filters.role"
-              class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-              @change="applyFilters"
-            >
-              <option value="">Todos</option>
-              <option value="admin">Administrador</option>
-              <option value="user">Usuario</option>
-              <option value="volunteer">Voluntario</option>
-              <option value="shelter">Refugio</option>
-            </select>
-          </div>
-
-          <div class="w-40">
-            <label class="mb-1 block text-sm font-medium text-gray-700">Estado</label>
-            <select
-              v-model="filters.status"
-              class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-              @change="applyFilters"
-            >
-              <option value="">Todos</option>
-              <option value="active">Activo</option>
-              <option value="inactive">Inactivo</option>
-              <option value="suspended">Suspendido</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-3">
           <button
-            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-            @click="resetFilters"
-          >
-            <Icon name="heroicons:arrow-path" class="mr-2 h-4 w-4" />
-            Restablecer
-          </button>
-          <button
-            class="inline-flex items-center rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+            class="flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 font-bold text-white transition-colors hover:bg-emerald-700 shadow-sm"
             @click="openCreateUserModal"
           >
-            <Icon name="heroicons:plus" class="mr-2 h-4 w-4" />
-            Añadir usuario
+            <Icon name="heroicons:plus" class="h-5 w-5" />
+            Añadir Usuario
           </button>
         </div>
       </div>
 
-      <!-- Users List -->
-      <div class="overflow-hidden rounded-lg bg-white shadow-md">
-        <div v-if="loading" class="flex justify-center py-8">
-          <div
-            class="h-10 w-10 animate-spin rounded-full border-b-2 border-t-2 border-emerald-600"
-          />
-        </div>
-
-        <div v-else-if="error" class="rounded-md bg-red-50 p-4">
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <Icon name="heroicons:exclamation-circle" class="h-5 w-5 text-red-400" />
+      <!-- Filters & Stats -->
+      <div class="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-4">
+         <!-- Search -->
+        <div class="lg:col-span-2">
+            <div class="relative">
+                <Icon
+                    name="heroicons:magnifying-glass"
+                    class="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
+                />
+                <input
+                    v-model="searchQuery"
+                    type="text"
+                    placeholder="Buscar por nombre o correo..."
+                    class="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 shadow-sm transition-all focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+                >
             </div>
-            <div class="ml-3">
-              <h3 class="text-sm font-medium text-red-800">Error al cargar los usuarios</h3>
-              <div class="mt-2 text-sm text-red-700">
-                <p>{{ error }}</p>
-              </div>
-            </div>
-          </div>
         </div>
+        
+        <!-- Role Filter -->
+         <div>
+            <select
+              v-model="filters.role"
+              class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+            >
+              <option value="">Todos los Roles</option>
+              <option value="admin">🛡️ Administrador</option>
+              <option value="user">👤 Usuario</option>
+              <option value="volunteer">🤝 Voluntario</option>
+              <option value="shelter">🏠 Refugio</option>
+            </select>
+         </div>
 
-        <div v-else-if="filteredUsers.length === 0" class="p-8 text-center">
-          <p class="text-gray-500">No se encontraron usuarios con los filtros actuales.</p>
+         <!-- Status Filter -->
+         <div>
+            <select
+              v-model="filters.status"
+              class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+            >
+              <option value="">Todos los Estados</option>
+              <option value="active">✅ Activo</option>
+              <option value="inactive">💤 Inactivo</option>
+              <option value="suspended">🚫 Suspendido</option>
+            </select>
+         </div>
+      </div>
+
+      <!-- Loading & Error States -->
+      <div v-if="loading" class="flex h-64 items-center justify-center">
+        <div class="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-emerald-600" />
+      </div>
+
+      <div v-else-if="error" class="rounded-2xl border border-red-100 bg-red-50 p-6 text-center">
+             <Icon name="heroicons:exclamation-circle" class="mx-auto h-12 w-12 text-red-400 mb-2" />
+             <h3 class="text-lg font-bold text-red-900">Error al cargar usuarios</h3>
+             <p class="text-red-700">{{ error }}</p>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        v-else-if="filteredUsers.length === 0"
+        class="flex flex-col items-center justify-center rounded-2xl bg-white py-16 text-center shadow-sm border border-slate-100"
+      >
+        <div class="mb-4 rounded-full bg-slate-50 p-4">
+            <Icon name="heroicons:users" class="h-10 w-10 text-slate-400" />
         </div>
+        <h3 class="text-lg font-medium text-slate-800">No hay usuarios</h3>
+        <p class="mt-1 text-slate-500">No se encontraron resultados con los filtros actuales.</p>
+        <button
+            class="mt-4 rounded-lg bg-emerald-100 px-4 py-2 text-sm font-bold text-emerald-700 hover:bg-emerald-200"
+            @click="resetFilters"
+        >
+            Limpiar filtros
+        </button>
+      </div>
 
-        <div v-else>
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-                >
-                  Usuario
-                </th>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-                >
-                  Rol
-                </th>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-                >
-                  Estado
-                </th>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-                >
-                  Fecha de registro
-                </th>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-                >
-                  Publicaciones
-                </th>
-                <th
-                  class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500"
-                >
-                  Acciones
-                </th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 bg-white">
-              <tr v-for="user in paginatedUsers" :key="user.id">
-                <td class="whitespace-nowrap px-6 py-4">
-                  <div class="flex items-center">
-                    <div
-                      v-if="user.photoURL"
-                      class="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full"
-                    >
-                      <NuxtImg
+      <!-- Users Grid -->
+      <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div
+            v-for="user in paginatedUsers"
+            :key="user.id"
+            class="group relative flex flex-col rounded-2xl bg-white p-5 shadow-sm border border-slate-100 transition-all hover:-translate-y-1 hover:shadow-md"
+        >
+            <!-- User Header -->
+            <div class="mb-4 flex items-center gap-4">
+                <div class="relative h-14 w-14 flex-shrink-0">
+                    <NuxtImg
+                        v-if="user.photoURL"
                         :src="user.photoURL"
-                        alt="Foto de perfil"
-                        class="h-full w-full object-cover"
-                      />
-                    </div>
-                    <div
-                      v-else
-                      class="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-emerald-100 text-emerald-500"
+                        class="h-14 w-14 rounded-full object-cover shadow-sm"
+                        alt="Avatar"
+                        @error="handleImageError"
+                    />
+                     <div
+                        v-else
+                        class="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-lg font-bold text-slate-500"
                     >
-                      {{ getInitials(user.displayName || user.email) }}
+                        {{ getInitials(user.displayName || user.email) }}
                     </div>
-                    <div class="ml-4">
-                      <div class="text-sm font-medium text-gray-900">
-                        {{ user.displayName || 'Sin nombre' }}
-                      </div>
-                      <div class="text-xs text-gray-500">
-                        {{ user.email }}
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td class="whitespace-nowrap px-6 py-4">
-                  <span
-                    :class="[
-                      'inline-flex rounded-full px-2 text-xs font-semibold leading-5',
-                      user.role === 'admin'
-                        ? 'bg-purple-100 text-purple-800'
-                        : user.role === 'volunteer'
-                          ? 'bg-blue-100 text-blue-800'
-                          : user.role === 'shelter'
-                            ? 'bg-amber-100 text-amber-800'
-                            : 'bg-gray-100 text-gray-800',
-                    ]"
-                  >
-                    {{
-                      user.role === 'admin'
-                        ? 'Administrador'
-                        : user.role === 'volunteer'
-                          ? 'Voluntario'
-                          : user.role === 'shelter'
-                            ? 'Refugio'
-                            : 'Usuario'
-                    }}
-                  </span>
-                </td>
-                <td class="whitespace-nowrap px-6 py-4">
-                  <span
-                    :class="[
-                      'inline-flex rounded-full px-2 text-xs font-semibold leading-5',
-                      user.status === 'active'
-                        ? 'bg-green-100 text-green-800'
-                        : user.status === 'inactive'
-                          ? 'bg-gray-100 text-gray-800'
-                          : 'bg-red-100 text-red-800',
-                    ]"
-                  >
-                    {{
-                      user.status === 'active'
-                        ? 'Activo'
-                        : user.status === 'inactive'
-                          ? 'Inactivo'
-                          : 'Suspendido'
-                    }}
-                  </span>
-                </td>
-                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                  {{ formatDate(user.createdAt) }}
-                </td>
-                <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                  {{ user.postCount || 0 }}
-                </td>
-                <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                  <button
-                    class="mr-2 text-emerald-600 hover:text-emerald-900"
-                    @click="editUser(user)"
-                  >
-                    Editar
-                  </button>
-                  <button
-                    v-if="user.status !== 'suspended'"
-                    class="mr-2 text-amber-600 hover:text-amber-900"
-                    @click="confirmSuspendUser(user)"
-                  >
-                    Suspender
-                  </button>
-                  <button
-                    v-if="user.status === 'suspended'"
-                    class="mr-2 text-blue-600 hover:text-blue-900"
-                    @click="reactivateUser(user)"
-                  >
-                    Reactivar
-                  </button>
-                  <button class="text-red-600 hover:text-red-900" @click="confirmDeleteUser(user)">
-                    Eliminar
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                     <!-- Status Dot -->
+                    <span 
+                        :class="[
+                            'absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-white',
+                            user.status === 'active' ? 'bg-green-500' : user.status === 'suspended' ? 'bg-red-500' : 'bg-gray-400'
+                        ]"
+                    />
+                </div>
+                <div class="min-w-0 flex-1">
+                    <h3 class="truncate text-base font-bold text-slate-900">{{ user.displayName || 'Sin Nombre' }}</h3>
+                    <p class="truncate text-xs text-slate-500">{{ user.email }}</p>
+                </div>
+            </div>
 
-          <!-- Pagination -->
-          <div
-            class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6"
-          >
-            <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-              <div>
-                <p class="text-sm text-gray-700">
-                  Mostrando
-                  <span class="font-medium">{{ paginationStart + 1 }}</span>
-                  a
-                  <span class="font-medium">{{ paginationEnd }}</span>
-                  de
-                  <span class="font-medium">{{ filteredUsers.length }}</span>
-                  usuarios
-                </p>
-              </div>
-              <div>
-                <nav
-                  class="isolate inline-flex -space-x-px rounded-md shadow-sm"
-                  aria-label="Pagination"
+            <!-- Role Badge & Info -->
+            <div class="mb-4 flex items-center justify-between">
+                <span :class="['px-2.5 py-1 rounded-full text-xs font-bold border', getRoleClass(user.role)]">
+                    {{ getRoleLabel(user.role) }}
+                </span>
+                <span class="text-xs text-slate-400">
+                     {{ formatDate(user.createdAt) }}
+                </span>
+            </div>
+            
+            <div class="my-auto"></div> <!-- Spacer to push actions down -->
+
+            <!-- Actions -->
+             <div class="mt-4 flex gap-2 border-t border-slate-50 pt-4">
+                <button 
+                    @click="editUser(user)"
+                    class="flex-1 rounded-lg bg-slate-50 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-blue-600 transition-colors"
                 >
-                  <button
+                    Editar
+                </button>
+             </div>
+              <!-- Alternative Actions Layout -->
+             <div class="mt-2 grid grid-cols-2 gap-2">
+                 <button 
+                    v-if="user.status !== 'suspended'"
+                    @click="confirmSuspendUser(user)"
+                    class="rounded-lg border border-amber-100 bg-amber-50 py-2 text-xs font-bold text-amber-700 hover:bg-amber-100"
+                 >
+                    Suspender
+                 </button>
+                  <button 
+                    v-else
+                    @click="reactivateUser(user)"
+                    class="rounded-lg border border-blue-100 bg-blue-50 py-2 text-xs font-bold text-blue-700 hover:bg-blue-100"
+                 >
+                    Reactivar
+                 </button>
+                 
+                 <button 
+                    @click="confirmDeleteUser(user)"
+                    class="rounded-lg border border-red-100 bg-red-50 py-2 text-xs font-bold text-red-700 hover:bg-red-100"
+                 >
+                    Eliminar
+                 </button>
+             </div>
+        </div>
+      </div>
+
+       <!-- Pagination -->
+       <div v-if="filteredUsers.length > 0" class="mt-8 flex justify-center">
+            <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm">
+                 <button
                     :disabled="currentPage === 1"
                     :class="[
-                      'relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700',
-                      currentPage === 1 ? 'cursor-not-allowed opacity-50' : 'hover:bg-gray-50',
+                      'relative inline-flex items-center rounded-l-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50',
+                      currentPage === 1 ? 'cursor-not-allowed opacity-50' : ''
                     ]"
                     @click="prevPage"
                   >
                     <Icon name="heroicons:chevron-left" class="h-5 w-5" />
                   </button>
-                  <button
+                  <span class="relative inline-flex items-center border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700">
+                    {{ currentPage }} / {{ totalPages }}
+                  </span>
+                   <button
                     :disabled="currentPage === totalPages"
                     :class="[
-                      'relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700',
-                      currentPage === totalPages
-                        ? 'cursor-not-allowed opacity-50'
-                        : 'hover:bg-gray-50',
+                      'relative inline-flex items-center rounded-r-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50',
+                      currentPage === totalPages ? 'cursor-not-allowed opacity-50' : ''
                     ]"
                     @click="nextPage"
                   >
                     <Icon name="heroicons:chevron-right" class="h-5 w-5" />
                   </button>
-                </nav>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+            </nav>
+       </div>
 
       <!-- Edit User Modal -->
       <div
         v-if="showEditModal"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
+        class="fixed inset-0 z-50 flex items-center justify-end bg-black/20 backdrop-blur-sm transition-opacity"
+        @click.self="closeEditModal"
       >
-        <div class="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
-          <div class="mb-4 flex items-center justify-between">
-            <h3 class="text-lg font-medium text-gray-900">
-              {{ selectedUser ? 'Editar usuario' : 'Añadir usuario' }}
+        <div class="h-full w-full max-w-md bg-white p-6 shadow-2xl transition-transform sm:border-l sm:border-slate-100 overflow-y-auto">
+          <div class="mb-6 flex items-center justify-between">
+            <h3 class="text-xl font-bold text-slate-800">
+              {{ selectedUser ? 'Editar Perfil' : 'Nuevo Usuario' }}
             </h3>
-            <button class="text-gray-400 hover:text-gray-500" @click="closeEditModal">
-              <Icon name="heroicons:x-mark" class="h-5 w-5" />
+            <button class="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600" @click="closeEditModal">
+              <Icon name="heroicons:x-mark" class="h-6 w-6" />
             </button>
           </div>
 
           <div class="space-y-4">
+             <!-- Form Fields with better styling -->
             <div>
-              <label class="block text-sm font-medium text-gray-700">Nombre</label>
+              <label class="mb-1 block text-sm font-bold text-slate-700">Nombre Completo</label>
               <input
                 v-model="userForm.displayName"
                 type="text"
-                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-                placeholder="Nombre completo"
+                class="w-full rounded-xl border-slate-200 bg-slate-50 px-4 py-3 focus:border-emerald-500 focus:bg-white focus:ring-emerald-500 transition-all font-medium"
+                placeholder="Ej. Juan Pérez"
               >
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700">Email</label>
+              <label class="mb-1 block text-sm font-bold text-slate-700">Correo Electrónico</label>
               <input
                 v-model="userForm.email"
                 type="email"
-                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-                placeholder="correo@example.com"
+                class="w-full rounded-xl border-slate-200 bg-slate-50 px-4 py-3 focus:border-emerald-500 focus:bg-white focus:ring-emerald-500 transition-all font-medium disabled:opacity-60"
+                placeholder="correo@ejemplo.com"
                 :disabled="!!selectedUser"
               >
             </div>
-
-            <div v-if="!selectedUser">
-              <label class="block text-sm font-medium text-gray-700">Contraseña</label>
+            
+             <div v-if="!selectedUser">
+              <label class="mb-1 block text-sm font-bold text-slate-700">Contraseña</label>
               <input
                 v-model="userForm.password"
                 type="password"
-                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-                placeholder="Contraseña"
+                class="w-full rounded-xl border-slate-200 bg-slate-50 px-4 py-3 focus:border-emerald-500 focus:bg-white focus:ring-emerald-500 transition-all font-medium"
+                placeholder="••••••••"
               >
             </div>
 
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Rol</label>
-              <select
-                v-model="userForm.role"
-                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-              >
-                <option value="user">Usuario</option>
-                <option value="volunteer">Voluntario</option>
-                <option value="shelter">Refugio</option>
-                <option value="admin">Administrador</option>
-              </select>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="mb-1 block text-sm font-bold text-slate-700">Rol</label>
+                    <select
+                        v-model="userForm.role"
+                         class="w-full rounded-xl border-slate-200 bg-slate-50 px-3 py-3 focus:border-emerald-500 focus:bg-white focus:ring-emerald-500 transition-all font-medium text-sm"
+                    >
+                        <option value="user">Usuario</option>
+                        <option value="volunteer">Voluntario</option>
+                        <option value="shelter">Refugio</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                 <div>
+                    <label class="mb-1 block text-sm font-bold text-slate-700">Estado</label>
+                    <select
+                        v-model="userForm.status"
+                         class="w-full rounded-xl border-slate-200 bg-slate-50 px-3 py-3 focus:border-emerald-500 focus:bg-white focus:ring-emerald-500 transition-all font-medium text-sm"
+                    >
+                        <option value="active">Activo</option>
+                        <option value="inactive">Inactivo</option>
+                        <option value="suspended">Suspendido</option>
+                    </select>
+                </div>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700">Estado</label>
-              <select
-                v-model="userForm.status"
-                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-              >
-                <option value="active">Activo</option>
-                <option value="inactive">Inactivo</option>
-                <option value="suspended">Suspendido</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Teléfono</label>
+              <label class="mb-1 block text-sm font-bold text-slate-700">Teléfono</label>
               <input
                 v-model="userForm.phone"
                 type="tel"
-                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-                placeholder="Número de teléfono"
+                class="w-full rounded-xl border-slate-200 bg-slate-50 px-4 py-3 focus:border-emerald-500 focus:bg-white focus:ring-emerald-500 transition-all font-medium"
+                placeholder="+58 414 ..."
               >
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700">Dirección</label>
+              <label class="mb-1 block text-sm font-bold text-slate-700">Dirección</label>
               <textarea
                 v-model="userForm.address"
-                rows="2"
-                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-                placeholder="Dirección"
+                rows="3"
+                class="w-full rounded-xl border-slate-200 bg-slate-50 px-4 py-3 focus:border-emerald-500 focus:bg-white focus:ring-emerald-500 transition-all font-medium"
+                placeholder="Ciudad, Estado..."
               />
             </div>
           </div>
 
-          <div class="mt-6 flex justify-end space-x-3">
+          <div class="mt-8 flex justify-end space-x-3 border-t border-slate-100 pt-6">
             <button
-              class="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              class="rounded-xl border border-slate-200 px-6 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors"
               @click="closeEditModal"
             >
               Cancelar
             </button>
             <button
-              class="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+              class="rounded-xl bg-emerald-600 px-8 py-3 text-sm font-bold text-white hover:bg-emerald-700 shadow-md transition-colors"
               @click="saveUser"
             >
-              Guardar
+              Guardar usuario
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Modal para confirmación/alertas -->
+       <!-- Modal Alert reused -->
       <ModalAlert
         :show="showModal"
         :type="modalType"
@@ -430,12 +345,11 @@ import { useAuth } from '~/composables/useAuth'
 import { useUsers } from '~/composables/useUsers'
 import ModalAlert from '~/components/common/ModalAlert.vue'
 
-// Verificar si el usuario es administrador
 definePageMeta({
   middleware: ['admin'],
+  layout: 'default'
 })
 
-// Usar el composable de usuarios
 const {
   users: allUsers,
   loading,
@@ -447,18 +361,15 @@ const {
   deleteUser,
 } = useUsers()
 
-// Estado para búsqueda y filtros
 const searchQuery = ref('')
 const filters = ref({
   role: '',
   status: '',
 })
 
-// Estado para paginación
 const currentPage = ref(1)
-const pageSize = 10
+const pageSize = 12
 
-// Estado para modales
 const showEditModal = ref(false)
 const selectedUser = ref(null)
 const userForm = ref({
@@ -471,7 +382,6 @@ const userForm = ref({
   address: '',
 })
 
-// Estado para el modal global
 const showModal = ref(false)
 const modalType = ref('')
 const modalTitle = ref('')
@@ -479,7 +389,6 @@ const modalMessage = ref('')
 const modalConfirmText = ref('')
 let confirmAction = () => {}
 
-// Cargar usuarios
 const loadUsers = async () => {
   try {
     await fetchAllUsers()
@@ -488,80 +397,39 @@ const loadUsers = async () => {
   }
 }
 
-// Filtrar usuarios
 const filteredUsers = computed(() => {
+  if (!allUsers.value) return []
+  
   return allUsers.value.filter((user) => {
-    // Filtrar por búsqueda
     const searchMatch = searchQuery.value
       ? user.displayName?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
         user.email?.toLowerCase().includes(searchQuery.value.toLowerCase())
       : true
 
-    // Filtrar por rol
     const roleMatch = filters.value.role ? user.role === filters.value.role : true
-
-    // Filtrar por estado
     const statusMatch = filters.value.status ? user.status === filters.value.status : true
 
     return searchMatch && roleMatch && statusMatch
   })
 })
 
-// Paginación
-const totalPages = computed(() => {
-  return Math.ceil(filteredUsers.value.length / pageSize)
-})
-
-const paginationStart = computed(() => {
-  return (currentPage.value - 1) * pageSize
-})
-
-const paginationEnd = computed(() => {
-  return Math.min(paginationStart.value + pageSize, filteredUsers.value.length)
-})
-
-const paginatedUsers = computed(() => {
-  return filteredUsers.value.slice(paginationStart.value, paginationEnd.value)
-})
-
-// Métodos para controles
-const applyFilters = () => {
-  currentPage.value = 1
-}
+const totalPages = computed(() => Math.ceil(filteredUsers.value.length / pageSize))
+const paginationStart = computed(() => (currentPage.value - 1) * pageSize)
+const paginationEnd = computed(() => Math.min(paginationStart.value + pageSize, filteredUsers.value.length))
+const paginatedUsers = computed(() => filteredUsers.value.slice(paginationStart.value, paginationEnd.value))
 
 const resetFilters = () => {
   searchQuery.value = ''
-  filters.value = {
-    role: '',
-    status: '',
-  }
+  filters.value = { role: '', status: '' }
   currentPage.value = 1
 }
 
-const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
-  }
-}
+const nextPage = () => { if (currentPage.value < totalPages.value) currentPage.value++ }
+const prevPage = () => { if (currentPage.value > 1) currentPage.value-- }
 
-const prevPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--
-  }
-}
-
-// Métodos para acciones de usuario
 const openCreateUserModal = () => {
   selectedUser.value = null
-  userForm.value = {
-    displayName: '',
-    email: '',
-    password: '',
-    role: 'user',
-    status: 'active',
-    phone: '',
-    address: '',
-  }
+  userForm.value = { displayName: '', email: '', password: '', role: 'user', status: 'active', phone: '', address: '' }
   showEditModal.value = true
 }
 
@@ -581,55 +449,34 @@ const editUser = (user) => {
 const closeEditModal = () => {
   showEditModal.value = false
   selectedUser.value = null
-  userForm.value = {
-    displayName: '',
-    email: '',
-    password: '',
-    role: 'user',
-    status: 'active',
-    phone: '',
-    address: '',
-  }
 }
 
 const saveUser = async () => {
   try {
     if (selectedUser.value) {
-      // Actualizar usuario existente
       await updateUser(selectedUser.value.id, userForm.value)
     } else {
-      // Crear nuevo usuario
       if (!userForm.value.email || !userForm.value.password) {
-        error.value = 'Email y contraseña son obligatorios'
+        error.value = 'Email y contraseña son obligatorios' // Should use proper error handling
         return
       }
-
-      await createUser({
-        ...userForm.value,
-        // El composable createUser ya se encarga de añadir createdAt
-      })
+      await createUser({ ...userForm.value })
     }
-
     closeEditModal()
+    await loadUsers() // Refresh list
   } catch (err) {
     console.error('Error saving user:', err)
   }
 }
 
-// Métodos para confirmación
 const confirmSuspendUser = (user) => {
   modalType.value = 'confirm'
   modalTitle.value = 'Suspender usuario'
-  modalMessage.value = `¿Estás seguro de que deseas suspender al usuario ${user.displayName || user.email}? El usuario no podrá acceder a su cuenta mientras esté suspendido.`
+  modalMessage.value = `¿Suspender a ${user.displayName || user.email}?`
   modalConfirmText.value = 'Suspender'
-  
   confirmAction = async () => {
     showModal.value = false
-    try {
-      await updateUserStatus(user.id, 'suspended')
-    } catch (err) {
-      console.error('Error suspending user:', err)
-    }
+    try { await updateUserStatus(user.id, 'suspended'); await loadUsers(); } catch (err) { console.error(err) }
   }
   showModal.value = true
 }
@@ -637,16 +484,11 @@ const confirmSuspendUser = (user) => {
 const confirmDeleteUser = (user) => {
   modalType.value = 'delete'
   modalTitle.value = 'Eliminar usuario'
-  modalMessage.value = `¿Estás seguro de que deseas eliminar al usuario ${user.displayName || user.email}? Esta acción no se puede deshacer.`
+  modalMessage.value = `¿Eliminar a ${user.displayName || user.email}?`
   modalConfirmText.value = 'Eliminar'
-  
   confirmAction = async () => {
     showModal.value = false
-    try {
-      await deleteUser(user.id)
-    } catch (err) {
-      console.error('Error deleting user:', err)
-    }
+    try { await deleteUser(user.id); await loadUsers(); } catch (err) { console.error(err) }
   }
   showModal.value = true
 }
@@ -654,41 +496,49 @@ const confirmDeleteUser = (user) => {
 const reactivateUser = async (user) => {
   modalType.value = 'confirm'
   modalTitle.value = 'Reactivar usuario'
-  modalMessage.value = `¿Estás seguro de que deseas reactivar al usuario ${user.displayName || user.email}?`
+  modalMessage.value = `¿Reactivar a ${user.displayName || user.email}?`
   modalConfirmText.value = 'Reactivar'
-  
   confirmAction = async () => {
     showModal.value = false
-    try {
-      await updateUserStatus(user.id, 'active')
-    } catch (err) {
-      console.error('Error reactivating user:', err)
-    }
+    try { await updateUserStatus(user.id, 'active'); await loadUsers(); } catch (err) { console.error(err) }
   }
   showModal.value = true
 }
 
-// Utilidades
 const formatDate = (timestamp) => {
   if (!timestamp) return 'N/A'
-  const d = new Date(timestamp)
-  return d.toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
+  return new Date(timestamp).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' })
 }
 
 const getInitials = (name) => {
-  if (!name) return ''
-  return name
-    .split(' ')
-    .map((word) => word.charAt(0))
-    .join('')
-    .toUpperCase()
-    .substring(0, 2)
+  if (!name) return '?'
+  return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
 }
 
-// Cargar usuarios al montar el componente
+const getRoleClass = (role) => {
+    const map = {
+        admin: 'bg-purple-100 text-purple-800 border-purple-200',
+        volunteer: 'bg-blue-100 text-blue-800 border-blue-200',
+        shelter: 'bg-amber-100 text-amber-800 border-amber-200',
+        user: 'bg-slate-100 text-slate-800 border-slate-200'
+    }
+    return map[role] || map.user
+}
+
+const getRoleLabel = (role) => {
+    const map = {
+        admin: 'Admin',
+        volunteer: 'Voluntario',
+        shelter: 'Refugio',
+        user: 'Usuario'
+    }
+    return map[role] || 'Usuario'
+}
+
+const handleImageError = (e) => {
+    e.target.src = '/img/placeholder-user.webp' // Ensure this exists or use a generic fallback
+    e.target.onerror = null // Prevent infinite loop
+}
+
 onMounted(loadUsers)
 </script>

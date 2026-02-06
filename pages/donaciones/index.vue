@@ -69,76 +69,139 @@
       </section>
 
       <section class="mb-16">
-        <div class="grid grid-cols-1 gap-8 md:grid-cols-3 justify-center items-center">
-          <!--En Especie-->
-          <div
-            class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105"
-          >
-            <h1 class="mb-4 text-xl font-semibold">Donacion en especie</h1>
-            <p class="mb-4 text-gray-600">
-              Realiza una donación de alimentos, medicinas o suministros para nuestras
-              mascotas y para los refugios del estado.
-            </p>
-            <NuxtLink to="/donaciones/especie" class="p-6">
-              <div
-                class="mx-auto bg-emerald-600 text-[#fefffa] p-4 hover:bg-emerald-700 rounded-xl max-w-xs items-center flex justify-center"
-              >
-                <span class="ml-2"> Mas detalles</span>
+        <div class="grid grid-cols-1 gap-12 lg:grid-cols-2">
+          
+          <!-- Columna Izquierda: Aportes Económicos -->
+          <div class="space-y-8">
+            <div class="text-left">
+              <h2 class="mb-2 flex items-center gap-3 text-3xl font-bold text-emerald-800">
+                <div class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                  <Icon name="mdi:cash-multiple" class="h-6 w-6" />
+                </div>
+                Aporte Económico
+              </h2>
+              <p class="text-gray-600">
+                Tu donación monetaria nos permite cubrir gastos veterinarios urgentes, comprar alimento y mantener nuestras instalaciones.
+              </p>
+            </div>
 
-                <Icon
-                  name="mdi:chevron-down"
-                  class="h-5 w-5 text-amber-50 transition-transform"
-                />
+            <!-- Opciones Agrupadas -->
+            <div class="grid gap-4 sm:grid-cols-1">
+              <!-- PayPal (Destacado) -->
+              <div class="rounded-2xl border-2 border-emerald-100 bg-white p-6 shadow-sm transition-all hover:border-emerald-300 hover:shadow-md">
+                <div class="mb-4 flex items-center justify-between">
+                  <h3 class="text-xl font-bold text-gray-800">Donar con PayPal</h3>
+                  <Icon name="logos:paypal" class="h-6" />
+                </div>
+                <p class="mb-6 text-sm text-gray-500">
+                  Seguro, rápido y puedes usar tu tarjeta de crédito o saldo PayPal.
+                </p>
+                <NuxtLink
+                  to="https://paypal.me/adoptazulia?country.x=VE&locale.x=en_US"
+                  target="_blank"
+                  class="flex w-full items-center justify-center rounded-xl bg-[#0070BA] py-3 font-bold text-white transition-colors hover:bg-[#005ea6]"
+                >
+                  Ir a PayPal
+                  <Icon name="mdi:arrow-top-right" class="ml-2 h-4 w-4" />
+                </NuxtLink>
               </div>
-            </NuxtLink>
+
+              <!-- Otras Plataformas (Patreon & Ko-fi) -->
+              <div class="grid gap-4 sm:grid-cols-2">
+                <!-- Patreon -->
+                <NuxtLink 
+                  to="https://patreon.com/AdoptaZulia"
+                  target="_blank"
+                  class="group flex flex-col justify-between rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all hover:border-red-100 hover:bg-red-50"
+                >
+                  <div>
+                    <Icon name="logos:patreon" class="mb-3 h-6 w-6" />
+                    <h3 class="font-bold text-gray-800">Ser Padrino</h3>
+                    <p class="mt-1 text-xs text-gray-500 group-hover:text-gray-700">Donación recurrente mensual</p>
+                  </div>
+                  <div class="mt-4 text-right">
+                    <span class="text-sm font-semibold text-red-500 group-hover:underline">Ver niveles →</span>
+                  </div>
+                </NuxtLink>
+
+                <!-- Ko-fi -->
+                <NuxtLink 
+                  to="https://ko-fi.com/adoptazulia"
+                  target="_blank"
+                  class="group flex flex-col justify-between rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all hover:border-sky-100 hover:bg-sky-50"
+                >
+                  <div>
+                    <Icon name="simple-icons:kofi" class="mb-3 h-6 w-6 text-[#29abe0]" />
+                    <h3 class="font-bold text-gray-800">Invítanos un Café</h3>
+                    <p class="mt-1 text-xs text-gray-500 group-hover:text-gray-700">Micro-donaciones puntuales</p>
+                  </div>
+                  <div class="mt-4 text-right">
+                    <span class="text-sm font-semibold text-[#29abe0] group-hover:underline">Donar $5 →</span>
+                  </div>
+                </NuxtLink>
+              </div>
+            </div>
+            
+            <!-- Confianza / Testimonio -->
+            <div class="rounded-xl bg-amber-50 p-4 text-sm text-amber-800">
+              <div class="flex items-start gap-3">
+                <Icon name="mdi:format-quote-open" class="h-6 w-6 flex-shrink-0 text-amber-500" />
+                <p class="italic">"Después de donar, recibí un correo detallado sobre cómo mi aporte ayudó a Max a recibir su tratamiento. ¡Increíble transparencia!" — <span class="font-bold not-italic">Laura M.</span></p>
+              </div>
+            </div>
           </div>
-          <!--PayPal-->
-          <div
-            class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105"
-          >
-            <h1 class="mb-4 text-xl font-semibold">PayPal</h1>
-            <p class="mb-4 text-gray-600">
-              Realiza una donación segura mediante PayPal, cualquier monto es una ayuda
-              para todos los animales que los necesitan
+
+          <!-- Columna Derecha: Aportes en Especie -->
+          <div class="flex flex-col rounded-3xl bg-emerald-50 p-8 lg:p-10">
+            <div class="mb-6">
+               <h2 class="mb-2 flex items-center gap-3 text-3xl font-bold text-emerald-800">
+                <div class="flex h-12 w-12 items-center justify-center rounded-full bg-white text-emerald-600">
+                  <Icon name="mdi:package-variant-closed" class="h-6 w-6" />
+                </div>
+                Donación en Especie
+              </h2>
+              <p class="text-emerald-900/80">
+                ¿Prefieres donar insumos? Aceptamos alimentos, medicinas y materiales para nuestros refugios aliados.
+              </p>
+            </div>
+
+            <div class="mb-8 flex-grow">
+              <h3 class="mb-4 text-lg font-bold text-emerald-800">Lo que más necesitamos:</h3>
+              <ul class="space-y-3">
+                <li class="flex items-center gap-3 rounded-lg bg-white/50 p-3">
+                  <div class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                    <Icon name="mdi:bone" class="h-4 w-4" />
+                  </div>
+                  <span class="font-medium text-emerald-900">Alimento (Perro y Gato)</span>
+                </li>
+                 <li class="flex items-center gap-3 rounded-lg bg-white/50 p-3">
+                  <div class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                    <Icon name="mdi:pill" class="h-4 w-4" />
+                  </div>
+                  <span class="font-medium text-emerald-900">Medicamentos y Vitaminas</span>
+                </li>
+                 <li class="flex items-center gap-3 rounded-lg bg-white/50 p-3">
+                  <div class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                    <Icon name="mdi:home-roof" class="h-4 w-4" />
+                  </div>
+                  <span class="font-medium text-emerald-900">Artículos de Limpieza</span>
+                </li>
+              </ul>
+            </div>
+
+            <NuxtLink 
+              to="/donaciones/especie"
+              class="group flex items-center justify-center gap-2 rounded-xl bg-emerald-600 py-4 text-lg font-bold text-white shadow-lg shadow-emerald-200 transition-all hover:bg-emerald-700 hover:shadow-xl"
+            >
+              Ver info de entrega
+              <Icon name="mdi:arrow-right" class="transition-transform group-hover:translate-x-1" />
+            </NuxtLink>
+            
+            <p class="mt-4 text-center text-xs text-emerald-800/60">
+              * Coordinamos recogidas en zona de Maracaibo/San Francisco
             </p>
-
-            <NuxtLink
-              to=" https://paypal.me/adoptazulia?country.x=VE&locale.x=en_US"
-              target="_blank"
-              class="mx-auto bg-emerald-600 text-[#fefffa] p-4 hover:bg-emerald-700 rounded-xl max-w-xs items-center flex justify-center"
-            >
-              <span class="ml-2">Donar via PayPal</span>
-              <Icon
-                name="mdi:chevron-down"
-                class="h-5 w-5 text-amber-50 transition-transform"
-              />
-            </NuxtLink>
           </div>
-          <!--Patreon-->
-          <NuxtLink to="https://patreon.com/AdoptaZulia">
-            <div
-              class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105"
-            >
-              <h1 class="mb-4 text-xl font-semibold">Patreon</h1>
-              <p class="mb-4 text-gray-600">
-                Apadrina a AdoptaZulia y todas las mascotas que ayudamos.
-              </p>
-              <NuxtImg src="/patreon.webp" alt="Patreon" class="mx-auto" loading="lazy" />
-            </div>
-          </NuxtLink>
 
-          <!--Ko-fi-->
-          <NuxtLink to="https://ko-fi.com/adoptazulia">
-            <div
-              class="transform rounded-lg bg-white p-8 text-center shadow-md transition-transform hover:scale-105"
-            >
-              <h1 class="mb-4 text-xl font-semibold">Ko-fi</h1>
-              <p class="mb-4 text-gray-600">
-                Compranos un cafe, para poder seguir brindando la ayuda que tanto merecen.
-              </p>
-              <NuxtImg src="/kofi.webp" alt="Ko-fi" class="mx-auto" loading="lazy" />
-            </div>
-          </NuxtLink>
         </div>
       </section>
 
@@ -370,17 +433,41 @@ onMounted(async () => {
       paypalButtonRendered.value = true;
     });
   }
-  useHead({
-    title: "Donaciones - Adopta Zulia",
-    meta: [
-      {
-        name: "description",
-        content:
-          "Conviértete en un héroe para nuestras mascotas. Descubre cómo puedes ayudar con donaciones únicas o mensuales.",
-      },
-    ],
+
   });
-});
+
+  const canonicalUrl = useCanonicalUrl('/donaciones')
+  const ogImage = useOgImage('/og.jpg')
+
+  useSeoMeta({
+    title: 'Donaciones | Adopta Zulia',
+    description: 'Tu ayuda salva vidas. Apoya nuestra misión de rescatar y cuidar mascotas en Zulia con donaciones económicas o en especie.',
+    ogTitle: 'Haz una Donación - Adopta Zulia',
+    ogDescription: 'Tu aporte transforma vidas. Ayúdanos a seguir rescatando, rehabilitando y encontrando hogares para mascotas en Zulia.',
+    ogImage,
+    ogImageAlt: 'Ayuda a las mascotas de Zulia',
+    ogUrl: canonicalUrl,
+    ogType: 'website',
+    twitterTitle: 'Donaciones - Adopta Zulia',
+    twitterDescription: 'Apoya nuestra misión de rescate animal en el estado Zulia.',
+    twitterImage: ogImage,
+    twitterCard: 'summary_large_image',
+  })
+
+  useHead({
+    link: [
+      {
+        rel: 'canonical',
+        href: canonicalUrl,
+      }
+    ],
+    script: [
+      useStructuredData(createBreadcrumbSchema([
+        { name: 'Inicio', url: useCanonicalUrl('/') },
+        { name: 'Donaciones', url: canonicalUrl }
+      ])),
+    ]
+  })
 </script>
 
 <style scoped>

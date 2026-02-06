@@ -123,7 +123,41 @@
   </section>
 </template>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+const canonicalUrl = useCanonicalUrl('/nosotros')
+const ogImage = useOgImage('/og.jpg')
+
+useSeoMeta({
+  title: 'Nosotros | Adopta Zulia',
+  description: 'Conoce al equipo detrás de Adopta Zulia. Nuestra misión es conectar mascotas abandonadas con hogares amorosos en el estado Zulia.',
+  ogTitle: 'Sobre Nosotros - Adopta Zulia',
+  ogDescription: 'Conoce nuestra misión, visión y el equipo de voluntarios dedicados al bienestar animal en Zulia.',
+  ogImage,
+  ogImageAlt: 'Equipo de Adopta Zulia',
+  ogUrl: canonicalUrl,
+  ogType: 'website',
+  twitterTitle: 'Sobre Nosotros - Adopta Zulia',
+  twitterDescription: 'Conoce nuestra misión y el equipo detrás de Adopta Zulia.',
+  twitterImage: ogImage,
+  twitterCard: 'summary_large_image',
+})
+
+useHead({
+  link: [
+    {
+      rel: 'canonical',
+      href: canonicalUrl,
+    }
+  ],
+  script: [
+    useStructuredData(createBreadcrumbSchema([
+      { name: 'Inicio', url: useCanonicalUrl('/') },
+      { name: 'Nosotros', url: canonicalUrl }
+    ])),
+    useStructuredData(createOrganizationSchema())
+  ]
+})
+</script>
 
 <style>
 .min-h-100 {

@@ -495,6 +495,54 @@ const hasAdoptionRequirements = computed(() => {
 
 const ownerAdoptionCount = computed(() => ownerAdoptions.value.length)
 
+// SEO Meta Tags
+useSeoMeta({
+  title: computed(() => pet.value ? `${pet.value.name} en adopción | Adopta Zulia` : 'Mascota en adopción | Adopta Zulia'),
+  description: computed(() => pet.value ? `Conoce a ${pet.value.name}, un ${pet.value.type} de raza ${pet.value.breed || 'mestiza'} que busca hogar en ${pet.value.location}. ${pet.value.description?.substring(0, 100)}...` : 'Detalles de mascota en adopción'),
+  ogTitle: computed(() => pet.value ? `Adopta a ${pet.value.name} - Adopta Zulia` : 'Mascota en adopción'),
+  ogDescription: computed(() => pet.value ? `Ayuda a ${pet.value.name} a encontrar un hogar. ${pet.value.description?.substring(0, 100)}...` : 'Ayuda a esta mascota a encontrar un hogar'),
+  ogImage: computed(() => useOgImage(pet.value?.image || pet.value?.photos?.[0])),
+  ogUrl: computed(() => useCanonicalUrl(`/mascotas/${petId}`)),
+  twitterTitle: computed(() => pet.value ? `Adopta a ${pet.value.name}` : 'Mascota en adopción'),
+  twitterDescription: computed(() => pet.value ? `${pet.value.name} busca un hogar en ${pet.value.location}.` : 'Mascota busca hogar'),
+  twitterImage: computed(() => useOgImage(pet.value?.image || pet.value?.photos?.[0])),
+  twitterCard: 'summary_large_image',
+})
+
+useHead({
+  link: [
+    {
+      rel: 'canonical',
+      href: computed(() => useCanonicalUrl(`/mascotas/${petId}`)),
+    }
+  ],
+  script: [
+    // Structured Data for the Pet
+    computed(() => {
+        if (!pet.value) return {}
+        return useStructuredData({
+            '@context': 'https://schema.org',
+            '@type': 'Product', // Often used for pets/products but waiting for a better Schema
+            name: pet.value.name,
+            image: pet.value.image ? [useOgImage(pet.value.image)] : [],
+            description: pet.value.description,
+            category: pet.value.type,
+            offers: {
+                '@type': 'Offer',
+                price: pet.value.adoptionFee || 0,
+                priceCurrency: 'USD',
+                availability: pet.value.status === 'adopted' ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
+            }
+        })
+    }),
+    useStructuredData(createBreadcrumbSchema([
+      { name: 'Inicio', url: useCanonicalUrl('/') },
+      { name: 'Mascotas', url: useCanonicalUrl('/mascotas') },
+      { name: pet.value?.name || 'Detalle', url: useCanonicalUrl(`/mascotas/${petId}`) }
+    ])),
+  ]
+})
+
 // Life Cycle
 onMounted(async () => {
     try {

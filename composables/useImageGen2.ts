@@ -1,20 +1,26 @@
 import { ref } from 'vue'
 import QRCode from 'qrcode'
 
+interface ImageGenOptions {
+  backgroundColor?: string
+  frameImageUrl?: string
+  downloadFilename?: string
+}
+
 export function useImageGen2() {
   const generating = ref(false)
-  const error = ref(null)
+  const error = ref<string | null>(null)
 
   /**
    * Genera una imagen compartible de una mascota con marco, logo y código QR
    * Solución especial para problemas de CORS con S3
    */
   async function generatePetImage(
-    petName,
-    petImageUrl,
-    petId,
-    options = {}
-  ) {
+    petName: string,
+    petImageUrl: string,
+    petId: string,
+    options: ImageGenOptions = {}
+  ): Promise<string | null> {
     generating.value = true
     error.value = null
 
@@ -33,6 +39,10 @@ export function useImageGen2() {
       canvas.width = canvasWidth
       canvas.height = canvasHeight
       const ctx = canvas.getContext('2d')
+      
+      if (!ctx) {
+        throw new Error('No se pudo obtener el contexto del canvas')
+      }
 
       // Cargar la fuente Bricolage Grotesque desde archivo local
       const fontFace = new FontFace('Bricolage Grotesque', 'url(/bricolage.ttf)')
@@ -44,7 +54,7 @@ export function useImageGen2() {
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
       // Cargar imagen de la mascota
-      function loadImage(url) {
+      function loadImage(url: string): Promise<HTMLImageElement> {
         return new Promise((resolve, reject) => {
           const img = new Image()
           

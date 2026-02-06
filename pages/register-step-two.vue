@@ -1,115 +1,140 @@
 <template>
-  <div class="w-full max-w-md space-y-8 mx-auto">
-    <div>
-      <NuxtPicture class="mx-auto h-16 w-auto" src="/logo.svg" alt="Adopta Zulia" sizes="64px" placeholder />
-      <h2 class="mt-6 text-center text-3xl font-bold tracking-tight text-emerald-800">
-        Completa tu perfil
-      </h2>
-      <p class="mt-2 text-center text-sm text-gray-600">
-        Solo un paso más para completar tu registro
-      </p>
-    </div>
+  <div class="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md space-y-8 rounded-3xl bg-white p-8 shadow-xl sm:p-10">
+      <!-- Steps Indicator -->
+      <div class="mx-auto flex w-full max-w-xs items-center justify-between">
+        <div class="flex flex-col items-center">
+          <div class="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 font-bold border-2 border-emerald-500">
+            <Icon name="heroicons:check" class="h-6 w-6" />
+          </div>
+          <span class="mt-2 text-xs font-medium text-emerald-600">Registro</span>
+        </div>
+        
+        <div class="h-1 flex-1 bg-emerald-100 mx-2">
+          <div class="h-full w-full bg-emerald-500 rounded-full" />
+        </div>
 
-    <div class="mt-8 space-y-6 rounded-lg bg-white p-8 shadow">
-      <div v-if="error" class="rounded-md bg-red-50 p-4">
-        <div class="flex items-center">
-          <div class="flex-shrink-0">
-            <Icon name="mdi:close-circle" class="h-5 w-5 text-red-500" />
+        <div class="flex flex-col items-center">
+          <div class="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-600 text-white font-bold shadow-lg ring-4 ring-emerald-50">
+            2
           </div>
-          <div class="ml-3">
-            <p class="text-sm text-red-700">{{ error }}</p>
-          </div>
+          <span class="mt-2 text-xs font-bold text-gray-900">Perfil</span>
         </div>
       </div>
 
-      <form class="space-y-6" @submit.prevent="handleCompleteProfile">
-        <!-- Avatar upload section -->
-        <div class="space-y-2">
-          <label class="block text-sm font-medium text-gray-700">Foto de perfil</label>
-          <div class="flex flex-col items-center space-y-4">
-            <div
-              class="relative h-32 w-32 overflow-hidden rounded-full border-2 border-gray-200 bg-gray-100"
-            >
+      <div class="text-center">
+        <h2 class="mt-6 text-3xl font-extrabold text-gray-900">
+          ¡Casi listo!
+        </h2>
+        <p class="mt-2 text-sm text-gray-600">
+          Personaliza tu perfil para que la comunidad te conozca.
+        </p>
+      </div>
+
+      <form class="mt-8 space-y-6" @submit.prevent="handleCompleteProfile">
+        <!-- Avatar Upload -->
+        <div class="flex flex-col items-center gap-6">
+          <div class="relative group">
+            <div class="relative h-32 w-32 overflow-hidden rounded-full border-4 border-white shadow-lg ring-2 ring-gray-100">
               <NuxtImg
                 v-if="photoPreview"
                 :src="photoPreview"
-                alt="Avatar preview"
                 class="h-full w-full object-cover"
-                sizes="128px"
-                placeholder
+                alt="Avatar preview"
               />
-              <div
-                v-else
-                class="flex h-full w-full items-center justify-center text-gray-400"
-              >
-                <Icon name="mdi:account" class="h-16 w-16" />
+              <div v-else class="flex h-full w-full items-center justify-center bg-gray-50 text-gray-300">
+                <Icon name="heroicons:user-solid" class="h-16 w-16" />
               </div>
-            </div>
-
-            <div class="flex items-center space-x-4">
-              <button
-                type="button"
-                class="inline-flex items-center rounded-md border border-emerald-600 bg-white px-4 py-2 text-sm font-medium text-emerald-600 shadow-sm hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+              
+              <!-- Hover Overlay -->
+              <div 
+                class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100 cursor-pointer"
                 @click="triggerFileInput"
               >
-                <Icon name="mdi:upload" class="-ml-1 mr-2 h-5 w-5" />
-                Subir foto
-              </button>
-              <button
-                v-if="photoPreview"
-                type="button"
-                class="inline-flex items-center rounded-md border border-red-600 bg-white px-4 py-2 text-sm font-medium text-red-600 shadow-sm hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                @click="removePhoto"
-              >
-                <Icon name="mdi:trash-can" class="-ml-1 mr-2 h-5 w-5" />
-                Eliminar
-              </button>
+                <Icon name="heroicons:camera" class="h-8 w-8 text-white" />
+              </div>
             </div>
-
-            <input
-              ref="fileInput"
-              type="file"
-              accept="image/*"
-              class="hidden"
-              @change="onFileSelected"
+            
+            <button 
+              type="button" 
+              class="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md hover:bg-emerald-600"
+              @click="triggerFileInput"
+              title="Subir foto"
             >
+              <Icon name="heroicons:plus-small" class="h-5 w-5" />
+            </button>
+          </div>
+          
+          <div class="text-center">
+             <button 
+                type="button" 
+                class="text-sm font-medium text-emerald-600 hover:text-emerald-500"
+                @click="triggerFileInput"
+             >
+               Subir una foto
+             </button>
+             <p v-if="photoError" class="mt-1 text-xs text-red-500">{{ photoError }}</p>
+             <p v-else class="mt-1 text-xs text-gray-400">JPG, PNG hasta 5MB</p>
+          </div>
 
-            <p v-if="photoError" class="text-sm text-red-600">{{ photoError }}</p>
+          <input
+            ref="fileInput"
+            type="file"
+            accept="image/*"
+            class="hidden"
+            @change="onFileSelected"
+          >
+        </div>
+
+        <div class="rounded-md shadow-sm -space-y-px">
+          <div>
+            <label for="username" class="sr-only">Nombre de usuario</label>
+            <div class="relative rounded-md shadow-sm">
+              <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                <span class="text-gray-500 sm:text-sm">@</span>
+              </div>
+              <input
+                id="username"
+                v-model="userName"
+                name="username"
+                type="text"
+                required
+                class="block w-full rounded-xl border-gray-300 pl-8 focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm py-3"
+                placeholder="nombre_de_usuario"
+                :class="{'border-red-300 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500': error}"
+              />
+            </div>
+            <p v-if="suggestedUsername && !userName" class="mt-2 text-xs text-gray-500">
+              Sugerencia: <button type="button" class="text-emerald-600 font-medium hover:underline" @click="userName = suggestedUsername">{{ suggestedUsername }}</button>
+            </p>
           </div>
         </div>
 
-        <!-- Username input -->
-        <div>
-          <label for="username" class="block text-sm font-medium text-gray-700">
-            Nombre de usuario
-          </label>
-          <div class="mt-1">
-            <input
-              id="username"
-              v-model="userName"
-              name="username"
-              type="text"
-              required
-              class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500 sm:text-sm"
-              placeholder="username"
-            >
+        <div v-if="error" class="rounded-md bg-red-50 p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <Icon name="heroicons:x-circle-mini" class="h-5 w-5 text-red-400" />
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">Hubo un problema</h3>
+              <div class="mt-2 text-sm text-red-700">
+                <p>{{ error }}</p>
+              </div>
+            </div>
           </div>
-          <p class="mt-1 text-xs text-gray-500">
-            Este nombre será visible para otros usuarios.
-          </p>
         </div>
 
-        <!-- Submit button -->
         <div>
-          <button
+           <button
             type="submit"
             :disabled="loading"
-            class="group relative flex w-full justify-center rounded-md border border-transparent bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+            class="group relative flex w-full justify-center rounded-xl border border-transparent bg-emerald-600 py-3 px-4 text-sm font-bold text-white shadow-lg transition-all hover:bg-emerald-700 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-70"
           >
             <span v-if="loading" class="absolute inset-y-0 left-0 flex items-center pl-3">
-              <Icon name="mdi:loading" class="h-5 w-5 animate-spin text-emerald-400" />
+               <Icon name="svg-spinners:ring-resize" class="h-5 w-5 text-emerald-200" />
             </span>
-            Completar perfil
+            Completar Registro
+            <Icon v-if="!loading" name="heroicons:arrow-right" class="ml-2 h-4 w-4 opacity-70 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
       </form>
@@ -118,17 +143,19 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuth } from '~/composables/useAuth'
+
 definePageMeta({
-  layout: 'auth',
+  layout: false, // Standalone page
+  middleware: 'auth'
 })
 
-// Composables
 const router = useRouter()
-const route = useRoute()
-const { user, userProfile, updateProfile, loading: authLoading, error: authError, needsProfileCompletion } = useAuth()
+const { user, userProfile, updateProfile, needsProfileCompletion } = useAuth()
 const { uploadFile } = useS3()
 
-// Estado local
 const loading = ref(false)
 const error = ref(null)
 const userName = ref('')
@@ -138,124 +165,90 @@ const photoError = ref(null)
 const fileInput = ref(null)
 const photoFile = ref(null)
 
-// Verificar si el usuario está autenticado pero sin nombre de usuario
 onMounted(() => {
-  // Si no hay usuario autenticado, redirigir a login
   if (!user.value) {
     router.push('/login')
     return
   }
 
-  // Si el usuario ya tiene un nombre de usuario, redirigir a inicio
-  if (userProfile.value?.userName) {
-    router.push('/')
+  // Pre-fill existing photo if any
+  if (userProfile.value?.photoURL) {
+    photoPreview.value = userProfile.value.photoURL
+  } else if (user.value?.photoURL) {
+     photoPreview.value = user.value.photoURL
   }
 
-  // Generar sugerencia de username a partir del displayName o email
-  const makeSuggestion = (s) =>
-    s
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-zA-Z0-9]/g, '')
-      .toLowerCase()
-      .slice(0, 8)
-
+  // Generate suggestion
+  const generateSlug = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 10)
+  
   if (userProfile.value?.userName) {
-    suggestedUsername.value = userProfile.value.userName
+     // Already has username, maybe just here to edit?
+     userName.value = userProfile.value.userName
   } else if (user.value?.displayName) {
-    suggestedUsername.value = makeSuggestion(user.value.displayName)
+    suggestedUsername.value = generateSlug(user.value.displayName)
   } else if (user.value?.email) {
-    suggestedUsername.value = makeSuggestion(user.value.email.split('@')[0])
+    suggestedUsername.value = generateSlug(user.value.email.split('@')[0])
   }
 })
 
-// Métodos para manipular la foto de perfil
-const triggerFileInput = () => {
-  fileInput.value.click()
-}
+const triggerFileInput = () => fileInput.value.click()
 
 const onFileSelected = (event) => {
   const file = event.target.files[0]
   if (!file) return
-
+  
   photoError.value = null
-
-  // Validar tipo de archivo
   if (!file.type.match('image.*')) {
-    photoError.value = 'Por favor selecciona una imagen válida'
+    photoError.value = 'Formato de imagen no válido'
     return
   }
-
-  // Validar tamaño (máximo 5MB)
   if (file.size > 5 * 1024 * 1024) {
-    photoError.value = 'La imagen no debe superar los 5MB'
+    photoError.value = 'La imagen es muy grande (Max 5MB)'
     return
   }
 
-  // Guardar el archivo y mostrar vista previa
   photoFile.value = file
   const reader = new FileReader()
-  reader.onload = (e) => {
-    photoPreview.value = e.target.result
-  }
+  reader.onload = (e) => photoPreview.value = e.target.result
   reader.readAsDataURL(file)
 }
 
-const removePhoto = () => {
-  photoFile.value = null
-  photoPreview.value = null
-  // Resetear el input file
-  if (fileInput.value) {
-    fileInput.value.value = ''
-  }
-}
-
-// Completar perfil
 const handleCompleteProfile = async () => {
   error.value = null
   loading.value = true
-
+  
   try {
-    let photoURL = null
+    let photoURL = userProfile.value?.photoURL
 
-    // Subir foto si existe
     if (photoFile.value) {
-      const userId = user.value.uid
-      const fileExtension = photoFile.value.name.split('.').pop()
-      const fileName = `avatar.${fileExtension}`
-
-      photoURL = await uploadFile(photoFile.value, `users/${userId}`, fileName)
+      const ext = photoFile.value.name.split('.').pop()
+      photoURL = await uploadFile(photoFile.value, `users/${user.value.uid}`, `avatar.${ext}`)
     }
 
-    // Asegurarnos de que userName no esté vacío, ya que es un campo requerido
     if (!userName.value.trim()) {
       error.value = 'El nombre de usuario es obligatorio'
       loading.value = false
       return
     }
 
-    // Actualizar perfil con valores seguros
     const success = await updateProfile(
-      userProfile.value?.displayName || '',
-      photoURL || userProfile.value?.photoURL || '',
-      userProfile.value?.bio || '', // Enviamos string vacío en lugar de undefined
+      userProfile.value?.displayName || user.value.displayName || '',
+      photoURL || '',
+      userProfile.value?.bio || '',
       userProfile.value?.phoneNumber || '',
       userName.value.trim()
     )
 
     if (success) {
-      // Redirigir a la página de inicio
       router.push('/')
     } else {
-      error.value = 'Error al actualizar tu perfil. Por favor intenta nuevamente.'
+      error.value = 'No se pudo guardar el perfil. Intenta con otro nombre de usuario.'
     }
   } catch (err) {
-    console.error('Error al completar perfil:', err)
-    error.value = 'Error al procesar tu solicitud. Por favor intenta nuevamente.'
+    console.error(err)
+    error.value = 'Error de conexión. Intenta nuevamente.'
   } finally {
     loading.value = false
   }
 }
 </script>
-
-<style></style>

@@ -1,244 +1,261 @@
 <template>
-  <section class="bg-emerald-600">
-    <header class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-2 lg:py-4">
-      <div class="flex flex-wrap items-center justify-between">
-        <NuxtLink to="/" class="flex items-center">
-
-          <NuxtPicture src="/logo.svg" class="h-12 w-12 text-[#fefffa] lg:h-16 lg:w-16" loading="lazy" sizes="sm:48px md:48px lg:64px" alt="Adopta Zulia isotipo" width="3rem" height="3rem" placeholder />
-          <h1 id="webTitle" class="ml-2">Adopta Zulia</h1>
+  <header class="sticky top-0 z-50 bg-emerald-700/95 backdrop-blur-md shadow-lg transition-all duration-300">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3">
+      <div class="flex items-center justify-between">
+        <!-- Logo -->
+        <NuxtLink to="/" class="group flex items-center gap-3 transition-transform hover:scale-105">
+          <NuxtPicture 
+            src="/logo.svg" 
+            class="h-10 w-10 lg:h-12 lg:w-12 drop-shadow-md" 
+            loading="eager" 
+            alt="Adopta Zulia Logo" 
+            width="48" 
+            height="48" 
+            placeholder 
+          />
+          <h1 class="text-xl font-bold tracking-tight text-white md:text-2xl drop-shadow-sm">
+            Adopta Zulia
+          </h1>
         </NuxtLink>
-        <button
-          type="button"
-          class="inline-flex items-center justify-center rounded-md p-2 text-white lg:hidden"
-          aria-expanded="false"
-            @click="isMenuOpen = !isMenuOpen"
-        >
-          <span class="sr-only">Abrir menú principal</span>
-          <Icon  v-if="!isMenuOpen"  name="heroicons:bars-3"  class="h-6 w-6"/>
-          <Icon v-else name="heroicons:x-mark"  class="h-6 w-6" />
-        </button>
-        <div class="hidden lg:ml-6 lg:flex lg:items-center lg:space-x-6">
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden lg:flex lg:items-center lg:gap-8">
           <NuxtLink
             v-for="(link, index) in navigationLinksWithoutProfile"
             :key="index"
             :to="link.link"
-            class="nav-link"
-            :aria-label="link.alt"
+            class="relative px-3 py-2 text-sm font-medium text-emerald-50 transition-colors hover:text-white"
+            active-class="text-white font-bold"
           >
             {{ link.name }}
+            <!-- Active Indicator -->
+            <span v-if="$route.path === link.link" class="absolute -bottom-1 left-0 h-0.5 w-full bg-amber-400 rounded-full shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
           </NuxtLink>
-          <div v-if="isAuthenticated" class="relative flex items-center">
-            <!-- Componente de notificaciones -->
-            <NotificationsPanel class="mr-4" />
+
+          <!-- Auth Section -->
+          <div v-if="isAuthenticated" class="relative flex items-center ml-4 pl-4 border-l border-emerald-600/50">
+            <NotificationsPanel class="mr-4 text-emerald-200 hover:text-white transition-colors" />
             
-            <button 
-              class="flex items-center space-x-2 focus:outline-none"
-              aria-haspopup="true"
-              aria-expanded="userMenuOpen"
-               @click="toggleUserMenu" 
-            >
-              <div class="overflow-hidden h-9 w-9 rounded-full border-2 border-amber-300">
-                <NuxtImg 
-                  v-if="user?.photoURL" 
-                  :src="user.photoURL" 
-                  :alt="user.displayName || 'Usuario'" 
-                  class="h-full w-full object-cover"
-                  loading="lazy"
-                  sizes="36px"
-                  placeholder
-                />
-                <div 
-                  v-else 
-                  class="flex h-full w-full items-center justify-center bg-emerald-100 text-emerald-700 font-bold"
-                >
-                  {{ getInitials(user.displayName || user.email || 'U') }}
-                </div>
-              </div>
-            </button>
-            <div 
-              v-show="userMenuOpen"
-              class="absolute right-0 top-12 mt-2 w-48 rounded-md bg-white py-2 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
-              role="menu"
-            >
-              <NuxtLink 
-                :to="profileRoute" 
-                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" 
-                role="menuitem"
-                @click="userMenuOpen = false"
-              >
-                <span class="flex items-center">
-                  <Icon name="heroicons:user" class="mr-2 h-4 w-4" />
-                  Mi perfil
-                </span>
-              </NuxtLink>
-              
-              <NuxtLink 
-                to="/mis-publicaciones" 
-                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" 
-                role="menuitem"
-                @click="userMenuOpen = false"
-              >
-                <span class="flex items-center">
-                  <Icon name="heroicons:photo" class="mr-2 h-4 w-4" />
-                  Mis publicaciones
-                </span>
-              </NuxtLink>
-              
-              <NuxtLink 
-                to="/perfil/configuracion" 
-                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" 
-                role="menuitem"
-                @click="userMenuOpen = false"
-              >
-                <span class="flex items-center">
-                  <Icon name="heroicons:cog-6-tooth" class="mr-2 h-4 w-4" />
-                  Configuración
-                </span>
-              </NuxtLink>
-
-              <div v-if="isAdmin" class="border-t border-gray-100 my-1"/>
-              
-              <NuxtLink 
-                v-if="isAdmin"
-                to="/admin" 
-                class="block px-4 py-2 text-sm text-emerald-700 hover:bg-gray-100" 
-                role="menuitem"
-                @click="userMenuOpen = false"
-              >
-                <span class="flex items-center">
-                  <Icon name="heroicons:shield-check" class="mr-2 h-4 w-4" />
-                  Panel de administración
-                </span>
-              </NuxtLink>
-
-              <div class="border-t border-gray-100 my-1"/>
-              
+            <div class="relative">
               <button 
-                class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100" 
-                role="menuitem"
-                @click="handleLogout"
+                class="flex items-center gap-2 rounded-full focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-emerald-700 transition-all hover:ring-2 hover:ring-emerald-500"
+                aria-haspopup="true"
+                aria-expanded="userMenuOpen"
+                @click="toggleUserMenu" 
               >
-                <span class="flex items-center">
-                  <Icon name="heroicons:arrow-right-on-rectangle" class="mr-2 h-4 w-4" />
-                  Cerrar sesión
-                </span>
+                <div class="h-9 w-9 overflow-hidden rounded-full border-2 border-amber-400 shadow-sm bg-emerald-800">
+                  <NuxtImg 
+                    v-if="user?.photoURL" 
+                    :src="user.photoURL" 
+                    :alt="user.displayName || 'Usuario'" 
+                    class="h-full w-full object-cover"
+                    loading="lazy"
+                    sizes="36px"
+                    placeholder
+                  />
+                  <div v-else class="flex h-full w-full items-center justify-center text-xs font-bold text-white">
+                    {{ getInitials(user.displayName || user.email || 'U') }}
+                  </div>
+                </div>
+                <Icon name="heroicons:chevron-down" class="h-4 w-4 text-emerald-200" :class="{ 'rotate-180': userMenuOpen }" />
               </button>
+
+              <!-- User Dropdown -->
+              <transition
+                enter-active-class="transition ease-out duration-100"
+                enter-from-class="transform opacity-0 scale-95"
+                enter-to-class="transform opacity-100 scale-100"
+                leave-active-class="transition ease-in duration-75"
+                leave-from-class="transform opacity-100 scale-100"
+                leave-to-class="transform opacity-0 scale-95"
+              >
+                <div 
+                  v-show="userMenuOpen"
+                  class="absolute right-0 top-12 mt-2 w-56 origin-top-right rounded-xl bg-white py-2 shadow-xl ring-1 ring-black/5 focus:outline-none z-50 divide-y divide-gray-100"
+                  role="menu"
+                >
+                  <div class="px-4 py-3">
+                    <p class="text-xs text-gray-500">Conectado como</p>
+                    <p class="truncate text-sm font-bold text-gray-900">{{ userName }}</p>
+                  </div>
+
+                  <div class="py-1">
+                    <NuxtLink 
+                      :to="profileRoute" 
+                      class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700" 
+                      role="menuitem"
+                      @click="userMenuOpen = false"
+                    >
+                      <Icon name="heroicons:user" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-emerald-500" />
+                      Mi perfil
+                    </NuxtLink>
+                    <NuxtLink 
+                      to="/mis-publicaciones" 
+                      class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700" 
+                      role="menuitem"
+                      @click="userMenuOpen = false"
+                    >
+                      <Icon name="heroicons:photo" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-emerald-500" />
+                      Mis publicaciones
+                    </NuxtLink>
+                  </div>
+
+                  <div v-if="isAdmin" class="py-1">
+                    <NuxtLink 
+                      to="/admin" 
+                      class="flex items-center px-4 py-2 text-sm text-purple-700 hover:bg-purple-50" 
+                      role="menuitem"
+                      @click="userMenuOpen = false"
+                    >
+                      <Icon name="heroicons:shield-check" class="mr-3 h-4 w-4 text-purple-500" />
+                      Panel Admin
+                    </NuxtLink>
+                  </div>
+
+                  <div class="py-1">
+                    <button 
+                      class="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50" 
+                      role="menuitem"
+                      @click="handleLogout"
+                    >
+                      <Icon name="heroicons:arrow-right-on-rectangle" class="mr-3 h-4 w-4 text-red-400" />
+                      Cerrar sesión
+                    </button>
+                  </div>
+                </div>
+              </transition>
             </div>
           </div>
+          
+          <div v-else class="flex gap-4 items-center">
+             <NuxtLink 
+                to="/login" 
+                class="text-sm font-medium text-emerald-100 hover:text-white transition-colors"
+              >
+                Iniciar sesión
+              </NuxtLink>
+              <NuxtLink 
+                to="/registro" 
+                class="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-emerald-400 transition-all hover:shadow-emerald-500/30"
+              >
+                Registrarse
+              </NuxtLink>
+          </div>
+        </nav>
 
-          <NuxtLink v-if="!isAuthenticated" to="/login" class="nav-link">Iniciar sesión</NuxtLink>
-        </div>
-      </div>
-    </header>
-
-    <!-- Menú móvil -->
-    <div v-show="isMenuOpen" class="lg:hidden">
-      <div class="space-y-1 px-4 pb-3 pt-2">
-        <NuxtLink
-          v-for="(link, index) in navigationLinks"
-          :key="index"
-          :to="link.link"
-          class="mobile-nav-link block"
-          :aria-label="link.alt"
-          @click="isMenuOpen = false"
-        >
-          {{ link.name }}
-        </NuxtLink>
-
-        <NuxtLink
-          v-if="!isAuthenticated"
-          to="/login"
-          class="mobile-nav-link block"
-          @click="isMenuOpen = false"
-        >
-          Iniciar sesión
-        </NuxtLink>
-
+        <!-- Mobile Menu Button -->
         <button
-          v-else
-          class="mobile-nav-link block w-full text-left"
-          aria-label="Cerrar sesión"
-          @click="handleLogoutMobile"
+          type="button"
+          class="inline-flex items-center justify-center rounded-lg p-2 text-emerald-100 hover:bg-emerald-800 transition-colors lg:hidden"
+          :aria-expanded="isMenuOpen"
+          @click="isMenuOpen = !isMenuOpen"
         >
-          Cerrar sesión
+          <span class="sr-only">Abrir menú principal</span>
+          <Icon v-if="!isMenuOpen" name="heroicons:bars-3" class="h-7 w-7" />
+          <Icon v-else name="heroicons:x-mark" class="h-7 w-7" />
         </button>
       </div>
     </div>
-  </section>
+
+    <!-- Mobile Menu Overlay -->
+    <transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="-translate-y-2 opacity-0"
+      enter-to-class="translate-y-0 opacity-100"
+      leave-active-class="transition duration-150 ease-in"
+      leave-from-class="translate-y-0 opacity-100"
+      leave-to-class="-translate-y-2 opacity-0"
+    >
+      <div v-if="isMenuOpen" class="absolute inset-x-0 top-full border-t border-emerald-600 bg-emerald-800 shadow-xl lg:hidden max-h-[90vh] overflow-y-auto">
+        <div class="space-y-1 px-4 py-6">
+          <NuxtLink
+            v-for="(link, index) in navigationLinks"
+            :key="index"
+            :to="link.link"
+            class="block rounded-lg px-4 py-3 text-base font-medium text-emerald-50 hover:bg-emerald-700 hover:text-white transition-colors"
+            active-class="bg-emerald-900/50 text-white font-bold"
+            @click="isMenuOpen = false"
+          >
+            {{ link.name }}
+          </NuxtLink>
+
+          <div class="my-4 border-t border-emerald-600/50" />
+
+          <template v-if="!isAuthenticated">
+            <NuxtLink
+              to="/login"
+              class="block rounded-lg px-4 py-3 text-base font-medium text-emerald-50 hover:bg-emerald-700 hover:text-white"
+              @click="isMenuOpen = false"
+            >
+              Iniciar sesión
+            </NuxtLink>
+            <NuxtLink
+              to="/registro"
+              class="block mt-2 rounded-lg bg-amber-500 px-4 py-3 text-center text-base font-bold text-white hover:bg-amber-600 shadow-md"
+              @click="isMenuOpen = false"
+            >
+              ¡Regístrate ahora!
+            </NuxtLink>
+          </template>
+
+          <button
+            v-else
+            class="flex w-full items-center rounded-lg px-4 py-3 text-base font-medium text-red-300 hover:bg-red-900/30 hover:text-red-200"
+            @click="handleLogoutMobile"
+          >
+            <Icon name="heroicons:arrow-right-on-rectangle" class="mr-3 h-5 w-5" />
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
+    </transition>
+  </header>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+
 const isMenuOpen = ref(false)
 const userMenuOpen = ref(false)
 
 const { isAdmin, isAuthenticated, logout, user, userProfile } = useAuth()
 
-// Enlaces en el menu de la cabecera
 const baseLinks = [
-  {
-    name: 'Adopta',
-    link: '/mascotas',
-    alt: 'Adoptar mascotas',
-  },
-  {
-    name: 'Perdidas',
-    link: '/perdidas',
-    alt: 'Mascotas perdidas',
-  },
-  {
-    name: 'Publica',
-    link: '/publicar',
-    alt: 'Dar en adopcion a mascotas',
-  },
-  {
-    name: 'Dona',
-    link: '/donaciones',
-    alt: 'Donar para ayudar a las mascotas',
-  },
+  { name: 'Adopta', link: '/mascotas', alt: 'Adoptar mascotas' },
+  { name: 'Perdidas', link: '/perdidas', alt: 'Mascotas perdidas' },
+  { name: 'Publica', link: '/publicar', alt: 'Dar en adopcion' },
+  { name: 'Dona', link: '/donaciones', alt: 'Donar' },
 ]
 
-// Function to handle logout
 const handleLogout = async () => {
   userMenuOpen.value = false
   await logout()
 }
 
-// Function to handle logout in mobile view
 const handleLogoutMobile = async () => {
   isMenuOpen.value = false
   await logout()
 }
 
-// Función para mostrar/ocultar el menú del usuario
 const toggleUserMenu = () => {
   userMenuOpen.value = !userMenuOpen.value
 }
 
-// Función para obtener las iniciales del nombre completo
 const getInitials = (name) => {
   if (!name) return 'U'
-  return name
-    .split(' ')
-    .map(part => part.charAt(0))
-    .join('')
-    .toUpperCase()
-    .substring(0, 2)
+  return name.split(' ').map(p => p.charAt(0)).join('').toUpperCase().substring(0, 2)
 }
 
-// Computed para obtener el nombre de usuario o el correo
 const userName = computed(() => {
   if (!user.value) return 'Usuario'
   return user.value.displayName || user.value.userName || user.value.email?.split('@')[0] || 'Usuario'
 })
 
-// Computed para obtener la ruta del perfil
 const profileRoute = computed(() => {
   if (!isAuthenticated.value) return '/perfil'
   return userProfile.value?.userName ? `/${userProfile.value.userName}` : '/perfil'
 })
 
-// Cerrar el menú de usuario cuando se hace clic fuera de él
 const closeUserMenuOnClickOutside = (event) => {
   const userMenu = document.querySelector('[role="menu"]')
   const userButton = document.querySelector('[aria-haspopup="true"]')
@@ -250,13 +267,10 @@ const closeUserMenuOnClickOutside = (event) => {
   }
 }
 
-// Añadir y eliminar event listeners
 onMounted(() => {
   document.addEventListener('click', closeUserMenuOnClickOutside)
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && userMenuOpen.value) {
-      userMenuOpen.value = false
-    }
+    if (e.key === 'Escape') userMenuOpen.value = false
   })
 })
 
@@ -264,20 +278,15 @@ onUnmounted(() => {
   document.removeEventListener('click', closeUserMenuOnClickOutside)
 })
 
-// Computed property for all navigation links
 const navigationLinks = computed(() => {
   const links = [...baseLinks]
-
-  // Añadir enlace de perfil si el usuario está autenticado
   if (isAuthenticated.value) {
     links.push({
-      name: userName.value,
+      name: 'Mi Perfil',
       link: profileRoute.value,
       alt: 'Perfil de usuario',
     })
   } 
-
-  // Añadir enlace de admin si el usuario es administrador
   if (isAdmin.value) {
     links.push({
       name: 'Admin',
@@ -285,60 +294,8 @@ const navigationLinks = computed(() => {
       alt: 'Panel de administración',
     })
   }
-
   return links
 })
 
-// Computed property for links without profile (used in desktop view with avatar)
-const navigationLinksWithoutProfile = computed(() => {
-  return baseLinks
-})
+const navigationLinksWithoutProfile = computed(() => baseLinks)
 </script>
-
-<style scoped>
-#webTitle {
-  font-size: 1.5rem;
-  line-height: 2rem;
-  font-weight: bold;
-  color: #fefffa;
-}
-
-@media (min-width: 768px) {
-  #webTitle {
-    font-size: 1.875rem;
-    line-height: 2.25rem;
-  }
-}
-
-.nav-link {
-  border-radius: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  font-size: 1.25rem;
-  font-weight: 500;
-  color: #fefffa;
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
-}
-
-.nav-link:hover,
-.nav-link:focus {
-  background-color: rgba(217, 119, 6, 0.8);
-}
-
-.mobile-nav-link {
-  border-radius: 0.375rem;
-  padding: 0.75rem 1rem;
-  font-size: 1.125rem;
-  font-weight: 500;
-  color: #fefffa;
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
-}
-
-.mobile-nav-link:hover,
-.mobile-nav-link:focus {
-  background-color: rgba(217, 119, 6, 0.8);
-}
-</style>

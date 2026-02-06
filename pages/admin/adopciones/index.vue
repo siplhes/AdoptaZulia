@@ -16,202 +16,182 @@
         </div>
       </div>
 
-      <!-- Filters & Search -->
-      <div
-        class="mb-6 flex flex-col gap-4 rounded-lg bg-white p-6 shadow-md lg:flex-row lg:items-center lg:justify-between"
-      >
-        <div class="flex flex-1 flex-col gap-4 sm:flex-row sm:items-center">
-          <div class="flex-1">
-            <label class="mb-1 block text-sm font-medium text-gray-700">Buscar</label>
-            <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Buscar por mascota o usuario..."
-              class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-              @input="applyFilters"
-            >
-          </div>
-
-          <div class="w-40">
-            <label class="mb-1 block text-sm font-medium text-gray-700">Estado</label>
-            <select
-              v-model="filters.status"
-              class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-              @change="applyFilters"
-            >
-              <option value="">Todos</option>
-              <option value="pending">Pendiente</option>
-              <option value="approved">Aprobada</option>
-              <option value="rejected">Rechazada</option>
-              <option value="completed">Completada</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <button
-            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-            @click="resetFilters"
+      <!-- New Tabbed Interface for KanBan-like flow -->
+      <div class="mb-6 flex space-x-1 overflow-x-auto rounded-xl bg-white p-1 shadow-sm">
+        <button
+          v-for="tab in tabs"
+          :key="tab.id"
+          :class="[
+            'flex-1 whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium transition-all sm:flex-none',
+            activeTab === tab.id
+              ? 'bg-emerald-100 text-emerald-700 shadow-sm'
+              : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700',
+          ]"
+          @click="activeTab = tab.id"
+        >
+          {{ tab.name }}
+          <span
+            v-if="tab.count > 0"
+            :class="[
+              'ml-2 rounded-full py-0.5 px-2 text-xs',
+              activeTab === tab.id ? 'bg-emerald-200 text-emerald-800' : 'bg-gray-100 text-gray-600'
+            ]"
           >
-            <Icon name="heroicons:arrow-path" class="mr-2 h-4 w-4" />
-            Restablecer
-          </button>
+            {{ tab.count }}
+          </span>
+        </button>
+      </div>
+
+      <!-- Search Bar (Simplified) -->
+      <div class="mb-6">
+        <div class="relative">
+          <Icon
+            name="heroicons:magnifying-glass"
+            class="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
+          />
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Buscar por nombre de mascota, solicitante o email..."
+            class="w-full rounded-xl border border-gray-200 bg-white py-3 pl-10 pr-4 shadow-sm transition-all focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+          >
         </div>
       </div>
 
-      <!-- Adoptions List -->
-      <div class="overflow-hidden rounded-lg bg-white shadow-md">
-        <div v-if="loading" class="flex justify-center py-8">
-          <div
-            class="h-10 w-10 animate-spin rounded-full border-b-2 border-t-2 border-emerald-600"
-          />
+      <!-- Adoptions List (Responsive Grid) -->
+      <div>
+        <div v-if="loading" class="flex justify-center py-12">
+          <div class="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-emerald-600" />
         </div>
 
-        <div v-else-if="error" class="rounded-md bg-red-50 p-4">
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <Icon name="heroicons:exclamation-circle" class="h-5 w-5 text-red-400" />
+        <div v-else-if="filteredAdoptions.length === 0" class="flex flex-col items-center justify-center rounded-2xl bg-white py-16 text-center shadow-sm">
+          <div class="mb-4 rounded-full bg-gray-50 p-4">
+            <Icon name="mdi:clipboard-text-off-outline" class="h-8 w-8 text-gray-400" />
+          </div>
+          <h3 class="text-lg font-medium text-gray-900">No hay solicitudes</h3>
+          <p class="mt-1 text-gray-500">{{ emptyMessage }}</p>
+        </div>
+
+        <div v-else class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <div
+            v-for="adoption in paginatedAdoptions"
+            :key="adoption.id"
+            class="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-md border border-gray-100"
+          >
+            <!-- Badge de estado -->
+             <div class="absolute right-3 top-3 z-10">
+               <span 
+                :class="[
+                  'px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm backdrop-blur-md',
+                  statusColors[adoption.status]
+                ]"
+               >
+                 {{ statusLabels[adoption.status] }}
+               </span>
+             </div>
+
+            <!-- Pet Image Header -->
+            <div class="relative h-48 bg-gray-100">
+               <NuxtImg
+                  v-if="adoption.pet?.imageUrl"
+                  :src="adoption.pet.imageUrl"
+                  class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+               />
+               <div v-else class="flex h-full w-full items-center justify-center text-gray-300">
+                 <Icon name="mdi:image-off" class="h-12 w-12" />
+               </div>
+               
+               <!-- Gradient Overlay -->
+               <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+               
+               <!-- Pet Name on Image -->
+               <div class="absolute bottom-3 left-4 text-white">
+                 <h3 class="text-xl font-bold leading-tight">{{ adoption.pet?.name || 'Mascota' }}</h3>
+                 <p class="text-xs opacity-90">{{ adoption.pet?.breed || 'Raza desconocida' }}</p>
+               </div>
             </div>
-            <div class="ml-3">
-              <h3 class="text-sm font-medium text-red-800">Error al cargar las adopciones</h3>
-              <div class="mt-2 text-sm text-red-700">
-                <p>{{ error }}</p>
+
+            <!-- Applicant Info -->
+            <div class="flex-1 p-5">
+              <div class="mb-4 flex items-center gap-3">
+                 <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100 font-bold text-emerald-700">
+                    {{ (adoption.user?.name || '?').charAt(0).toUpperCase() }}
+                 </div>
+                 <div class="min-w-0 flex-1">
+                    <p class="truncate text-sm font-bold text-gray-900">{{ adoption.user?.name || 'Usuario' }}</p>
+                    <p class="truncate text-xs text-gray-500">{{ adoption.user?.email }}</p>
+                 </div>
+              </div>
+              
+              <div class="space-y-2 text-sm text-gray-600">
+                 <div class="flex items-center gap-2">
+                    <Icon name="heroicons:calendar" class="h-4 w-4 text-gray-400" />
+                    <span>{{ formatDate(adoption.createdAt) }}</span>
+                 </div>
+                 <div class="flex items-center gap-2">
+                    <Icon name="heroicons:chat-bubble-left-ellipsis" class="h-4 w-4 text-gray-400" />
+                    <span class="truncate italic">"{{ adoption.message || 'Sin mensaje' }}"</span>
+                 </div>
+              </div>
+            </div>
+
+            <!-- Actions Footer -->
+            <div class="border-t border-gray-100 bg-gray-50 p-4">
+              <div v-if="adoption.status === 'pending'" class="grid grid-cols-2 gap-3">
+                 <button
+                    class="flex items-center justify-center gap-2 rounded-lg border border-red-200 bg-white py-2 text-sm font-bold text-red-600 transition-colors hover:bg-red-50 hover:border-red-300"
+                    @click="rejectAdoption(adoption)"
+                 >
+                    <Icon name="heroicons:x-mark" class="h-4 w-4" />
+                    Rechazar
+                 </button>
+                 <button
+                    class="flex items-center justify-center gap-2 rounded-lg bg-emerald-600 py-2 text-sm font-bold text-white transition-colors hover:bg-emerald-700 shadow-sm"
+                    @click="approveAdoption(adoption)"
+                 >
+                    <Icon name="heroicons:check" class="h-4 w-4" />
+                    Aprobar
+                 </button>
+              </div>
+              
+               <div v-else-if="adoption.status === 'approved'" class="grid grid-cols-1">
+                 <button
+                    class="flex items-center justify-center gap-2 rounded-lg bg-blue-600 py-2 text-sm font-bold text-white transition-colors hover:bg-blue-700 shadow-sm"
+                    @click="completeAdoption(adoption)"
+                 >
+                    <Icon name="mdi:home-heart" class="h-4 w-4" />
+                    Finalizar Adopción
+                 </button>
+              </div>
+
+              <div v-else class="grid grid-cols-1">
+                 <button
+                    class="flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
+                    @click="viewDetails(adoption)"
+                 >
+                    <Icon name="heroicons:eye" class="h-4 w-4" />
+                    Ver Detalles Completos
+                 </button>
+              </div>
+              
+              <!-- Secondary Action for Pending/Approved (View Details) -->
+              <div v-if="['pending', 'approved'].includes(adoption.status)" class="mt-3 text-center">
+                 <button 
+                  class="text-xs font-semibold text-gray-500 hover:text-emerald-600 hover:underline"
+                  @click="viewDetails(adoption)"
+                 >
+                    Ver detalles completos
+                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        <div v-else-if="filteredAdoptions.length === 0" class="p-8 text-center">
-          <p class="text-gray-500">
-            No se encontraron solicitudes de adopción con los filtros actuales.
-          </p>
-        </div>
-
-        <div v-else>
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-                >
-                  Mascota
-                </th>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-                >
-                  Solicitante
-                </th>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-                >
-                  Fecha de solicitud
-                </th>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-                >
-                  Estado
-                </th>
-                <th
-                  class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500"
-                >
-                  Acciones
-                </th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200 bg-white">
-              <tr v-for="adoption in paginatedAdoptions" :key="adoption.id">
-                <td class="whitespace-nowrap px-6 py-4">
-                  <div class="flex items-center">
-                    <div class="h-10 w-10 flex-shrink-0 overflow-hidden rounded-md bg-gray-100">
-                      <NuxtImg
-                        v-if="adoption.pet?.imageUrl"
-                        :src="adoption.pet.imageUrl"
-                        alt="Imagen de mascota"
-                        class="h-full w-full object-cover"
-                      />
-                      <div v-else class="flex h-full w-full items-center justify-center">
-                        <Icon name="mdi:paw" class="h-5 w-5 text-gray-400" />
-                      </div>
-                    </div>
-                    <div class="ml-4">
-                      <div class="text-sm font-medium text-gray-900">
-                        {{ adoption.pet?.name || 'Mascota no disponible' }}
-                      </div>
-                      <div class="text-xs text-gray-500">
-                        {{ adoption.pet?.species || 'N/A' }} - {{ adoption.pet?.breed || 'N/A' }}
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td class="whitespace-nowrap px-6 py-4">
-                  <div class="text-sm text-gray-900">
-                    {{ adoption.user?.name || adoption.user?.email || 'Usuario desconocido' }}
-                  </div>
-                  <div class="text-xs text-gray-500">{{ adoption.user?.email || 'N/A' }}</div>
-                </td>
-                <td class="whitespace-nowrap px-6 py-4">
-                  <div class="text-sm text-gray-900">{{ formatDate(adoption.createdAt) }}</div>
-                </td>
-                <td class="whitespace-nowrap px-6 py-4">
-                  <span
-                    :class="[
-                      'inline-flex rounded-full px-2 text-xs font-semibold leading-5',
-                      adoption.status === 'pending'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : adoption.status === 'approved'
-                          ? 'bg-blue-100 text-blue-800'
-                          : adoption.status === 'rejected'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-green-100 text-green-800',
-                    ]"
-                  >
-                    {{
-                      adoption.status === 'pending'
-                        ? 'Pendiente'
-                        : adoption.status === 'approved'
-                          ? 'Aprobada'
-                          : adoption.status === 'rejected'
-                            ? 'Rechazada'
-                            : 'Completada'
-                    }}
-                  </span>
-                </td>
-                <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                  <button
-                    v-if="adoption.status === 'pending'"
-                    class="mr-2 text-blue-600 hover:text-blue-900"
-                    @click="approveAdoption(adoption)"
-                  >
-                    Aprobar
-                  </button>
-                  <button
-                    v-if="adoption.status === 'pending'"
-                    class="mr-2 text-red-600 hover:text-red-900"
-                    @click="rejectAdoption(adoption)"
-                  >
-                    Rechazar
-                  </button>
-                  <button
-                    v-if="adoption.status === 'approved'"
-                    class="mr-2 text-green-600 hover:text-green-900"
-                    @click="completeAdoption(adoption)"
-                  >
-                    Completar
-                  </button>
-                  <button
-                    class="text-emerald-600 hover:text-emerald-900"
-                    @click="viewDetails(adoption)"
-                  >
-                    Ver detalles
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          <!-- Pagination -->
-          <div
-            class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6"
+        <!-- Pagination (Preserved but styled) -->
+        <div
+            v-if="filteredAdoptions.length > 0"
+            class="mt-8 flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6"
           >
             <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
               <div>
@@ -256,7 +236,6 @@
               </div>
             </div>
           </div>
-        </div>
       </div>
 
       <!-- Adoption Details Modal -->
@@ -431,7 +410,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 import { useAdoptions } from '~/composables/useAdoptions'
 import ModalAlert from '~/components/common/ModalAlert.vue'
@@ -439,6 +418,7 @@ import ModalAlert from '~/components/common/ModalAlert.vue'
 // Verificar si el usuario es administrador
 definePageMeta({
   middleware: ['admin'],
+  layout: 'default'
 })
 
 // Usar el composable de adopciones
@@ -451,21 +431,57 @@ const {
   updateAdoptionNotes,
 } = useAdoptions()
 
-// Estado para búsqueda y filtros
+// Estado para búsqueda y tabs
 const searchQuery = ref('')
-const filters = ref({
-  status: '',
+const activeTab = ref('pending')
+
+const tabs = computed(() => {
+  const pending = allAdoptions.value.filter(a => a.status === 'pending').length
+  const approved = allAdoptions.value.filter(a => a.status === 'approved').length
+  const rejected = allAdoptions.value.filter(a => a.status === 'rejected').length
+  const completed = allAdoptions.value.filter(a => a.status === 'completed').length
+  
+  return [
+    { id: 'all', name: 'Todas', count: allAdoptions.value.length },
+    { id: 'pending', name: 'Pendientes', count: pending },
+    { id: 'approved', name: 'Aprobadas', count: approved },
+    { id: 'rejected', name: 'Rechazadas', count: rejected },
+    { id: 'completed', name: 'Completadas', count: completed },
+  ]
 })
 
-// Estado para paginación
-const currentPage = ref(1)
-const pageSize = 10
+const statusLabels = {
+  pending: 'Pendiente',
+  approved: 'Aprobada',
+  rejected: 'Rechazada',
+  completed: 'Completada',
+}
 
-// Estado para modal de detalles
+const statusColors = {
+  pending: 'bg-yellow-100 text-yellow-800 border border-yellow-200',
+  approved: 'bg-blue-100 text-blue-800 border border-blue-200',
+  rejected: 'bg-red-100 text-red-800 border border-red-200',
+  completed: 'bg-emerald-100 text-emerald-800 border border-emerald-200',
+}
+
+const emptyMessage = computed(() => {
+  if (searchQuery.value) return 'Intenta con otros términos de búsqueda.'
+  switch (activeTab.value) {
+    case 'pending': return 'No tienes solicitudes pendientes por revisar. ¡Buen trabajo!'
+    case 'approved': return 'No hay adopciones en curso actualmente.'
+    case 'rejected': return 'No hay solicitudes rechazadas.'
+    case 'completed': return 'Aún no se ha completado ninguna adopción.'
+    default: return 'No hay solicitudes registradas.'
+  }
+})
+
+// Paginación
+const currentPage = ref(1)
+const pageSize = 9
+
+// Estado para modal de detalles y acciones
 const selectedAdoption = ref(null)
 const adminNotes = ref('')
-
-// Estado para el modal global
 const showModal = ref(false)
 const modalType = ref('')
 const modalTitle = ref('')
@@ -473,7 +489,12 @@ const modalMessage = ref('')
 const modalConfirmText = ref('')
 let confirmAction = () => {}
 
-// Métodos para cargar datos
+// Resetear página al cambiar tab O búsqueda
+watch([activeTab, searchQuery], () => {
+  currentPage.value = 1
+})
+
+// Obtener adopciones
 const loadAdoptions = async () => {
   try {
     await fetchAllAdoptions()
@@ -486,109 +507,64 @@ const loadAdoptions = async () => {
 const filteredAdoptions = computed(() => {
   return allAdoptions.value.filter((adoption) => {
     // Filtrar por búsqueda
-    const searchMatch = searchQuery.value
-      ? adoption.pet?.name?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        adoption.user?.name?.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        adoption.user?.email?.toLowerCase().includes(searchQuery.value.toLowerCase())
-      : true
+    const term = searchQuery.value.toLowerCase()
+    const searchMatch = !term || 
+        adoption.pet?.name?.toLowerCase().includes(term) ||
+        adoption.user?.name?.toLowerCase().includes(term) ||
+        adoption.user?.email?.toLowerCase().includes(term)
 
-    // Filtrar por estado
-    const statusMatch = filters.value.status ? adoption.status === filters.value.status : true
+    // Filtrar por tab
+    const statusMatch = activeTab.value === 'all' || adoption.status === activeTab.value
 
     return searchMatch && statusMatch
   })
 })
 
 // Paginación
-const totalPages = computed(() => {
-  return Math.ceil(filteredAdoptions.value.length / pageSize)
-})
+const totalPages = computed(() => Math.ceil(filteredAdoptions.value.length / pageSize))
+const paginationStart = computed(() => (currentPage.value - 1) * pageSize)
+const paginationEnd = computed(() => Math.min(paginationStart.value + pageSize, filteredAdoptions.value.length))
+const paginatedAdoptions = computed(() => filteredAdoptions.value.slice(paginationStart.value, paginationEnd.value))
 
-const paginationStart = computed(() => {
-  return (currentPage.value - 1) * pageSize
-})
+const nextPage = () => { if (currentPage.value < totalPages.value) currentPage.value++ }
+const prevPage = () => { if (currentPage.value > 1) currentPage.value-- }
 
-const paginationEnd = computed(() => {
-  return Math.min(paginationStart.value + pageSize, filteredAdoptions.value.length)
-})
-
-const paginatedAdoptions = computed(() => {
-  return filteredAdoptions.value.slice(paginationStart.value, paginationEnd.value)
-})
-
-// Métodos
-const applyFilters = () => {
-  currentPage.value = 1
-}
-
-const resetFilters = () => {
-  searchQuery.value = ''
-  filters.value = {
-    status: '',
-  }
-  currentPage.value = 1
-}
-
-const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
-  }
-}
-
-const prevPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--
-  }
-}
-
-// Acciones sobre las adopciones
+// Acciones
 const approveAdoption = async (adoption) => {
   modalType.value = 'confirm'
   modalTitle.value = 'Aprobar adopción'
-  modalMessage.value = `¿Estás seguro de que quieres aprobar la solicitud de adopción de ${adoption.pet?.name} para ${adoption.user?.name || 'este usuario'}?`
-  modalConfirmText.value = 'Aprobar'
+  modalMessage.value = `¿Aprobar solicitud de ${adoption.user?.name} para ${adoption.pet?.name}?`
+  modalConfirmText.value = 'Sí, Aprobar'
   
   confirmAction = async () => {
     showModal.value = false
-    try {
-      await updateAdoptionStatus(adoption.id, 'approved')
-    } catch (err) {
-      console.error('Error approving adoption:', err)
-    }
+    await updateAdoptionStatus(adoption.id, 'approved')
   }
   showModal.value = true
 }
 
 const rejectAdoption = async (adoption) => {
-  modalType.value = 'delete' // Using delete type for rejection (usually red)
+  modalType.value = 'delete'
   modalTitle.value = 'Rechazar adopción'
-  modalMessage.value = `¿Estás seguro de que quieres rechazar esta solicitud?`
+  modalMessage.value = `¿Estás seguro de rechazar esta solicitud? Esta acción no se puede deshacer.`
   modalConfirmText.value = 'Rechazar'
   
   confirmAction = async () => {
     showModal.value = false
-    try {
-      await updateAdoptionStatus(adoption.id, 'rejected')
-    } catch (err) {
-      console.error('Error rejecting adoption:', err)
-    }
+    await updateAdoptionStatus(adoption.id, 'rejected')
   }
   showModal.value = true
 }
 
 const completeAdoption = async (adoption) => {
   modalType.value = 'confirm'
-  modalTitle.value = 'Completar adopción'
-  modalMessage.value = `¿Estás seguro de que quieres marcar esta adopción como completada?`
-  modalConfirmText.value = 'Completar'
+  modalTitle.value = 'Finalizar Adopción'
+  modalMessage.value = `¿Confirmas que ${adoption.pet?.name} ha sido entregado a ${adoption.user?.name}?`
+  modalConfirmText.value = '¡Sí, Adoptado!'
   
   confirmAction = async () => {
     showModal.value = false
-    try {
-      await updateAdoptionStatus(adoption.id, 'completed')
-    } catch (err) {
-      console.error('Error completing adoption:', err)
-    }
+    await updateAdoptionStatus(adoption.id, 'completed')
   }
   showModal.value = true
 }
@@ -600,26 +576,15 @@ const viewDetails = (adoption) => {
 
 const saveNotes = async () => {
   if (!selectedAdoption.value) return
-
-  try {
-    await updateAdoptionNotes(selectedAdoption.value.id, adminNotes.value)
-    // La función updateAdoptionNotes ya actualiza el estado local
-  } catch (err) {
-    console.error('Error saving notes:', err)
-  }
+  await updateAdoptionNotes(selectedAdoption.value.id, adminNotes.value)
 }
 
-// Formato de fecha
 const formatDate = (timestamp) => {
   if (!timestamp) return 'N/A'
-  const d = new Date(timestamp)
-  return d.toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+  return new Date(timestamp).toLocaleDateString('es-ES', {
+    day: 'numeric', month: 'short', year: 'numeric'
   })
 }
 
-// Cargar adopciones al montar el componente
 onMounted(loadAdoptions)
 </script>

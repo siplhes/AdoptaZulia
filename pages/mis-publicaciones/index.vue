@@ -1,133 +1,160 @@
 <template>
   <div class="min-h-screen bg-amber-50 py-6 md:py-12">
     <div class="container mx-auto px-4">
-      <h1 class="mb-6 text-3xl font-bold text-emerald-800">Mis Publicaciones</h1>
+      <!-- Header Section -->
+      <div class="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-center">
+        <div>
+          <h1 class="text-3xl font-bold text-emerald-800">Mis Publicaciones</h1>
+          <p class="mt-1 text-emerald-600">Gestiona las mascotas que has puesto en adopción</p>
+        </div>
+        
+        <NuxtLink
+          to="/publicar"
+          class="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-6 py-3 font-semibold text-white shadow-lg transition-all hover:bg-emerald-700 hover:shadow-xl active:scale-95 md:w-auto"
+        >
+          <Icon name="heroicons:plus-circle" class="mr-2 h-5 w-5" />
+          Nueva Publicación
+        </NuxtLink>
+      </div>
       
       <!-- Estado de carga -->
-      <div v-if="loading" class="flex h-64 items-center justify-center">
-        <div class="h-12 w-12 animate-spin rounded-full border-b-2 border-emerald-700" />
+      <div v-if="loading" class="flex h-64 flex-col items-center justify-center">
+        <div class="h-12 w-12 animate-spin rounded-full border-4 border-emerald-200 border-t-emerald-600" />
+        <p class="mt-4 animate-pulse text-emerald-600 font-medium">Cargando tus mascotas...</p>
       </div>
 
       <!-- Mensaje de error -->
-      <div v-else-if="error" class="mb-6 border-l-4 border-red-500 bg-red-50 p-4">
-        <div class="flex">
-          <div class="flex-shrink-0">
-            <Icon name="heroicons:exclamation-triangle" class="h-5 w-5 text-red-500" />
+      <div v-else-if="error" class="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 shadow-sm">
+        <div class="flex items-center gap-3">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
+            <Icon name="heroicons:exclamation-triangle" class="h-6 w-6" />
           </div>
-          <div class="ml-3">
+          <div>
+            <h3 class="font-semibold text-red-800">Ha ocurrido un error</h3>
             <p class="text-sm text-red-700">{{ error }}</p>
           </div>
         </div>
       </div>
 
-      <!-- Sin publicaciones -->
-      <div v-else-if="userPets.length === 0" class="flex flex-col items-center justify-center">
-        <div class="mb-4 h-32 w-32 rounded-full bg-gray-200 p-8">
-          <Icon name="heroicons:photo" class="h-16 w-16 text-gray-400" />
-        </div>
-        <h2 class="mb-2 text-xl font-semibold text-gray-800">Aún no tienes mascotas publicadas</h2>
-        <p class="mb-6 text-center text-gray-600">
-          ¿Tienes una mascota que necesita un nuevo hogar? ¡Publica su perfil para encontrarle una familia!
-        </p>
-        <NuxtLink
-          to="/publicar"
-          class="inline-flex items-center rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700"
-        >
-          <Icon name="heroicons:plus" class="mr-2 h-5 w-5" />
-          Publicar una mascota
-        </NuxtLink>
-      </div>
-
-      <!-- Lista de publicaciones -->
+      <!-- Vista principal -->
       <div v-else>
-        <!-- Panel de estadísticas -->
-        <div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-          <div class="rounded-lg bg-white p-4 shadow-md">
-            <div class="mb-2 flex items-center justify-between">
-              <h3 class="text-lg font-medium text-gray-700">Total</h3>
-              <div class="rounded-full bg-blue-100 p-2">
-                <Icon name="heroicons:photo" class="h-5 w-5 text-blue-600" />
-              </div>
+        
+        <!-- Empty State (Si no tiene mascotas) -->
+        <div v-if="userPets.length === 0" class="mx-auto max-w-lg py-12 text-center">
+          <div class="relative mx-auto mb-6 h-48 w-48">
+            <div class="absolute inset-0 animate-pulse rounded-full bg-emerald-100 opacity-50"></div>
+            <div class="relative flex h-full w-full items-center justify-center rounded-full bg-white shadow-inner">
+               <Icon name="fluent-emoji:dog-face" class="h-24 w-24" />
             </div>
-            <p class="text-2xl font-bold text-gray-800">{{ userPets.length }}</p>
-            <p class="text-sm text-gray-600">Mascotas publicadas</p>
           </div>
-          
-          <div class="rounded-lg bg-white p-4 shadow-md">
-            <div class="mb-2 flex items-center justify-between">
-              <h3 class="text-lg font-medium text-gray-700">Disponibles</h3>
-              <div class="rounded-full bg-emerald-100 p-2">
-                <Icon name="heroicons:heart" class="h-5 w-5 text-emerald-600" />
-              </div>
-            </div>
-            <p class="text-2xl font-bold text-gray-800">{{ availablePets }}</p>
-            <p class="text-sm text-gray-600">Buscando hogar</p>
-          </div>
-          
-          <div class="rounded-lg bg-white p-4 shadow-md">
-            <div class="mb-2 flex items-center justify-between">
-              <h3 class="text-lg font-medium text-gray-700">Adoptadas</h3>
-              <div class="rounded-full bg-amber-100 p-2">
-                <Icon name="heroicons:check-badge" class="h-5 w-5 text-amber-600" />
-              </div>
-            </div>
-            <p class="text-2xl font-bold text-gray-800">{{ adoptedPets }}</p>
-            <p class="text-sm text-gray-600">Encontraron hogar</p>
-          </div>
-          
-          <div class="rounded-lg bg-white p-4 shadow-md">
-            <div class="mb-2 flex items-center justify-between">
-              <h3 class="text-lg font-medium text-gray-700">Solicitudes</h3>
-              <div class="rounded-full bg-purple-100 p-2">
-                <Icon name="heroicons:document-text" class="h-5 w-5 text-purple-600" />
-              </div>
-            </div>
-            <p class="text-2xl font-bold text-gray-800">{{ totalAdoptionRequests }}</p>
-            <p class="text-sm text-gray-600">Recibidas en total</p>
-          </div>
-        </div>
-
-        <!-- Filtros y botón de publicar -->
-        <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
-          <div class="flex flex-wrap items-center gap-3">
-            <button
-              v-for="(filter, index) in filters"
-              :key="index"
-              class="rounded-full px-4 py-2 text-sm font-medium transition-colors"
-              :class="selectedFilter === filter.value ? 'bg-emerald-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'"
-              @click="selectedFilter = filter.value"
-            >
-              {{ filter.label }}
-            </button>
-          </div>
-          
+          <h2 class="mb-3 text-2xl font-bold text-gray-800">¡Tu primera publicación te espera!</h2>
+          <p class="mb-8 text-lg text-gray-600">
+            Ayuda a una mascota a encontrar su hogar ideal. Publicar es gratis y solo toma unos minutos.
+          </p>
           <NuxtLink
             to="/publicar"
-            class="inline-flex items-center rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700"
+            class="inline-flex items-center rounded-xl bg-emerald-600 px-8 py-4 text-lg font-bold text-white shadow-lg transition-all hover:-translate-y-1 hover:bg-emerald-700 hover:shadow-emerald-200"
           >
-            <Icon name="heroicons:plus" class="mr-2 h-5 w-5" />
-            Nueva publicación
+            Publicar Mascota Ahora
+            <Icon name="heroicons:arrow-right" class="ml-2 h-5 w-5" />
           </NuxtLink>
         </div>
 
-        <!-- Listado de mascotas -->
-        <!-- Listado de mascotas -->
-        <div v-if="filteredPets.length > 0" class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          <UserPetCard
-            v-for="pet in filteredPets"
-            :key="pet.id"
-            :pet="pet"
-            @delete="confirmDeletePet"
-            @update-status="handleStatusUpdate"
-            @mark-adopted="markAsAdopted"
-          />
-        </div>
-        
-        <!-- Mensaje cuando no hay resultados con el filtro actual -->
-        <div v-else-if="userPets.length > 0" class="flex flex-col items-center justify-center py-8">
-          <Icon name="heroicons:face-frown" class="mb-2 h-16 w-16 text-gray-400" />
-          <h3 class="mb-1 text-lg font-medium text-gray-700">No hay mascotas en esta categoría</h3>
-          <p class="text-sm text-gray-500">Prueba con otro filtro o publica una nueva mascota</p>
+        <!-- Dashboard Content -->
+        <div v-else class="space-y-8">
+          
+          <!-- Stats Cards (Grid Responsive) -->
+          <div class="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
+            <!-- Total -->
+            <div class="relative overflow-hidden rounded-2xl bg-white p-4 shadow-sm transition-shadow hover:shadow-md border border-slate-100">
+              <div class="absolute right-0 top-0 h-16 w-16 -mr-4 -mt-4 rounded-full bg-blue-50" />
+              <p class="relative text-sm font-medium text-slate-500">Publicadas</p>
+              <div class="relative mt-1 flex items-baseline gap-2">
+                <span class="text-3xl font-bold text-slate-800">{{ userPets.length }}</span>
+                <span class="text-xs font-semibold text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">Total</span>
+              </div>
+            </div>
+
+            <!-- Disponibles -->
+            <div class="relative overflow-hidden rounded-2xl bg-white p-4 shadow-sm transition-shadow hover:shadow-md border border-slate-100">
+              <div class="absolute right-0 top-0 h-16 w-16 -mr-4 -mt-4 rounded-full bg-emerald-50" />
+              <p class="relative text-sm font-medium text-slate-500">En Adopción</p>
+              <div class="relative mt-1 flex items-baseline gap-2">
+                <span class="text-3xl font-bold text-slate-800">{{ availablePets }}</span>
+                <span v-if="availablePets > 0" class="flex h-2 w-2 rounded-full bg-emerald-500" />
+              </div>
+            </div>
+
+            <!-- Adoptadas -->
+            <div class="relative overflow-hidden rounded-2xl bg-white p-4 shadow-sm transition-shadow hover:shadow-md border border-slate-100">
+              <div class="absolute right-0 top-0 h-16 w-16 -mr-4 -mt-4 rounded-full bg-amber-50" />
+              <p class="relative text-sm font-medium text-slate-500">Adoptadas</p>
+              <div class="relative mt-1 flex items-baseline gap-2">
+                <span class="text-3xl font-bold text-slate-800">{{ adoptedPets }}</span>
+                <Icon name="heroicons:trophy" class="h-4 w-4 text-amber-500" />
+              </div>
+            </div>
+            
+            <!-- Solicitudes -->
+            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 p-4 shadow-md text-white">
+              <p class="relative text-sm font-medium text-purple-100">Solicitudes</p>
+              <div class="relative mt-1 flex items-baseline gap-2">
+                <span class="text-3xl font-bold">{{ totalAdoptionRequests }}</span>
+                <span v-if="totalAdoptionRequests > 0" class="animate-pulse rounded-full bg-white/20 px-2 py-0.5 text-xs font-bold">Nuevas</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filters & Search Bar -->
+          <div class="sticky top-0 z-30 -mx-4 bg-amber-50/95 px-4 py-3 backdrop-blur-sm sm:static sm:mx-0 sm:bg-transparent sm:p-0">
+             <div class="flex w-full overflow-x-auto pb-2 scrollbar-hide sm:flex-wrap sm:pb-0 gap-2">
+                <button
+                  v-for="filter in filters"
+                  :key="filter.value"
+                  class="whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium transition-all"
+                  :class="selectedFilter === filter.value 
+                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-200' 
+                    : 'bg-white text-gray-600 shadow-sm hover:bg-gray-50 border border-gray-100'"
+                  @click="selectedFilter = filter.value"
+                >
+                  {{ filter.label }}
+                  <span v-if="getFilterCount(filter.value) > 0" class="ml-1 opacity-80">
+                    ({{ getFilterCount(filter.value) }})
+                  </span>
+                </button>
+             </div>
+          </div>
+
+          <!-- Pet Grid -->
+          <div v-if="filteredPets.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+             <transition-group name="list" appear>
+              <UserPetCard
+                v-for="pet in filteredPets"
+                :key="pet.id"
+                :pet="pet"
+                class="h-full"
+                @delete="confirmDeletePet"
+                @update-status="handleStatusUpdate"
+                @mark-adopted="markAsAdopted"
+              />
+            </transition-group>
+          </div>
+          
+          <!-- Empty Filter State -->
+          <div v-else class="flex flex-col items-center justify-center py-16 text-center">
+            <div class="mb-4 rounded-full bg-gray-100 p-6">
+               <Icon name="heroicons:funnel" class="h-10 w-10 text-gray-400" />
+            </div>
+            <h3 class="text-xl font-semibold text-gray-800">Sin resultados</h3>
+            <p class="text-gray-500">No tienes mascotas en la categoría "{{ getFilterLabel(selectedFilter) }}"</p>
+            <button 
+              @click="selectedFilter = 'all'"
+              class="mt-4 text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline"
+            >
+              Ver todas mis publicaciones
+            </button>
+          </div>
+
         </div>
       </div>
     </div>
@@ -410,6 +437,16 @@ const getInitials = (name) => {
     .join('')
     .toUpperCase()
     .substring(0, 2)
+}
+
+const getFilterCount = (filterValue) => {
+  if (filterValue === 'all') return userPets.value.length
+  if (filterValue === 'available') return userPets.value.filter(pet => !pet.status || pet.status === 'available').length
+  return userPets.value.filter(pet => pet.status === filterValue).length
+}
+
+const getFilterLabel = (filterValue) => {
+  return filters.find(f => f.value === filterValue)?.label || 'Filtro'
 }
 
 // Funciones de gestión de publicaciones

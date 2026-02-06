@@ -1,22 +1,33 @@
 <template>
-  <section class="bg-amber-50 py-12 md:py-16">
+  <section class="bg-[#FEFFFA] py-16 md:py-20 border-t border-emerald-50">
     <div class="container mx-auto px-4">
-      <div class="mx-auto max-w-3xl text-center">
-        <h2 class="mb-4 text-3xl font-bold text-emerald-800 md:text-4xl">Mantente informado</h2>
-        <p class="mb-8 text-gray-600">
-          Siguenos en nuestras redes sociales para recibir actualizaciones sobre nuevas mascotas
-          disponibles, consejos de cuidado y eventos de adopción.
-        </p>
-        <div class="grid grid-cols-2 w-full md:grid-cols-4 items-center justify-center gap-3">
-          <NuxtLink
-            v-for="(social, index) in socialLinks"
-            :key="index"
-            :to="social.link"
-            target="_blank"
-            class="mx-3 text-lg rounded-lg bg-amber-600 p-4 text-[#fefffa] inline-flex items-center justify-center gap-3"
-          >
-              <Icon :name="social.iconName" class="text-2xl" size="28px" />  {{ social.name }}
-          </NuxtLink>
+      <div class="mx-auto max-w-4xl rounded-3xl bg-emerald-900 p-8 text-center shadow-2xl md:p-12 lg:p-16 relative overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="absolute -top-24 -left-24 h-64 w-64 rounded-full bg-emerald-800/30 blur-3xl" />
+        <div class="absolute -bottom-24 -right-24 h-64 w-64 rounded-full bg-amber-500/10 blur-3xl" />
+
+        <div class="relative z-10">
+          <h2 class="mb-4 text-3xl font-bold text-white md:text-4xl">
+            Únete a la Manada
+          </h2>
+          <p class="mx-auto mb-10 max-w-2xl text-lg text-emerald-100">
+            Síguenos para ver historias de éxito, mascotas recién llegadas y eventos de la comunidad. 
+            ¡Juntos hacemos más ruido!
+          </p>
+
+          <div class="flex flex-wrap justify-center gap-4">
+            <a
+              v-for="social in socialLinks"
+              :key="social.name"
+              :href="social.link"
+              target="_blank"
+              class="group flex items-center gap-3 rounded-full px-6 py-3 font-medium transition-all hover:-translate-y-1 hover:shadow-lg"
+              :class="social.colorClasses"
+            >
+              <Icon :name="social.icon" class="h-6 w-6" />
+              <span>{{ social.name }}</span>
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -28,23 +39,26 @@ const socialLinks = [
   {
     name: 'Instagram',
     link: 'https://instagram.com/adopta.zulia',
-    iconName: 'mdi:instagram',
+    icon: 'mdi:instagram',
+    colorClasses: 'bg-white text-pink-600 hover:bg-pink-50',
   },
   {
     name: 'Facebook',
-    link: 'https://www.facebook.com/profile.php?id=61574778734797',
-    iconName: 'ic:baseline-facebook',
+    link: 'https://facebook.com/adopta.zulia',
+    icon: 'mdi:facebook',
+    colorClasses: 'bg-white text-blue-600 hover:bg-blue-50',
   },
   {
-    name: 'Twitter',
+    name: 'Twitter (X)',
     link: 'https://x.com/AdoptaZulia',
-    iconName: 'mdi:alpha-x-circle',
+    icon: 'mdi:twitter',
+    colorClasses: 'bg-white text-gray-900 hover:bg-gray-50',
   },
-    {
+  {
     name: 'WhatsApp',
     link: 'https://wa.me/584146646526',
-    iconName: 'mdi:whatsapp',
+    icon: 'mdi:whatsapp',
+    colorClasses: 'bg-white text-green-600 hover:bg-green-50',
   },
-
 ]
 </script>

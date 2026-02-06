@@ -8,18 +8,18 @@ import type { UserProfile, UserData } from '~/models/User'
 import { useSecureLogger } from '~/composables/useSecureLogger'
 
 type User = UserInfo & {
-  uid: string | any
-  email: string | any
-  userName?: string | any
-  displayName: string | any
-  emailVerified: boolean | any
-  isAnonymous: boolean | any
+  uid: string
+  email: string | null
+  userName?: string
+  displayName: string | null
+  emailVerified: boolean
+  isAnonymous: boolean
   metadata?: {
-    creationTime?: string | any
-    lastSignInTime?: string | any
+    creationTime?: string
+    lastSignInTime?: string
   }
   providerData: UserInfo[]
-  refreshToken: string | any
+  refreshToken: string
 }
 
 const user = ref<User | null>(null)
@@ -38,7 +38,7 @@ function initializeAuth() {
   const { error: logError } = useSecureLogger()
   try {
     const authService = new AuthService()
-    unsubscribeAuth = authService.onAuthStateChanged(async (currentUser) => {
+    unsubscribeAuth = authService.onAuthStateChanged(async (currentUser: any) => {
       user.value = currentUser
       if (currentUser) {
         try {

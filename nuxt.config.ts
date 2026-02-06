@@ -22,7 +22,7 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@nuxtjs/color-mode',
     'nuxt-vuefire',
-    'nuxt-booster'
+    'nuxt-booster',
   ],
 
   runtimeConfig: {
@@ -96,12 +96,12 @@ export default defineNuxtConfig({
   },
   image: {
     domains: [
-      process.env.AWS_S3_BUCKET_DOMAIN || 's1bckt.s3.us-east-2.amazonaws.com'
+      process.env.AWS_S3_BUCKET_DOMAIN
     ],
     ipx: {
       remote: {
         domains: [
-          process.env.AWS_S3_BUCKET_DOMAIN || 's1bckt.s3.us-east-2.amazonaws.com'
+          process.env.AWS_S3_BUCKET_DOMAIN
         ]
       }
     }

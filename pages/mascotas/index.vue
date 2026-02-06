@@ -40,43 +40,79 @@
               Buscar
             </button>
           </div>
+
+          <!-- Quick Filters (Mobile/Desktop) -->
+          <div class="mt-6 flex flex-wrap gap-2">
+            <button
+                v-for="(filter, idx) in quickFilters"
+                :key="idx"
+                class="rounded-full bg-emerald-800/30 px-4 py-1.5 text-sm font-medium text-emerald-50 backdrop-blur-sm transition-colors hover:bg-emerald-100 hover:text-emerald-800 border border-emerald-500/30"
+                @click="applyQuickFilter(filter)"
+            >
+                {{ filter.label }}
+            </button>
+          </div>
         </div>
       </div>
 
       <div class="flex flex-col gap-8 lg:flex-row">
-        <!-- Filters Sidebar -->
+        <!-- Filters Sidebar (Desktop) / Drawer (Mobile) -->
         <div class="w-full lg:w-1/4">
-          <div class="sticky top-24 rounded-lg bg-white p-6 shadow-sm">
-            <div class="mb-6 flex items-center justify-between">
-              <h2 class="text-xl font-semibold text-emerald-800">Filtros</h2>
-              <button
-                class="text-sm text-emerald-600 transition-colors hover:text-emerald-700"
-                @click="resetFilters"
-              >
-                Restablecer
-              </button>
-            </div>
-
-            <!-- Botón desplegable para filtros en móviles -->
+             <!-- Mobile Filter Toggle -->
             <button
-              class="mb-6 flex items-center justify-between w-full rounded-md bg-emerald-600 px-4 py-2 text-white transition-colors hover:bg-emerald-700 lg:hidden"
-              @click="showFilters = !showFilters"
+                class="mb-6 flex w-full items-center justify-between rounded-xl bg-white p-4 text-emerald-800 shadow-sm lg:hidden hover:bg-gray-50 transition-colors border border-gray-100"
+                @click="showFilters = true"
             >
-              <span class="flex items-center">
-                <Icon name="heroicons:funnel" class="mr-2 h-5 w-5" />
-                {{ showFilters ? 'Ocultar filtros' : 'Mostrar filtros' }}
-              </span>
-              <Icon 
-                name="heroicons:chevron-down" 
-                class="h-5 w-5 transition-transform duration-200" 
-                :class="{'transform rotate-180': showFilters}"
-              />
+                <div class="flex items-center font-bold">
+                    <Icon name="heroicons:adjustments-horizontal" class="mr-3 h-5 w-5 text-emerald-600" />
+                    Filtros y Orden
+                </div>
+                <div v-if="activeFiltersCount > 0" class="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-600 text-xs font-bold text-white">
+                    {{ activeFiltersCount }}
+                </div>
             </button>
 
-            <div v-show="showFilters || !isMobile" class="space-y-6">
-              <!-- Location Filter -->
-              <div class="mb-6">
-                <h3 class="mb-3 font-medium text-gray-900">Ubicación</h3>
+            <!-- Filters Container -->
+          <div 
+            class="lg:sticky lg:top-24 lg:block"
+            :class="[
+                isMobile ? 'fixed inset-0 z-50 transform transition-transform duration-300 ease-in-out' : '',
+                showFilters ? 'translate-x-0' : (isMobile ? 'translate-x-[100%]' : '')
+            ]"
+          >
+            <!-- Mobile Overlay/Backdrop -->
+             <div v-if="isMobile && showFilters" class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" @click="showFilters = false" />
+
+            <!-- Filter Content -->
+            <div class="relative h-full overflow-y-auto bg-white p-6 shadow-xl lg:h-auto lg:rounded-2xl lg:shadow-sm lg:p-6 lg:border lg:border-gray-100">
+                
+                <!-- Mobile Header -->
+                <div class="flex items-center justify-between mb-6 lg:hidden">
+                    <h2 class="text-xl font-bold text-gray-900">Filtros</h2>
+                    <button class="p-2 text-gray-500 hover:bg-gray-100 rounded-full" @click="showFilters = false">
+                        <Icon name="heroicons:x-mark" class="h-6 w-6" />
+                    </button>
+                </div>
+
+                <!-- Desktop Header -->
+                <div class="mb-6 hidden items-center justify-between lg:flex">
+                  <h2 class="text-xl font-bold text-emerald-800">Filtros</h2>
+                  <button
+                    v-if="hasActiveFilters"
+                    class="text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline"
+                    @click="resetFilters"
+                  >
+                    Limpiar todo
+                  </button>
+                </div>
+
+                <div class="space-y-8">
+                  <!-- Location Filter -->
+                  <div>
+                    <h3 class="flex items-center mb-3 font-bold text-gray-900">
+                         <Icon name="heroicons:map-pin" class="mr-2 h-4 w-4 text-emerald-500" />
+                         Ubicación
+                    </h3>
                 <select
                   v-model="filters.location"
                   class="w-full rounded-md border-gray-300 bg-amber-50 p-2 text-amber-950 shadow-sm focus:border-emerald-500 focus:ring focus:ring-emerald-200 focus:ring-opacity-50"
@@ -183,11 +219,12 @@
               </div>
 
               <button
-                class="w-full rounded-md bg-emerald-600 py-2 text-white transition-colors hover:bg-emerald-700"
+                class="w-full rounded-xl bg-emerald-600 py-3 text-white font-bold shadow-lg shadow-emerald-200 transition-transform hover:scale-[1.02] active:scale-95 lg:hover:bg-emerald-700"
                 @click="applyFilters"
               >
-                Aplicar filtros
+                Ver {{ filteredPets.length }} mascotas
               </button>
+            </div>
             </div>
           </div>
         </div>
@@ -240,93 +277,12 @@
             <div
               v-for="pet in filteredPets"
               :key="pet.id"
-              class="overflow-hidden rounded-lg bg-white shadow-md transition-shadow hover:shadow-lg"
             >
-              <div class="relative">
-                <NuxtImg 
-                  :src="pet.image" 
-                  :alt="pet.name" 
-                  class="h-80 w-full object-cover sm:h-64 lg:h-64" 
-                  loading="lazy"
-                  sizes="sm:100vw md:50vw lg:33vw"
-                  placeholder
-                />
-                <!-- Overlay completo cuando la mascota está adoptada -->
-                <div
-                  v-if="pet.status === 'adopted'"
-                  class="absolute inset-0 bg-black bg-opacity-60 z-10 flex items-center justify-center p-4"
-                >
-                  <div
-                    class="bg-white px-4 py-3 rounded-md font-bold text-emerald-700 transform transition-transform duration-300 flex flex-col items-center max-w-xs text-center"
-                  >
-                    <span class="text-xl">ADOPTADO</span>
-                    <span class="text-xs mt-1">¡Ya encontró un hogar!</span>
-                  </div>
-                </div>
-
-                <div class="absolute right-4 top-4 flex space-x-2 z-20">
-                  <!-- Badge de urgente con mejor contraste para accesibilidad (solo si no está adoptada) -->
-                  <div
-                    v-if="pet.urgent && pet.status !== 'adopted'"
-                    class="rounded-full bg-red-600 px-2 py-1 text-xs font-bold text-white"
-                    role="status"
-                    aria-live="polite"
-                  >
-                    URGENTE
-                  </div>
-                </div>
-              </div>
-
-              <div class="p-6">
-                <div class="mb-2 flex items-start justify-between">
-                  <h3 class="text-xl font-semibold text-emerald-800">
-                    {{ pet.name }}
-                  </h3>
-                  <Icon
-                    name="heroicons:heart"
-                    class="h-6 w-6 cursor-pointer text-gray-400 transition-colors hover:text-red-500"
-                  />
-                </div>
-
-                <p class="mb-4 text-gray-600">
-                  {{ pet.breed }} • {{ pet.age }} • {{ pet.location }}
-                </p>
-
-                <div class="mb-4 flex flex-wrap gap-2">
-                  <span
-                    v-if="pet.vaccinated"
-                    class="flex items-center rounded-full bg-green-100 px-2 py-1 text-xs text-green-800"
-                  >
-                    <Icon name="heroicons:check-circle" class="mr-1 h-3 w-3" />
-                    Vacunado
-                  </span>
-                  <span
-                    v-if="pet.neutered"
-                    class="flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs text-blue-800"
-                  >
-                    <Icon name="heroicons:check-circle" class="mr-1 h-3 w-3" />
-                    Esterilizado
-                  </span>
-                  <span
-                    class="flex items-center rounded-full bg-purple-100 px-2 py-1 text-xs text-purple-800"
-                  >
-                    <Icon name="heroicons:square-2-stack" class="mr-1 h-3 w-3" />
-                    {{ pet.size }}
-                  </span>
-                </div>
-
-                <a
-                  :href="`/mascotas/${pet.id}`"
-                  class="block w-full rounded-lg py-2 text-center font-medium transition-colors"
-                  :class="[
-                    pet.status === 'adopted'
-                      ? 'bg-gray-400 text-white cursor-default'
-                      : 'bg-emerald-600 text-white hover:bg-emerald-700'
-                  ]"
-                >
-                  {{ pet.status === 'adopted' ? 'Mascota adoptada' : `Conoce a ${pet.name}` }}
-                </a>
-              </div>
+              <PetCard 
+                :pet="pet" 
+                :is-favorite="false" 
+                @toggle-favorite="toggleFavorite"
+              />
             </div>
           </div>
 
@@ -384,6 +340,7 @@
 import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { usePets } from '~/composables/usePets'
+import PetCard from '~/components/common/PetCard.vue'
 
 const route = useRoute()
 const { fetchAllPets } = usePets()
@@ -399,6 +356,21 @@ const filters = ref({
   urgent: false,
   location: '',
 })
+
+const quickFilters = [
+  { label: '🐶 Perros', type: 'perro' },
+  { label: '🐱 Gatos', type: 'gato' },
+  { label: '🐾 Cachorros', age: 'cachorro' },
+  { label: '🚑 Urgentes', urgent: true },
+]
+
+const applyQuickFilter = (filter) => {
+  resetFilters()
+  if (filter.type) filters.value.types = [filter.type]
+  if (filter.age) filters.value.ages = [filter.age]
+  if (filter.urgent) filters.value.urgent = true
+  currentPage.value = 1
+}
 
 const showFilters = ref(false)
 const isMobile = ref(false)
@@ -421,7 +393,15 @@ watch(() => route.fullPath, () => {
 onBeforeUnmount(() => {
   if (import.meta.client) {
     window.removeEventListener('resize', checkIfMobile)
+    document.body.style.overflow = ''
   }
+})
+
+// Watch showFilters to prevent body scroll when drawer is open
+watch(showFilters, (val) => {
+    if (import.meta.client) {
+        document.body.style.overflow = val && isMobile.value ? 'hidden' : ''
+    }
 })
 
 const sortBy = ref('recent')
@@ -655,16 +635,40 @@ onMounted(async () => {
   if (queryParams.buscar) {
     searchQuery.value = queryParams.buscar
   }
+})
 
-  useHead({
-    title: 'Mascotas en adopción | Adopta Zulia',
-    meta: [
-      {
-        name: 'description',
-        content: 'Encuentra tu compañero perfecto entre nuestras mascotas en adopción.',
-      },
-    ],
-  })
+const canonicalUrl = useCanonicalUrl('/mascotas')
+const ogImage = useOgImage('/og.jpg')
+
+// SEO Meta Tags - must be at top level for SSR
+useSeoMeta({
+  title: 'Mascotas en adopción | Adopta Zulia',
+  description: 'Encuentra tu compañero perfecto entre perros, gatos y otras mascotas en adopción en el estado Zulia. Filtra por tamaño, edad, ubicación y más características.',
+  ogTitle: 'Mascotas en adopción - Adopta Zulia',
+  ogDescription: 'Explora nuestra lista de mascotas disponibles para adopción. Encuentra tu compañero ideal filtrando por tipo, tamaño, edad y ubicación.',
+  ogImage,
+  ogImageAlt: 'Mascotas disponibles para adopción en Zulia',
+  ogUrl: canonicalUrl,
+  ogType: 'website',
+  twitterTitle: 'Mascotas en adopción - Adopta Zulia',
+  twitterDescription: 'Encuentra perros, gatos y otras mascotas disponibles para adopción en el estado Zulia.',
+  twitterImage: ogImage,
+  twitterCard: 'summary_large_image',
+})
+
+useHead({
+  link: [
+    {
+      rel: 'canonical',
+      href: canonicalUrl,
+    }
+  ],
+  script: [
+    useStructuredData(createBreadcrumbSchema([
+      { name: 'Inicio', url: useCanonicalUrl('/') },
+      { name: 'Mascotas en Adopción', url: canonicalUrl }
+    ])),
+  ]
 })
 </script>
 

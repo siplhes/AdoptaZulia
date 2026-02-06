@@ -1,9 +1,9 @@
 <template>
-  <section class="pt-12 md:pt-16 bg-emerald-600">
-    <div class="py-6 container mx-auto px-4">
-      <div class="mb-12 text-center  pt-6">
-        <h2 class="mb-3 text-3xl font-bold text-[#FEFFFA]">Historias de adopción</h2>
-        <p class="mx-auto max-w-2xl text-lg text-emerald-50">
+  <section class="pt-10 md:pt-12 bg-emerald-600">
+    <div class="py-4 container mx-auto px-4">
+      <div class="mb-8 text-center pt-4">
+        <h2 class="mb-2 text-2xl font-bold text-[#FEFFFA] md:text-3xl">Historias de adopción</h2>
+        <p class="mx-auto max-w-2xl text-base text-emerald-50">
           Conoce las inspiradoras historias de mascotas que encontraron un hogar gracias a nuestra
           comunidad.
         </p>

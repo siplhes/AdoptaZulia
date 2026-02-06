@@ -103,5 +103,4 @@ firebase-adminsdk-*.json
 # yarn.lock
 # pnpm-lock.yaml
 
-# Project specific
-pages/nosotros/index.vue
+

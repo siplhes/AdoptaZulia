@@ -1,10 +1,10 @@
 <template>
-  <section class="gradient from-bg-[#111] to-bg-amber-50 py-12 md:py-16">
+  <section class="gradient from-bg-[#111] to-bg-amber-50 py-10 md:py-12">
     <div class="container mx-auto px-4">
       <div class="overflow-hidden rounded-2xl bg-emerald-700">
         <div class="grid grid-cols-1 lg:grid-cols-2">
-          <div class="p-8 md:p-12">
-            <h2 class="mb-4 text-3xl font-bold text-white md:text-4xl">
+          <div class="p-6 md:p-10">
+            <h2 class="mb-3 text-2xl font-bold text-white md:text-3xl">
               Tu donación puede salvar vidas
             </h2>
             <p class="mb-6 text-emerald-100">

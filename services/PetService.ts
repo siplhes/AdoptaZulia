@@ -9,6 +9,7 @@ import {
   query,
   orderByChild,
   equalTo,
+  limitToLast,
 } from 'firebase/database'
 import type { Pet, PetFilters } from '~/models/Pet'
 
@@ -77,6 +78,33 @@ export class PetService {
     }
 
     return []
+  }
+
+  /**
+   * Obtiene las mascotas más recientes
+   */
+  async getRecentPets(limit: number): Promise<Pet[]> {
+    try {
+      // Intentar ordenar por fecha de creación si existe el índice
+      const petsQuery = query(this.petsRef, orderByChild('createdAt'), limitToLast(limit))
+      const snapshot = await get(petsQuery)
+
+      if (snapshot.exists()) {
+        const pets: Pet[] = []
+        snapshot.forEach((childSnapshot) => {
+          pets.push(childSnapshot.val() as Pet)
+        })
+        // Firebase devuelve orden ascendente (más antiguo a más nuevo con limitToLast), 
+        // así que invertimos para tener el más nuevo primero
+        return pets.reverse()
+      }
+      return []
+    } catch (error) {
+       console.warn('Error al obtener mascotas recientes con query, usando fallback:', error)
+       // Fallback: Obtener todas y cortar (no óptimo pero funciona sin índices)
+       const all = await this.getAllPets()
+       return all.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, limit)
+    }
   }
 
   /**

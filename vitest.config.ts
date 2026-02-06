@@ -1,16 +1,15 @@
-import { defineVitestConfig } from '@nuxt/test-utils/config'
+import { defineConfig } from 'vitest/config'
+import path from 'path'
 
-export default defineVitestConfig({
-  test: {
-    environment: 'happy-dom',
-    exclude: ['node_modules', '.nuxt', '.output'],
-    environmentOptions: {
-      nuxt: {
-        mock: {
-          intersectionObserver: true,
-          indexedDb: true,
-        }
-      }
+export default defineConfig({
+  resolve: {
+    alias: {
+      '~': path.resolve(__dirname, './'),
+      '@': path.resolve(__dirname, './')
     }
   },
+  test: {
+    globals: true,
+    environment: 'node'
+  }
 })

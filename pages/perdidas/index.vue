@@ -8,7 +8,7 @@
             src="/img3.webp"
             height="400"
             width="1200"
-            alt="Mascotas en adopción"
+            alt="Mascotas perdidas"
             class="h-full w-full object-cover opacity-20"
             loading="lazy"
             sizes="sm:100vw md:100vw lg:100vw"
@@ -28,7 +28,7 @@
               <input
                 v-model="searchQuery"
                 type="text"
-                placeholder="Buscar por nombre, ubicación o descripción..."
+                placeholder="Buscar por nombre, ubicación, descripción..."
                 class="w-full text-gray-800 focus:outline-none"
               >
             </div>
@@ -39,146 +39,135 @@
               Buscar
             </button>
           </div>
-   
-        </div>   
+
+          <!-- Quick Filters (Mobile/Desktop) -->
+          <div class="mt-6 flex flex-wrap gap-2">
+            <button
+                v-for="(filter, idx) in quickFilters"
+                :key="idx"
+                class="rounded-full bg-emerald-800/30 px-4 py-1.5 text-sm font-medium text-emerald-50 backdrop-blur-sm transition-colors hover:bg-emerald-100 hover:text-emerald-800 border border-emerald-500/30"
+                @click="applyQuickFilter(filter)"
+            >
+                {{ filter.label }}
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="flex flex-col gap-8 lg:flex-row">
-        <!-- Filters Sidebar -->
+        <!-- Filters Sidebar (Desktop) / Drawer (Mobile) -->
         <div class="w-full lg:w-1/4">
-          <div class="sticky top-24 rounded-lg bg-white p-6 shadow-sm">     <button
-              class="my-2 rounded-md bg-red-600 px-6 py-2 text-white transition-colors hover:bg-red-700 md:mt-0"
+             <!-- Mobile Filter Toggle -->
+            <button
+                class="mb-6 flex w-full items-center justify-between rounded-xl bg-white p-4 text-emerald-800 shadow-sm lg:hidden hover:bg-gray-50 transition-colors border border-gray-100"
+                @click="showFilters = true"
+            >
+                <div class="flex items-center font-bold">
+                    <Icon name="heroicons:adjustments-horizontal" class="mr-3 h-5 w-5 text-emerald-600" />
+                    Filtros y Orden
+                </div>
+            </button>
+
+            <!-- Report Button (Mobile/Desktop) -->
+           <div class="mb-6">
+            <button
+              class="w-full rounded-xl bg-red-600 px-6 py-3 text-white font-bold shadow-lg shadow-red-200 transition-transform hover:scale-[1.02] active:scale-95 hover:bg-red-700 flex items-center justify-center gap-2"
               @click="$router.push('/perdidas/crear')"
             >
-              Publicar mascota perdida
+              <Icon name="heroicons:megaphone" class="h-5 w-5" />
+              Reportar mascota
             </button>
-            <div class="mb-6 flex items-center justify-between">
-              <h2 class="text-xl font-semibold text-emerald-800">Filtros</h2>
-              <button
-                class="text-sm text-emerald-600 transition-colors hover:text-emerald-700"
-                @click="resetFilters"
-              >
-                Restablecer
-              </button>
-            </div>
-
-            <!-- Botón desplegable para filtros en móviles -->
-            <button
-              class="mb-6 flex items-center justify-between w-full rounded-md bg-emerald-600 px-4 py-2 text-white transition-colors hover:bg-emerald-700 lg:hidden"
-              @click="showFilters = !showFilters"
-            >
-              <span class="flex items-center">
-                <Icon name="heroicons:funnel" class="mr-2 h-5 w-5" />
-                {{ showFilters ? 'Ocultar filtros' : 'Mostrar filtros' }}
-              </span>
-              <Icon 
-                name="heroicons:chevron-down" 
-                class="h-5 w-5 transition-transform duration-200" 
-                :class="{'transform rotate-180': showFilters}"
-              />
-            </button>
-
-            <div v-show="showFilters || !isMobile" class="space-y-6">
-              <!-- Location Filter -->
-              <div class="mb-6">
-                <h3 class="mb-3 font-medium text-gray-900">Ubicación</h3>
-                <select
-                  v-model="filters.location"
-                  class="w-full rounded-md border-gray-300 bg-amber-50 p-2 text-amber-950 shadow-sm focus:border-emerald-500 focus:ring focus:ring-emerald-200 focus:ring-opacity-50"
-                >
-                  <option value="">Todas las ubicaciones</option>
-                  <option v-for="location in locations" :key="location" :value="location">
-                    {{ location }}
-                  </option>
-                </select>
-              </div>
-              <!-- Type Filter -->
-              <div v-if="petTypes && petTypes.length" class="mb-6">
-                <h3 class="mb-3 font-medium text-gray-900">Tipo de mascota</h3>
-                <div class="space-y-2">
-                  <label v-for="type in petTypes" :key="type.value" class="flex items-center">
-                    <input
-                      v-model="filters.types"
-                      type="checkbox"
-                      :value="type.value"
-                      class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                    >
-                    <span class="ml-2 text-gray-700">{{ type.label }}</span>
-                  </label>
-                </div>
-              </div>
-
-              <!-- Age Filter -->
-              <div v-if="ageRanges && ageRanges.length" class="mb-6">
-                <h3 class="mb-3 font-medium text-gray-900">Edad</h3>
-                <div class="space-y-2">
-                  <label v-for="age in ageRanges" :key="age.value" class="flex items-center">
-                    <input
-                      v-model="filters.ages"
-                      type="checkbox"
-                      :value="age.value"
-                      class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                    >
-                    <span class="ml-2 text-gray-700">{{ age.label }}</span>
-                  </label>
-                </div>
-              </div>
-
-              <!-- Size Filter -->
-              <div v-if="sizes && sizes.length" class="mb-6">
-                <h3 class="mb-3 font-medium text-gray-900">Tamaño</h3>
-                <div class="space-y-2">
-                  <label v-for="size in sizes" :key="size.value" class="flex items-center">
-                    <input
-                      v-model="filters.sizes"
-                      type="checkbox"
-                      :value="size.value"
-                      class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                    >
-                    <span class="ml-2 text-gray-700">{{ size.label }}</span>
-                  </label>
-                </div>
-              </div>
-
-              <!-- Gender Filter -->
-              <div v-if="genders && genders.length" class="mb-6">
-                <h3 class="mb-3 font-medium text-gray-900">Género</h3>
-                <div class="space-y-2">
-                  <label v-for="gender in genders" :key="gender.value" class="flex items-center">
-                    <input
-                      v-model="filters.gender"
-                      type="radio"
-                      :value="gender.value"
-                      class="h-4 w-4 border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                    >
-                    <span class="ml-2 text-gray-700">{{ gender.label }}</span>
-                  </label>
-                </div>
-              </div>
-
-              <!-- Additional Filters (only relevant ones for lost reports) -->
-              <div class="mb-6">
-                <h3 class="mb-3 font-medium text-gray-900">Características</h3>
-                <div class="space-y-2">
-                  <label class="flex items-center">
-                    <input
-                      v-model="filters.urgent"
-                      type="checkbox"
-                      class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-                    >
-                    <span class="ml-2 text-gray-700">Con recompensa</span>
-                  </label>
-                </div>
-              </div>
-
-              <button
-                class="w-full rounded-md bg-emerald-600 py-2 text-white transition-colors hover:bg-emerald-700"
-                @click="applyFilters"
-              >
-                Aplicar filtros
-              </button>
-            </div>
           </div>
+          
+            <!-- Filters Container -->
+          <div 
+            class="lg:sticky lg:top-24 lg:block"
+            :class="[
+                isMobile ? 'fixed inset-0 z-50 transform transition-transform duration-300 ease-in-out' : '',
+                showFilters ? 'translate-x-0' : (isMobile ? 'translate-x-[100%]' : '')
+            ]"
+          >
+           <!-- Mobile Overlay/Backdrop -->
+             <div v-if="isMobile && showFilters" class="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity" @click="showFilters = false" />
+
+           <!-- Filter Content -->
+            <div class="relative h-full overflow-y-auto bg-white p-6 shadow-xl lg:h-auto lg:rounded-2xl lg:shadow-sm lg:p-6 lg:border lg:border-gray-100">
+                
+                <!-- Mobile Header -->
+                <div class="flex items-center justify-between mb-6 lg:hidden">
+                    <h2 class="text-xl font-bold text-gray-900">Filtros</h2>
+                    <button class="p-2 text-gray-500 hover:bg-gray-100 rounded-full" @click="showFilters = false">
+                        <Icon name="heroicons:x-mark" class="h-6 w-6" />
+                    </button>
+                </div>
+
+                <!-- Desktop Header -->
+                <div class="mb-6 hidden items-center justify-between lg:flex">
+                  <h2 class="text-xl font-bold text-emerald-800">Filtros</h2>
+                  <button
+                    class="text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:underline"
+                    @click="resetFilters"
+                  >
+                    Limpiar
+                  </button>
+                </div>
+
+                <div class="space-y-8">
+                  <!-- Location Filter -->
+                  <div>
+                    <h3 class="flex items-center mb-3 font-bold text-gray-900">
+                         <Icon name="heroicons:map-pin" class="mr-2 h-4 w-4 text-emerald-500" />
+                         Ubicación
+                    </h3>
+                    <select
+                      v-model="filters.location"
+                      class="w-full rounded-md border-gray-300 bg-amber-50 p-2 text-amber-950 shadow-sm focus:border-emerald-500 focus:ring focus:ring-emerald-200 focus:ring-opacity-50"
+                    >
+                      <option value="">Todas las ubicaciones</option>
+                      <option v-for="location in locations" :key="location" :value="location">
+                        {{ location }}
+                      </option>
+                    </select>
+                  </div>
+              
+                  <!-- Additional Filters -->
+                  <div>
+                     <h3 class="flex items-center mb-3 font-bold text-gray-900">Tipo</h3>
+                     <div class="flex flex-wrap gap-2">
+                         <label v-for="type in petTypes" :key="type.value" class="cursor-pointer">
+                            <input v-model="filters.types" type="checkbox" :value="type.value" class="peer sr-only">
+                            <span class="rounded-lg border px-3 py-1 text-sm peer-checked:bg-emerald-600 peer-checked:text-white peer-checked:border-emerald-600 hover:bg-gray-50 transition-colors">
+                                {{ type.label }}
+                            </span>
+                         </label>
+                     </div>
+                  </div>
+
+                  <!-- Characteristics -->
+                  <div>
+                    <h3 class="mb-3 font-bold text-gray-900">Características</h3>
+                    <div class="space-y-2">
+                      <label class="flex items-center p-2 rounded-lg border border-gray-100 hover:bg-gray-50 cursor-pointer">
+                        <input
+                          v-model="filters.urgent"
+                          type="checkbox"
+                          class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                        >
+                        <span class="ml-2 text-gray-700 font-medium">Con recompensa</span>
+                        <span class="ml-auto text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full">$$$</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <button
+                    class="w-full rounded-xl bg-emerald-600 py-3 text-white font-bold shadow-lg shadow-emerald-200 transition-transform hover:scale-[1.02] active:scale-95 lg:hover:bg-emerald-700"
+                    @click="applyFilters"
+                  >
+                    Ver reportes
+                  </button>
+                </div>
+              </div>
+            </div>
         </div>
 
         <!-- Pets Grid -->
@@ -225,61 +214,83 @@
           </div>
 
           <!-- Pets Grid -->
-          <div v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
             <div
               v-for="pet in filteredPets"
               :key="pet.id"
-              class="overflow-hidden rounded-lg bg-white shadow-md transition-shadow hover:shadow-lg"
+              class="group flex flex-col overflow-hidden rounded-xl bg-white shadow-md transition-all hover:-translate-y-1 hover:shadow-xl border border-gray-100"
             >
-              <div class="relative">
+              <div class="relative aspect-[4/3] overflow-hidden bg-gray-100">
                 <NuxtImg
                   :src="(pet.images && pet.images.length) ? pet.images[0] : (pet.image || '/img/placeholder.png')"
                   :alt="pet.name"
-                  class="h-80 w-full object-cover sm:h-64 lg:h-64"
+                  class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
                   sizes="sm:100vw md:50vw lg:33vw"
                   placeholder
                 />
-                <div class="absolute right-4 top-4 flex space-x-2 z-20">
-                  <!-- Mostrar recompensa si existe -->
-                  <div
-                    v-if="pet.reward"
-                    class="rounded-full bg-yellow-500 px-2 py-1 text-xs font-bold text-white"
-                    role="status"
-                    aria-live="polite"
-                  >
-                    RECOMPENSA
-                  </div>
+                
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60 transition-opacity group-hover:opacity-40" />
+
+                <!-- Reward Badge -->
+                <div v-if="pet.reward" class="absolute top-3 right-3 z-10">
+                    <div class="flex flex-col items-center justify-center rounded-lg bg-yellow-400 px-3 py-1.5 shadow-lg animate-bounce-slow">
+                        <span class="text-[10px] uppercase font-bold text-yellow-900 leading-tight">Recompensa</span>
+                        <span class="text-xs font-black text-yellow-950">$$$</span>
+                    </div>
+                </div>
+
+                <!-- Badges Container -->
+                <div class="absolute bottom-3 left-3 right-3 flex items-end justify-between z-10">
+                   <div class="flex flex-wrap gap-2">
+                       <span class="flex items-center gap-1 rounded-lg bg-white/90 px-2.5 py-1 text-xs font-bold text-gray-800 backdrop-blur-md shadow-sm">
+                           <Icon :name="pet.type === 'perro' ? 'ph:dog-bold' : (pet.type === 'gato' ? 'ph:cat-bold' : 'ph:paw-print-bold')" class="h-3.5 w-3.5 text-emerald-600" />
+                           {{ pet.type }}
+                       </span>
+                       <span v-if="pet.age" class="rounded-lg bg-emerald-100/90 px-2.5 py-1 text-xs font-bold text-emerald-800 backdrop-blur-md shadow-sm">
+                           {{ pet.age }}
+                       </span>
+                   </div>
                 </div>
               </div>
 
-              <div class="p-6">
+              <div class="flex flex-1 flex-col p-5">
                 <div class="mb-2 flex items-start justify-between">
-                  <h3 class="text-xl font-semibold text-emerald-800">
+                  <h3 class="text-xl font-bold text-red-700 group-hover:text-red-600 transition-colors line-clamp-1">
                     {{ pet.name }}
                   </h3>
-                  <Icon
-                    name="heroicons:heart"
-                    class="h-6 w-6 cursor-pointer text-gray-400 transition-colors hover:text-red-500"
-                  />
+                   <div class="rounded-full bg-red-50 p-1.5 text-red-500">
+                     <Icon name="heroicons:exclamation-triangle" class="h-5 w-5" />
+                   </div>
                 </div>
 
-                <p class="mb-4 text-gray-600">
-                  <span v-if="pet.lastSeenAt">Visto: {{ new Date(pet.lastSeenAt).toLocaleDateString() }}</span>
-                  <span v-if="pet.lastSeenAt"> • </span>
-                  <span>{{ pet.location }}</span>
-                </p>
-
-                <div class="mb-4">
-                  <p class="text-sm text-gray-700 line-clamp-3">{{ pet.description }}</p>
+                <div class="mb-4 space-y-1">
+                   <div class="flex items-start text-sm text-gray-700 font-medium">
+                       <Icon name="heroicons:map-pin" class="mr-1.5 h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+                       <span class="line-clamp-1">{{ pet.location }}</span>
+                   </div>
+                   <div v-if="pet.lastSeenAt" class="flex items-center text-xs text-gray-500">
+                       <Icon name="heroicons:clock" class="mr-1.5 h-3.5 w-3.5 text-gray-400" />
+                       <span>Visto: {{ new Date(pet.lastSeenAt).toLocaleDateString() }}</span>
+                   </div>
                 </div>
 
-                <a
-                  :href="`/perdidas/${pet.id}`"
-                  class="block w-full rounded-lg py-2 text-center font-medium transition-colors bg-emerald-600 text-white hover:bg-emerald-700"
+                <div class="mb-5 flex-1">
+                  <p class="text-sm text-gray-600 line-clamp-2 leading-relaxed italic border-l-2 border-red-100 pl-3">
+                    "{{ pet.description }}"
+                  </p>
+                </div>
+
+                <NuxtLink
+                  :to="`/perdidas/${pet.id}`"
+                  class="group/btn relative flex w-full items-center justify-center overflow-hidden rounded-xl bg-red-600 py-3 text-sm font-bold text-white transition-all hover:bg-red-700 hover:shadow-lg hover:shadow-red-200 focus:ring-4 focus:ring-red-100 active:scale-[0.98]"
                 >
-                  Ver reporte
-                </a>
+                  <span class="relative z-10 flex items-center gap-2">
+                    Ayudar a buscar
+                    <Icon name="heroicons:arrow-right" class="h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
+                  </span>
+                  <div class="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-500 group-hover/btn:animate-shimmer" />
+                </NuxtLink>
               </div>
             </div>
           </div>
@@ -354,6 +365,21 @@ const filters = ref({
   location: '',
 })
 
+const quickFilters = [
+  { label: '📅 Recientes', sortBy: 'recent' },
+  { label: '💰 Recompensa', urgent: true },
+  { label: '🐶 Perros', type: 'perro' },
+  { label: '🐱 Gatos', type: 'gato' },
+]
+
+const applyQuickFilter = (filter) => {
+  resetFilters()
+  if (filter.type) filters.value.types = [filter.type]
+  if (filter.urgent) filters.value.urgent = true
+  if (filter.sortBy) sortBy.value = filter.sortBy
+  currentPage.value = 1
+}
+
 const showFilters = ref(false)
 const isMobile = ref(false)
 
@@ -375,7 +401,15 @@ watch(() => route.fullPath, () => {
 onBeforeUnmount(() => {
   if (import.meta.client) {
     window.removeEventListener('resize', checkIfMobile)
+    document.body.style.overflow = ''
   }
+})
+
+// Watch showFilters to prevent body scroll
+watch(showFilters, (val) => {
+    if (import.meta.client) {
+        document.body.style.overflow = val && isMobile.value ? 'hidden' : ''
+    }
 })
 
 const sortBy = ref('recent')
@@ -383,7 +417,11 @@ const currentPage = ref(1)
 const itemsPerPage = 9
 
 // For lost pets we keep only location options; other filters are not relevant to lost reports
-const petTypes = []
+const petTypes = [
+    { label: 'Perro', value: 'perro' },
+    { label: 'Gato', value: 'gato' },
+    { label: 'Otro', value: 'otro' }
+]
 const ageRanges = []
 const sizes = []
 const genders = []
@@ -411,6 +449,11 @@ const filteredPets = computed(() => {
     result = result.filter((pet) => pet.location === filters.value.location)
   }
 
+  // Type filter
+  if (filters.value.types.length) {
+    result = result.filter((pet) => filters.value.types.includes(pet.type))
+  }
+
   // 'Urgente' checkbox maps to presence of reward in lost reports
   if (filters.value.urgent) {
     result = result.filter((pet) => pet.reward)
@@ -418,10 +461,10 @@ const filteredPets = computed(() => {
 
   switch (sortBy.value) {
     case 'recent':
-      result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      result.sort((a, b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date))
       break
     case 'oldest':
-      result.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+      result.sort((a, b) => new Date(a.createdAt || a.date) - new Date(b.createdAt || b.date))
       break
     case 'name_asc':
       result.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
@@ -456,6 +499,10 @@ const totalPages = computed(() => {
 
   if (filters.value.urgent) {
     result = result.filter((pet) => pet.reward)
+  }
+  
+   if (filters.value.types.length) {
+    result = result.filter((pet) => filters.value.types.includes(pet.type))
   }
 
   return Math.ceil(result.length / itemsPerPage)
@@ -512,6 +559,40 @@ const loadPets = async () => {
   }
 }
 
+// SEO Meta Tags
+const canonicalUrl = useCanonicalUrl('/perdidas')
+const ogImage = useOgImage('/og.jpg')
+
+useSeoMeta({
+  title: 'Mascotas Perdidas | Adopta Zulia',
+  description: 'Ayuda a reunir mascotas perdidas con sus dueños en el estado Zulia. Reporta mascotas encontradas o busca a tu compañero perdido.',
+  ogTitle: 'Mascotas Perdidas y Encontradas - Adopta Zulia',
+  ogDescription: 'Comunidad de apoyo para encontrar mascotas perdidas en Zulia. Publica reportes y ayuda a difundir.',
+  ogImage,
+  ogImageAlt: 'Mascotas perdidas en Zulia',
+  ogUrl: canonicalUrl,
+  ogType: 'website',
+  twitterTitle: 'Mascotas Perdidas - Adopta Zulia',
+  twitterDescription: 'Ayuda a encontrar mascotas perdidas en el estado Zulia.',
+  twitterImage: ogImage,
+  twitterCard: 'summary_large_image',
+})
+
+useHead({
+  link: [
+    {
+      rel: 'canonical',
+      href: canonicalUrl,
+    }
+  ],
+  script: [
+    useStructuredData(createBreadcrumbSchema([
+      { name: 'Inicio', url: useCanonicalUrl('/') },
+      { name: 'Mascotas Perdidas', url: canonicalUrl }
+    ])),
+  ]
+})
+
 onMounted(async () => {
   await loadPets()
 
@@ -540,16 +621,6 @@ onMounted(async () => {
   if (queryParams.buscar) {
     searchQuery.value = queryParams.buscar
   }
-
-  useHead({
-    title: 'Mascotas perdidas | Adopta Zulia',
-    meta: [
-      {
-        name: 'description',
-        content: 'Reportes de mascotas perdidas: ayuda a reunir a las mascotas con sus familias.',
-      },
-    ],
-  })
 })
 </script>
 

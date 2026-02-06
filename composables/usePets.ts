@@ -256,6 +256,24 @@ export function usePets() {
   }
 
   /**
+   * Obtiene mascotas recientes (optimizado)
+   */
+  async function fetchRecentPets(limit: number = 6): Promise<Pet[]> {
+    loading.value = true
+    error.value = null
+    try {
+      const results = await petService.getRecentPets(limit)
+      return results
+    } catch (err: any) {
+      logError('Error al obtener mascotas recientes:', err)
+      error.value = 'Error al obtener mascotas recientes'
+      return []
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
    * Obtiene las mascotas destacadas (urgentes primero, luego las más recientes)
    */
   async function fetchFeaturedPets(limit: number = 3): Promise<Pet[]> {
@@ -393,6 +411,7 @@ export function usePets() {
     fetchUserPets,
     fetchTotalPetsByCategory,
     fetchFeaturedPets,
+    fetchRecentPets,
     fetchAdoptionStories,
     isPetFavorite,
     addFavorite,

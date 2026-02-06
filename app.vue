@@ -10,30 +10,32 @@
 <script setup>
 const config = useRuntimeConfig()
 const baseUrl = config.public.baseUrl || 'https://adopta-zulia.vercel.app'
+const route = useRoute()
+
+const canonicalUrl = computed(() => `${baseUrl}${route.path}`)
 
 useSeoMeta({
   title: 'Adopta Zulia | Adopta, no compres',
-  description: 'Salvemos a las mascotas',
-  image: `${baseUrl}/og.jpg`,
+  description: 'Plataforma de adopción de mascotas en el estado Zulia, Venezuela. Encuentra tu compañero perfecto, comparte historias de adopción y ayuda a mascotas que necesitan un hogar.',
   ogTitle: 'Adopta Zulia | Adopta, no compres',
-  ogDescription: 'Salvemos a las mascotas',
+  ogDescription: 'Plataforma de adopción de mascotas en el estado Zulia, Venezuela. Encuentra tu compañero perfecto, comparte historias de adopción y ayuda a mascotas que necesitan un hogar.',
   ogImage: `${baseUrl}/og.jpg`,
-  ogUrl: baseUrl,
+  ogImageAlt: 'Adopta Zulia - Plataforma de adopción de mascotas',
+  ogUrl: canonicalUrl,
+  ogType: 'website',
+  ogLocale: 'es_VE',
   twitterTitle: 'Adopta Zulia | Adopta, no compres',
-  twitterDescription: 'Salvemos a las mascotas',
+  twitterDescription: 'Plataforma de adopción de mascotas en el estado Zulia, Venezuela. Encuentra tu compañero perfecto y ayuda a mascotas que necesitan un hogar.',
   twitterImage: `${baseUrl}/og.jpg`,
-  twitterCard: 'summary',
+  twitterCard: 'summary_large_image',
+  twitterSite: '@AdoptaZulia',
 })
 
 useHead({
-  htmlAttrs: {
-    lang: 'es',
-  },
   link: [
     {
-      rel: 'icon',
-      type: 'image/svg+xml',
-      href: '/favicon.svg',
+      rel: 'canonical',
+      href: canonicalUrl,
     },
     {
       rel: 'stylesheet',
@@ -45,7 +47,8 @@ useHead({
       src: 'https://storage.ko-fi.com/cdn/scripts/overlay-widget.js',
       body: true,
       defer: true,
-    }
+    },
+    useStructuredData(createOrganizationSchema()),
   ]
 })
 </script>

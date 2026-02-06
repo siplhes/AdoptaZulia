@@ -1,130 +1,147 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-emerald-50 to-amber-50 py-12">
+  <div class="min-h-screen bg-slate-50 py-12">
     <div class="container mx-auto px-4">
-      <!-- Header -->
-      <div class="mb-8">
-        <h1 class="text-4xl font-bold text-emerald-900 mb-2">Configuración de Características</h1>
-        <p class="text-gray-600">Activa o desactiva funcionalidades específicas de la plataforma</p>
-      </div>
-
-      <!-- Cargando -->
-      <div v-if="loading" class="flex justify-center py-12">
-        <div class="text-center">
-          <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
-          <p class="mt-4 text-gray-600">Cargando configuración...</p>
+      <div class="mx-auto max-w-3xl">
+        <!-- Header -->
+        <div class="mb-10 text-center">
+          <h1 class="text-3xl font-extrabold text-slate-800">Control de Funcionalidades</h1>
+          <p class="mt-2 text-slate-600">Activa o desactiva módulos de la plataforma en tiempo real.</p>
+           <NuxtLink
+            to="/admin"
+            class="mt-4 inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 shadow-sm transition-colors hover:bg-slate-50 hover:text-emerald-600"
+          >
+            <Icon name="heroicons:arrow-left" class="h-4 w-4" />
+            Volver al Panel
+          </NuxtLink>
         </div>
-      </div>
 
-      <!-- Error -->
-      <div v-if="error" class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
-        <div class="flex gap-3">
-          <Icon name="mdi:alert-circle" class="h-5 w-5 flex-shrink-0 text-red-700 mt-0.5" />
-          <div>
-            <h3 class="font-semibold text-red-800">Error</h3>
-            <p class="text-sm text-red-700">{{ error }}</p>
+        <!-- Loading -->
+        <div v-if="loading" class="flex flex-col items-center justify-center py-12">
+          <div class="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-emerald-600" />
+          <p class="mt-4 font-medium text-slate-500">Sincronizando configuración...</p>
+        </div>
+
+        <!-- Error -->
+        <div v-else-if="error" class="mb-6 rounded-2xl border border-red-100 bg-red-50 p-4 shadow-sm">
+          <div class="flex items-start gap-3">
+            <Icon name="heroicons:exclamation-triangle" class="mt-0.5 h-6 w-6 text-red-500" />
+            <div>
+              <h3 class="font-bold text-red-900">Error de Sincronización</h3>
+              <p class="text-sm text-red-700">{{ error }}</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Contenido -->
-      <div v-if="!loading" class="max-w-2xl">
-        <!-- Tarjeta de configuración -->
-        <div class="rounded-lg bg-white shadow-lg overflow-hidden">
-          <!-- Favoritos -->
-          <div class="border-b border-gray-200 p-6 hover:bg-gray-50 transition-colors">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-4">
-                <Icon name="heroicons:heart" class="h-8 w-8 text-red-500" />
-                <div>
-                  <h3 class="text-lg font-semibold text-gray-900">Sistema de Favoritos</h3>
-                  <p class="text-sm text-gray-600 mt-1">Permite a los usuarios marcar mascotas como favoritas</p>
+        <!-- Content -->
+        <div v-else class="space-y-6">
+          
+          <!-- Feature Card: Favorites -->
+          <div class="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm transition-all hover:shadow-md border border-slate-100">
+             <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                   <div class="rounded-xl bg-red-100 p-3 text-red-600">
+                      <Icon name="heroicons:heart" class="h-8 w-8" />
+                   </div>
+                   <div>
+                      <h3 class="text-lg font-bold text-slate-800">Sistema de Favoritos</h3>
+                      <p class="text-sm text-slate-500">Permite a los usuarios guardar mascotas.</p>
+                   </div>
                 </div>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  v-model="localFeatures.favorites"
-                  @change="updateFeature('favorites', localFeatures.favorites)"
-                  class="sr-only peer"
-                >
-                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
-              </label>
-            </div>
+                 <!-- Toggle -->
+                 <button 
+                  class="relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                  :class="localFeatures.favorites ? 'bg-emerald-500' : 'bg-slate-200'"
+                  @click="toggleFeature('favorites')"
+                 >
+                    <span
+                      class="inline-block h-5 w-5 transform rounded-full bg-white transition-transform"
+                      :class="localFeatures.favorites ? 'translate-x-6' : 'translate-x-1'"
+                    />
+                 </button>
+             </div>
           </div>
 
-          <!-- Comentarios -->
-          <div class="border-b border-gray-200 p-6 hover:bg-gray-50 transition-colors">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-4">
-                <Icon name="heroicons:chat-bubble-left" class="h-8 w-8 text-blue-500" />
-                <div>
-                  <h3 class="text-lg font-semibold text-gray-900">Sistema de Comentarios</h3>
-                  <p class="text-sm text-gray-600 mt-1">Permite a los usuarios comentar y calificar mascotas</p>
+           <!-- Feature Card: Comments -->
+          <div class="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm transition-all hover:shadow-md border border-slate-100">
+             <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                   <div class="rounded-xl bg-blue-100 p-3 text-blue-600">
+                      <Icon name="heroicons:chat-bubble-left-right" class="h-8 w-8" />
+                   </div>
+                   <div>
+                      <h3 class="text-lg font-bold text-slate-800">Comentarios y Reseñas</h3>
+                      <p class="text-sm text-slate-500">Habilita la sección de comentarios en las fichas.</p>
+                   </div>
                 </div>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  v-model="localFeatures.comments"
-                  @change="updateFeature('comments', localFeatures.comments)"
-                  class="sr-only peer"
-                >
-                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
-              </label>
-            </div>
+                 <!-- Toggle -->
+                 <button 
+                  class="relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                  :class="localFeatures.comments ? 'bg-emerald-500' : 'bg-slate-200'"
+                  @click="toggleFeature('comments')"
+                 >
+                    <span
+                      class="inline-block h-5 w-5 transform rounded-full bg-white transition-transform"
+                      :class="localFeatures.comments ? 'translate-x-6' : 'translate-x-1'"
+                    />
+                 </button>
+             </div>
           </div>
 
-          <!-- Generador de imágenes -->
-          <div class="p-6 hover:bg-gray-50 transition-colors">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-4">
-                <Icon name="heroicons:photo" class="h-8 w-8 text-amber-500" />
-                <div>
-                  <h3 class="text-lg font-semibold text-gray-900">Generador de Imágenes IA</h3>
-                  <p class="text-sm text-gray-600 mt-1">Permite generar imágenes compartibles con marco y código QR</p>
+          <!-- Feature Card: AI Images -->
+          <div class="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm transition-all hover:shadow-md border border-slate-100">
+             <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                   <div class="rounded-xl bg-amber-100 p-3 text-amber-600">
+                      <Icon name="heroicons:sparkles" class="h-8 w-8" />
+                   </div>
+                   <div>
+                      <h3 class="text-lg font-bold text-slate-800">Generador con IA</h3>
+                      <p class="text-sm text-slate-500">Creación de posters automáticos para compartir.</p>
+                   </div>
                 </div>
+                 <!-- Toggle -->
+                 <button 
+                  class="relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                  :class="localFeatures.imageGeneration ? 'bg-emerald-500' : 'bg-slate-200'"
+                  @click="toggleFeature('imageGeneration')"
+                 >
+                    <span
+                      class="inline-block h-5 w-5 transform rounded-full bg-white transition-transform"
+                      :class="localFeatures.imageGeneration ? 'translate-x-6' : 'translate-x-1'"
+                    />
+                 </button>
+             </div>
+          </div>
+
+           <!-- Info Box -->
+          <div class="rounded-2xl border border-blue-100 bg-blue-50 p-5">
+              <div class="flex gap-4">
+                  <Icon name="heroicons:information-circle" class="h-6 w-6 flex-shrink-0 text-blue-600" />
+                  <div class="text-sm text-blue-800">
+                      <p class="font-bold">Información Importante</p>
+                      <p class="mt-1">Los cambios se aplican globalmente en tiempo real. Desactivar una función la ocultará para todos los usuarios, pero no eliminará los datos asociados.</p>
+                  </div>
               </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  v-model="localFeatures.imageGeneration"
-                  @change="updateFeature('imageGeneration', localFeatures.imageGeneration)"
-                  class="sr-only peer"
-                >
-                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
-              </label>
+          </div>
+
+          <!-- Status Toast (Fixed Bottom) -->
+          <Transition
+            enter-active-class="transform ease-out duration-300 transition"
+            enter-from-class="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+            enter-to-class="translate-y-0 opacity-100 sm:translate-x-0"
+            leave-active-class="transition ease-in duration-100"
+            leave-from-class="opacity-100"
+            leave-to-class="opacity-0"
+          >
+            <div v-if="savingFeature || lastSaved" class="fixed bottom-6 right-6 z-50">
+                 <div class="flex items-center gap-3 rounded-xl bg-slate-900 px-4 py-3 text-white shadow-xl">
+                      <Icon v-if="savingFeature" name="heroicons:arrow-path" class="h-5 w-5 animate-spin text-emerald-400" />
+                      <Icon v-else name="heroicons:check-circle" class="h-5 w-5 text-emerald-400" />
+                      <span class="text-sm font-medium">{{ savingFeature ? 'Guardando cambios...' : '¡Configuración actualizada!' }}</span>
+                 </div>
             </div>
-          </div>
-        </div>
+          </Transition>
 
-        <!-- Información útil -->
-        <div class="mt-8 rounded-lg border border-blue-200 bg-blue-50 p-4">
-          <div class="flex gap-3">
-            <Icon name="mdi:information" class="h-5 w-5 flex-shrink-0 text-blue-700 mt-0.5" />
-            <div class="text-sm text-blue-800">
-              <p class="font-semibold mb-2">Información</p>
-              <ul class="list-disc list-inside space-y-1">
-                <li>Estos cambios se aplican inmediatamente en toda la plataforma</li>
-                <li>Las funcionalidades desactivadas estarán ocultas para todos los usuarios</li>
-                <li>Los datos existentes no se eliminarán, solo se ocultarán</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <!-- Estado de guardado -->
-        <div v-if="savingFeature" class="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
-          <div class="flex items-center gap-3">
-            <Icon name="mdi:clock-outline" class="h-5 w-5 text-amber-700 animate-spin" />
-            <p class="text-sm text-amber-800">Guardando cambios...</p>
-          </div>
-        </div>
-
-        <div v-if="lastSaved" class="mt-4 rounded-lg border border-green-200 bg-green-50 p-4">
-          <div class="flex items-center gap-3">
-            <Icon name="mdi:check-circle" class="h-5 w-5 text-green-700" />
-            <p class="text-sm text-green-800">Cambios guardados correctamente</p>
-          </div>
         </div>
       </div>
     </div>
@@ -132,14 +149,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue'
-import { useAuth } from '../../composables/useAuth'
-import { useFeatures } from '../../composables/useFeatures'
+import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuth } from '~/composables/useAuth'
+import { useFeatures } from '~/composables/useFeatures'
+
+definePageMeta({
+  middleware: ['admin'],
+  layout: 'default'
+})
 
 const router = useRouter()
-const { isAuthenticated, user } = useAuth()
-const { features, loading, error, fetchFeatures, updateFeatures, isFeatureEnabled } = useFeatures()
+const { isAuthenticated } = useAuth()
+// Removed user destructuring if not used directly
+const { features, loading, error, fetchFeatures, updateFeatures } = useFeatures()
 
 const localFeatures = reactive({
   favorites: false,
@@ -150,41 +173,48 @@ const localFeatures = reactive({
 const savingFeature = ref(false)
 const lastSaved = ref(false)
 
-// Cargar features al montar
 onMounted(async () => {
-  // Verificar que sea admin (esto debería estar en middleware)
   if (!isAuthenticated.value) {
     router.push('/login')
     return
   }
-
-  // Cargar configuración
   await fetchFeatures()
-  
-  // Actualizar locales
-  localFeatures.favorites = features.value.favorites
-  localFeatures.comments = features.value.comments
-  localFeatures.imageGeneration = features.value.imageGeneration
+  syncLocalFeatures()
 })
 
-// Actualizar feature individual
-const updateFeature = async (featureName: string, value: boolean) => {
-  savingFeature.value = true
-  lastSaved.value = false
+const syncLocalFeatures = () => {
+    if (features.value) {
+        localFeatures.favorites = !!features.value.favorites
+        localFeatures.comments = !!features.value.comments
+        localFeatures.imageGeneration = !!features.value.imageGeneration
+    }
+}
 
-  const updates: any = {}
-  updates[featureName] = value
-
-  const success = await updateFeatures(updates)
-  
-  if (success) {
-    lastSaved.value = true
-    // Ocultar el mensaje después de 3 segundos
-    setTimeout(() => {
-      lastSaved.value = false
-    }, 3000)
-  }
-
-  savingFeature.value = false
+const toggleFeature = async (featureName: keyof typeof localFeatures) => {
+    // Optimistic UI update
+    const newValue = !localFeatures[featureName]
+    localFeatures[featureName] = newValue
+    
+    savingFeature.value = true
+    lastSaved.value = false
+    
+    const updates: any = {}
+    updates[featureName] = newValue
+    
+    try {
+        const success = await updateFeatures(updates)
+        if (success) {
+            lastSaved.value = true
+            setTimeout(() => { lastSaved.value = false }, 3000)
+        } else {
+            // Revert on failure (optional, but good UX)
+            localFeatures[featureName] = !newValue
+        }
+    } catch (e) {
+        localFeatures[featureName] = !newValue
+        console.error(e)
+    } finally {
+        savingFeature.value = false
+    }
 }
 </script>

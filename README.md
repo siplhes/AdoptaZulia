@@ -1,6 +1,17 @@
 # 🐾 Adopta Zulia
 
-Bienvenido al repositorio de **Adopta Zulia**, una plataforma para facilitar la adopción de mascotas en la región del Zulia.
+Bienvenido al repositorio oficial de **Adopta Zulia**.
+
+> [!IMPORTANT]
+> **Este proyecto no es una plantilla.** Este es el código fuente de la plataforma activa **Adopta Zulia**. El objetivo de este repositorio es permitir que la comunidad de desarrolladores colabore, mejore y mantenga la plataforma existente. Si deseas apoyar la causa, ¡tu ayuda es bienvenida!
+
+## 🤝 Cómo Contribuir
+
+Queremos que seas parte de este proyecto. Aquí hay algunas formas en las que puedes ayudar:
+
+1.  **Reportar problemas**: Si encuentras un bug, abre un "Issue".
+2.  **Sugerir mejoras**: Tienes ideas para nuevas funcionalidades? Compártelas en los "Issues".
+3.  **Enviar código**: Haz un fork del repositorio, crea una rama con tus cambios y envía un Pull Request.
 
 ## 🛠️ Tecnologías
 
@@ -14,14 +25,16 @@ Este proyecto está construido con un stack moderno y eficiente:
 
 ## 🚀 Requisitos Previos
 
-Asegúrate de tener instalado:
+Para colaborar, asegúrate de tener instalado:
 
 - [Node.js](https://nodejs.org/) (versión 18+ recomendada)
 - [NPM](https://www.npmjs.com/)
 
-## ⚙️ Configuración del Entorno
+## ⚙️ Configuración del Entorno de Desarrollo
 
-Crea un archivo `.env` en la raíz del proyecto basándote en las variables requeridas en `nuxt.config.ts`:
+Para correr el proyecto localmente y probar tus cambios, necesitas configurar las variables de entorno.
+Crea un archivo `.env` en la raíz del proyecto basándote en las variables requeridas en `nuxt.config.ts`.
+_(Nota: Pide acceso a los mantenedores para obtener las credenciales de desarrollo si es necesario, o usa tu propio proyecto de Firebase/AWS para pruebas)_
 
 ```bash
 # AWS S3 Configuration
@@ -63,22 +76,17 @@ ADMIN_EMAILS=admin@example.com
 
 ## 🧪 Testing
 
-Este proyecto utiliza **Vitest** para pruebas unitarias.
+Asegúrate de que tus cambios no rompan nada ejecutando las pruebas:
 
 ```bash
 npm run test
 ```
 
-## 📦 Construcción y Despliegue
+## 📦 Construcción (Build)
 
-El proyecto está configurado para desplegarse con **SSR (Server Side Rendering)** habilitado.
+Si necesitas verificar la construcción final:
 
 ```bash
 npm run build
-```
-
-Para previsualizar la build localmente:
-
-```bash
 npm run preview
 ```

@@ -1,304 +1,245 @@
 <template>
-  <div class="min-h-screen bg-amber-50 py-8">
+  <div class="min-h-screen bg-slate-50 py-8">
     <div class="container mx-auto px-4">
       <div class="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 class="text-3xl font-bold text-emerald-800">Gestión de Mascotas</h1>
-          <p class="text-gray-600">Administra todas las mascotas en la plataforma</p>
+          <h1 class="text-3xl font-bold text-slate-800">Gestión de Mascotas</h1>
+          <p class="text-slate-600">Administra el inventario de adopciones</p>
         </div>
         <div class="flex gap-3">
           <NuxtLink
             to="/admin"
-            class="rounded-lg border border-emerald-600 px-4 py-2 text-emerald-600 transition-colors hover:bg-emerald-50"
+            class="flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-slate-600 transition-colors hover:bg-white hover:text-emerald-600"
           >
             Volver al panel
           </NuxtLink>
           <NuxtLink
             to="/publicar"
-            class="rounded-lg bg-emerald-600 px-4 py-2 text-white transition-colors hover:bg-emerald-700"
+            class="flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 font-bold text-white transition-colors hover:bg-emerald-700 shadow-sm"
           >
-            Añadir mascota
+            <Icon name="heroicons:plus" class="h-5 w-5" />
+            Nueva Mascota
           </NuxtLink>
         </div>
       </div>
 
-      <!-- Filters & Search -->
-      <div
-        class="mb-6 flex flex-col gap-4 rounded-lg bg-white p-6 shadow-md lg:flex-row lg:items-center lg:justify-between"
-      >
-        <div class="flex flex-1 flex-col gap-4 sm:flex-row sm:items-center">
-          <div class="flex-1">
-            <label class="mb-1 block text-sm font-medium text-gray-700">Buscar</label>
+      <!-- Stats / Tabs Header -->
+       <div class="mb-6 flex space-x-1 overflow-x-auto rounded-xl bg-white p-1 shadow-sm border border-slate-100">
+        <button
+          v-for="filter in statusFilters"
+          :key="filter.value"
+          :class="[
+            'flex-1 whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium transition-all sm:flex-none',
+            filters.status === filter.value
+              ? 'bg-emerald-100 text-emerald-700 shadow-sm'
+              : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700',
+          ]"
+          @click="filters.status = filter.value"
+        >
+          {{ filter.label }}
+        </button>
+      </div>
+
+      <!-- Search & Type Filter -->
+      <div class="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div class="md:col-span-2">
+            <div class="relative">
+            <Icon
+                name="heroicons:magnifying-glass"
+                class="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"
+            />
             <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="Buscar por nombre, ubicación..."
-              class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-              @input="applyFilters"
+                v-model="searchQuery"
+                type="text"
+                placeholder="Buscar por nombre, raza o ubicación..."
+                class="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 shadow-sm transition-all focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
             >
-          </div>
-
-          <div class="w-40">
-            <label class="mb-1 block text-sm font-medium text-gray-700">Estado</label>
-            <select
-              v-model="filters.status"
-              class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-              @change="applyFilters"
-            >
-              <option value="">Todos</option>
-              <option value="available">Disponible</option>
-              <option value="adopted">Adoptado</option>
-              <option value="pending">En proceso</option>
-              <option value="lost">Perdido</option>
-              <option value="found">Encontrado</option>
-            </select>
-          </div>
-
-          <div class="w-40">
-            <label class="mb-1 block text-sm font-medium text-gray-700">Tipo</label>
-            <select
-              v-model="filters.type"
-              class="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-              @change="applyFilters"
-            >
-              <option value="">Todos</option>
-              <option value="perro">Perros</option>
-              <option value="gato">Gatos</option>
-              <option value="ave">Aves</option>
-              <option value="conejo">Conejos</option>
-              <option value="otro">Otros</option>
-            </select>
-          </div>
+            </div>
         </div>
-
-        <div class="flex items-center gap-2">
-          <button
-            class="flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm hover:bg-gray-50"
-            @click="resetFilters"
-          >
-            <RefreshCwIcon class="mr-1 h-4 w-4" />
-            Restablecer
-          </button>
-          <button
-            class="flex items-center justify-center rounded-md bg-emerald-600 px-4 py-2 text-sm text-white shadow-sm hover:bg-emerald-700"
-            @click="applyFilters"
-          >
-            <FilterIcon class="mr-1 h-4 w-4" />
-            Filtrar
-          </button>
+        <div>
+             <select
+              v-model="filters.type"
+              class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
+            >
+              <option value="">Todas las especies</option>
+              <option value="perro">🐶 Perros</option>
+              <option value="gato">🐱 Gatos</option>
+              <option value="ave">🐦 Aves</option>
+              <option value="conejo">🐰 Conejos</option>
+              <option value="otro">🐾 Otros</option>
+            </select>
         </div>
       </div>
 
       <!-- Loading state -->
-      <div v-if="loading" class="flex h-40 items-center justify-center">
-        <div class="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-emerald-700" />
+      <div v-if="loading" class="flex h-64 items-center justify-center">
+        <div class="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-emerald-600" />
       </div>
 
       <!-- Error state -->
-      <div v-else-if="error" class="rounded-lg border-l-4 border-red-500 bg-red-50 p-4">
-        <div class="flex">
-          <div class="flex-shrink-0">
-            <AlertCircleIcon class="h-5 w-5 text-red-500" />
-          </div>
-          <div class="ml-3">
-            <p class="text-sm text-red-700">{{ error }}</p>
-          </div>
-        </div>
+      <div v-else-if="error" class="rounded-2xl border border-red-100 bg-red-50 p-6 text-center">
+             <Icon name="heroicons:exclamation-circle" class="mx-auto h-12 w-12 text-red-400 mb-2" />
+             <h3 class="text-lg font-bold text-red-900">Error al cargar</h3>
+             <p class="text-red-700">{{ error }}</p>
       </div>
 
       <!-- No results -->
       <div
         v-else-if="filteredPets.length === 0"
-        class="rounded-lg bg-white p-8 text-center shadow-md"
+        class="flex flex-col items-center justify-center rounded-2xl bg-white py-16 text-center shadow-sm border border-slate-100"
       >
-        <div
-          class="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-amber-100"
-        >
-          <SearchIcon class="h-12 w-12 text-amber-500" />
+        <div class="mb-4 rounded-full bg-amber-50 p-4">
+            <Icon name="mdi:paw-off" class="h-10 w-10 text-amber-400" />
         </div>
-        <h3 class="mb-2 text-xl font-semibold text-gray-800">No se encontraron resultados</h3>
-        <p class="mb-6 text-gray-600">
-          No hay mascotas que coincidan con tus filtros. Intenta con otros criterios de búsqueda.
-        </p>
+        <h3 class="text-lg font-medium text-slate-800">No hay mascotas</h3>
+        <p class="mt-1 text-slate-500">No hay coincidencias con los filtros actuales.</p>
         <button
-          class="rounded-md bg-emerald-600 px-6 py-2 text-white transition-colors hover:bg-emerald-700"
-          @click="resetFilters"
+            class="mt-4 rounded-lg bg-emerald-100 px-4 py-2 text-sm font-bold text-emerald-700 hover:bg-emerald-200"
+            @click="resetFilters"
         >
-          Restablecer filtros
+            Limpiar filtros
         </button>
       </div>
 
-      <!-- Pets table -->
-      <div v-else class="overflow-hidden rounded-lg bg-white shadow-md">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th
-                scope="col"
-                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-              >
-                Mascota
-              </th>
-              <th
-                scope="col"
-                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-              >
-                Información
-              </th>
-              <th
-                scope="col"
-                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-              >
-                Estado
-              </th>
-              <th
-                scope="col"
-                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-              >
-                Contacto
-              </th>
-              <th
-                scope="col"
-                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
-              >
-                Acciones
-              </th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200 bg-white">
-            <tr
-              v-for="pet in paginatedPets"
-              :key="pet.id"
-              class="transition-colors hover:bg-gray-50"
-            >
-              <!-- Pet info column -->
-              <td class="whitespace-nowrap px-6 py-4">
-                <div class="flex items-center">
-                  <div class="h-14 w-14 flex-shrink-0">
-                    <NuxtImg
-                      :src="pet.image"
-                      :alt="pet.name"
-                      class="h-14 w-14 rounded-full object-cover"
-                      @error="handleImageError"
-                    />
-                  </div>
-                  <div class="ml-4">
-                    <div class="flex items-center">
-                      <div class="text-sm font-medium text-gray-900">{{ pet.name }}</div>
-                      <span
-                        v-if="pet.urgent"
-                        class="ml-2 rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800"
-                      >
-                        Urgente
-                      </span>
+      <!-- Pets Grid -->
+      <div v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div 
+            v-for="pet in paginatedPets" 
+            :key="pet.id"
+            class="group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-md border border-slate-100"
+        >
+             <!-- Image Header -->
+             <div class="relative h-56 bg-slate-100">
+                <NuxtImg
+                    :src="pet.image"
+                    class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    @error="handleImageError"
+                />
+                 <!-- Status Badge (Top Right) -->
+                 <div class="absolute right-3 top-3 z-10">
+                    <span 
+                        :class="[
+                            'px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm backdrop-blur-md',
+                            getStatusClass(pet.status)
+                        ]"
+                    >
+                        {{ formatStatus(pet.status) }}
+                    </span>
+                 </div>
+                 
+                <!-- Actions Overlay (Bottom) -->
+                <div class="absolute bottom-0 left-0 right-0 flex items-center justify-between bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 pt-12">
+                     <div class="text-white">
+                        <h3 class="text-lg font-bold leading-tight">{{ pet.name }}</h3>
+                        <p class="text-xs opacity-90 capitalize">{{ pet.breed || 'Raza desconocida' }} • {{ pet.gender === 'male' ? 'Macho' : 'Hembra' }}</p>
+                     </div>
+                </div>
+             </div>
+
+             <!-- Control Body -->
+             <div class="flex-1 p-4">
+                <!-- Status Control -->
+                <div class="mb-4">
+                    <label class="mb-1 block text-xs font-bold uppercase text-slate-400">Estado Actual</label>
+                    <div class="relative">
+                        <select
+                            v-model="pet.status"
+                            class="w-full appearance-none rounded-lg border-slate-200 bg-slate-50 py-2 pl-3 pr-8 text-sm font-medium text-slate-700 focus:border-emerald-500 focus:ring-emerald-500"
+                            @change="updatePetStatus(pet)"
+                        >
+                            <option value="available">🟢 Disponible</option>
+                            <option value="pending">🟡 En proceso</option>
+                            <option value="adopted">🏠 ¡Adoptado!</option>
+                            <option value="lost">🆘 Perdido</option>
+                            <option value="found">🔍 Encontrado</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
+                             <Icon name="heroicons:chevron-down" class="h-4 w-4" />
+                        </div>
                     </div>
-                    <div class="text-sm text-gray-500">{{ pet.type }}</div>
-                  </div>
                 </div>
-              </td>
-
-              <!-- Information column -->
-              <td class="whitespace-nowrap px-6 py-4">
-                <div class="text-sm text-gray-900">{{ pet.breed || 'No especificada' }}</div>
-                <div class="text-sm text-gray-500">{{ pet.location }}</div>
-                <div class="text-sm text-gray-500">{{ formatDate(pet.createdAt) }}</div>
-              </td>
-
-              <!-- Status column -->
-              <td class="whitespace-nowrap px-6 py-4">
-                <span
-                  class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium"
-                  :class="getStatusClass(pet.status)"
-                >
-                  {{ formatStatus(pet.status) }}
-                </span>
-                <div class="mt-1 flex items-center">
-                  <select
-                    v-model="pet.status"
-                    class="mt-1 w-full rounded-md border-gray-300 py-1 text-xs shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
-                    @change="updatePetStatus(pet)"
-                  >
-                    <option value="available">Disponible</option>
-                    <option value="adopted">Adoptado</option>
-                    <option value="pending">En proceso</option>
-                    <option value="lost">Perdido</option>
-                    <option value="found">Encontrado</option>
-                  </select>
+                
+                 <div class="flex items-center justify-between rounded-lg border border-slate-100 p-3 bg-white">
+                    <div class="flex items-center gap-2">
+                         <Icon name="mdi:alert-decagram" :class="pet.urgent ? 'text-amber-500' : 'text-slate-300'" class="h-5 w-5" />
+                         <span class="text-sm font-medium text-slate-700">Caso Urgente</span>
+                    </div>
+                    <!-- Urgent Toggle -->
+                    <button 
+                        @click="toggleUrgent(pet)"
+                        :class="[
+                            'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none',
+                            pet.urgent ? 'bg-amber-500' : 'bg-slate-200'
+                        ]"
+                    >
+                        <span 
+                            aria-hidden="true" 
+                            :class="[
+                                'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out',
+                                pet.urgent ? 'translate-x-5' : 'translate-x-0'
+                            ]" 
+                        />
+                    </button>
                 </div>
-              </td>
+             </div>
 
-              <!-- Contact column -->
-              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                <div class="text-sm font-medium text-gray-900">
-                  {{ pet.contact?.name || 'N/A' }}
-                </div>
-                <div class="text-sm text-gray-500">{{ pet.contact?.email || 'N/A' }}</div>
-                <div class="text-sm text-gray-500">{{ pet.contact?.phone || 'N/A' }}</div>
-              </td>
-
-              <!-- Actions column -->
-              <td class="whitespace-nowrap px-6 py-4 text-sm font-medium">
-                <div class="flex space-x-2">
-                  <button
-                    title="Ver mascota"
-                    class="text-blue-600 hover:text-blue-900"
+             <!-- Footer Actions -->
+             <div class="grid grid-cols-3 divide-x divide-slate-100 border-t border-slate-100 bg-slate-50">
+                <button 
                     @click="viewPet(pet.id)"
-                  >
-                    <EyeIcon class="h-5 w-5" />
-                  </button>
-                  <button
-                    title="Editar mascota"
-                    class="text-indigo-600 hover:text-indigo-900"
+                    class="flex items-center justify-center py-3 text-slate-500 hover:bg-white hover:text-emerald-600 transition-colors"
+                    title="Ver ficha"
+                >
+                    <Icon name="heroicons:eye" class="h-5 w-5" />
+                </button>
+                <button 
                     @click="editPet(pet.id)"
-                  >
-                    <EditIcon class="h-5 w-5" />
-                  </button>
-                  <button
-                    title="Eliminar mascota"
-                    class="text-red-600 hover:text-red-900"
+                    class="flex items-center justify-center py-3 text-slate-500 hover:bg-white hover:text-blue-600 transition-colors"
+                    title="Editar"
+                >
+                    <Icon name="heroicons:pencil-square" class="h-5 w-5" />
+                </button>
+                <button 
                     @click="confirmDelete(pet)"
+                    class="flex items-center justify-center py-3 text-slate-500 hover:bg-white hover:text-red-600 transition-colors"
+                    title="Eliminar"
+                >
+                    <Icon name="heroicons:trash" class="h-5 w-5" />
+                </button>
+             </div>
+        </div>
+      </div>
+       <!-- Pagination -->
+       <div v-if="filteredPets.length > 0" class="mt-8 flex justify-center">
+            <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                 <button
+                    :disabled="currentPage === 1"
+                    :class="[
+                      'relative inline-flex items-center rounded-l-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50',
+                      currentPage === 1 ? 'cursor-not-allowed opacity-50' : ''
+                    ]"
+                    @click="prevPage"
                   >
-                    <TrashIcon class="h-5 w-5" />
+                    <Icon name="heroicons:chevron-left" class="h-5 w-5" />
+                    <span class="sr-only">Anterior</span>
                   </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+                  <span class="relative inline-flex items-center border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700">
+                    {{ currentPage }} / {{ totalPages }}
+                  </span>
+                   <button
+                    :disabled="currentPage === totalPages"
+                    :class="[
+                      'relative inline-flex items-center rounded-r-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50',
+                      currentPage === totalPages ? 'cursor-not-allowed opacity-50' : ''
+                    ]"
+                    @click="nextPage"
+                  >
+                    <Icon name="heroicons:chevron-right" class="h-5 w-5" />
+                    <span class="sr-only">Siguiente</span>
+                  </button>
+            </nav>
+       </div>
 
-      <!-- Pagination -->
-      <div v-if="filteredPets.length > 0" class="mt-4 flex justify-between">
-        <div class="text-sm text-gray-700">
-          Mostrando
-          <span class="font-medium">{{ paginationStart + 1 }}</span>
-          a
-          <span class="font-medium">{{ Math.min(paginationEnd, filteredPets.length) }}</span>
-          de
-          <span class="font-medium">{{ filteredPets.length }}</span>
-          resultados
-        </div>
-        <div class="flex space-x-2">
-          <button
-            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-            :disabled="currentPage === 1"
-            :class="{ 'cursor-not-allowed opacity-50': currentPage === 1 }"
-            @click="prevPage"
-          >
-            <ChevronLeftIcon class="mr-1 h-5 w-5" />
-            Anterior
-          </button>
-          <button
-            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-            :disabled="currentPage === totalPages"
-            :class="{ 'cursor-not-allowed opacity-50': currentPage === totalPages }"
-            @click="nextPage"
-          >
-            Siguiente
-            <ChevronRightIcon class="ml-1 h-5 w-5" />
-          </button>
-        </div>
-      </div>
 
       <!-- Modal para confirmación/alertas -->
       <ModalAlert
@@ -316,23 +257,13 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import {
-  RefreshCwIcon,
-  FilterIcon,
-  SearchIcon,
-  EyeIcon,
-  EditIcon,
-  TrashIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  AlertCircleIcon,
-} from 'lucide-vue-next'
 import { usePets } from '~/composables/usePets'
 import ModalAlert from '~/components/common/ModalAlert.vue'
 
 // Verificar si el usuario es administrador
 definePageMeta({
   middleware: ['admin'],
+  layout: 'default'
 })
 
 const router = useRouter()
@@ -346,9 +277,17 @@ const filters = ref({
   type: '',
 })
 
+const statusFilters = [
+    { label: 'Todos', value: '' },
+    { label: 'Disponibles', value: 'available' },
+    { label: 'Adoptados', value: 'adopted' },
+    { label: 'En Proceso', value: 'pending' },
+    { label: 'Casos Perdidos', value: 'lost' },
+]
+
 // Estado para paginación
 const currentPage = ref(1)
-const pageSize = 10
+const pageSize = 12 // Cards per page
 
 // Estado para el modal global
 const showModal = ref(false)
@@ -370,9 +309,7 @@ const filteredPets = computed(() => {
         pet.name?.toLowerCase().includes(query) ||
         pet.breed?.toLowerCase().includes(query) ||
         pet.location?.toLowerCase().includes(query) ||
-        pet.description?.toLowerCase().includes(query) ||
-        pet.contact?.name?.toLowerCase().includes(query) ||
-        pet.contact?.email?.toLowerCase().includes(query)
+        pet.description?.toLowerCase().includes(query)
     )
   }
 
@@ -383,11 +320,8 @@ const filteredPets = computed(() => {
 
   // Filtrar por tipo
   if (filters.value.type) {
-    result = result.filter((pet) => pet.typeValue === filters.value.type)
+    result = result.filter((pet) => pet.typeValue === filters.value.type || pet.type === filters.value.type)
   }
-
-  // Ordenar por fecha de creación (más recientes primero)
-  result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
 
   return result
 })
@@ -405,12 +339,10 @@ watch([searchQuery, filters], () => {
   currentPage.value = 1
 })
 
-// Cargar mascotas al montar el componente
 onMounted(async () => {
   await loadPets()
 })
 
-// Métodos
 async function loadPets() {
   try {
     allPets.value = await fetchAllPets()
@@ -419,56 +351,31 @@ async function loadPets() {
   }
 }
 
-function applyFilters() {
-  currentPage.value = 1
-}
-
 function resetFilters() {
   searchQuery.value = ''
-  filters.value = {
-    status: '',
-    type: '',
-  }
+  filters.value = { status: '', type: '' }
   currentPage.value = 1
 }
 
-function prevPage() {
-  if (currentPage.value > 1) {
-    currentPage.value--
-  }
-}
+function prevPage() { if (currentPage.value > 1) currentPage.value-- }
+function nextPage() { if (currentPage.value < totalPages.value) currentPage.value++ }
 
-function nextPage() {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
-  }
-}
-
-function viewPet(petId) {
-  router.push(`/mascotas/${petId}`)
-}
-
-function editPet(petId) {
-  router.push(`/publicar/editar/${petId}`)
-}
+function viewPet(petId) { router.push(`/mascotas/${petId}`) }
+function editPet(petId) { router.push(`/publicar/editar/${petId}`) }
 
 function confirmDelete(pet) {
   modalType.value = 'delete'
   modalTitle.value = 'Confirmar eliminación'
-  modalMessage.value = `¿Estás seguro de que deseas eliminar a ${pet.name}? Esta acción no se puede deshacer.`
+  modalMessage.value = `¿Eliminar a ${pet.name}?`
   modalConfirmText.value = 'Eliminar'
   
   confirmAction = async () => {
     showModal.value = false
     try {
-      loading.value = true // Manually set loading if needed, or rely on composable
       await deletePetById(pet.id)
       await loadPets()
     } catch (err) {
-      console.error('Error al eliminar mascota:', err)
-      // Show error modal if needed
-    } finally {
-      loading.value = false
+      console.error('Error al eliminar:', err)
     }
   }
   showModal.value = true
@@ -482,52 +389,37 @@ async function updatePetStatus(pet) {
   }
 }
 
-// Formato y utilidades
-function formatDate(dateString) {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  return new Intl.DateTimeFormat('es-ES', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  }).format(date)
+async function toggleUrgent(pet) {
+    const newVal = !pet.urgent
+    // Optimistic update
+    pet.urgent = newVal
+    try {
+        await updatePet(pet.id, { urgent: newVal })
+    } catch (err) {
+        pet.urgent = !newVal // Revert
+        console.error("Error updating urgent status", err)
+    }
 }
 
 function formatStatus(status) {
-  switch (status) {
-    case 'available':
-      return 'Disponible'
-    case 'adopted':
-      return 'Adoptado'
-    case 'pending':
-      return 'En proceso'
-    case 'lost':
-      return 'Perdido'
-    case 'found':
-      return 'Encontrado'
-    default:
-      return 'Desconocido'
+  const map = {
+    available: 'Disponible', adopted: 'Adoptado', pending: 'En Proceso', lost: 'Perdido', found: 'Encontrado'
   }
+  return map[status] || status
 }
 
 function getStatusClass(status) {
-  switch (status) {
-    case 'available':
-      return 'bg-green-100 text-green-800'
-    case 'adopted':
-      return 'bg-blue-100 text-blue-800'
-    case 'pending':
-      return 'bg-yellow-100 text-yellow-800'
-    case 'lost':
-      return 'bg-red-100 text-red-800'
-    case 'found':
-      return 'bg-purple-100 text-purple-800'
-    default:
-      return 'bg-gray-100 text-gray-800'
+   const map = {
+    available: 'bg-emerald-100 text-emerald-800 border border-emerald-200',
+    adopted: 'bg-blue-100 text-blue-800 border border-blue-200',
+    pending: 'bg-amber-100 text-amber-800 border border-amber-200',
+    lost: 'bg-red-100 text-red-800 border border-red-200',
+    found: 'bg-purple-100 text-purple-800 border border-purple-200'
   }
+  return map[status] || 'bg-gray-100 text-gray-800'
 }
 
 function handleImageError(event) {
-  event.target.src = '/placeholder.webp?height=100&width=100'
+  event.target.src = '/img/placeholder-paw.webp' // Fallback
 }
 </script>

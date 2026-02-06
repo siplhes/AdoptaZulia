@@ -1,129 +1,153 @@
 <template>
-  <div class="min-h-screen bg-amber-50 py-8">
+  <div class="min-h-screen bg-slate-50 py-8">
     <div class="container mx-auto px-4">
-      <div class="mb-8 flex items-center justify-between">
+      
+      <!-- Welcome Header with Quick Status -->
+      <div v-if="!loading" class="mb-10 rounded-2xl bg-white p-6 shadow-sm border border-slate-100 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
         <div>
-          <h1 class="text-3xl font-bold text-emerald-800">Panel de Administración</h1>
-          <p class="text-gray-600">Gestiona las mascotas, usuarios y configuraciones del sitio</p>
+           <p class="text-sm font-semibold uppercase tracking-wider text-slate-400">Panel de Control</p>
+           <h1 class="mt-1 text-3xl font-bold text-slate-800">
+            Hola, <span class="text-emerald-600">{{ user?.displayName || 'Admin' }}</span> 👋
+           </h1>
+           <p class="mt-2 text-slate-600">
+             Tienes <strong class="text-amber-600">{{ stats.pendingRequests }} solicitudes pendientes</strong> hoy.
+           </p>
         </div>
+        
         <div class="flex gap-3">
           <NuxtLink
-            to="/admin/features"
-            class="rounded-lg bg-indigo-600 px-4 py-2 text-white transition-colors hover:bg-indigo-700 flex items-center gap-2"
-          >
-            <Icon name="mdi:cog" class="h-5 w-5" />
-            Características
-          </NuxtLink>
-          <NuxtLink
             to="/"
-            class="rounded-lg border border-emerald-600 px-4 py-2 text-emerald-600 transition-colors hover:bg-emerald-50"
+            class="flex items-center gap-2 rounded-xl bg-slate-100 px-5 py-3 font-medium text-slate-700 transition-colors hover:bg-slate-200"
           >
-            Volver al sitio
+            <Icon name="mdi:home-outline" class="h-5 w-5" />
+            Ver Sitio
           </NuxtLink>
         </div>
       </div>
 
       <!-- Loading indicator -->
-      <div v-if="loading" class="mb-8 flex h-32 items-center justify-center">
+      <div v-if="loading" class="flex h-64 items-center justify-center">
         <div class="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-emerald-600" />
       </div>
 
-      <!-- Admin stats -->
-      <div v-else class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
-        <div class="rounded-lg bg-white p-6 shadow-md">
-          <h2 class="mb-2 text-xl font-semibold text-emerald-800">Mascotas en adopción</h2>
-          <div class="flex items-baseline justify-between">
-            <p class="text-3xl font-bold text-emerald-600">{{ stats.totalPets }}</p>
-            <p class="text-sm text-gray-500">Total</p>
-          </div>
-        </div>
+      <div v-else class="space-y-10">
+        
+        <!-- Module Group: Gestión -->
+        <section>
+          <h2 class="mb-5 flex items-center gap-2 text-lg font-bold text-slate-700">
+            <Icon name="mdi:folder-account-outline" class="h-5 w-5" />
+            Gestión General
+          </h2>
+          
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+             <!-- Adopciones (High Priority) -->
+             <NuxtLink
+              to="/admin/adopciones"
+              class="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md border border-slate-100"
+            >
+              <div class="absolute right-0 top-0 h-24 w-24 translate-x-8 translate-y--8 rounded-full bg-amber-50 opacity-50 transition-transform group-hover:scale-110" />
+              
+              <div class="relative z-10 flex items-start justify-between">
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 text-amber-600">
+                  <Icon name="mdi:handshake" class="h-6 w-6" />
+                </div>
+                
+                <!-- Notification Badge -->
+                <span v-if="stats.pendingRequests > 0" class="flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-sm font-bold text-white shadow-sm animate-pulse">
+                  {{ stats.pendingRequests }}
+                </span>
+              </div>
+              
+              <div class="relative z-10 mt-4">
+                <h3 class="text-xl font-bold text-slate-800">Adopciones</h3>
+                <p class="mt-1 text-sm text-slate-500">Revisar solicitudes de adopción pendientes.</p>
+              </div>
+            </NuxtLink>
 
-        <div class="rounded-lg bg-white p-6 shadow-md">
-          <h2 class="mb-2 text-xl font-semibold text-emerald-800">Mascotas urgentes</h2>
-          <div class="flex items-baseline justify-between">
-            <p class="text-3xl font-bold text-amber-600">{{ stats.urgentPets }}</p>
-            <p class="text-sm text-gray-500">Necesitan atención</p>
-          </div>
-        </div>
+            <!-- Mascotas -->
+            <NuxtLink
+              to="/admin/mascotas"
+              class="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md border border-slate-100"
+            >
+              <div class="absolute right-0 top-0 h-24 w-24 translate-x-8 translate-y--8 rounded-full bg-emerald-50 opacity-50 transition-transform group-hover:scale-110" />
+              
+               <div class="relative z-10 flex items-start justify-between">
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
+                  <Icon name="mdi:paw" class="h-6 w-6" />
+                </div>
+                 <!-- Urgent Badge -->
+                 <span v-if="stats.urgentPets > 0" class="flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700">
+                  ⚠️ {{ stats.urgentPets }} Urgentes
+                </span>
+              </div>
+              
+              <div class="relative z-10 mt-4">
+                <h3 class="text-xl font-bold text-slate-800">Mascotas</h3>
+                <p class="mt-1 text-sm text-slate-500">Gestionar inventario de mascotas.</p>
+              </div>
+            </NuxtLink>
 
-        <div class="rounded-lg bg-white p-6 shadow-md">
-          <h2 class="mb-2 text-xl font-semibold text-emerald-800">Usuarios registrados</h2>
-          <div class="flex items-baseline justify-between">
-            <p class="text-3xl font-bold text-blue-600">{{ stats.totalUsers }}</p>
-            <p class="text-sm text-gray-500">Activos</p>
+            <!-- Usuarios -->
+            <NuxtLink
+              to="/admin/usuarios"
+              class="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md border border-slate-100"
+            >
+               <div class="relative z-10 flex items-start justify-between">
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
+                  <Icon name="mdi:account-group" class="h-6 w-6" />
+                </div>
+              </div>
+              
+              <div class="relative z-10 mt-4">
+                <h3 class="text-xl font-bold text-slate-800">Usuarios</h3>
+                <p class="mt-1 text-sm text-slate-500">Administrar roles y perfiles.</p>
+              </div>
+            </NuxtLink>
           </div>
-        </div>
+        </section>
+
+        <!-- Module Group: Sistema -->
+        <section>
+          <h2 class="mb-5 flex items-center gap-2 text-lg font-bold text-slate-700">
+            <Icon name="mdi:cog-outline" class="h-5 w-5" />
+            Sistema y Configuración
+          </h2>
+          
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <!-- Estadísticas -->
+            <NuxtLink
+              to="/admin/estadisticas"
+              class="flex items-center gap-4 rounded-xl bg-white p-4 shadow-sm transition-colors hover:bg-slate-50 border border-slate-100"
+            >
+              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 text-purple-600">
+                <Icon name="mdi:chart-bar" class="h-5 w-5" />
+              </div>
+              <div>
+                <h3 class="font-bold text-slate-700">Analíticas</h3>
+                <p class="text-xs text-slate-400">Reportes de impacto</p>
+              </div>
+            </NuxtLink>
+
+            <!-- Features -->
+            <NuxtLink
+              to="/admin/features"
+              class="flex items-center gap-4 rounded-xl bg-white p-4 shadow-sm transition-colors hover:bg-slate-50 border border-slate-100"
+            >
+              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
+                <Icon name="mdi:toggle-switch" class="h-5 w-5" />
+              </div>
+              <div>
+                <h3 class="font-bold text-slate-700">Features</h3>
+                <p class="text-xs text-slate-400">Activar funciones</p>
+              </div>
+            </NuxtLink>
+            
+          </div>
+        </section>
+
       </div>
-
-      <!-- Admin menu -->
-      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <NuxtLink
-          to="/admin/mascotas"
-          class="flex flex-col items-center rounded-lg bg-white p-6 shadow-md transition-transform hover:scale-105"
-        >
-          <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-            <Icon name="mdi:paw" class="h-8 w-8 text-emerald-600" />
-          </div>
-          <h3 class="mb-2 text-xl font-semibold text-emerald-800">Gestionar Mascotas</h3>
-          <p class="text-center text-sm text-gray-600">
-            Administra las mascotas en adopción, perdidas y encontradas
-          </p>
-        </NuxtLink>
-
-        <NuxtLink
-          to="/admin/usuarios"
-          class="flex flex-col items-center rounded-lg bg-white p-6 shadow-md transition-transform hover:scale-105"
-        >
-          <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
-            <Icon name="mdi:account-group" class="h-8 w-8 text-blue-600" />
-          </div>
-          <h3 class="mb-2 text-xl font-semibold text-emerald-800">Gestionar Usuarios</h3>
-          <p class="text-center text-sm text-gray-600">
-            Administra los usuarios y permisos de la plataforma
-          </p>
-        </NuxtLink>
-
-        <NuxtLink
-          to="/admin/adopciones"
-          class="flex flex-col items-center rounded-lg bg-white p-6 shadow-md transition-transform hover:scale-105"
-        >
-          <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100">
-            <Icon name="mdi:handshake" class="h-8 w-8 text-amber-600" />
-          </div>
-          <h3 class="mb-2 text-xl font-semibold text-emerald-800">Adopciones</h3>
-          <p class="text-center text-sm text-gray-600">
-            Seguimiento de procesos de adopción y solicitudes
-          </p>
-        </NuxtLink>
-
-        <NuxtLink
-          to="/admin/estadisticas"
-          class="flex flex-col items-center rounded-lg bg-white p-6 shadow-md transition-transform hover:scale-105"
-        >
-          <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-100">
-            <Icon name="mdi:chart-bar" class="h-8 w-8 text-purple-600" />
-          </div>
-          <h3 class="mb-2 text-xl font-semibold text-emerald-800">Estadísticas</h3>
-          <p class="text-center text-sm text-gray-600">
-            Visualiza métricas y analíticas de la plataforma
-          </p>
-        </NuxtLink>
-
-        <NuxtLink
-          to="/admin/features"
-          class="flex flex-col items-center rounded-lg bg-white p-6 shadow-md transition-transform hover:scale-105"
-        >
-          <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100">
-            <Icon name="mdi:toggle-multiple" class="h-8 w-8 text-indigo-600" />
-          </div>
-          <h3 class="mb-2 text-xl font-semibold text-emerald-800">Características</h3>
-          <p class="text-center text-sm text-gray-600">
-            Activa o desactiva funcionalidades de la plataforma
-          </p>
-        </NuxtLink>
-    </div>
   </div>
-</div>
+  </div>
 </template>
 
 <script setup>
@@ -134,9 +158,10 @@ import { useStats } from '~/composables/useStats'
 // Verificar si el usuario es administrador
 definePageMeta({
   middleware: ['admin'],
+  layout: 'default'
 })
 
-const { user, isAdmin } = useAuth()
+const { user } = useAuth()
 const { stats, loading, fetchStats } = useStats()
 
 // Cargar estadísticas al montar el componente

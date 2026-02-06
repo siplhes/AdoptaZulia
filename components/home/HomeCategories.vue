@@ -1,22 +1,28 @@
 <template>
-  <section class="pt-1 md:pt-2">
+  <section class="py-10 md:py-12 bg-gray-50">
     <div class="container mx-auto px-4">
-      <h2 class="mb-6 text-center text-3xl font-bold text-emerald-800 md:text-4xl">
-        ¿Qué tipo de mascota buscas?
-      </h2>
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-emerald-900 mb-2">
+          Explora por categoría
+        </h2>
+        <p class="text-gray-600 max-w-2xl mx-auto text-sm md:text-base">
+          Encuentra tu compañero ideal navegando por nuestras categorías principales
+        </p>
+      </div>
 
       <!-- Estado de carga -->
       <div v-if="loading" class="flex justify-center py-12">
-        <div
-          class="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-emerald-600 border-r-transparent align-[-0.125em]"
-        />
+        <div class="h-12 w-12 animate-spin rounded-full border-4 border-emerald-600 border-t-transparent"/>
       </div>
 
       <!-- Mensaje de error -->
-      <div v-else-if="error" class="py-8 text-center">
-        <p class="text-red-500">{{ error }}</p>
+      <div v-else-if="error" class="py-8 text-center bg-red-50 rounded-xl">
+        <div class="inline-flex items-center justify-center h-12 w-12 rounded-full bg-red-100 text-red-500 mb-3">
+             <Icon name="heroicons:exclamation-triangle" class="h-6 w-6" />
+        </div>
+        <p class="text-red-700 font-medium mb-3">{{ error }}</p>
         <button
-          class="mt-4 rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700"
+          class="rounded-lg bg-white border border-red-200 px-4 py-2 text-red-700 hover:bg-red-50 transition-colors shadow-sm"
           @click="loadCategories"
         >
           Intentar de nuevo
@@ -25,43 +31,40 @@
 
       <!-- Grid de categorías -->
       <div v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4">
-        <a
+        <NuxtLink
           v-for="(category, index) in petCategories"
           :key="index"
-          :href="category.link"
-          class="group flex flex-col items-center rounded-xl bg-emerald-600 p-3 transition-transform hover:scale-105 hover:bg-emerald-700"
+          :to="category.link"
+          class="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100"
         >
-          <div
-        class="group-hover:bg-amber-60 mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-amber-50 shadow-md transition-colors"
-          >
-        <Icon :name="category.icon" class="h-12 w-12 text-emerald-600" />
+          <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-110 duration-500">
+               <Icon :name="category.icon" class="h-24 w-24 text-emerald-600" />
           </div>
-          <div class="flex flex-col items-center justify-center">
-        <h3 class="mb-2 text-xl font-semibold text-[#FEFFFA]">
-          {{ category.name }}
-        </h3>
-        <p class="text-gray-200">{{ category.count }} disponibles</p>
-          </div>
-        </a>
-      </div>
-    </div>
 
-    <!-- Wave divider -->
-    <div class="">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 1440 120"
-        class="fill-emerald-600"
-      >
-        <path
-          d="M0,64L80,69.3C160,75,320,85,480,80C640,75,800,53,960,48C1120,43,1280,53,1360,58.7L1440,64L1440,120L1360,120C1280,120,1120,120,960,120C800,120,640,120,480,120C320,120,160,120,80,120L0,120Z"
-        />
-      </svg>
+          <div class="relative z-10 flex flex-col items-center text-center">
+              <div
+                class="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors duration-300 shadow-sm"
+              >
+                <Icon :name="category.icon" class="h-8 w-8" />
+              </div>
+
+            <h3 class="mb-1 text-xl font-bold text-gray-900 group-hover:text-emerald-700 transition-colors">
+              {{ category.name }}
+            </h3>
+            <div class="inline-flex items-center text-sm font-medium text-gray-500 bg-gray-50 px-2.5 py-0.5 rounded-full mt-2 group-hover:bg-emerald-50 group-hover:text-emerald-700 transition-colors">
+                 {{ category.count }} disponibles
+            </div>
+          </div>
+        </NuxtLink>
+      </div>
     </div>
   </section>
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue';
+import { usePets } from '~/composables/usePets';
+
 const { fetchTotalPetsByCategory } = usePets();
 const loading = ref(true);
 const error = ref(null);
