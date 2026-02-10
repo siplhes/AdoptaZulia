@@ -30,19 +30,20 @@
 defineProps({
   title: {
     type: String,
-    default: 'Acceso denegado'
+    default: 'Acceso denegado',
   },
   message: {
     type: String,
-    default: 'No tienes permisos para acceder a esta funcionalidad. Se requiere rol de administrador.'
+    default:
+      'No tienes permisos para acceder a esta funcionalidad. Se requiere rol de administrador.',
   },
   redirectRoute: {
     type: String,
-    default: '/'
+    default: '/',
   },
   redirectText: {
     type: String,
-    default: 'Volver a inicio'
-  }
+    default: 'Volver a inicio',
+  },
 })
 </script>

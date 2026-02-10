@@ -51,7 +51,13 @@
             v-if="story.images && story.images.length > 0"
             class="h-60 w-full overflow-hidden sm:h-80 md:h-96"
           >
-            <NuxtImg :src="story.images[0]" :alt="story.title" class="h-full w-full object-cover" sizes="sm:100vw md:100vw lg:100vw" placeholder />
+            <NuxtImg
+              :src="story.images[0]"
+              :alt="story.title"
+              class="h-full w-full object-cover"
+              sizes="sm:100vw md:100vw lg:100vw"
+              placeholder
+            />
           </div>
 
           <!-- Badge de destacado -->
@@ -127,7 +133,7 @@
             </div>
 
             <!-- Separador -->
-            <div class="my-6 border-t border-gray-200"/>
+            <div class="my-6 border-t border-gray-200" />
 
             <!-- Contenido principal -->
             <div class="prose prose-emerald lg:prose-lg max-w-none">
@@ -186,7 +192,7 @@
                 <button
                   v-if="isOwner"
                   class="flex items-center gap-2 rounded-md border border-red-300 px-4 py-2 text-red-700 hover:bg-red-50"
-                  @click="deleteStory"
+                  @click="deleteStoryHandler"
                 >
                   <Icon name="heroicons:trash" size="20px" />
                   <span>Eliminar</span>
@@ -211,8 +217,11 @@ import { es } from 'date-fns/locale'
 // Composables y router
 const route = useRoute()
 const router = useRouter()
+const toast = useToast()
 const { fetchStoryById, likeStory, deleteStory, loading, error } = useAdoptionStories()
 const { user, isAuthenticated } = useAuth()
+const config = useRuntimeConfig()
+const baseUrl = config.public.baseUrl || 'https://adopta-zulia.vercel.app'
 
 // Estado local
 const story = ref(null)
@@ -221,16 +230,34 @@ const storyId = route.params.id
 
 // SEO Meta Tags
 useSeoMeta({
-  title: computed(() => story.value ? `${story.value.title} | Historias Adopta Zulia` : 'Historia de Adopción | Adopta Zulia'),
-  description: computed(() => story.value ? `${story.value.content?.substring(0, 150)}...` : 'Lee esta inspiradora historia de adopción.'),
+  title: computed(() =>
+    story.value
+      ? `${story.value.title} | Historias Adopta Zulia`
+      : 'Historia de Adopción | Adopta Zulia'
+  ),
+  description: computed(() =>
+    story.value
+      ? `${story.value.content?.substring(0, 150)}...`
+      : 'Lee esta inspiradora historia de adopción.'
+  ),
   ogTitle: computed(() => story.value?.title || 'Historia de Adopción'),
-  ogDescription: computed(() => story.value ? `Historia de adopción de ${story.value.pet?.name || 'una mascota'}. ${story.value.content?.substring(0, 100)}...` : 'Historia de adopción'),
-  ogImage: computed(() => useOgImage(story.value?.images?.[0] || story.value?.pet?.image)),
-  ogUrl: computed(() => useCanonicalUrl(`/historias/${storyId}`)),
+  ogDescription: computed(() =>
+    story.value
+      ? `Historia de adopción de ${story.value.pet?.name || 'una mascota'}. ${story.value.content?.substring(0, 100)}...`
+      : 'Historia de adopción'
+  ),
+  ogImage: computed(() => useOgImage(story.value?.images?.[0] || story.value?.pet?.image, baseUrl)),
+  ogUrl: computed(() => useCanonicalUrl(`/historias/${storyId}`, baseUrl)),
   ogType: 'article',
   twitterTitle: computed(() => story.value?.title || 'Historia de Adopción'),
-  twitterDescription: computed(() => story.value ? `Historia de adopción de ${story.value.pet?.name || 'una mascota'}.` : 'Historia de adopción'),
-  twitterImage: computed(() => useOgImage(story.value?.images?.[0] || story.value?.pet?.image)),
+  twitterDescription: computed(() =>
+    story.value
+      ? `Historia de adopción de ${story.value.pet?.name || 'una mascota'}.`
+      : 'Historia de adopción'
+  ),
+  twitterImage: computed(() =>
+    useOgImage(story.value?.images?.[0] || story.value?.pet?.image, baseUrl)
+  ),
   twitterCard: 'summary_large_image',
   articlePublishedTime: computed(() => story.value?.createdAt),
   articleAuthor: computed(() => story.value?.user?.displayName || 'Adopta Zulia'),
@@ -241,7 +268,7 @@ useHead({
     {
       rel: 'canonical',
       href: computed(() => useCanonicalUrl(`/historias/${storyId}`)),
-    }
+    },
   ],
   script: [
     computed(() => {
@@ -251,19 +278,23 @@ useHead({
         '@type': 'Article',
         headline: story.value.title,
         image: story.value.images?.length ? [useOgImage(story.value.images[0])] : [],
-        datePublished: story.value.createdAt ? new Date(story.value.createdAt).toISOString() : undefined,
+        datePublished: story.value.createdAt
+          ? new Date(story.value.createdAt).toISOString()
+          : undefined,
         author: {
           '@type': 'Person',
-          name: story.value.user?.displayName || 'Usuario'
-        }
+          name: story.value.user?.displayName || 'Usuario',
+        },
       })
     }),
-    useStructuredData(createBreadcrumbSchema([
-      { name: 'Inicio', url: useCanonicalUrl('/') },
-      { name: 'Historias', url: useCanonicalUrl('/historias') },
-      { name: story.value?.title || 'Historia', url: useCanonicalUrl(`/historias/${storyId}`) }
-    ])),
-  ]
+    useStructuredData(
+      createBreadcrumbSchema([
+        { name: 'Inicio', url: useCanonicalUrl('/') },
+        { name: 'Historias', url: useCanonicalUrl('/historias') },
+        { name: story.value?.title || 'Historia', url: useCanonicalUrl(`/historias/${storyId}`) },
+      ])
+    ),
+  ],
 })
 
 // Verificar si el usuario actual es propietario de la historia
@@ -299,22 +330,8 @@ const handleLike = async () => {
 }
 
 // Compartir historia
-const shareStory = async () => {
-  if (navigator.share) {
-    try {
-      await navigator.share({
-        title: story.value?.title || 'Historia de adopción',
-        text: `Lee esta emotiva historia de adopción: ${story.value?.title}`,
-        url: window.location.href,
-      })
-    } catch (error) {
-      console.error('Error compartiendo:', error)
-    }
-  } else {
-    // Fallback para navegadores que no soportan Web Share API
-    navigator.clipboard.writeText(window.location.href)
-    alert('¡Enlace copiado al portapapeles!')
-  }
+const shareStory = () => {
+  showShareModal.value = true
 }
 
 // Eliminar historia
@@ -330,10 +347,19 @@ const deleteStoryHandler = async () => {
   }
 
   try {
-    await deleteStory(storyId)
-    router.push('/historias')
-  } catch (error) {
-    console.error('Error al eliminar la historia:', error)
+    console.log('[DELETE] Attempting to delete story', storyId, 'User:', user.value?.uid)
+    if (user.value) {
+      const success = await deleteStory(storyId, user.value.uid)
+      if (success) {
+        toast.success('Historia eliminada correctamente')
+        router.push('/historias')
+      } else {
+        toast.error('No se pudo eliminar la historia')
+      }
+    }
+  } catch (err) {
+    console.error('Error al eliminar la historia:', err)
+    toast.error('Error inesperado al eliminar')
   }
 }
 

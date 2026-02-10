@@ -4,7 +4,8 @@
       <div class="mb-12 text-center text-white">
         <h2 class="mb-4 text-3xl font-bold md:text-4xl">Historias que inspiran</h2>
         <p class="mx-auto max-w-2xl text-lg text-emerald-100">
-          Nada nos hace más felices que ver finales felices. Estas son algunas de las familias que crecieron gracias a la adopción.
+          Nada nos hace más felices que ver finales felices. Estas son algunas de las familias que
+          crecieron gracias a la adopción.
         </p>
       </div>
 
@@ -15,7 +16,9 @@
           class="group relative rounded-2xl bg-white p-8 shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl"
         >
           <!-- Quote Icon -->
-          <div class="absolute -top-4 right-8 flex h-10 w-10 items-center justify-center rounded-full bg-amber-400 text-white shadow-lg">
+          <div
+            class="absolute -top-4 right-8 flex h-10 w-10 items-center justify-center rounded-full bg-amber-400 text-white shadow-lg"
+          >
             <Icon name="mdi:format-quote-close" class="h-6 w-6" />
           </div>
 
@@ -34,7 +37,9 @@
             </div>
             <div>
               <h4 class="font-bold text-gray-900">{{ testimonial.name }}</h4>
-              <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">{{ testimonial.location }}</p>
+              <p class="text-xs font-medium uppercase tracking-wide text-gray-500">
+                {{ testimonial.location }}
+              </p>
             </div>
           </div>
 
@@ -44,7 +49,7 @@
           </div>
 
           <!-- Quote -->
-          <blockquote class="mb-6 text-gray-600 leading-relaxed">
+          <blockquote class="mb-6 leading-relaxed text-gray-600">
             "{{ testimonial.quote }}"
           </blockquote>
 
@@ -87,26 +92,29 @@ onMounted(async () => {
           name: 'María González',
           location: 'Maracaibo',
           image: 'https://ui-avatars.com/api/?name=Maria+G&background=random',
-          quote: 'Luna cambió nuestra vida. El proceso de adopción fue súper sencillo y transparente. ¡Gracias por unirnos!',
+          quote:
+            'Luna cambió nuestra vida. El proceso de adopción fue súper sencillo y transparente. ¡Gracias por unirnos!',
           petName: 'Luna',
-          petImage: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1'
+          petImage: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1',
         },
         {
           name: 'Carlos Pérez',
           location: 'San Francisco',
           image: 'https://ui-avatars.com/api/?name=Carlos+P&background=random',
-          quote: 'Nunca pensé que adoptaría, pero ver a Rocky buscando hogar me rompió el corazón. Es el mejor compañero.',
+          quote:
+            'Nunca pensé que adoptaría, pero ver a Rocky buscando hogar me rompió el corazón. Es el mejor compañero.',
           petName: 'Rocky',
-          petImage: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e'
+          petImage: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e',
         },
-         {
+        {
           name: 'Ana Rodríguez',
           location: 'Cabimas',
           image: 'https://ui-avatars.com/api/?name=Ana+R&background=random',
-          quote: 'Adoptar a Mishi fue la mejor decisión. El equipo de Adopta Zulia me ayudó en todo momento.',
+          quote:
+            'Adoptar a Mishi fue la mejor decisión. El equipo de Adopta Zulia me ayudó en todo momento.',
           petName: 'Mishi',
-          petImage: 'https://images.unsplash.com/photo-1574158622682-e40e69881006'
-        }
+          petImage: 'https://images.unsplash.com/photo-1574158622682-e40e69881006',
+        },
       ]
     }
   } catch (err) {

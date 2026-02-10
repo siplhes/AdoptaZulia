@@ -54,7 +54,7 @@ export function useABTesting() {
   function recordImpression(testName: TestName) {
     const variant = getTestVariant(testName)
     testResults.value[testName][variant].impressions++
-    
+
     // In a real implementation, you might want to send this to your analytics service
     // sendToAnalytics('impression', testName, variant)
   }
@@ -65,7 +65,7 @@ export function useABTesting() {
   function recordClick(testName: TestName) {
     const variant = getTestVariant(testName)
     testResults.value[testName][variant].clicks++
-    
+
     // sendToAnalytics('click', testName, variant)
   }
 
@@ -75,7 +75,7 @@ export function useABTesting() {
   function recordAdoptionRequest(testName: TestName) {
     const variant = getTestVariant(testName)
     testResults.value[testName][variant].adoptionRequests++
-    
+
     // sendToAnalytics('adoption_request', testName, variant)
   }
 

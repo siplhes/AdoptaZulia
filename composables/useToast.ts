@@ -1,55 +1,60 @@
 import { ref } from 'vue'
 
-interface Toast {
-    id: string
-    type: 'success' | 'error' | 'warning' | 'info'
-    title: string
-    message: string
-    duration?: number
+export interface Toast {
+  id: string
+  title?: string
+  message: string
+  type: 'success' | 'error' | 'info' | 'warning'
+  duration?: number
 }
 
 const toasts = ref<Toast[]>([])
 
 export function useToast() {
-    const showToast = (toast: Omit<Toast, 'id'>) => {
-        const id = Date.now().toString() + Math.random().toString(36).substr(2, 9)
-        const newToast = { ...toast, id, duration: toast.duration || 3000 }
-        toasts.value.push(newToast)
-
-        setTimeout(() => {
-            removeToast(id)
-        }, newToast.duration)
-
-        return id
+  const add = (toast: Omit<Toast, 'id'>) => {
+    const id = Math.random().toString(36).substring(2, 9)
+    const newToast: Toast = {
+      id,
+      duration: 3000, // Duración por defecto
+      ...toast,
     }
 
-    const removeToast = (id: string) => {
-        toasts.value = toasts.value.filter(t => t.id !== id)
-    }
+    toasts.value.push(newToast)
 
-    const success = (title: string, message: string, duration?: number) => {
-        return showToast({ type: 'success', title, message, duration })
+    if (newToast.duration && newToast.duration > 0) {
+      setTimeout(() => {
+        remove(id)
+      }, newToast.duration)
     }
+  }
 
-    const error = (title: string, message: string, duration?: number) => {
-        return showToast({ type: 'error', title, message, duration: duration || 5000 })
-    }
+  const remove = (id: string) => {
+    toasts.value = toasts.value.filter((t) => t.id !== id)
+  }
 
-    const warning = (title: string, message: string, duration?: number) => {
-        return showToast({ type: 'warning', title, message, duration })
-    }
+  const success = (message: string, title?: string) => {
+    add({ type: 'success', message, title })
+  }
 
-    const info = (title: string, message: string, duration?: number) => {
-        return showToast({ type: 'info', title, message, duration })
-    }
+  const error = (message: string, title?: string) => {
+    add({ type: 'error', message, title, duration: 5000 })
+  }
 
-    return {
-        toasts,
-        showToast,
-        removeToast,
-        success,
-        error,
-        warning,
-        info
-    }
+  const info = (message: string, title?: string) => {
+    add({ type: 'info', message, title })
+  }
+
+  const warning = (message: string, title?: string) => {
+    add({ type: 'warning', message, title })
+  }
+
+  return {
+    toasts,
+    add,
+    remove,
+    success,
+    error,
+    info,
+    warning,
+  }
 }

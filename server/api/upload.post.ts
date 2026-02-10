@@ -14,6 +14,8 @@ export default defineEventHandler(async (event) => {
     })
     const formData = await readMultipartFormData(event)
 
+    console.log('📦 FormData recibido:', formData?.length, 'fields')
+
     if (!formData || formData.length === 0) {
       throw createError({
         statusCode: 400,
@@ -24,6 +26,14 @@ export default defineEventHandler(async (event) => {
     const fileField = formData.find((field) => field.name === 'file')
     const folderField = formData.find((field) => field.name === 'folder')
     const fileNameField = formData.find((field) => field.name === 'fileName')
+
+    console.log('📎 File field:', {
+      exists: !!fileField,
+      name: fileField?.name,
+      filename: fileField?.filename,
+      type: fileField?.type,
+      dataLength: fileField?.data?.length,
+    })
 
     if (!fileField || !fileField.data) {
       throw createError({

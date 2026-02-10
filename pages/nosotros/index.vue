@@ -1,114 +1,122 @@
 <template>
   <section class="min-h-100 w-full bg-white">
-    <div class="mx-auto max-w-6xl py-12 px-4 sm:px-6 lg:px-8">
-      <h1 class="text-4xl font-bold text-emerald-600 mb-6 text-center">Nosotros</h1>
-      <p class="text-lg text-gray-700 text-center max-w-3xl mx-auto mb-8">
-        Somos una organización sin fines de lucro dedicada a conectar mascotas en situación de abandono 
-        con familias amorosas que les brinden un hogar permanente.
+    <div class="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+      <h1 class="mb-6 text-center text-4xl font-bold text-emerald-600">Nosotros</h1>
+      <p class="mx-auto mb-8 max-w-3xl text-center text-lg text-gray-700">
+        Somos una organización sin fines de lucro dedicada a conectar mascotas en situación de
+        abandono con familias amorosas que les brinden un hogar permanente.
       </p>
       <div class="flex justify-center">
-        <img src="/img4.webp" alt="Mascotas de AdoptaZulia" class="rounded-lg shadow-lg w-full max-w-2xl">
+        <img
+          src="/img4.webp"
+          alt="Mascotas de AdoptaZulia"
+          class="w-full max-w-2xl rounded-lg shadow-lg"
+        />
       </div>
     </div>
     <div class="bg-gray-50 py-16">
       <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div class="grid md:grid-cols-2 gap-12">
-          <div class="bg-white p-8 rounded-lg shadow-md">
-            <h2 class="text-2xl font-semibold text-emerald-600 mb-4">Nuestra Misión</h2>
+        <div class="grid gap-12 md:grid-cols-2">
+          <div class="rounded-lg bg-white p-8 shadow-md">
+            <h2 class="mb-4 text-2xl font-semibold text-emerald-600">Nuestra Misión</h2>
             <p class="text-gray-700">
-              Facilitar la adopción responsable de mascotas en el estado Zulia, Venezuela, promoviendo el bienestar 
-              animal y la tenencia responsable a través de educación, concientización y un proceso de adopción 
-              eficiente y seguro.
+              Facilitar la adopción responsable de mascotas en el estado Zulia, Venezuela,
+              promoviendo el bienestar animal y la tenencia responsable a través de educación,
+              concientización y un proceso de adopción eficiente y seguro.
             </p>
           </div>
-          <div class="bg-white p-8 rounded-lg shadow-md">
-            <h2 class="text-2xl font-semibold text-emerald-600 mb-4">Nuestra Visión</h2>
+          <div class="rounded-lg bg-white p-8 shadow-md">
+            <h2 class="mb-4 text-2xl font-semibold text-emerald-600">Nuestra Visión</h2>
             <p class="text-gray-700">
-              Convertirnos en el principal referente en adopción de mascotas en Venezuela, creando una comunidad 
-              comprometida con el bienestar animal y logrando que ningún animal sea abandonado o maltratado.
+              Convertirnos en el principal referente en adopción de mascotas en Venezuela, creando
+              una comunidad comprometida con el bienestar animal y logrando que ningún animal sea
+              abandonado o maltratado.
             </p>
           </div>
         </div>
       </div>
     </div>
-    <div class="py-16 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-      <h2 class="text-3xl font-bold text-emerald-600 mb-8 text-center">Nuestra Historia</h2>
-      <div class="bg-white p-8 rounded-lg shadow-md">
-        <p class="text-gray-700 mb-4">
-          AdoptaZulia nació en 2025 como respuesta a la creciente población de animales abandonados en el estado Zulia
-          Luego de tratar de poner en adopcion a unos gatitos que necesitaban un hogar nos dimos cuenta de lo anticuado
-          que estabamos en el proceso de adopción aca en el pais, por lo que decidimos crear una plataforma que facilitara la conexión entre
-          los animales necesitados y las familias dispuestas a brindarles un hogar.
+    <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+      <h2 class="mb-8 text-center text-3xl font-bold text-emerald-600">Nuestra Historia</h2>
+      <div class="rounded-lg bg-white p-8 shadow-md">
+        <p class="mb-4 text-gray-700">
+          AdoptaZulia nació en 2025 como respuesta a la creciente población de animales abandonados
+          en el estado Zulia Luego de tratar de poner en adopcion a unos gatitos que necesitaban un
+          hogar nos dimos cuenta de lo anticuado que estabamos en el proceso de adopción aca en el
+          pais, por lo que decidimos crear una plataforma que facilitara la conexión entre los
+          animales necesitados y las familias dispuestas a brindarles un hogar.
         </p>
       </div>
     </div>
     <div class="bg-gray-50 py-16">
       <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <h2 class="text-3xl font-bold text-emerald-600 mb-8 text-center">Nuestros Valores</h2>
-        <div class="grid md:grid-cols-3 gap-6">
-          <div class="bg-white p-6 rounded-lg shadow-md">
-            <h3 class="text-xl font-semibold text-emerald-600 mb-3">Compromiso</h3>
+        <h2 class="mb-8 text-center text-3xl font-bold text-emerald-600">Nuestros Valores</h2>
+        <div class="grid gap-6 md:grid-cols-3">
+          <div class="rounded-lg bg-white p-6 shadow-md">
+            <h3 class="mb-3 text-xl font-semibold text-emerald-600">Compromiso</h3>
             <p class="text-gray-700">
-              Dedicamos nuestro tiempo y esfuerzo al bienestar de cada mascota, asegurando que encuentre un hogar 
-              adecuado a sus necesidades.
+              Dedicamos nuestro tiempo y esfuerzo al bienestar de cada mascota, asegurando que
+              encuentre un hogar adecuado a sus necesidades.
             </p>
           </div>
-          <div class="bg-white p-6 rounded-lg shadow-md">
-            <h3 class="text-xl font-semibold text-emerald-600 mb-3">Responsabilidad</h3>
+          <div class="rounded-lg bg-white p-6 shadow-md">
+            <h3 class="mb-3 text-xl font-semibold text-emerald-600">Responsabilidad</h3>
             <p class="text-gray-700">
-              Promovemos la adopción consciente y responsable, educando a los adoptantes sobre el cuidado 
-              adecuado de sus nuevas mascotas.
+              Promovemos la adopción consciente y responsable, educando a los adoptantes sobre el
+              cuidado adecuado de sus nuevas mascotas.
             </p>
           </div>
-          <div class="bg-white p-6 rounded-lg shadow-md">
-            <h3 class="text-xl font-semibold text-emerald-600 mb-3">Transparencia</h3>
+          <div class="rounded-lg bg-white p-6 shadow-md">
+            <h3 class="mb-3 text-xl font-semibold text-emerald-600">Transparencia</h3>
             <p class="text-gray-700">
-              Operamos con total transparencia en nuestros procesos de adopción y en el manejo de donaciones 
-              y recursos que recibimos.
+              Operamos con total transparencia en nuestros procesos de adopción y en el manejo de
+              donaciones y recursos que recibimos.
             </p>
           </div>
         </div>
       </div>
     </div>
-    <div class="py-16 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-      <h2 class="text-3xl font-bold text-emerald-600 mb-8 text-center">Nuestro Equipo</h2>
-      <p class="text-lg text-gray-700 text-center max-w-3xl mx-auto mb-12">
-        Detrás de AdoptaZulia hay un equipo comprometido de voluntarios que trabaja incansablemente 
+    <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+      <h2 class="mb-8 text-center text-3xl font-bold text-emerald-600">Nuestro Equipo</h2>
+      <p class="mx-auto mb-12 max-w-3xl text-center text-lg text-gray-700">
+        Detrás de AdoptaZulia hay un equipo comprometido de voluntarios que trabaja incansablemente
         por el bienestar animal.
       </p>
-      <div class="grid md:grid-cols-4 gap-6">
-        <div class="bg-white p-6 rounded-lg shadow-md text-center mx-auto">
-          <div class="h-24 w-24 rounded-full bg-gray-200 mx-auto mb-4 overflow-hidden">
-            <img src="/placeholder.webp" alt="Voluntario" class="w-full h-full object-cover">
+      <div class="grid gap-6 md:grid-cols-4">
+        <div class="mx-auto rounded-lg bg-white p-6 text-center shadow-md">
+          <div class="mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full bg-gray-200">
+            <img src="/placeholder.webp" alt="Voluntario" class="h-full w-full object-cover" />
           </div>
           <h3 class="text-xl font-semibold text-emerald-600">Lismar Molaya</h3>
           <p class="text-gray-600">Fundadora</p>
         </div>
-        <div class="bg-white p-6 rounded-lg shadow-md text-center">
-          <div class="h-24 w-24 rounded-full bg-gray-200 mx-auto mb-4 overflow-hidden">
-            <img src="/placeholder.webp" alt="Voluntario" class="w-full h-full object-cover">
+        <div class="rounded-lg bg-white p-6 text-center shadow-md">
+          <div class="mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full bg-gray-200">
+            <img src="/placeholder.webp" alt="Voluntario" class="h-full w-full object-cover" />
           </div>
           <h3 class="text-xl font-semibold text-emerald-600">Carlos Pérez</h3>
           <p class="text-gray-600">Coordinador de Adopciones</p>
         </div>
-        <div class="bg-white p-6 rounded-lg shadow-md text-center">
-          <div class="h-24 w-24 rounded-full bg-gray-200 mx-auto mb-4 overflow-hidden">
-            <img src="/placeholder.webp" alt="Voluntario" class="w-full h-full object-cover">
+        <div class="rounded-lg bg-white p-6 text-center shadow-md">
+          <div class="mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full bg-gray-200">
+            <img src="/placeholder.webp" alt="Voluntario" class="h-full w-full object-cover" />
           </div>
           <h3 class="text-xl font-semibold text-emerald-600">Suokhe</h3>
           <p class="text-gray-600">Desarrollador web</p>
         </div>
-
       </div>
     </div>
     <div class="bg-gray-50 py-16">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="text-3xl font-bold text-emerald-600 mb-6">¿Quieres unirte a nuestra causa?</h2>
-        <p class="text-lg text-gray-700 max-w-3xl mx-auto mb-8">
-          Siempre estamos buscando voluntarios apasionados que quieran aportar su tiempo y habilidades 
-          para ayudar a las mascotas necesitadas.
+      <div class="mx-auto max-w-6xl px-4 text-center sm:px-6 lg:px-8">
+        <h2 class="mb-6 text-3xl font-bold text-emerald-600">¿Quieres unirte a nuestra causa?</h2>
+        <p class="mx-auto mb-8 max-w-3xl text-lg text-gray-700">
+          Siempre estamos buscando voluntarios apasionados que quieran aportar su tiempo y
+          habilidades para ayudar a las mascotas necesitadas.
         </p>
-        <a href="/contacto" class="inline-block bg-emerald-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-emerald-700 transition-colors">
+        <a
+          href="/contacto"
+          class="inline-block rounded-lg bg-emerald-600 px-8 py-3 font-semibold text-white transition-colors hover:bg-emerald-700"
+        >
           Contáctanos
         </a>
       </div>
@@ -129,9 +137,11 @@ const ogImage = useOgImage('/og.jpg')
 
 useSeoMeta({
   title: 'Nosotros | Adopta Zulia',
-  description: 'Conoce al equipo detrás de Adopta Zulia. Nuestra misión es conectar mascotas abandonadas con hogares amorosos en el estado Zulia.',
+  description:
+    'Conoce al equipo detrás de Adopta Zulia. Nuestra misión es conectar mascotas abandonadas con hogares amorosos en el estado Zulia.',
   ogTitle: 'Sobre Nosotros - Adopta Zulia',
-  ogDescription: 'Conoce nuestra misión, visión y el equipo de voluntarios dedicados al bienestar animal en Zulia.',
+  ogDescription:
+    'Conoce nuestra misión, visión y el equipo de voluntarios dedicados al bienestar animal en Zulia.',
   ogImage,
   ogImageAlt: 'Equipo de Adopta Zulia',
   ogUrl: canonicalUrl,
@@ -147,15 +157,17 @@ useHead({
     {
       rel: 'canonical',
       href: canonicalUrl,
-    }
+    },
   ],
   script: [
-    useStructuredData(createBreadcrumbSchema([
-      { name: 'Inicio', url: useCanonicalUrl('/') },
-      { name: 'Nosotros', url: canonicalUrl }
-    ])),
-    useStructuredData(createOrganizationSchema())
-  ]
+    useStructuredData(
+      createBreadcrumbSchema([
+        { name: 'Inicio', url: useCanonicalUrl('/') },
+        { name: 'Nosotros', url: canonicalUrl },
+      ])
+    ),
+    useStructuredData(createOrganizationSchema()),
+  ],
 })
 </script>
 

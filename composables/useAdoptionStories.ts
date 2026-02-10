@@ -1,19 +1,8 @@
 import { ref, computed } from 'vue'
-import {
-  getDatabase,
-  ref as dbRef,
-  get,
-  set,
-  update,
-  remove,
-  push,
-  query,
-  orderByChild,
-  limitToLast,
-} from 'firebase/database'
-import { useFirebaseApp } from 'vuefire'
-import type { AdoptionStory } from '@/models/AdoptionStory'
+import type { AdoptionStory } from '../models/AdoptionStory'
 import { useSecureLogger } from '~/composables/useSecureLogger'
+import { fetchData, updateData, deleteData, pushData, setData } from '~/utils/firebase'
+import { handleFirebaseError } from '~/utils/errorHandler'
 
 export function useAdoptionStories() {
   const stories = ref<AdoptionStory[]>([])
@@ -30,33 +19,27 @@ export function useAdoptionStories() {
     error.value = null
 
     try {
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
-      const storiesRef = dbRef(db, 'adoption_stories')
+      const rawData = await fetchData<Record<string, any>>('adoption_stories')
 
-      // Obtenemos las historias ordenadas por fecha de creación (más recientes primero)
-      const storiesQuery = query(storiesRef, orderByChild('createdAt'))
-      const snapshot = await get(storiesQuery)
-
-      if (snapshot.exists()) {
+      if (rawData) {
         const storiesData: AdoptionStory[] = []
-        const rawData = snapshot.val()
 
         // Convertimos los datos en un array y añadimos el ID
-        for (const [id, data] of Object.entries(rawData)) {
-          const storyData = data as any
-          storiesData.push({
-            id,
-            petId: storyData.petId,
-            userId: storyData.userId,
-            title: storyData.title || '',
-            content: storyData.content || '',
-            images: storyData.images || [],
-            featured: storyData.featured || false,
-            likes: storyData.likes || 0,
-            createdAt: storyData.createdAt || Date.now(),
-            updatedAt: storyData.updatedAt || storyData.createdAt || Date.now(),
-          })
+        for (const [id, storyData] of Object.entries(rawData)) {
+          if (!storyData.isTest) {
+            storiesData.push({
+              id,
+              petId: storyData.petId,
+              userId: storyData.userId,
+              title: storyData.title || '',
+              content: storyData.content || '',
+              images: storyData.images || [],
+              featured: storyData.featured || false,
+              likes: storyData.likes || 0,
+              createdAt: storyData.createdAt || Date.now(),
+              updatedAt: storyData.updatedAt || storyData.createdAt || Date.now(),
+            })
+          }
         }
 
         // Enriquecemos los datos con información de mascotas y usuarios
@@ -72,8 +55,9 @@ export function useAdoptionStories() {
         return []
       }
     } catch (err: any) {
+      const errorMsg = handleFirebaseError(err)
       logError('Error al obtener historias de adopción:', err)
-      error.value = 'Error al cargar historias. Por favor, intenta de nuevo.'
+      error.value = errorMsg || 'Error al cargar historias'
       return []
     } finally {
       loading.value = false
@@ -89,21 +73,14 @@ export function useAdoptionStories() {
     error.value = null
 
     try {
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
-      const storiesRef = dbRef(db, 'adoption_stories')
+      const rawData = await fetchData<Record<string, any>>('adoption_stories')
 
-      // Obtenemos todas las historias
-      const snapshot = await get(storiesRef)
-
-      if (snapshot.exists()) {
+      if (rawData) {
         const featuredStoriesData: AdoptionStory[] = []
         const regularStoriesData: AdoptionStory[] = []
-        const rawData = snapshot.val()
 
         // Clasificamos las historias en destacadas y regulares
-        for (const [id, data] of Object.entries(rawData)) {
-          const storyData = data as any
+        for (const [id, storyData] of Object.entries(rawData)) {
           const storyObj = {
             id,
             petId: storyData.petId,
@@ -116,7 +93,7 @@ export function useAdoptionStories() {
             createdAt: storyData.createdAt || Date.now(),
             updatedAt: storyData.updatedAt || storyData.createdAt || Date.now(),
           }
-          
+
           if (storyData.featured) {
             featuredStoriesData.push(storyObj)
           } else {
@@ -131,7 +108,10 @@ export function useAdoptionStories() {
         // Si no hay suficientes historias destacadas, añadimos las más recientes
         let resultStories = [...featuredStoriesData]
         if (resultStories.length < limit) {
-          resultStories = [...resultStories, ...regularStoriesData.slice(0, limit - resultStories.length)]
+          resultStories = [
+            ...resultStories,
+            ...regularStoriesData.slice(0, limit - resultStories.length),
+          ]
         } else {
           // Si hay más destacadas que el límite, tomamos solo las más recientes
           resultStories = resultStories.slice(0, limit)
@@ -147,8 +127,9 @@ export function useAdoptionStories() {
         return []
       }
     } catch (err: any) {
+      const errorMsg = handleFirebaseError(err)
       logError('Error al obtener historias destacadas:', err)
-      error.value = 'Error al cargar historias destacadas. Por favor, intenta de nuevo.'
+      error.value = errorMsg || 'Error al cargar historias destacadas'
       return []
     } finally {
       loading.value = false
@@ -161,25 +142,19 @@ export function useAdoptionStories() {
   async function enrichStoriesData(storiesData: AdoptionStory[]): Promise<void> {
     if (storiesData.length === 0) return
 
-    const firebaseApp = useFirebaseApp()
-    const db = getDatabase(firebaseApp)
-
     // Recopilamos IDs únicos de mascotas y usuarios
     const petIds = [...new Set(storiesData.map((s) => s.petId))]
     const userIds = [...new Set(storiesData.map((s) => s.userId))]
 
-    // Obtenemos datos de mascotas
+    // Obtenemos datos de mascotas y usuarios en paralelo
     const petPromises = petIds.map(async (petId) => {
-      const petRef = dbRef(db, `pets/${petId}`)
-      const snapshot = await get(petRef)
-      return { id: petId, data: snapshot.exists() ? snapshot.val() : null }
+      const data = await fetchData<any>(`pets/${petId}`)
+      return { id: petId, data }
     })
 
-    // Obtenemos datos de usuarios
     const userPromises = userIds.map(async (userId) => {
-      const userRef = dbRef(db, `users/${userId}`)
-      const snapshot = await get(userRef)
-      return { id: userId, data: snapshot.exists() ? snapshot.val() : null }
+      const data = await fetchData<any>(`users/${userId}`)
+      return { id: userId, data }
     })
 
     // Esperamos a que se resuelvan todas las promesas
@@ -194,6 +169,8 @@ export function useAdoptionStories() {
 
     // Enriquecemos los datos de historias
     for (const story of storiesData) {
+      if (!story.petId) continue
+
       const petData = petsMap.get(story.petId)
       const userData = usersMap.get(story.userId)
 
@@ -267,7 +244,32 @@ export function useAdoptionStories() {
   /**
    * Crea una nueva historia de adopción
    */
+  /**
+   * Crea una nueva historia de adopción (Server-Side)
+   */
   async function createStory(storyData: Partial<AdoptionStory>): Promise<string | null> {
+    loading.value = true
+    error.value = null
+
+    try {
+      const response = await $fetch('/api/stories/create', {
+        method: 'POST',
+        body: { storyData },
+      })
+
+      return (response as any).storyId
+    } catch (err: any) {
+      logError('Error creating story:', err)
+      error.value = err.data?.message || 'Error al crear la historia. Por favor, intenta de nuevo.'
+      return null
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Old implementation commented out or removed
+  /*
+  async function createStoryOriginal(storyData: Partial<AdoptionStory>): Promise<string | null> {
     loading.value = true
     error.value = null
 
@@ -275,6 +277,7 @@ export function useAdoptionStories() {
       const firebaseApp = useFirebaseApp()
       const db = getDatabase(firebaseApp)
       const storiesRef = dbRef(db, 'adoption_stories')
+
 
       const petId = storyData.petId
       if (!petId) {
@@ -326,45 +329,56 @@ export function useAdoptionStories() {
       loading.value = false
     }
   }
+  */
 
   /**
-   * Actualiza una historia de adopción existente
+   * Actualiza una historia de adopción existente (Server-Side)
    */
   async function updateStory(storyId: string, updates: Partial<AdoptionStory>): Promise<boolean> {
     loading.value = true
     error.value = null
 
     try {
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
-      const storyRef = dbRef(db, `adoption_stories/${storyId}`)
+      if (!updates.userId) throw new Error('UserId is required for updates')
 
-      // Preparamos los datos a actualizar
-      const updateData: any = {
-        updatedAt: Date.now(),
-      }
-
-      if (updates.title !== undefined) updateData.title = updates.title
-      if (updates.content !== undefined) updateData.content = updates.content
-      if (updates.images !== undefined) updateData.images = updates.images
-      if (updates.featured !== undefined) updateData.featured = updates.featured
-
-      // Actualizamos en la base de datos
-      await update(storyRef, updateData)
-
-      // Actualizamos también el estado local
-      const index = stories.value.findIndex((s) => s.id === storyId)
-      if (index !== -1) {
-        stories.value[index] = {
-          ...stories.value[index],
-          ...updateData,
-        }
-      }
+      await $fetch('/api/stories/update', {
+        method: 'POST',
+        body: {
+          storyData: { ...updates, id: storyId },
+        },
+      })
 
       return true
     } catch (err: any) {
       logError(`Error al actualizar historia (${storyId}):`, err)
-      error.value = 'Error al actualizar la historia. Por favor, intenta de nuevo.'
+      error.value = err.data?.message || 'Error al actualizar la historia.'
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
+   * Elimina una historia de adopción (Server-Side)
+   */
+  async function deleteStory(storyId: string, userId: string): Promise<boolean> {
+    loading.value = true
+    error.value = null
+
+    try {
+      await $fetch('/api/stories/delete', {
+        method: 'POST',
+        body: { storyId, userId },
+      })
+
+      // Update local state if needed
+      stories.value = stories.value.filter((s) => s.id !== storyId)
+      featuredStories.value = featuredStories.value.filter((s) => s.id !== storyId)
+
+      return true
+    } catch (err: any) {
+      logError(`Error al eliminar historia (${storyId}):`, err)
+      error.value = err.data?.message || 'Error al eliminar la historia.'
       return false
     } finally {
       loading.value = false
@@ -419,43 +433,6 @@ export function useAdoptionStories() {
   /**
    * Elimina una historia de adopción
    */
-  async function deleteStory(storyId: string): Promise<boolean> {
-    loading.value = true
-    error.value = null
-
-    try {
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
-      const storyRef = dbRef(db, `adoption_stories/${storyId}`)
-
-      const snap = await get(storyRef)
-      if (!snap.exists()) {
-        error.value = 'Historia no encontrada'
-        return false
-      }
-
-      const story = snap.val()
-      const petId = story.petId
-
-      // Eliminamos usando multi-path para limpiar también petStories
-      const updates: Record<string, any> = {}
-      updates[`/adoption_stories/${storyId}`] = null
-      if (petId) updates[`/petStories/${petId}`] = null
-      await update(dbRef(db, '/'), updates)
-
-      // Eliminamos también del estado local
-      stories.value = stories.value.filter((s) => s.id !== storyId)
-      featuredStories.value = featuredStories.value.filter((s) => s.id !== storyId)
-
-      return true
-    } catch (err: any) {
-      logError(`Error al eliminar historia (${storyId}):`, err)
-      error.value = 'Error al eliminar la historia. Por favor, intenta de nuevo.'
-      return false
-    } finally {
-      loading.value = false
-    }
-  }
 
   /**
    * Obtiene las historias de adopción de un usuario específico
@@ -465,20 +442,13 @@ export function useAdoptionStories() {
     error.value = null
 
     try {
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
-      const storiesRef = dbRef(db, 'adoption_stories')
+      const rawData = await fetchData<Record<string, any>>('adoption_stories')
 
-      // Obtenemos todas las historias
-      const snapshot = await get(storiesRef)
-
-      if (snapshot.exists()) {
+      if (rawData) {
         const storiesData: AdoptionStory[] = []
-        const rawData = snapshot.val()
 
         // Filtramos por el ID de usuario
-        for (const [id, data] of Object.entries(rawData)) {
-          const storyData = data as any
+        for (const [id, storyData] of Object.entries(rawData)) {
           if (storyData.userId === userId) {
             storiesData.push({
               id,
@@ -506,8 +476,9 @@ export function useAdoptionStories() {
         return []
       }
     } catch (err: any) {
+      const errorMsg = handleFirebaseError(err)
       logError(`Error al obtener historias del usuario (${userId}):`, err)
-      error.value = 'Error al cargar las historias. Por favor, intenta de nuevo.'
+      error.value = errorMsg || 'Error al cargar historias del usuario'
       return []
     } finally {
       loading.value = false
@@ -522,20 +493,13 @@ export function useAdoptionStories() {
     error.value = null
 
     try {
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
-      const storiesRef = dbRef(db, 'adoption_stories')
+      const rawData = await fetchData<Record<string, any>>('adoption_stories')
 
-      // Obtenemos todas las historias
-      const snapshot = await get(storiesRef)
-
-      if (snapshot.exists()) {
+      if (rawData) {
         const storiesData: AdoptionStory[] = []
-        const rawData = snapshot.val()
 
         // Filtramos por el ID de mascota
-        for (const [id, data] of Object.entries(rawData)) {
-          const storyData = data as any
+        for (const [id, storyData] of Object.entries(rawData)) {
           if (storyData.petId === petId) {
             storiesData.push({
               id,
@@ -563,8 +527,59 @@ export function useAdoptionStories() {
         return []
       }
     } catch (err: any) {
+      const errorMsg = handleFirebaseError(err)
       logError(`Error al obtener historias de la mascota (${petId}):`, err)
-      error.value = 'Error al cargar las historias. Por favor, intenta de nuevo.'
+      error.value = errorMsg || 'Error al cargar historias de la mascota'
+      return []
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
+   * Obtiene todas las historias incluyendo datos de prueba (para Admin)
+   */
+  async function fetchAllStoriesRaw(): Promise<AdoptionStory[]> {
+    loading.value = true
+    error.value = null
+    try {
+      const firebaseApp = useFirebaseApp()
+      const db = getDatabase(firebaseApp)
+      const storiesRef = dbRef(db, 'adoption_stories')
+      const storiesQuery = query(storiesRef, orderByChild('createdAt'))
+      const snapshot = await get(storiesQuery)
+
+      if (snapshot.exists()) {
+        const storiesData: AdoptionStory[] = []
+        const rawData = snapshot.val()
+
+        for (const [id, data] of Object.entries(rawData)) {
+          const storyData = data as any
+          storiesData.push({
+            id,
+            petId: storyData.petId,
+            userId: storyData.userId,
+            title: storyData.title || '',
+            content: storyData.content || '',
+            images: storyData.images || [],
+            featured: storyData.featured || false,
+            likes: storyData.likes || 0,
+            createdAt: storyData.createdAt || Date.now(),
+            updatedAt: storyData.updatedAt || storyData.createdAt || Date.now(),
+          })
+        }
+
+        await enrichStoriesData(storiesData)
+        storiesData.sort((a, b) => b.createdAt - a.createdAt)
+        stories.value = storiesData
+        return storiesData
+      } else {
+        stories.value = []
+        return []
+      }
+    } catch (err: any) {
+      logError('Error al obtener historias de adopción (raw):', err)
+      error.value = 'Error al cargar historias.'
       return []
     } finally {
       loading.value = false
@@ -577,6 +592,7 @@ export function useAdoptionStories() {
     loading,
     error,
     fetchAllStories,
+    fetchAllStoriesRaw,
     fetchFeaturedStories,
     fetchStoryById,
     createStory,

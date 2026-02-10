@@ -25,7 +25,11 @@ export default defineEventHandler(async (event) => {
     const s3Service = new S3Service(s3Config as any)
 
     // call method dynamically to avoid TS mismatch in environments
-    const result: any = await (s3Service as any).getPresignedUploadUrl(folder, fileName, Number(expiresIn))
+    const result: any = await (s3Service as any).getPresignedUploadUrl(
+      folder,
+      fileName,
+      Number(expiresIn)
+    )
     const { url, key } = result || {}
 
     return { url, key }

@@ -1,6 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { AuthService } from '../../services/AuthService'
-import { getAuth, signInWithPopup, signOut as firebaseSignOut, GoogleAuthProvider, updateProfile } from 'firebase/auth'
+import {
+  getAuth,
+  signInWithPopup,
+  signOut as firebaseSignOut,
+  GoogleAuthProvider,
+  updateProfile,
+} from 'firebase/auth'
 import { getDatabase, ref, get, update, query } from 'firebase/database'
 
 // Mock dependencies
@@ -12,7 +18,7 @@ vi.mock('firebase/auth', () => ({
   updateProfile: vi.fn(),
   setPersistence: vi.fn(),
   browserLocalPersistence: 'local',
-  onAuthStateChanged: vi.fn()
+  onAuthStateChanged: vi.fn(),
 }))
 
 vi.mock('firebase/database', () => ({
@@ -24,37 +30,39 @@ vi.mock('firebase/database', () => ({
   query: vi.fn(),
   orderByChild: vi.fn(),
   equalTo: vi.fn(),
-  limitToFirst: vi.fn()
+  limitToFirst: vi.fn(),
 }))
 
 vi.mock('firebase/app', () => ({
   initializeApp: vi.fn(),
   getApps: vi.fn(() => []),
-  getApp: vi.fn()
+  getApp: vi.fn(),
 }))
 
 vi.mock('vuefire', () => ({
-  useFirebaseApp: vi.fn()
+  useFirebaseApp: vi.fn(),
 }))
 
 vi.mock('#app', () => ({
   useRuntimeConfig: vi.fn(() => ({
     public: {
-      adminEmails: 'admin@test.com'
-    }
-  }))
+      adminEmails: 'admin@test.com',
+    },
+  })),
 }))
 
 describe('AuthService', () => {
   let authService: AuthService
-  const mockAuth = { currentUser: { uid: 'user-123', displayName: 'Test User', email: 'test@test.com' } }
+  const mockAuth = {
+    currentUser: { uid: 'user-123', displayName: 'Test User', email: 'test@test.com' },
+  }
   const mockDb = {}
 
   beforeEach(() => {
     vi.clearAllMocks()
     ;(getAuth as any).mockReturnValue(mockAuth)
     ;(getDatabase as any).mockReturnValue(mockDb)
-    
+
     authService = new AuthService()
   })
 
@@ -65,8 +73,8 @@ describe('AuthService', () => {
           uid: 'user-123',
           displayName: 'Test User',
           email: 'test@test.com',
-          photoURL: 'photo.jpg'
-        }
+          photoURL: 'photo.jpg',
+        },
       }
       ;(signInWithPopup as any).mockResolvedValue(mockUserResult)
       ;(ref as any).mockReturnValue({})
@@ -106,7 +114,7 @@ describe('AuthService', () => {
       const mockProfile = { displayName: 'Test' }
       const mockSnapshot = {
         exists: () => true,
-        val: () => mockProfile
+        val: () => mockProfile,
       }
       ;(get as any).mockResolvedValue(mockSnapshot)
 
@@ -127,7 +135,7 @@ describe('AuthService', () => {
     it('should return true if user is in admins collection', async () => {
       const mockSnapshot = {
         exists: () => true,
-        val: () => true
+        val: () => true,
       }
       ;(get as any).mockResolvedValue(mockSnapshot) // Mock admin check
 
@@ -138,32 +146,28 @@ describe('AuthService', () => {
     it('should return true if email is in admin list', async () => {
       // First call check admin collection (false)
       // Second call check user profile (has email)
-        
+
       // We need to mock separate return values for consecutive get calls
       const adminSnapshot = { exists: () => false }
-      const userSnapshot = { 
-          exists: () => true, 
-          val: () => ({ email: 'admin@test.com' }) 
+      const userSnapshot = {
+        exists: () => true,
+        val: () => ({ email: 'admin@test.com' }),
       }
-      
-      ;(get as any)
-        .mockResolvedValueOnce(adminSnapshot)
-        .mockResolvedValueOnce(userSnapshot)
+
+      ;(get as any).mockResolvedValueOnce(adminSnapshot).mockResolvedValueOnce(userSnapshot)
 
       const result = await authService.isAdmin('user-123')
       expect(result).toBe(true)
     })
 
-     it('should return false if not admin', async () => {
+    it('should return false if not admin', async () => {
       const adminSnapshot = { exists: () => false }
-      const userSnapshot = { 
-          exists: () => true, 
-          val: () => ({ email: 'user@test.com' }) 
+      const userSnapshot = {
+        exists: () => true,
+        val: () => ({ email: 'user@test.com' }),
       }
-      
-      ;(get as any)
-        .mockResolvedValueOnce(adminSnapshot)
-        .mockResolvedValueOnce(userSnapshot)
+
+      ;(get as any).mockResolvedValueOnce(adminSnapshot).mockResolvedValueOnce(userSnapshot)
 
       const result = await authService.isAdmin('user-123')
       expect(result).toBe(false)

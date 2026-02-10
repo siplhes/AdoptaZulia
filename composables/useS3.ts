@@ -5,35 +5,76 @@ export const useS3 = () => {
   const config = useRuntimeConfig()
   const { optimizeImage } = useImageOptimizer()
 
-  const uploadFile = async (file: File, folder: string, fileName: string, options?: {
-    optimize?: boolean,
-    maxSizeMB?: number,
-    maxWidthOrHeight?: number,
-    quality?: number
-  }): Promise<string> => {
+  const uploadFile = async (
+    file: File,
+    folder: string,
+    fileName: string,
+    options?: {
+      optimize?: boolean
+      maxSizeMB?: number
+      maxWidthOrHeight?: number
+      quality?: number
+    }
+  ): Promise<string> => {
     try {
       // Optimizar la imagen si la opción está habilitada (por defecto: true)
       const shouldOptimize = options?.optimize !== false
       let fileToUpload = file
-      
+
+      console.log('🖼️ [Frontend] Archivo original:', {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        isFile: file instanceof File,
+      })
+
       if (shouldOptimize && file.type.startsWith('image/')) {
         // Configurar opciones de optimización
         const optimizationOptions = {
-          maxSizeMB: options?.maxSizeMB || 1, 
+          maxSizeMB: options?.maxSizeMB || 1,
           maxWidthOrHeight: options?.maxWidthOrHeight || 1920,
           quality: options?.quality || 0.8,
-          useWebWorker: true
+          useWebWorker: true,
         }
+
+        console.log('🔄 [Frontend] Optimizando imagen...')
         
-        // Optimizar la imagen antes de subirla
-        fileToUpload = await optimizeImage(file, optimizationOptions)
+        // Optimizar la imagen antes de subirla y extraer el archivo del resultado
+        const result = await optimizeImage(file, optimizationOptions)
+        
+        // Convert Blob to File with proper filename
+        const compressedBlob = result.file
+        fileToUpload = new File([compressedBlob], file.name, {
+          type: compressedBlob.type || file.type,
+          lastModified: Date.now(),
+        })
+        
+        console.log('✨ [Frontend] Imagen optimizada:', {
+          originalSize: result.originalSize,
+          compressedSize: result.compressedSize,
+          savings: result.savingsPercent + '%',
+          fileIsFile: fileToUpload instanceof File,
+          fileIsBlob: fileToUpload instanceof Blob,
+          fileSize: fileToUpload.size,
+          fileName: fileToUpload.name,
+        })
       }
-      
+
+      console.log('📤 [Frontend] Archivo a subir:', {
+        isFile: fileToUpload instanceof File,
+        isBlob: fileToUpload instanceof Blob,
+        size: fileToUpload?.size,
+        type: fileToUpload?.type,
+        name: fileToUpload?.name,
+      })
+
       // Crear un FormData para enviar el archivo
       const formData = new FormData()
       formData.append('file', fileToUpload)
       formData.append('folder', folder)
       formData.append('fileName', fileName)
+
+      console.log('📦 [Frontend] FormData creado, enviando...')
 
       // Llamar al endpoint del servidor para subir el archivo
       const response = await fetch('/api/upload', {
@@ -55,27 +96,41 @@ export const useS3 = () => {
   }
 
   // Upload with progress callback (onProgress receives 0-100)
-  const uploadFileWithProgress = (file: File, folder: string, fileName: string, onProgress: (p: number) => void, options?: {
-    optimize?: boolean,
-    maxSizeMB?: number,
-    maxWidthOrHeight?: number,
-    quality?: number
-  }): Promise<string> => {
-    return new Promise(async (resolve, reject) => {
-      try {
-        // Optimize if needed
-        const shouldOptimize = options?.optimize !== false
-        let fileToUpload: File = file
-        if (shouldOptimize && file.type.startsWith('image/')) {
-          const optimizationOptions = {
-            maxSizeMB: options?.maxSizeMB || 1,
-            maxWidthOrHeight: options?.maxWidthOrHeight || 1920,
-            quality: options?.quality || 0.8,
-            useWebWorker: true
-          }
-          fileToUpload = await optimizeImage(file, optimizationOptions)
-        }
+  const uploadFileWithProgress = async (
+    file: File,
+    folder: string,
+    fileName: string,
+    onProgress: (p: number) => void,
+    options?: {
+      optimize?: boolean
+      maxSizeMB?: number
+      maxWidthOrHeight?: number
+      quality?: number
+    }
+  ): Promise<string> => {
+    // Optimize if needed
+    const shouldOptimize = options?.optimize !== false
+    let fileToUpload: File = file
+    if (shouldOptimize && file.type.startsWith('image/')) {
+      const optimizationOptions = {
+        maxSizeMB: options?.maxSizeMB || 1,
+        maxWidthOrHeight: options?.maxWidthOrHeight || 1920,
+        quality: options?.quality || 0.8,
+        useWebWorker: true,
+      }
+      
+      const result = await optimizeImage(file, optimizationOptions)
+      
+      // Convert Blob to File with proper filename
+      const compressedBlob = result.file
+      fileToUpload = new File([compressedBlob], file.name, {
+        type: compressedBlob.type || file.type,
+        lastModified: Date.now(),
+      })
+    }
 
+    return new Promise((resolve, reject) => {
+      try {
         const formData = new FormData()
         formData.append('file', fileToUpload)
         formData.append('folder', folder)
@@ -86,7 +141,11 @@ export const useS3 = () => {
         xhr.upload.onprogress = (ev) => {
           if (ev.lengthComputable) {
             const percent = Math.round((ev.loaded / ev.total) * 100)
-            try { onProgress(percent) } catch (e) { /* ignore */ }
+            try {
+              onProgress(percent)
+            } catch (e) {
+              /* ignore */
+            }
           }
         }
         xhr.onload = () => {

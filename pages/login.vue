@@ -1,20 +1,26 @@
 <template>
   <div class="flex min-h-screen bg-white">
     <!-- Left Side: Login Form -->
-    <div class="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
+    <div
+      class="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24"
+    >
       <div class="mx-auto w-full max-w-sm lg:w-96">
         <div class="text-center lg:text-left">
           <NuxtLink to="/" class="inline-block">
-             <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
-               <Icon name="ph:paw-print-fill" class="h-7 w-7" />
-             </div>
+            <div
+              class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600"
+            >
+              <Icon name="ph:paw-print-fill" class="h-7 w-7" />
+            </div>
           </NuxtLink>
           <h2 class="mt-6 text-3xl font-extrabold tracking-tight text-gray-900">
             Bienvenido de nuevo
           </h2>
           <p class="mt-2 text-sm text-gray-600">
-            ¿No tienes cuenta? 
-            <span class="font-medium text-emerald-600">Se creará automáticamente al iniciar sesión</span>
+            ¿No tienes cuenta?
+            <span class="font-medium text-emerald-600">
+              Se creará automáticamente al iniciar sesión
+            </span>
           </p>
         </div>
 
@@ -33,20 +39,20 @@
               <button
                 type="button"
                 :disabled="loading"
-                class="group relative flex w-full justify-center rounded-xl border border-gray-300 bg-white py-3 px-4 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 hover:text-gray-900 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                class="group relative flex w-full justify-center rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 hover:text-gray-900 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70"
                 @click="handleLoginWithGoogle"
               >
-                 <span v-if="loading" class="absolute left-4 flex items-center">
-                    <Icon name="svg-spinners:ring-resize" class="h-5 w-5 text-emerald-600" />
-                 </span>
-                 <span v-else class="absolute left-4 flex items-center">
-                    <Icon name="logos:google-icon" class="h-5 w-5" />
-                 </span>
+                <span v-if="loading" class="absolute left-4 flex items-center">
+                  <Icon name="svg-spinners:ring-resize" class="h-5 w-5 text-emerald-600" />
+                </span>
+                <span v-else class="absolute left-4 flex items-center">
+                  <Icon name="logos:google-icon" class="h-5 w-5" />
+                </span>
                 <span :class="{ 'pl-6': !loading }">Google</span>
               </button>
             </div>
-            
-            <div v-if="error" class="mt-6 rounded-lg bg-red-50 p-4 border border-red-100">
+
+            <div v-if="error" class="mt-6 rounded-lg border border-red-100 bg-red-50 p-4">
               <div class="flex">
                 <div class="flex-shrink-0">
                   <Icon name="heroicons:x-circle-solid" class="h-5 w-5 text-red-400" />
@@ -73,10 +79,13 @@
         placeholder
       />
       <!-- Gradient Overlay -->
-      <div class="absolute inset-0 bg-gradient-to-t from-emerald-900/60 to-transparent flex flex-col justify-end p-12">
+      <div
+        class="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-emerald-900/60 to-transparent p-12"
+      >
         <blockquote class="mb-6 border-l-4 border-emerald-400 pl-4">
-          <p class="text-xl font-medium text-white italic">
-            "Adoptar es el acto de amor más puro que existe. Salvas una vida y cambias la tuya para siempre."
+          <p class="text-xl font-medium italic text-white">
+            "Adoptar es el acto de amor más puro que existe. Salvas una vida y cambias la tuya para
+            siempre."
           </p>
         </blockquote>
       </div>
@@ -106,13 +115,17 @@ const error = ref('')
 const loading = ref(false)
 
 // Watchers handled internally by composables mostly, but keeping local state syncing
-watch(authError, (newVal) => { if(newVal) error.value = newVal })
-watch(authLoading, (newVal) => { loading.value = newVal })
+watch(authError, (newVal) => {
+  if (newVal) error.value = newVal
+})
+watch(authLoading, (newVal) => {
+  loading.value = newVal
+})
 
 const handleLoginWithGoogle = async () => {
   error.value = ''
   loading.value = true
-  
+
   try {
     const success = await loginWithGoogle()
 

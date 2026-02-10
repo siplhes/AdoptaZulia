@@ -208,9 +208,11 @@ const ogImage = useOgImage('/og.jpg')
 
 useSeoMeta({
   title: 'Historias de Adopción | Adopta Zulia',
-  description: 'Lee historias inspiradoras de mascotas que encontraron su hogar definitivo en Zulia. Comparte tu propia experiencia de adopción.',
+  description:
+    'Lee historias inspiradoras de mascotas que encontraron su hogar definitivo en Zulia. Comparte tu propia experiencia de adopción.',
   ogTitle: 'Historias de Adopción - Adopta Zulia',
-  ogDescription: 'Historias reales de amor y segunda oportunidad. Descubre cómo una adopción puede cambiar vidas.',
+  ogDescription:
+    'Historias reales de amor y segunda oportunidad. Descubre cómo una adopción puede cambiar vidas.',
   ogImage,
   ogImageAlt: 'Finales felices en Adopta Zulia',
   ogUrl: canonicalUrl,
@@ -226,13 +228,15 @@ useHead({
     {
       rel: 'canonical',
       href: canonicalUrl,
-    }
+    },
   ],
   script: [
-    useStructuredData(createBreadcrumbSchema([
-      { name: 'Inicio', url: useCanonicalUrl('/') },
-      { name: 'Historias', url: canonicalUrl }
-    ])),
-  ]
+    useStructuredData(
+      createBreadcrumbSchema([
+        { name: 'Inicio', url: useCanonicalUrl('/') },
+        { name: 'Historias', url: canonicalUrl },
+      ])
+    ),
+  ],
 })
 </script>

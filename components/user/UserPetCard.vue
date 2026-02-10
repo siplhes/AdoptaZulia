@@ -17,10 +17,7 @@
 
       <!-- Etiqueta de estado -->
       <div class="absolute right-3 top-3">
-        <span
-          class="rounded-full px-3 py-1 text-xs font-semibold"
-          :class="statusClasses"
-        >
+        <span class="rounded-full px-3 py-1 text-xs font-semibold" :class="statusClasses">
           {{ getStatusText(pet.status) }}
         </span>
       </div>
@@ -38,12 +35,11 @@
       <!-- Solicitudes de adopción -->
       <div class="mb-4">
         <div class="flex items-center justify-between">
-          <span class="text-sm text-gray-700">{{ pet.adoptionRequestsCount || 0 }} solicitudes</span>
+          <span class="text-sm text-gray-700">
+            {{ pet.adoptionRequestsCount || 0 }} solicitudes
+          </span>
           <div class="flex items-center gap-3">
-            <button
-              class="text-sm text-emerald-600 hover:text-emerald-800"
-              @click="toggleRequests"
-            >
+            <button class="text-sm text-emerald-600 hover:text-emerald-800" @click="toggleRequests">
               {{ showRequests ? 'Ocultar solicitudes' : 'Ver solicitudes' }}
             </button>
             <NuxtLink
@@ -56,10 +52,7 @@
         </div>
 
         <!-- Collapsible preview -->
-        <div
-          v-if="showRequests"
-          class="mt-3 rounded-md border border-gray-100 bg-gray-50 p-3"
-        >
+        <div v-if="showRequests" class="mt-3 rounded-md border border-gray-100 bg-gray-50 p-3">
           <div v-if="loadingRequests" class="flex justify-center py-2">
             <Icon name="heroicons:arrow-path" class="h-5 w-5 animate-spin text-emerald-600" />
           </div>
@@ -76,20 +69,29 @@
                     :src="req.user.photoURL"
                     :alt="req.user?.name || 'Usuario'"
                     class="h-full w-full object-cover"
+                  />
+                  <div
+                    v-else
+                    class="flex h-full w-full items-center justify-center font-bold text-emerald-700"
                   >
-                  <div v-else class="flex h-full w-full items-center justify-center font-bold text-emerald-700">
                     {{ getInitials(req.user?.name || req.user?.email || 'U') }}
                   </div>
                 </div>
                 <div class="ml-3">
-                  <p class="text-sm font-medium text-gray-900">{{ req.user?.name || req.user?.email || 'Usuario' }}</p>
+                  <p class="text-sm font-medium text-gray-900">
+                    {{ req.user?.name || req.user?.email || 'Usuario' }}
+                  </p>
                   <p class="text-xs text-gray-500">
-                    {{ formatShortDate(req.createdAt) }} — <span class="capitalize">{{ req.status }}</span>
+                    {{ formatShortDate(req.createdAt) }} —
+                    <span class="capitalize">{{ req.status }}</span>
                   </p>
                 </div>
               </div>
               <div class="text-sm text-gray-500">
-                <NuxtLink :to="`/mi-solicitud/${req.id}`" class="text-emerald-600 hover:text-emerald-800">
+                <NuxtLink
+                  :to="`/mi-solicitud/${req.id}`"
+                  class="text-emerald-600 hover:text-emerald-800"
+                >
                   Ver solicitud
                 </NuxtLink>
               </div>
@@ -98,9 +100,7 @@
               Mostrando 5 de {{ requests.length }} solicitudes
             </div>
           </div>
-          <div v-else class="text-sm text-gray-500">
-            No hay solicitudes aún.
-          </div>
+          <div v-else class="text-sm text-gray-500">No hay solicitudes aún.</div>
         </div>
       </div>
 
@@ -179,6 +179,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useAdoptions } from '~/composables/useAdoptions'
+import { formatRelativeTime, formatShortDate } from '~/utils/dateFormatter'
 
 const props = defineProps({
   pet: {
@@ -273,40 +274,10 @@ const getStatusText = (status) => {
   }
 }
 
-const formatDate = (timestamp) => {
-  if (!timestamp) return 'Fecha desconocida'
-  const date = new Date(timestamp)
-  const now = new Date()
-  const diffMs = now - date
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+// formatDate replaced by formatRelativeTime from utils
+const formatDate = (timestamp) => formatRelativeTime(timestamp)
 
-  if (diffDays === 0) {
-    return 'hoy'
-  } else if (diffDays === 1) {
-    return 'ayer'
-  } else if (diffDays < 7) {
-    return `hace ${diffDays} días`
-  } else if (diffDays < 30) {
-    const weeks = Math.floor(diffDays / 7)
-    return `hace ${weeks} ${weeks === 1 ? 'semana' : 'semanas'}`
-  } else if (diffDays < 365) {
-    const months = Math.floor(diffDays / 30)
-    return `hace ${months} ${months === 1 ? 'mes' : 'meses'}`
-  } else {
-    const years = Math.floor(diffDays / 365)
-    return `hace ${years} ${years === 1 ? 'año' : 'años'}`
-  }
-}
-
-const formatShortDate = (timestamp) => {
-  if (!timestamp) return ''
-  const date = new Date(timestamp)
-  return date.toLocaleDateString('es-ES', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
-}
+// formatShortDate imported from utils
 
 const getInitials = (name) => {
   if (!name) return 'U'

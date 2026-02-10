@@ -1,11 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { ref, computed } from 'vue'
 import type { UserInfo } from 'firebase/auth'
 import { AuthService } from '~/services/AuthService'
 import { useNuxtApp } from '#app'
 import type { UserProfile, UserData } from '~/models/User'
 import { useSecureLogger } from '~/composables/useSecureLogger'
+import { getAuth, setPersistence, browserLocalPersistence } from 'firebase/auth'
+import { useFirebaseApp } from 'vuefire'
 
 type User = UserInfo & {
   uid: string
@@ -31,13 +31,36 @@ const needsProfileCompletion = ref(false)
 let unsubscribeAuth: (() => void) | null = null
 let isInitialized = false
 
+// Promise that resolves when initial auth state is determined
+let authReadyResolve: (() => void) | null = null
+const authReady = new Promise<void>((resolve) => {
+  authReadyResolve = resolve
+})
 
+// Configure global persistence before any auth operations
+async function configurePersistence() {
+  if (!import.meta.client) return
+
+  try {
+    const firebaseApp = useFirebaseApp()
+    const auth = getAuth(firebaseApp)
+    await setPersistence(auth, browserLocalPersistence)
+  } catch (err) {
+    console.error('Error configuring auth persistence:', err)
+  }
+}
 
 function initializeAuth() {
   if (isInitialized || !import.meta.client) return
   const { error: logError } = useSecureLogger()
+
+  // Configure persistence first
+  configurePersistence()
+
   try {
     const authService = new AuthService()
+    let isFirstCall = true
+
     unsubscribeAuth = authService.onAuthStateChanged(async (currentUser: any) => {
       user.value = currentUser
       if (currentUser) {
@@ -73,11 +96,19 @@ function initializeAuth() {
         isAdmin.value = false
         needsProfileCompletion.value = false
       }
+
+      // Resolve authReady promise on first auth state determination
+      if (isFirstCall && authReadyResolve) {
+        authReadyResolve()
+        isFirstCall = false
+      }
     })
     isInitialized = true
   } catch (err) {
     const { error: logError } = useSecureLogger()
     logError('Error al inicializar autenticación:', err)
+    // Resolve even on error so middleware doesn't hang
+    if (authReadyResolve) authReadyResolve()
   }
 }
 
@@ -92,8 +123,6 @@ export function useAuth() {
   }
   const authService = new AuthService()
   const isAuthenticated = computed(() => !!user.value)
-
-
 
   async function loginWithGoogle() {
     loading.value = true
@@ -125,7 +154,6 @@ export function useAuth() {
       loading.value = false
     }
   }
-
 
   async function logout() {
     loading.value = true
@@ -231,7 +259,7 @@ export function useAuth() {
           displayName: userData.displayName || '',
           email: userData.email || null,
           photoURL: userData.photoURL || null,
-          userName: userData.userName || username
+          userName: userData.userName || username,
         }
       }
       return null
@@ -243,7 +271,6 @@ export function useAuth() {
       loading.value = false
     }
   }
-
 
   /**
    * Retrieves complete data for the currently authenticated user
@@ -285,6 +312,13 @@ export function useAuth() {
     }
   }
 
+  /**
+   * Wait for initial auth state to be determined
+   * Useful for middleware to avoid premature redirects
+   */
+  async function waitForAuth(): Promise<void> {
+    await authReady
+  }
 
   return {
     user,
@@ -299,6 +333,7 @@ export function useAuth() {
     updateProfile,
     isLoggedIn,
     getUserByUsername,
-    getCurrentUserData
+    getCurrentUserData,
+    waitForAuth,
   }
 }

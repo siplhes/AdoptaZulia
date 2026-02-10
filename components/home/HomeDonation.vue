@@ -31,20 +31,22 @@
                 <p class="text-white">Transportamos animales rescatados</p>
               </div>
             </div>
-            <NuxtLink  to="/donaciones"  class="flex flex-inline justify-center items-center mt-8 p-4 rounded-lg bg-white text-emerald-800 font-semibold text-lg shadow">
-     
-                <Icon name="mdi:heart" class="mr-2 h-6 w-6" />
-                Dona ahora
-              </NuxtLink>
-
+            <NuxtLink
+              to="/donaciones"
+              class="flex-inline mt-8 flex items-center justify-center rounded-lg bg-white p-4 text-lg font-semibold text-emerald-800 shadow"
+            >
+              <Icon name="mdi:heart" class="mr-2 h-6 w-6" />
+              Dona ahora
+            </NuxtLink>
           </div>
           <div class="relative hidden lg:block">
-            <NuxtImg 
-            src="/img1.webp"
-            alt="Perro rescatado"
-            sizes="100em sm:50vw md:400px"
-           :placeholder="[50, 25, 75, 5]" 
-             class="h-full w-full object-cover" />
+            <NuxtImg
+              src="/img1.webp"
+              alt="Perro rescatado"
+              sizes="100em sm:50vw md:400px"
+              :placeholder="[50, 25, 75, 5]"
+              class="h-full w-full object-cover"
+            />
           </div>
         </div>
       </div>

@@ -8,7 +8,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     if (msg.includes('<Suspense> is an experimental feature')) {
       return
     }
-    
+
     // Suppress specific ToastContainer warnings if they still appear (though we removed the component)
     if (msg.includes('Failed to resolve component: ToastContainer')) {
       return

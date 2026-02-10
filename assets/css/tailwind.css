@@ -3,13 +3,76 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-emerald-50;
-  font-family: "Inter", sans-serif;
-}
+/* Import our centralized color system */
+@import './colors.css';
 
-h1, h2, h3 {
-  font-family: "Bricolage Grotesque", sans-serif;
+/* Additional global styles */
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-gray-50 antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: 'Bricolage Grotesque', sans-serif;
     font-style: normal;
+  }
 }
 
+@layer components {
+  /* Primary Button */
+  .btn-primary {
+    @apply rounded-xl bg-emerald-600 px-6 py-3 font-semibold text-white;
+    @apply hover:bg-emerald-700 active:bg-emerald-800;
+    @apply shadow-sm transition-all duration-200 hover:shadow-md;
+    @apply disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  /* Secondary Button */
+  .btn-secondary {
+    @apply rounded-xl bg-amber-500 px-6 py-3 font-semibold text-white;
+    @apply hover:bg-amber-600 active:bg-amber-700;
+    @apply shadow-sm transition-all duration-200 hover:shadow-md;
+    @apply disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  /* Outline Button */
+  .btn-outline {
+    @apply rounded-xl border-2 border-gray-300 bg-white px-6 py-3 font-semibold text-gray-700;
+    @apply hover:border-gray-400 hover:bg-gray-50 active:bg-gray-100;
+    @apply shadow-sm transition-all duration-200;
+    @apply disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  /* Card Component */
+  .card {
+    @apply rounded-2xl border border-gray-100 bg-white p-6 shadow-sm;
+  }
+
+  /* Badge Components */
+  .badge-success {
+    @apply inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800;
+  }
+
+  .badge-warning {
+    @apply inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800;
+  }
+
+  .badge-error {
+    @apply inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800;
+  }
+
+  .badge-info {
+    @apply inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800;
+  }
+
+  .badge-neutral {
+    @apply inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800;
+  }
+}

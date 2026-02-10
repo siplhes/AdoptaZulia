@@ -15,7 +15,7 @@ vi.mock('firebase/database', () => ({
   orderByChild: vi.fn(),
   equalTo: vi.fn(),
   limitToFirst: vi.fn(),
-  limitToLast: vi.fn()
+  limitToLast: vi.fn(),
 }))
 
 describe('AdoptionService', () => {
@@ -32,16 +32,16 @@ describe('AdoptionService', () => {
     it('should return all adoptions', async () => {
       const mockAdoptions = {
         'adop-1': { userId: 'user-1', petId: 'pet-1', status: 'pending', createdAt: 100 },
-        'adop-2': { userId: 'user-2', petId: 'pet-2', status: 'approved', createdAt: 200 }
+        'adop-2': { userId: 'user-2', petId: 'pet-2', status: 'approved', createdAt: 200 },
       }
-      
+
       const mockSnapshot = {
         exists: () => true,
-        forEach: (callback: Function) => {
+        forEach: (callback: (snapshot: { key: string; val: () => any }) => void) => {
           Object.entries(mockAdoptions).forEach(([key, val]) => {
             callback({ key, val: () => val })
           })
-        }
+        },
       }
       ;(get as any).mockResolvedValue(mockSnapshot)
       ;(query as any).mockReturnValue({})
@@ -61,7 +61,7 @@ describe('AdoptionService', () => {
         userId: 'user-1',
         petId: 'pet-1',
         status: 'pending',
-        createdAt: 123
+        createdAt: 123,
       } as any
 
       const mockPushResult = { key: 'new-adop-id' }
@@ -92,38 +92,38 @@ describe('AdoptionService', () => {
 
   describe('checkExistingAdoption', () => {
     it('should return existing adoption if found', async () => {
-       const mockAdoptions = [
-         { id: '1', userId: 'user-1', petId: 'pet-1' },
-         { id: '2', userId: 'user-1', petId: 'pet-2' }
-       ]
-       
-       // Mock getUserAdoptions internally
-       // Since it's a class method calling another class method, we can spy on it
-       // But mocking the DB call is safer integration-like test
-       
-       const mockSnapshot = {
+      const mockAdoptions = [
+        { id: '1', userId: 'user-1', petId: 'pet-1' },
+        { id: '2', userId: 'user-1', petId: 'pet-2' },
+      ]
+
+      // Mock getUserAdoptions internally
+      // Since it's a class method calling another class method, we can spy on it
+      // But mocking the DB call is safer integration-like test
+
+      const mockSnapshot = {
         exists: () => true,
-        forEach: (callback: Function) => {
+        forEach: (callback: (snapshot: { key: string; val: () => any }) => void) => {
           mockAdoptions.forEach((adop) => {
             callback({ key: adop.id, val: () => adop })
           })
-        }
+        },
       }
       ;(get as any).mockResolvedValue(mockSnapshot)
       ;(query as any).mockReturnValue({})
 
       const result = await adoptionService.checkExistingAdoption('user-1', 'pet-1')
-      
+
       expect(result).toBeTruthy()
       expect(result?.id).toBe('1')
     })
 
     it('should return null if not found for that pet', async () => {
-       const mockSnapshot = { exists: () => false }
-       ;(get as any).mockResolvedValue(mockSnapshot)
+      const mockSnapshot = { exists: () => false }
+      ;(get as any).mockResolvedValue(mockSnapshot)
 
-       const result = await adoptionService.checkExistingAdoption('user-1', 'pet-999')
-       expect(result).toBeNull()
+      const result = await adoptionService.checkExistingAdoption('user-1', 'pet-999')
+      expect(result).toBeNull()
     })
   })
 })

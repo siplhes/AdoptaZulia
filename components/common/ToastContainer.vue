@@ -1,21 +1,21 @@
 <template>
-  <div class="fixed top-4 right-4 z-50 space-y-2 max-w-sm">
+  <div class="fixed right-4 top-4 z-50 max-w-sm space-y-2">
     <TransitionGroup name="toast">
       <div
         v-for="toast in toasts"
         :key="toast.id"
-        class="rounded-lg shadow-lg p-4 flex items-start gap-3 backdrop-blur-sm"
+        class="flex items-start gap-3 rounded-lg p-4 shadow-lg backdrop-blur-sm"
         :class="toastClasses(toast.type)"
         role="alert"
       >
-        <Icon :name="toastIcon(toast.type)" class="h-5 w-5 flex-shrink-0 mt-0.5" />
-        <div class="flex-1 min-w-0">
-          <h4 class="font-semibold text-sm">{{ toast.title }}</h4>
-          <p class="text-sm mt-1 opacity-90">{{ toast.message }}</p>
+        <Icon :name="toastIcon(toast.type)" class="mt-0.5 h-5 w-5 flex-shrink-0" />
+        <div class="min-w-0 flex-1">
+          <h4 class="text-sm font-semibold">{{ toast.title }}</h4>
+          <p class="mt-1 text-sm opacity-90">{{ toast.message }}</p>
         </div>
-        <button 
-          @click="removeToast(toast.id)" 
-          class="flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity"
+        <button
+          @click="removeToast(toast.id)"
+          class="flex-shrink-0 opacity-70 transition-opacity hover:opacity-100"
           aria-label="Cerrar notificación"
         >
           <Icon name="mdi:close" class="h-4 w-4" />

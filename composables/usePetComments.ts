@@ -1,18 +1,8 @@
 import { ref } from 'vue'
-import {
-  getDatabase,
-  ref as dbRef,
-  get,
-  set,
-  push,
-  update,
-  remove,
-  query,
-  orderByChild,
-} from 'firebase/database'
-import { useFirebaseApp } from 'vuefire'
 import type { PetComment } from '@/models/PetComment'
 import { useSecureLogger } from '~/composables/useSecureLogger'
+import { fetchData, updateData, deleteData, pushData, setData } from '~/utils/firebase'
+import { handleFirebaseError, logError as utilLogError } from '~/utils/errorHandler'
 
 export function usePetComments() {
   const comments = ref<PetComment[]>([])
@@ -28,37 +18,30 @@ export function usePetComments() {
     error.value = null
 
     try {
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
-      const commentsRef = dbRef(db, 'petComments')
+      const allComments = await fetchData<Record<string, any>>('petComments')
 
-      // Obtenemos todos los comentarios
-      const snapshot = await get(commentsRef)
-
-      if (snapshot.exists()) {
+      if (allComments) {
         const commentsData: PetComment[] = []
-        const rawData = snapshot.val()
 
-        // Filtramos por el ID de la mascota y convertimos a array
-        for (const [id, data] of Object.entries(rawData)) {
-          const commentData = data as any
-          if (commentData.petId === petId) {
+        // Filter by petId and map to array
+        for (const [id, data] of Object.entries(allComments)) {
+          if (data.petId === petId) {
             commentsData.push({
               id,
-              petId: commentData.petId,
-              userId: commentData.userId,
-              content: commentData.content || '',
-              rating: commentData.rating || 0,
-              createdAt: commentData.createdAt || Date.now(),
-              updatedAt: commentData.updatedAt || commentData.createdAt || Date.now(),
+              petId: data.petId,
+              userId: data.userId,
+              content: data.content || '',
+              rating: data.rating || 0,
+              createdAt: data.createdAt || Date.now(),
+              updatedAt: data.updatedAt || data.createdAt || Date.now(),
             })
           }
         }
 
-        // Enriquecemos los datos con información de usuarios
+        // Enrich with user data
         await enrichCommentsData(commentsData)
 
-        // Ordenamos por fecha de creación (más recientes primero)
+        // Sort by date (newest first)
         commentsData.sort((a, b) => b.createdAt - a.createdAt)
 
         comments.value = commentsData
@@ -68,8 +51,9 @@ export function usePetComments() {
         return []
       }
     } catch (err: any) {
-      logError(`Error al obtener comentarios de la mascota (${petId}):`, err)
-      error.value = 'Error al cargar comentarios. Por favor, intenta de nuevo.'
+      const errorMsg = handleFirebaseError(err)
+      utilLogError('fetchPetComments', err, { petId })
+      error.value = errorMsg || 'Error al cargar comentarios'
       return []
     } finally {
       loading.value = false
@@ -82,26 +66,21 @@ export function usePetComments() {
   async function enrichCommentsData(commentsData: PetComment[]): Promise<void> {
     if (commentsData.length === 0) return
 
-    const firebaseApp = useFirebaseApp()
-    const db = getDatabase(firebaseApp)
-
-    // Recopilamos IDs únicos de usuarios
+    // Collect unique user IDs
     const userIds = [...new Set(commentsData.map((c) => c.userId))]
 
-    // Obtenemos datos de usuarios
+    // Fetch user data
     const userPromises = userIds.map(async (userId) => {
-      const userRef = dbRef(db, `users/${userId}`)
-      const snapshot = await get(userRef)
-      return { id: userId, data: snapshot.exists() ? snapshot.val() : null }
+      const userData = await fetchData(`users/${userId}`)
+      return { id: userId, data: userData }
     })
 
-    // Esperamos a que se resuelvan todas las promesas
     const usersResults = await Promise.all(userPromises)
 
-    // Creamos mapa para acceso rápido
+    // Create map for fast access
     const usersMap = new Map(usersResults.map((u) => [u.id, u.data]))
 
-    // Enriquecemos los datos de comentarios
+    // Enrich comments with user data
     for (const comment of commentsData) {
       const userData = usersMap.get(comment.userId)
 
@@ -123,14 +102,6 @@ export function usePetComments() {
     error.value = null
 
     try {
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
-      const commentsRef = dbRef(db, 'petComments')
-
-      // Generamos un ID único para el nuevo comentario
-      const newCommentRef = push(commentsRef)
-
-      // Datos mínimos requeridos
       const newComment = {
         petId: commentData.petId,
         userId: commentData.userId,
@@ -140,16 +111,12 @@ export function usePetComments() {
         updatedAt: Date.now(),
       }
 
-      // Guardamos en la base de datos
-      await set(newCommentRef, newComment)
-
-      // Extraemos el ID generado
-      const commentId = newCommentRef.key
-
+      const commentId = await pushData('petComments', newComment)
       return commentId
     } catch (err: any) {
-      logError('Error al crear comentario:', err)
-      error.value = 'Error al publicar el comentario. Por favor, intenta de nuevo.'
+      const errorMsg = handleFirebaseError(err)
+      utilLogError('createComment', err, { commentData })
+      error.value = errorMsg || 'Error al publicar el comentario'
       return null
     } finally {
       loading.value = false
@@ -164,34 +131,29 @@ export function usePetComments() {
     error.value = null
 
     try {
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
-      const commentRef = dbRef(db, `petComments/${commentId}`)
-
-      // Preparamos los datos a actualizar
-      const updateData: any = {
+      const updatePayload: any = {
         updatedAt: Date.now(),
       }
 
-      if (updates.content !== undefined) updateData.content = updates.content
-      if (updates.rating !== undefined) updateData.rating = updates.rating
+      if (updates.content !== undefined) updatePayload.content = updates.content
+      if (updates.rating !== undefined) updatePayload.rating = updates.rating
 
-      // Actualizamos en la base de datos
-      await update(commentRef, updateData)
+      await updateData(`petComments/${commentId}`, updatePayload)
 
-      // Actualizamos también el estado local
+      // Update local state
       const index = comments.value.findIndex((c) => c.id === commentId)
       if (index !== -1) {
         comments.value[index] = {
           ...comments.value[index],
-          ...updateData,
+          ...updatePayload,
         }
       }
 
       return true
     } catch (err: any) {
-      logError(`Error al actualizar comentario (${commentId}):`, err)
-      error.value = 'Error al actualizar el comentario. Por favor, intenta de nuevo.'
+      const errorMsg = handleFirebaseError(err)
+      utilLogError('updateComment', err, { commentId, updates })
+      error.value = errorMsg || 'Error al actualizar el comentario'
       return false
     } finally {
       loading.value = false
@@ -206,20 +168,16 @@ export function usePetComments() {
     error.value = null
 
     try {
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
-      const commentRef = dbRef(db, `petComments/${commentId}`)
+      await deleteData(`petComments/${commentId}`)
 
-      // Eliminamos de la base de datos
-      await remove(commentRef)
-
-      // Eliminamos también del estado local
+      // Remove from local state
       comments.value = comments.value.filter((c) => c.id !== commentId)
 
       return true
     } catch (err: any) {
-      logError(`Error al eliminar comentario (${commentId}):`, err)
-      error.value = 'Error al eliminar el comentario. Por favor, intenta de nuevo.'
+      const errorMsg = handleFirebaseError(err)
+      utilLogError('deleteComment', err, { commentId })
+      error.value = errorMsg || 'Error al eliminar el comentario'
       return false
     } finally {
       loading.value = false
@@ -265,37 +223,30 @@ export function usePetComments() {
     error.value = null
 
     try {
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
-      const commentsRef = dbRef(db, 'petComments')
+      const allComments = await fetchData<Record<string, any>>('petComments')
 
-      // Obtenemos todos los comentarios
-      const snapshot = await get(commentsRef)
-
-      if (snapshot.exists()) {
+      if (allComments) {
         const commentsData: PetComment[] = []
-        const rawData = snapshot.val()
 
-        // Filtramos por el ID de usuario
-        for (const [id, data] of Object.entries(rawData)) {
-          const commentData = data as any
-          if (commentData.userId === userId) {
+        // Filter by userId
+        for (const [id, data] of Object.entries(allComments)) {
+          if (data.userId === userId) {
             commentsData.push({
               id,
-              petId: commentData.petId,
-              userId: commentData.userId,
-              content: commentData.content || '',
-              rating: commentData.rating || 0,
-              createdAt: commentData.createdAt || Date.now(),
-              updatedAt: commentData.updatedAt || commentData.createdAt || Date.now(),
+              petId: data.petId,
+              userId: data.userId,
+              content: data.content || '',
+              rating: data.rating || 0,
+              createdAt: data.createdAt || Date.now(),
+              updatedAt: data.updatedAt || data.createdAt || Date.now(),
             })
           }
         }
 
-        // Enriquecemos los datos con información de usuarios
+        // Enrich with user data
         await enrichCommentsData(commentsData)
 
-        // Ordenamos por fecha de creación (más recientes primero)
+        // Sort by date (newest first)
         commentsData.sort((a, b) => b.createdAt - a.createdAt)
 
         return commentsData
@@ -303,8 +254,9 @@ export function usePetComments() {
         return []
       }
     } catch (err: any) {
-      logError(`Error al obtener comentarios del usuario (${userId}):`, err)
-      error.value = 'Error al cargar comentarios. Por favor, intenta de nuevo.'
+      const errorMsg = handleFirebaseError(err)
+      utilLogError('fetchUserComments', err, { userId })
+      error.value = errorMsg || 'Error al cargar comentarios'
       return []
     } finally {
       loading.value = false

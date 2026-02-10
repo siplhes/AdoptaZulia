@@ -1,7 +1,7 @@
 import { initializeApp, getApps, getApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { getDatabase } from 'firebase/database'
-import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
+import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check'
 import { defineNuxtPlugin, useRuntimeConfig } from '#app'
 import { useFirebaseApp } from 'vuefire'
 import { initializeDebugMode } from '~/utils/debugMode'
@@ -39,7 +39,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           initializeAppCheck(firebaseApp, {
             provider: new ReCaptchaV3Provider(config.public.recaptchaSiteKey),
             isTokenAutoRefreshEnabled: true,
-          });
+          })
         }
       }
     }
@@ -47,10 +47,8 @@ export default defineNuxtPlugin((nuxtApp) => {
     const auth = getAuth(firebaseApp)
     const database = getDatabase(firebaseApp)
     return {
-
       provide: {
         firebaseAuthHelper: {
-        
           isProduction: process.env.NODE_ENV === 'production',
           getErrorMessage: (errorCode: string) => {
             const errorMessages: Record<string, string> = {

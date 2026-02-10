@@ -5,7 +5,7 @@
     <HomeFeatured />
     <HomeCategories />
     <HomeDonation />
-    <HomeHowItWorks />    
+    <HomeHowItWorks />
     <HomeAdoptionStories />
     <HomeSocial />
   </div>
@@ -27,15 +27,18 @@ const ogImage = useOgImage('/og.jpg')
 // SEO Meta Tags - must be at top level for SSR
 useSeoMeta({
   title: 'Inicio | Adopta Zulia - Adopta, no compres',
-  description: 'Descubre mascotas en adopción en el estado Zulia, Venezuela. Encuentra perros, gatos y otras mascotas que buscan un hogar. Historias inspiradoras y cómo puedes ayudar.',
+  description:
+    'Descubre mascotas en adopción en el estado Zulia, Venezuela. Encuentra perros, gatos y otras mascotas que buscan un hogar. Historias inspiradoras y cómo puedes ayudar.',
   ogTitle: 'Adopta Zulia - Plataforma de adopción de mascotas',
-  ogDescription: 'Descubre mascotas en adopción en el estado Zulia. Encuentra tu compañero perfecto, lee historias inspiradoras y aprende cómo puedes ayudar.',
+  ogDescription:
+    'Descubre mascotas en adopción en el estado Zulia. Encuentra tu compañero perfecto, lee historias inspiradoras y aprende cómo puedes ayudar.',
   ogImage,
   ogImageAlt: 'Adopta Zulia - Mascotas buscando hogar',
   ogUrl: canonicalUrl,
   ogType: 'website',
   twitterTitle: 'Adopta Zulia - Plataforma de adopción de mascotas',
-  twitterDescription: 'Descubre mascotas en adopción en el estado Zulia. Encuentra tu compañero perfecto y ayuda a mascotas que necesitan un hogar.',
+  twitterDescription:
+    'Descubre mascotas en adopción en el estado Zulia. Encuentra tu compañero perfecto y ayuda a mascotas que necesitan un hogar.',
   twitterImage: ogImage,
   twitterCard: 'summary_large_image',
 })
@@ -45,7 +48,7 @@ useHead({
     {
       rel: 'canonical',
       href: canonicalUrl,
-    }
+    },
   ],
   script: [
     useStructuredData(createWebsiteSchema()),
@@ -56,7 +59,7 @@ useHead({
       description: 'Descubre mascotas en adopción en el estado Zulia, Venezuela',
       url: canonicalUrl,
     }),
-  ]
+  ],
 })
 </script>
 

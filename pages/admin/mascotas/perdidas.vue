@@ -38,12 +38,19 @@
       </div>
 
       <div v-else-if="lostList.length === 0" class="rounded-lg bg-white p-8 text-center shadow-md">
-        <div class="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-amber-100">
+        <div
+          class="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-amber-100"
+        >
           <Icon name="heroicons:paw" class="h-12 w-12 text-amber-500" />
         </div>
         <h3 class="mb-2 text-xl font-semibold text-gray-800">No hay reportes</h3>
         <p class="mb-6 text-gray-600">No se han publicado reportes de mascotas perdidas todavía.</p>
-        <NuxtLink to="/perdidas/crear" class="rounded-md bg-emerald-600 px-6 py-2 text-white hover:bg-emerald-700">Crear uno</NuxtLink>
+        <NuxtLink
+          to="/perdidas/crear"
+          class="rounded-md bg-emerald-600 px-6 py-2 text-white hover:bg-emerald-700"
+        >
+          Crear uno
+        </NuxtLink>
       </div>
 
       <div v-else class="">
@@ -52,18 +59,39 @@
         </div>
       </div>
 
-      <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+      <div
+        v-if="showDeleteModal"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
+      >
         <div class="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
           <div class="mb-4 flex items-start justify-between">
             <h3 class="text-xl font-semibold text-gray-900">Confirmar eliminación</h3>
-            <button type="button" class="ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900" @click="showDeleteModal = false">
+            <button
+              type="button"
+              class="ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900"
+              @click="showDeleteModal = false"
+            >
               <Icon name="mdi:close" class="h-5 w-5" />
             </button>
           </div>
-          <p class="text-sm text-gray-600">¿Deseas eliminar el reporte <span class="font-semibold">{{ reportToDelete?.name }}</span> ? Esto no se puede deshacer.</p>
+          <p class="text-sm text-gray-600">
+            ¿Deseas eliminar el reporte
+            <span class="font-semibold">{{ reportToDelete?.name }}</span>
+            ? Esto no se puede deshacer.
+          </p>
           <div class="mt-6 flex justify-end space-x-4">
-            <button class="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-900" @click="showDeleteModal = false">Cancelar</button>
-            <button class="rounded-lg bg-red-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-700" @click="deleteReport">Eliminar</button>
+            <button
+              class="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+              @click="showDeleteModal = false"
+            >
+              Cancelar
+            </button>
+            <button
+              class="rounded-lg bg-red-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-700"
+              @click="deleteReport"
+            >
+              Eliminar
+            </button>
           </div>
         </div>
       </div>
@@ -77,7 +105,7 @@ import { useRouter } from 'vue-router'
 import PetCard from '~/components/PetCard.vue'
 import { useLostPets } from '~/composables/useLostPets'
 
-definePageMeta({ middleware: ['admin'] })
+definePageMeta({ middleware: ['admin'], layout: 'admin' })
 
 const router = useRouter()
 const { lostPets, loading, error, fetchLostPets, updateLostPet, deleteLostPet } = useLostPets()
@@ -95,7 +123,9 @@ const lostList = computed(() => allLost.value || [])
 const totalPages = computed(() => Math.ceil(lostList.value.length / pageSize))
 const paginationStart = computed(() => (currentPage.value - 1) * pageSize)
 const paginationEnd = computed(() => currentPage.value * pageSize)
-const paginatedLost = computed(() => lostList.value.slice(paginationStart.value, paginationEnd.value))
+const paginatedLost = computed(() =>
+  lostList.value.slice(paginationStart.value, paginationEnd.value)
+)
 
 const mappedLost = computed(() => {
   return allLost.value.map((r) => ({

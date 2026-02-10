@@ -41,7 +41,8 @@
         <div class="mb-8">
           <h1 class="text-3xl font-bold text-emerald-800">Detalles de tu solicitud</h1>
           <p class="mt-2 text-gray-600">
-            Tu solicitud para adoptar a <span class="font-semibold">{{ pet.name }}</span>
+            Tu solicitud para adoptar a
+            <span class="font-semibold">{{ pet.name }}</span>
           </p>
         </div>
 
@@ -49,68 +50,68 @@
           <!-- Información de la mascota (1/3) -->
           <div class="rounded-lg bg-white p-6 shadow-md">
             <h2 class="mb-4 text-xl font-bold text-emerald-800">Mascota</h2>
-            
+
             <div class="mb-4">
               <NuxtImg
                 :src="pet.image"
                 :alt="pet.name"
-                class=" w-full rounded-lg object-cover"
+                class="w-full rounded-lg object-cover"
                 sizes="sm:100vw md:33vw"
                 placeholder
                 @error="handleImageError"
               />
             </div>
-            
+
             <h3 class="mb-2 text-lg font-semibold text-gray-900">{{ pet.name }}</h3>
-            
+
             <div class="mb-4 grid grid-cols-2 gap-y-2">
               <div>
                 <p class="text-sm text-gray-500">Tipo</p>
                 <p class="font-medium">{{ formatType(pet.type) }}</p>
               </div>
-              
+
               <div>
                 <p class="text-sm text-gray-500">Género</p>
                 <p class="font-medium">{{ pet.gender === 'macho' ? 'Macho' : 'Hembra' }}</p>
               </div>
-              
+
               <div>
                 <p class="text-sm text-gray-500">Edad</p>
                 <p class="font-medium">{{ pet.age }}</p>
               </div>
-              
+
               <div>
                 <p class="text-sm text-gray-500">Ubicación</p>
                 <p class="font-medium">{{ pet.location }}</p>
               </div>
             </div>
-            
-            <NuxtLink 
-              :to="`/mascotas/${pet.id}`" 
+
+            <NuxtLink
+              :to="`/mascotas/${pet.id}`"
               class="inline-flex items-center text-emerald-600 hover:text-emerald-800"
             >
               <span>Ver más detalles</span>
               <Icon name="heroicons:arrow-right" class="ml-1 h-4 w-4" />
             </NuxtLink>
           </div>
-          
+
           <!-- Detalles de la solicitud (2/3) -->
           <div class="lg:col-span-2">
             <div class="rounded-lg bg-white p-6 shadow-md">
               <h2 class="mb-4 text-xl font-bold text-emerald-800">Estado de la solicitud</h2>
-              
+
               <!-- Estado de la solicitud -->
               <div class="mb-6">
-                <div 
+                <div
                   class="mb-6 rounded-lg p-4"
                   :class="{
-                    'bg-yellow-50 border border-yellow-200': adoption.status === 'pending',
-                    'bg-green-50 border border-green-200': adoption.status === 'approved',
-                    'bg-red-50 border border-red-200': adoption.status === 'rejected',
+                    'border border-yellow-200 bg-yellow-50': adoption.status === 'pending',
+                    'border border-green-200 bg-green-50': adoption.status === 'approved',
+                    'border border-red-200 bg-red-50': adoption.status === 'rejected',
                   }"
                 >
                   <div class="flex items-center">
-                    <div 
+                    <div
                       class="flex h-10 w-10 items-center justify-center rounded-full"
                       :class="{
                         'bg-yellow-100': adoption.status === 'pending',
@@ -118,8 +119,14 @@
                         'bg-red-100': adoption.status === 'rejected',
                       }"
                     >
-                      <Icon 
-                        :name="adoption.status === 'pending' ? 'heroicons:clock' : adoption.status === 'approved' ? 'heroicons:check' : 'heroicons:x-mark'" 
+                      <Icon
+                        :name="
+                          adoption.status === 'pending'
+                            ? 'heroicons:clock'
+                            : adoption.status === 'approved'
+                              ? 'heroicons:check'
+                              : 'heroicons:x-mark'
+                        "
                         class="h-6 w-6"
                         :class="{
                           'text-yellow-600': adoption.status === 'pending',
@@ -129,7 +136,7 @@
                       />
                     </div>
                     <div class="ml-4">
-                      <h3 
+                      <h3
                         class="text-lg font-semibold"
                         :class="{
                           'text-yellow-800': adoption.status === 'pending',
@@ -139,7 +146,7 @@
                       >
                         {{ getStatusTitle(adoption.status) }}
                       </h3>
-                      <p 
+                      <p
                         class="text-sm"
                         :class="{
                           'text-yellow-600': adoption.status === 'pending',
@@ -152,20 +159,20 @@
                     </div>
                   </div>
                 </div>
-                
+
                 <div class="space-y-4">
                   <!-- Fecha de solicitud -->
                   <div>
                     <p class="text-sm font-medium text-gray-500">Fecha de solicitud</p>
                     <p class="text-gray-900">{{ formatFullDate(adoption.createdAt) }}</p>
                   </div>
-                  
+
                   <!-- Fecha de última actualización -->
                   <div v-if="adoption.updatedAt && adoption.updatedAt !== adoption.createdAt">
                     <p class="text-sm font-medium text-gray-500">Última actualización</p>
                     <p class="text-gray-900">{{ formatFullDate(adoption.updatedAt) }}</p>
                   </div>
-                  
+
                   <!-- Tu mensaje -->
                   <div>
                     <p class="text-sm font-medium text-gray-500">Tu mensaje</p>
@@ -173,65 +180,73 @@
                       <p class="text-gray-700">{{ adoption.message }}</p>
                     </div>
                   </div>
-                  
+
                   <!-- Acciones según el estado -->
                   <div class="mt-8">
                     <!-- Solicitud pendiente - Mostrar datos de contacto para agilizar proceso -->
                     <div v-if="adoption.status === 'pending' && pet.contact" class="space-y-3">
-                      <div class="rounded-lg border border-amber-200 bg-amber-50 p-4 mb-4">
+                      <div class="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
                         <div class="flex items-start">
-                          <Icon name="heroicons:information-circle" class="mr-2 h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                          <Icon
+                            name="heroicons:information-circle"
+                            class="mr-2 mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600"
+                          />
                           <p class="text-sm text-amber-700">
-                            Puedes contactar directamente con el propietario sin esperar a que acepte tu solicitud. ¡Esto acelera el proceso de adopción!
+                            Puedes contactar directamente con el propietario sin esperar a que
+                            acepte tu solicitud. ¡Esto acelera el proceso de adopción!
                           </p>
                         </div>
                       </div>
 
-                      <h3 class="text-lg font-semibold text-gray-900">Datos de contacto del propietario</h3>
-                      
+                      <h3 class="text-lg font-semibold text-gray-900">
+                        Datos de contacto del propietario
+                      </h3>
+
                       <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        <a 
-                          :href="`tel:${pet.contact.phone}`" 
+                        <a
+                          :href="`tel:${pet.contact.phone}`"
                           class="flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-3 text-white hover:bg-emerald-700"
                         >
                           <Icon name="heroicons:phone" class="mr-2 h-5 w-5" />
                           Llamar
                         </a>
-                        
-                        <button 
+
+                        <button
                           class="flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-3 text-white hover:bg-emerald-700"
                           @click="contactWhatsapp"
                         >
                           <Icon name="mdi:whatsapp" class="mr-2 h-5 w-5" />
                           WhatsApp
                         </button>
-                        
-                        <a 
-                          :href="`mailto:${pet.contact.email}`" 
+
+                        <a
+                          :href="`mailto:${pet.contact.email}`"
                           class="flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-3 text-white hover:bg-emerald-700"
                         >
                           <Icon name="heroicons:envelope" class="mr-2 h-5 w-5" />
                           Email
                         </a>
                       </div>
-                      
+
                       <!-- Detalles del contacto -->
                       <div class="mt-4 rounded-lg bg-gray-50 p-4">
                         <h4 class="font-medium text-gray-900">{{ pet.contact.name }}</h4>
-                        <p class="mt-1 text-sm text-gray-500">{{ formatContactType(pet.contact.type) }}</p>
-                        
+                        <p class="mt-1 text-sm text-gray-500">
+                          {{ formatContactType(pet.contact.type) }}
+                        </p>
+
                         <div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                           <div class="flex items-center">
                             <Icon name="heroicons:phone" class="mr-2 h-5 w-5 text-gray-400" />
                             <span class="text-gray-700">{{ pet.contact.phone }}</span>
                           </div>
-                          
+
                           <div class="flex items-center">
                             <Icon name="heroicons:envelope" class="mr-2 h-5 w-5 text-gray-400" />
                             <span class="text-gray-700">{{ pet.contact.email }}</span>
                           </div>
                         </div>
-                        
+
                         <div v-if="pet.contact.notes" class="mt-3 border-t border-gray-200 pt-3">
                           <p class="text-sm text-gray-600">{{ pet.contact.notes }}</p>
                         </div>
@@ -239,28 +254,31 @@
                     </div>
 
                     <!-- Solicitud aprobada - Botones de contacto -->
-                    <div v-else-if="adoption.status === 'approved' && pet.contact" class="space-y-3">
+                    <div
+                      v-else-if="adoption.status === 'approved' && pet.contact"
+                      class="space-y-3"
+                    >
                       <h3 class="text-lg font-semibold text-gray-900">Información de contacto</h3>
-                      
+
                       <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        <a 
-                          :href="`tel:${pet.contact.phone}`" 
+                        <a
+                          :href="`tel:${pet.contact.phone}`"
                           class="flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-3 text-white hover:bg-emerald-700"
                         >
                           <Icon name="heroicons:phone" class="mr-2 h-5 w-5" />
                           Llamar
                         </a>
-                        
-                        <button 
+
+                        <button
                           class="flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-3 text-white hover:bg-emerald-700"
                           @click="contactWhatsapp"
                         >
                           <Icon name="mdi:whatsapp" class="mr-2 h-5 w-5" />
                           WhatsApp
                         </button>
-                        
-                        <a 
-                          :href="`mailto:${pet.contact.email}`" 
+
+                        <a
+                          :href="`mailto:${pet.contact.email}`"
                           class="flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-3 text-white hover:bg-emerald-700"
                         >
                           <Icon name="heroicons:envelope" class="mr-2 h-5 w-5" />
@@ -268,50 +286,55 @@
                         </a>
 
                         <!-- Botón para confirmar adopción (por parte del adoptante) -->
-                        <button 
+                        <button
                           v-if="!adoption.completed && (!pet.status || pet.status !== 'adopted')"
-                          class="flex items-center justify-center rounded-lg bg-blue-600 px-4 py-3 text-white hover:bg-blue-700 col-span-full"
+                          class="col-span-full flex items-center justify-center rounded-lg bg-blue-600 px-4 py-3 text-white hover:bg-blue-700"
                           @click="confirmAdoption"
                         >
                           <Icon name="heroicons:check-badge" class="mr-2 h-5 w-5" />
                           Confirmar adopción completada
                         </button>
                       </div>
-                      
+
                       <!-- Detalles del contacto -->
                       <div class="mt-4 rounded-lg bg-gray-50 p-4">
                         <h4 class="font-medium text-gray-900">{{ pet.contact.name }}</h4>
-                        <p class="mt-1 text-sm text-gray-500">{{ formatContactType(pet.contact.type) }}</p>
-                        
+                        <p class="mt-1 text-sm text-gray-500">
+                          {{ formatContactType(pet.contact.type) }}
+                        </p>
+
                         <div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                           <div class="flex items-center">
                             <Icon name="heroicons:phone" class="mr-2 h-5 w-5 text-gray-400" />
                             <span class="text-gray-700">{{ pet.contact.phone }}</span>
                           </div>
-                          
+
                           <div class="flex items-center">
                             <Icon name="heroicons:envelope" class="mr-2 h-5 w-5 text-gray-400" />
                             <span class="text-gray-700">{{ pet.contact.email }}</span>
                           </div>
                         </div>
-                        
+
                         <div v-if="pet.contact.notes" class="mt-3 border-t border-gray-200 pt-3">
                           <p class="text-sm text-gray-600">{{ pet.contact.notes }}</p>
                         </div>
                       </div>
                     </div>
-                    
+
                     <!-- Adopción completada - Mostrar certificado y opción para crear historia -->
                     <div v-else-if="adoption.status === 'completed'" class="space-y-3">
                       <div class="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
-                        <p class="text-sm text-emerald-700 mb-3">
-                          <Icon name="heroicons:check-circle" class="inline-block mr-1 h-5 w-5 text-emerald-600" />
+                        <p class="mb-3 text-sm text-emerald-700">
+                          <Icon
+                            name="heroicons:check-circle"
+                            class="mr-1 inline-block h-5 w-5 text-emerald-600"
+                          />
                           ¡Felicidades! La adopción de {{ pet.name }} ha sido completada con éxito.
                         </p>
-                        
+
                         <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                           <!-- Enlace al certificado -->
-                          <NuxtLink 
+                          <NuxtLink
                             :to="`/certificados/${adoption.id}`"
                             class="flex items-center justify-center rounded-lg bg-amber-600 px-4 py-3 text-white hover:bg-amber-700"
                           >
@@ -320,7 +343,7 @@
                           </NuxtLink>
 
                           <!-- Crear historia de adopción -->
-                          <NuxtLink 
+                          <NuxtLink
                             :to="`/historias/crear?petId=${adoption.petId}&adoptionId=${adoption.id}`"
                             class="flex items-center justify-center rounded-lg bg-emerald-600 px-4 py-3 text-white hover:bg-emerald-700"
                           >
@@ -330,18 +353,18 @@
                         </div>
                       </div>
                     </div>
-                    
+
                     <!-- Solicitud rechazada -->
                     <div v-else-if="adoption.status === 'rejected'" class="space-y-3">
                       <div class="rounded-lg border border-red-200 bg-red-50 p-4">
                         <p class="text-sm text-red-700">
-                          Lo sentimos, tu solicitud ha sido rechazada por el propietario. 
-                          Puedes buscar otras mascotas disponibles para adopción.
+                          Lo sentimos, tu solicitud ha sido rechazada por el propietario. Puedes
+                          buscar otras mascotas disponibles para adopción.
                         </p>
                       </div>
-                      
-                      <NuxtLink 
-                        to="/mascotas" 
+
+                      <NuxtLink
+                        to="/mascotas"
                         class="mt-4 inline-flex items-center rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700"
                       >
                         <Icon name="heroicons:heart" class="mr-2 h-5 w-5" />
@@ -356,24 +379,31 @@
             <!-- Sección de información del propietario -->
             <div class="mt-6 rounded-lg bg-white p-6 shadow-md">
               <h2 class="mb-4 text-xl font-bold text-emerald-800">Información del propietario</h2>
-              
-              <div v-if="adoption.status === 'pending'" class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3">
+
+              <div
+                v-if="adoption.status === 'pending'"
+                class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3"
+              >
                 <p class="text-sm text-emerald-700">
-                  <Icon name="heroicons:information-circle" class="inline-block mr-1 h-4 w-4" />
-                  Puedes contactar directamente con el propietario sin esperar a que acepte tu solicitud.
+                  <Icon name="heroicons:information-circle" class="mr-1 inline-block h-4 w-4" />
+                  Puedes contactar directamente con el propietario sin esperar a que acepte tu
+                  solicitud.
                 </p>
               </div>
-              
+
               <div>
                 <div class="flex items-start">
                   <div class="h-10 w-10 overflow-hidden rounded-full bg-emerald-100">
-                    <img 
-                      v-if="pet.ownerPhotoURL" 
-                      :src="pet.ownerPhotoURL" 
-                      alt="Propietario" 
+                    <img
+                      v-if="pet.ownerPhotoURL"
+                      :src="pet.ownerPhotoURL"
+                      alt="Propietario"
                       class="h-full w-full object-cover"
+                    />
+                    <div
+                      v-else
+                      class="flex h-full w-full items-center justify-center font-bold text-emerald-700"
                     >
-                    <div v-else class="flex h-full w-full items-center justify-center font-bold text-emerald-700">
                       {{ getInitials(pet.contact.name || 'P') }}
                     </div>
                   </div>
@@ -382,19 +412,19 @@
                     <p class="text-sm text-gray-500">{{ formatContactType(pet.contact.type) }}</p>
                   </div>
                 </div>
-                
+
                 <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div class="flex items-center">
                     <Icon name="heroicons:phone" class="mr-2 h-5 w-5 text-gray-400" />
                     <span class="text-gray-700">{{ pet.contact.phone }}</span>
                   </div>
-                  
+
                   <div class="flex items-center">
                     <Icon name="heroicons:envelope" class="mr-2 h-5 w-5 text-gray-400" />
                     <span class="text-gray-700">{{ pet.contact.email }}</span>
                   </div>
                 </div>
-                
+
                 <div v-if="pet.contact.notes" class="mt-4 rounded-lg bg-gray-50 p-3">
                   <p class="text-sm text-gray-700">{{ pet.contact.notes }}</p>
                 </div>
@@ -404,44 +434,54 @@
             <!-- Sección de información del solicitante -->
             <div class="mt-6 rounded-lg bg-white p-6 shadow-md">
               <h2 class="mb-4 text-xl font-bold text-emerald-800">Tu información de contacto</h2>
-              
+
               <div v-if="user">
                 <div class="flex items-start">
                   <div class="h-10 w-10 overflow-hidden rounded-full bg-emerald-100">
-                    <img 
-                      v-if="user.photoURL" 
-                      :src="user.photoURL" 
-                      alt="Tu perfil" 
+                    <img
+                      v-if="user.photoURL"
+                      :src="user.photoURL"
+                      alt="Tu perfil"
                       class="h-full w-full object-cover"
+                    />
+                    <div
+                      v-else
+                      class="flex h-full w-full items-center justify-center font-bold text-emerald-700"
                     >
-                    <div v-else class="flex h-full w-full items-center justify-center font-bold text-emerald-700">
                       {{ getInitials(user.displayName || user.email || 'U') }}
                     </div>
                   </div>
                   <div class="ml-4">
-                    <h3 class="font-semibold text-gray-900">{{ user.displayName || 'No disponible' }}</h3>
+                    <h3 class="font-semibold text-gray-900">
+                      {{ user.displayName || 'No disponible' }}
+                    </h3>
                     <p class="text-sm text-gray-500">{{ user.email }}</p>
                   </div>
                 </div>
-                
+
                 <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div class="flex items-center">
                     <Icon name="heroicons:phone" class="mr-2 h-5 w-5 text-gray-400" />
                     <span class="text-gray-700">{{ user.phoneNumber || 'No disponible' }}</span>
                   </div>
-                  
+
                   <div v-if="user.address" class="flex items-center">
                     <Icon name="heroicons:map-pin" class="mr-2 h-5 w-5 text-gray-400" />
                     <span class="text-gray-700">{{ user.address }}</span>
                   </div>
                 </div>
-                
+
                 <div class="mt-4 rounded-lg bg-gray-50 p-3">
                   <p class="text-sm text-gray-700">
-                    Esta es la información que el propietario puede ver sobre ti. Puedes actualizar tu perfil en la 
-                    <NuxtLink to="/perfil/configuracion" class="text-emerald-600 hover:text-emerald-700">
+                    Esta es la información que el propietario puede ver sobre ti. Puedes actualizar
+                    tu perfil en la
+                    <NuxtLink
+                      to="/perfil/configuracion"
+                      class="text-emerald-600 hover:text-emerald-700"
+                    >
                       configuración de tu cuenta
-                    </NuxtLink>.
+                    </NuxtLink>
+                    .
                   </p>
                 </div>
               </div>
@@ -504,28 +544,28 @@ onMounted(async () => {
 
   try {
     loading.value = true
-    
+
     // Cargar los detalles de la solicitud
     const adoptionData = await getAdoptionById(adoptionId)
-    
+
     if (!adoptionData) {
       error.value = 'No se encontró la solicitud de adopción'
       return
     }
-    
+
     // Verificar que la solicitud pertenece al usuario actual
     if (adoptionData.userId !== user.value.uid) {
       error.value = 'No tienes permiso para ver esta solicitud'
       return
     }
-    
+
     adoption.value = adoptionData
-    
+
     // Cargar los detalles de la mascota
     if (adoptionData.petId) {
       pet.value = await fetchPetById(adoptionData.petId)
     }
-    
+
     if (!pet.value) {
       error.value = 'No se encontró la mascota asociada a esta solicitud'
     }
@@ -545,16 +585,16 @@ const handleImageError = (event) => {
 // Formatear fecha
 const formatFullDate = (timestamp) => {
   if (!timestamp) return 'Fecha desconocida'
-  
+
   const date = new Date(timestamp)
-  
+
   return date.toLocaleString('es-ES', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   })
 }
 
@@ -620,22 +660,22 @@ const formatContactType = (type) => {
 const contactWhatsapp = () => {
   if (pet.value && pet.value.contact && pet.value.contact.phone) {
     let phoneNumber = pet.value.contact.phone.toString().trim()
-    
+
     // Eliminar el código de país si ya está presente
     if (phoneNumber.startsWith('+58')) {
       phoneNumber = phoneNumber.substring(3)
     } else if (phoneNumber.startsWith('58')) {
       phoneNumber = phoneNumber.substring(2)
     }
-    
+
     // Eliminar el 0 inicial si existe
     if (phoneNumber.startsWith('0')) {
       phoneNumber = phoneNumber.substring(1)
     }
-    
+
     // Asegurar que no hay espacios ni caracteres especiales
     phoneNumber = phoneNumber.replace(/[^0-9]/g, '')
-    
+
     // Abrir WhatsApp con el número procesado
     window.open(`https://wa.me/58${phoneNumber}`)
   }
@@ -653,7 +693,11 @@ const goBack = () => {
 // Obtener iniciales
 const getInitials = (name) => {
   if (!name) return 'U'
-  return name.split(' ').map(word => word.charAt(0).toUpperCase()).join('').substring(0, 2)
+  return name
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase())
+    .join('')
+    .substring(0, 2)
 }
 
 const showAlert = (title, message) => {
@@ -673,12 +717,12 @@ const confirmAdoption = () => {
   modalTitle.value = 'Confirmar adopción'
   modalMessage.value = `¿Estás seguro de que quieres confirmar la adopción de ${pet.value.name}? Esto marcará la mascota como adoptada y generará un certificado de adopción.`
   modalConfirmText.value = 'Confirmar'
-  
+
   confirmAction = async () => {
     try {
       loading.value = true
       showModal.value = false
-      
+
       // Completar la adopción y crear verificación
       const verificationId = await confirmAdoptionAndVerify(adoptionId, null, false)
 
@@ -694,7 +738,10 @@ const confirmAdoption = () => {
           pet.value.adoptionDate = Date.now()
         }
 
-        showAlert('¡Felicidades!', 'La adopción ha sido completada y verificada. Ahora puedes acceder al certificado de adopción.')
+        showAlert(
+          '¡Felicidades!',
+          'La adopción ha sido completada y verificada. Ahora puedes acceder al certificado de adopción.'
+        )
       } else {
         error.value = 'Error al completar la adopción'
       }

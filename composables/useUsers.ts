@@ -1,25 +1,17 @@
 import { ref } from 'vue'
 import {
-  getDatabase,
-  ref as dbRef,
-  get,
-  set,
-  update,
-  remove,
-  query,
-  orderByChild,
-} from 'firebase/database'
-import { useFirebaseApp } from 'vuefire'
-import {
   getAuth,
   createUserWithEmailAndPassword,
   updateProfile,
   deleteUser as firebaseDeleteUser,
   type UserCredential,
 } from 'firebase/auth'
+import { useFirebaseApp } from 'vuefire'
 import type { UserProfile, UserData } from '~/models/User'
 import { useAuth } from '~/composables/useAuth'
 import { useSecureLogger } from '~/composables/useSecureLogger'
+import { fetchData, updateData, deleteData, setData } from '~/utils/firebase'
+import { handleFirebaseError } from '~/utils/errorHandler'
 
 export function useUsers() {
   const users = ref<UserProfile[]>([])
@@ -36,7 +28,8 @@ export function useUsers() {
    */
   function checkAdminPermission(): boolean {
     if (!isAdmin.value) {
-      error.value = 'No tienes permisos para realizar esta operación. Se requiere rol de administrador.'
+      error.value =
+        'No tienes permisos para realizar esta operación. Se requiere rol de administrador.'
       logError('Intento de acceso a funcionalidad administrativa sin permisos')
       return false
     }
@@ -56,20 +49,13 @@ export function useUsers() {
         return []
       }
 
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
-      const usersRef = dbRef(db, 'users')
+      const rawData = await fetchData<Record<string, any>>('users')
 
-      // Obtenemos los usuarios
-      const snapshot = await get(usersRef)
-
-      if (snapshot.exists()) {
+      if (rawData) {
         const usersData: UserProfile[] = []
-        const rawData = snapshot.val()
 
         // Convertimos los datos en un array y añadimos el ID
-        for (const [id, data] of Object.entries(rawData)) {
-          const userData = data as any
+        for (const [id, userData] of Object.entries(rawData)) {
           usersData.push({
             id,
             displayName: userData.displayName || '',
@@ -81,7 +67,7 @@ export function useUsers() {
             address: userData.address || '',
             createdAt: userData.createdAt || 0,
             lastLogin: userData.lastLogin || 0,
-            postCount: await fetchUserPostCount(id, db),
+            postCount: await fetchUserPostCount(id),
           })
         }
 
@@ -92,8 +78,9 @@ export function useUsers() {
         return []
       }
     } catch (err: any) {
+      const errorMsg = handleFirebaseError(err)
       logError('Error al obtener usuarios:', err)
-      error.value = 'Error al cargar usuarios. Por favor, intenta de nuevo.'
+      error.value = errorMsg || 'Error al cargar usuarios'
       return []
     } finally {
       loading.value = false
@@ -103,17 +90,13 @@ export function useUsers() {
   /**
    * Obtiene el número de publicaciones de un usuario
    */
-  async function fetchUserPostCount(userId: string, db: any): Promise<number> {
+  async function fetchUserPostCount(userId: string): Promise<number> {
     try {
-      // Consulta para obtener mascotas publicadas por el usuario
-      const petsRef = dbRef(db, 'pets')
-      const userPetsQuery = query(petsRef, orderByChild('userId'))
+      const allPets = await fetchData<Record<string, any>>('pets')
 
-      const snapshot = await get(userPetsQuery)
-
-      if (snapshot.exists()) {
+      if (allPets) {
         // Filtramos las mascotas del usuario específico
-        const pets = Object.values(snapshot.val() || {}).filter((pet: any) => pet.userId === userId)
+        const pets = Object.values(allPets).filter((pet: any) => pet.userId === userId)
         return pets.length
       }
 
@@ -134,15 +117,9 @@ export function useUsers() {
     error.value = null
 
     try {
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
-      const userRef = dbRef(db, `users/${userId}`)
+      const userData = await fetchData<any>(`users/${userId}`)
 
-      const snapshot = await get(userRef)
-
-      if (snapshot.exists()) {
-        const userData = snapshot.val()
-
+      if (userData) {
         const userProfile: UserProfile = {
           id: userId,
           displayName: userData.displayName || '',
@@ -154,7 +131,7 @@ export function useUsers() {
           address: userData.address || '',
           createdAt: userData.createdAt || 0,
           lastLogin: userData.lastLogin || 0,
-          postCount: await fetchUserPostCount(userId, db),
+          postCount: await fetchUserPostCount(userId),
         }
 
         return userProfile
@@ -163,8 +140,9 @@ export function useUsers() {
         return null
       }
     } catch (err: any) {
+      const errorMsg = handleFirebaseError(err)
       logError(`Error al obtener usuario ${userId}:`, err)
-      error.value = 'Error al cargar usuario. Por favor, intenta de nuevo.'
+      error.value = errorMsg || 'Error al cargar usuario'
       return null
     } finally {
       loading.value = false
@@ -208,8 +186,6 @@ export function useUsers() {
       }
 
       // Guardar datos adicionales en Realtime Database
-      const userRef = dbRef(db, `users/${user.uid}`)
-
       const additionalData = {
         email: userData.email || '',
         displayName: userData.displayName || '',
@@ -222,7 +198,7 @@ export function useUsers() {
         lastLogin: Date.now(),
       }
 
-      await set(userRef, additionalData)
+      await setData(`users/${user.uid}`, additionalData)
 
       // Actualizar el estado local
       const newUser: UserProfile = {
@@ -243,19 +219,9 @@ export function useUsers() {
 
       return user.uid
     } catch (err: any) {
+      const errorMsg = handleFirebaseError(err)
       logError('Error al crear usuario:', err)
-
-      // Manejar errores específicos de Firebase Auth
-      if (err.code === 'auth/email-already-in-use') {
-        error.value = 'El correo electrónico ya está en uso.'
-      } else if (err.code === 'auth/invalid-email') {
-        error.value = 'El formato del correo electrónico no es válido.'
-      } else if (err.code === 'auth/weak-password') {
-        error.value = 'La contraseña debe tener al menos 6 caracteres.'
-      } else {
-        error.value = 'Error al crear usuario. Por favor, intenta de nuevo.'
-      }
-
+      error.value = errorMsg || 'Error al crear usuario'
       return null
     } finally {
       loading.value = false
@@ -275,37 +241,34 @@ export function useUsers() {
         return false
       }
 
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
-      const userRef = dbRef(db, `users/${userId}`)
-
       // Solo actualizamos los campos proporcionados
-      const updateData: any = {}
+      const updatePayload: any = {}
 
-      if (userData.displayName !== undefined) updateData.displayName = userData.displayName
-      if (userData.photoURL !== undefined) updateData.photoURL = userData.photoURL
-      if (userData.role !== undefined) updateData.role = userData.role
-      if (userData.status !== undefined) updateData.status = userData.status
-      if (userData.phone !== undefined) updateData.phoneNumber = userData.phone
-      if (userData.address !== undefined) updateData.address = userData.address
+      if (userData.displayName !== undefined) updatePayload.displayName = userData.displayName
+      if (userData.photoURL !== undefined) updatePayload.photoURL = userData.photoURL
+      if (userData.role !== undefined) updatePayload.role = userData.role
+      if (userData.status !== undefined) updatePayload.status = userData.status
+      if (userData.phone !== undefined) updatePayload.phoneNumber = userData.phone
+      if (userData.address !== undefined) updatePayload.address = userData.address
 
       // Actualizar en la base de datos
-      await update(userRef, updateData)
+      await updateData(`users/${userId}`, updatePayload)
 
       // Actualizar el estado local
       const index = users.value.findIndex((u) => u.id === userId)
       if (index !== -1) {
         users.value[index] = {
           ...users.value[index],
-          ...updateData,
-          phone: updateData.phoneNumber || users.value[index].phone,
+          ...updatePayload,
+          phone: updatePayload.phoneNumber || users.value[index].phone,
         }
       }
 
       return true
     } catch (err: any) {
+      const errorMsg = handleFirebaseError(err)
       logError(`Error al actualizar usuario (${userId}):`, err)
-      error.value = 'Error al actualizar usuario. Por favor, intenta de nuevo.'
+      error.value = errorMsg || 'Error al actualizar usuario'
       return false
     } finally {
       loading.value = false
@@ -342,12 +305,8 @@ export function useUsers() {
         return false
       }
 
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
-      const userRef = dbRef(db, `users/${userId}`)
-
       // Eliminamos de Realtime Database
-      await remove(userRef)
+      await deleteData(`users/${userId}`)
 
       // Nota: No podemos eliminar el usuario de Firebase Auth directamente
       // desde el cliente debido a restricciones de seguridad
@@ -357,8 +316,9 @@ export function useUsers() {
 
       return true
     } catch (err: any) {
+      const errorMsg = handleFirebaseError(err)
       logError(`Error al eliminar usuario (${userId}):`, err)
-      error.value = 'Error al eliminar usuario. Por favor, intenta de nuevo.'
+      error.value = errorMsg || 'Error al eliminar usuario'
       return false
     } finally {
       loading.value = false

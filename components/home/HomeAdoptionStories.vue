@@ -1,7 +1,7 @@
 <template>
-  <section class="pt-10 md:pt-12 bg-emerald-600">
-    <div class="py-4 container mx-auto px-4">
-      <div class="mb-8 text-center pt-4">
+  <section class="bg-emerald-600 pt-10 md:pt-12">
+    <div class="container mx-auto px-4 py-4">
+      <div class="mb-8 pt-4 text-center">
         <h2 class="mb-2 text-2xl font-bold text-[#FEFFFA] md:text-3xl">Historias de adopción</h2>
         <p class="mx-auto max-w-2xl text-base text-emerald-50">
           Conoce las inspiradoras historias de mascotas que encontraron un hogar gracias a nuestra
@@ -42,8 +42,6 @@
         </NuxtLink>
       </div>
     </div>
-
- 
   </section>
 </template>
 

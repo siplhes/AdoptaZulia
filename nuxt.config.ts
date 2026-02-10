@@ -9,7 +9,7 @@ export default defineNuxtConfig({
 
   experimental: {
     typescriptPlugin: true,
-    extractAsyncDataHandlers: true, 
+    extractAsyncDataHandlers: true,
   },
 
   modules: [
@@ -63,64 +63,59 @@ export default defineNuxtConfig({
       measurementId: process.env.FIREBASE_MEASUREMENT_ID,
       databaseURL: process.env.FIREBASE_DATABASE_URL,
     },
- admin: {
+    admin: {
       // AQUÍ ESTÁ LA CLAVE:
       // Si existe la variable, la parseamos. Si no, undefined (para evitar error en build)
-       serviceAccount: process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON 
-         ? JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON) 
-         : undefined,
-     },
-   },
- 
- 
- 
-   plugins: ['~/plugins/firebase.ts'],
-   tailwindcss: {
-     exposeConfig: true,
-   },
-   app: {
-     head: {
-       title: 'Adopta Zulia',
-       meta: [
-         { charset: 'utf-8' },
-         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      serviceAccount: process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON
+        ? JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON)
+        : undefined,
+    },
+  },
+
+  plugins: ['~/plugins/firebase.ts'],
+  tailwindcss: {
+    exposeConfig: true,
+  },
+  app: {
+    head: {
+      title: 'Adopta Zulia',
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         {
           name: 'Content-Security-Policy',
-          content: process.env.NODE_ENV === 'production'
-            ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://firebaseio.com https://*.firebaseio.com https://www.google-analytics.com; frame-src 'self' https://www.paypal.com; object-src 'none';"
-            : "default-src 'self' 'unsafe-inline' 'unsafe-eval' *"
-        }
+          content:
+            process.env.NODE_ENV === 'production'
+              ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://firebaseio.com https://*.firebaseio.com https://www.google-analytics.com; frame-src 'self' https://www.paypal.com; object-src 'none';"
+              : "default-src 'self' 'unsafe-inline' 'unsafe-eval' *",
+        },
       ],
       link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
     },
   },
   image: {
-    domains: [
-      process.env.AWS_S3_BUCKET_DOMAIN
-    ],
+    domains: [process.env.AWS_S3_BUCKET_DOMAIN],
     ipx: {
       remote: {
-        domains: [
-          process.env.AWS_S3_BUCKET_DOMAIN
-        ]
-      }
-    }
+        domains: [process.env.AWS_S3_BUCKET_DOMAIN],
+      },
+    },
   },
   booster: {
     detection: {
       performance: true,
-      browserSupport: true
+      browserSupport: true,
     },
   },
   performanceMetrics: {
     device: {
       hardwareConcurrency: { min: 2, max: 48 },
-      deviceMemory: { min: 2 }
+      deviceMemory: { min: 2 },
     },
     timing: {
       fcp: 800,
-      dcl: 1200
-    }
+      dcl: 1200,
+    },
   },
 
   nitro: {
@@ -133,10 +128,8 @@ export default defineNuxtConfig({
           'X-XSS-Protection': '1; mode=block',
           'Referrer-Policy': 'strict-origin-when-cross-origin',
           'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
-        }
-      }
-    }
+        },
+      },
+    },
   },
-
-
 })

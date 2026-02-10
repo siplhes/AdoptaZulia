@@ -33,8 +33,10 @@
           <span
             v-if="tab.count > 0"
             :class="[
-              'ml-2 rounded-full py-0.5 px-2 text-xs',
-              activeTab === tab.id ? 'bg-emerald-200 text-emerald-800' : 'bg-gray-100 text-gray-600'
+              'ml-2 rounded-full px-2 py-0.5 text-xs',
+              activeTab === tab.id
+                ? 'bg-emerald-200 text-emerald-800'
+                : 'bg-gray-100 text-gray-600',
             ]"
           >
             {{ tab.count }}
@@ -54,17 +56,22 @@
             type="text"
             placeholder="Buscar por nombre de mascota, solicitante o email..."
             class="w-full rounded-xl border border-gray-200 bg-white py-3 pl-10 pr-4 shadow-sm transition-all focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
-          >
+          />
         </div>
       </div>
 
       <!-- Adoptions List (Responsive Grid) -->
       <div>
         <div v-if="loading" class="flex justify-center py-12">
-          <div class="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-emerald-600" />
+          <div
+            class="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-emerald-600"
+          />
         </div>
 
-        <div v-else-if="filteredAdoptions.length === 0" class="flex flex-col items-center justify-center rounded-2xl bg-white py-16 text-center shadow-sm">
+        <div
+          v-else-if="filteredAdoptions.length === 0"
+          class="flex flex-col items-center justify-center rounded-2xl bg-white py-16 text-center shadow-sm"
+        >
           <div class="mb-4 rounded-full bg-gray-50 p-4">
             <Icon name="mdi:clipboard-text-off-outline" class="h-8 w-8 text-gray-400" />
           </div>
@@ -76,113 +83,122 @@
           <div
             v-for="adoption in paginatedAdoptions"
             :key="adoption.id"
-            class="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-md border border-gray-100"
+            class="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
           >
             <!-- Badge de estado -->
-             <div class="absolute right-3 top-3 z-10">
-               <span 
+            <div class="absolute right-3 top-3 z-10">
+              <span
                 :class="[
-                  'px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-sm backdrop-blur-md',
-                  statusColors[adoption.status]
+                  'rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-wider shadow-sm backdrop-blur-md',
+                  statusColors[adoption.status],
                 ]"
-               >
-                 {{ statusLabels[adoption.status] }}
-               </span>
-             </div>
+              >
+                {{ statusLabels[adoption.status] }}
+              </span>
+            </div>
 
             <!-- Pet Image Header -->
             <div class="relative h-48 bg-gray-100">
-               <NuxtImg
-                  v-if="adoption.pet?.imageUrl"
-                  :src="adoption.pet.imageUrl"
-                  class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  loading="lazy"
-               />
-               <div v-else class="flex h-full w-full items-center justify-center text-gray-300">
-                 <Icon name="mdi:image-off" class="h-12 w-12" />
-               </div>
-               
-               <!-- Gradient Overlay -->
-               <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-               
-               <!-- Pet Name on Image -->
-               <div class="absolute bottom-3 left-4 text-white">
-                 <h3 class="text-xl font-bold leading-tight">{{ adoption.pet?.name || 'Mascota' }}</h3>
-                 <p class="text-xs opacity-90">{{ adoption.pet?.breed || 'Raza desconocida' }}</p>
-               </div>
+              <NuxtImg
+                v-if="adoption.pet?.imageUrl"
+                :src="adoption.pet.imageUrl"
+                class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
+              <div v-else class="flex h-full w-full items-center justify-center text-gray-300">
+                <Icon name="mdi:image-off" class="h-12 w-12" />
+              </div>
+
+              <!-- Gradient Overlay -->
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+
+              <!-- Pet Name on Image -->
+              <div class="absolute bottom-3 left-4 text-white">
+                <h3 class="text-xl font-bold leading-tight">
+                  {{ adoption.pet?.name || 'Mascota' }}
+                </h3>
+                <p class="text-xs opacity-90">{{ adoption.pet?.breed || 'Raza desconocida' }}</p>
+              </div>
             </div>
 
             <!-- Applicant Info -->
             <div class="flex-1 p-5">
               <div class="mb-4 flex items-center gap-3">
-                 <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100 font-bold text-emerald-700">
-                    {{ (adoption.user?.name || '?').charAt(0).toUpperCase() }}
-                 </div>
-                 <div class="min-w-0 flex-1">
-                    <p class="truncate text-sm font-bold text-gray-900">{{ adoption.user?.name || 'Usuario' }}</p>
-                    <p class="truncate text-xs text-gray-500">{{ adoption.user?.email }}</p>
-                 </div>
+                <div
+                  class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100 font-bold text-emerald-700"
+                >
+                  {{ (adoption.user?.name || '?').charAt(0).toUpperCase() }}
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-sm font-bold text-gray-900">
+                    {{ adoption.user?.name || 'Usuario' }}
+                  </p>
+                  <p class="truncate text-xs text-gray-500">{{ adoption.user?.email }}</p>
+                </div>
               </div>
-              
+
               <div class="space-y-2 text-sm text-gray-600">
-                 <div class="flex items-center gap-2">
-                    <Icon name="heroicons:calendar" class="h-4 w-4 text-gray-400" />
-                    <span>{{ formatDate(adoption.createdAt) }}</span>
-                 </div>
-                 <div class="flex items-center gap-2">
-                    <Icon name="heroicons:chat-bubble-left-ellipsis" class="h-4 w-4 text-gray-400" />
-                    <span class="truncate italic">"{{ adoption.message || 'Sin mensaje' }}"</span>
-                 </div>
+                <div class="flex items-center gap-2">
+                  <Icon name="heroicons:calendar" class="h-4 w-4 text-gray-400" />
+                  <span>{{ formatDate(adoption.createdAt) }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <Icon name="heroicons:chat-bubble-left-ellipsis" class="h-4 w-4 text-gray-400" />
+                  <span class="truncate italic">"{{ adoption.message || 'Sin mensaje' }}"</span>
+                </div>
               </div>
             </div>
 
             <!-- Actions Footer -->
             <div class="border-t border-gray-100 bg-gray-50 p-4">
               <div v-if="adoption.status === 'pending'" class="grid grid-cols-2 gap-3">
-                 <button
-                    class="flex items-center justify-center gap-2 rounded-lg border border-red-200 bg-white py-2 text-sm font-bold text-red-600 transition-colors hover:bg-red-50 hover:border-red-300"
-                    @click="rejectAdoption(adoption)"
-                 >
-                    <Icon name="heroicons:x-mark" class="h-4 w-4" />
-                    Rechazar
-                 </button>
-                 <button
-                    class="flex items-center justify-center gap-2 rounded-lg bg-emerald-600 py-2 text-sm font-bold text-white transition-colors hover:bg-emerald-700 shadow-sm"
-                    @click="approveAdoption(adoption)"
-                 >
-                    <Icon name="heroicons:check" class="h-4 w-4" />
-                    Aprobar
-                 </button>
+                <button
+                  class="flex items-center justify-center gap-2 rounded-lg border border-red-200 bg-white py-2 text-sm font-bold text-red-600 transition-colors hover:border-red-300 hover:bg-red-50"
+                  @click="rejectAdoption(adoption)"
+                >
+                  <Icon name="heroicons:x-mark" class="h-4 w-4" />
+                  Rechazar
+                </button>
+                <button
+                  class="flex items-center justify-center gap-2 rounded-lg bg-emerald-600 py-2 text-sm font-bold text-white shadow-sm transition-colors hover:bg-emerald-700"
+                  @click="approveAdoption(adoption)"
+                >
+                  <Icon name="heroicons:check" class="h-4 w-4" />
+                  Aprobar
+                </button>
               </div>
-              
-               <div v-else-if="adoption.status === 'approved'" class="grid grid-cols-1">
-                 <button
-                    class="flex items-center justify-center gap-2 rounded-lg bg-blue-600 py-2 text-sm font-bold text-white transition-colors hover:bg-blue-700 shadow-sm"
-                    @click="completeAdoption(adoption)"
-                 >
-                    <Icon name="mdi:home-heart" class="h-4 w-4" />
-                    Finalizar Adopción
-                 </button>
+
+              <div v-else-if="adoption.status === 'approved'" class="grid grid-cols-1">
+                <button
+                  class="flex items-center justify-center gap-2 rounded-lg bg-blue-600 py-2 text-sm font-bold text-white shadow-sm transition-colors hover:bg-blue-700"
+                  @click="completeAdoption(adoption)"
+                >
+                  <Icon name="mdi:home-heart" class="h-4 w-4" />
+                  Finalizar Adopción
+                </button>
               </div>
 
               <div v-else class="grid grid-cols-1">
-                 <button
-                    class="flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
-                    @click="viewDetails(adoption)"
-                 >
-                    <Icon name="heroicons:eye" class="h-4 w-4" />
-                    Ver Detalles Completos
-                 </button>
+                <button
+                  class="flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
+                  @click="viewDetails(adoption)"
+                >
+                  <Icon name="heroicons:eye" class="h-4 w-4" />
+                  Ver Detalles Completos
+                </button>
               </div>
-              
+
               <!-- Secondary Action for Pending/Approved (View Details) -->
-              <div v-if="['pending', 'approved'].includes(adoption.status)" class="mt-3 text-center">
-                 <button 
+              <div
+                v-if="['pending', 'approved'].includes(adoption.status)"
+                class="mt-3 text-center"
+              >
+                <button
                   class="text-xs font-semibold text-gray-500 hover:text-emerald-600 hover:underline"
                   @click="viewDetails(adoption)"
-                 >
-                    Ver detalles completos
-                 </button>
+                >
+                  Ver detalles completos
+                </button>
               </div>
             </div>
           </div>
@@ -190,52 +206,52 @@
 
         <!-- Pagination (Preserved but styled) -->
         <div
-            v-if="filteredAdoptions.length > 0"
-            class="mt-8 flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6"
-          >
-            <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-              <div>
-                <p class="text-sm text-gray-700">
-                  Mostrando
-                  <span class="font-medium">{{ paginationStart + 1 }}</span>
-                  a
-                  <span class="font-medium">{{ paginationEnd }}</span>
-                  de
-                  <span class="font-medium">{{ filteredAdoptions.length }}</span>
-                  resultados
-                </p>
-              </div>
-              <div>
-                <nav
-                  class="isolate inline-flex -space-x-px rounded-md shadow-sm"
-                  aria-label="Pagination"
+          v-if="filteredAdoptions.length > 0"
+          class="mt-8 flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6"
+        >
+          <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+            <div>
+              <p class="text-sm text-gray-700">
+                Mostrando
+                <span class="font-medium">{{ paginationStart + 1 }}</span>
+                a
+                <span class="font-medium">{{ paginationEnd }}</span>
+                de
+                <span class="font-medium">{{ filteredAdoptions.length }}</span>
+                resultados
+              </p>
+            </div>
+            <div>
+              <nav
+                class="isolate inline-flex -space-x-px rounded-md shadow-sm"
+                aria-label="Pagination"
+              >
+                <button
+                  :disabled="currentPage === 1"
+                  :class="[
+                    'relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700',
+                    currentPage === 1 ? 'cursor-not-allowed opacity-50' : 'hover:bg-gray-50',
+                  ]"
+                  @click="prevPage"
                 >
-                  <button
-                    :disabled="currentPage === 1"
-                    :class="[
-                      'relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700',
-                      currentPage === 1 ? 'cursor-not-allowed opacity-50' : 'hover:bg-gray-50',
-                    ]"
-                    @click="prevPage"
-                  >
-                    <Icon name="heroicons:chevron-left" class="h-5 w-5" />
-                  </button>
-                  <button
-                    :disabled="currentPage === totalPages"
-                    :class="[
-                      'relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700',
-                      currentPage === totalPages
-                        ? 'cursor-not-allowed opacity-50'
-                        : 'hover:bg-gray-50',
-                    ]"
-                    @click="nextPage"
-                  >
-                    <Icon name="heroicons:chevron-right" class="h-5 w-5" />
-                  </button>
-                </nav>
-              </div>
+                  <Icon name="heroicons:chevron-left" class="h-5 w-5" />
+                </button>
+                <button
+                  :disabled="currentPage === totalPages"
+                  :class="[
+                    'relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700',
+                    currentPage === totalPages
+                      ? 'cursor-not-allowed opacity-50'
+                      : 'hover:bg-gray-50',
+                  ]"
+                  @click="nextPage"
+                >
+                  <Icon name="heroicons:chevron-right" class="h-5 w-5" />
+                </button>
+              </nav>
             </div>
           </div>
+        </div>
       </div>
 
       <!-- Adoption Details Modal -->
@@ -377,7 +393,7 @@
               v-model="adminNotes"
               class="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-emerald-500"
               placeholder="Añadir notas administrativas..."
-            >
+            />
 
             <button
               class="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
@@ -418,7 +434,7 @@ import ModalAlert from '~/components/common/ModalAlert.vue'
 // Verificar si el usuario es administrador
 definePageMeta({
   middleware: ['admin'],
-  layout: 'default'
+  layout: 'admin',
 })
 
 // Usar el composable de adopciones
@@ -427,6 +443,7 @@ const {
   loading,
   error,
   fetchAllAdoptions,
+  fetchAllAdoptionsRaw,
   updateAdoptionStatus,
   updateAdoptionNotes,
 } = useAdoptions()
@@ -436,11 +453,11 @@ const searchQuery = ref('')
 const activeTab = ref('pending')
 
 const tabs = computed(() => {
-  const pending = allAdoptions.value.filter(a => a.status === 'pending').length
-  const approved = allAdoptions.value.filter(a => a.status === 'approved').length
-  const rejected = allAdoptions.value.filter(a => a.status === 'rejected').length
-  const completed = allAdoptions.value.filter(a => a.status === 'completed').length
-  
+  const pending = allAdoptions.value.filter((a) => a.status === 'pending').length
+  const approved = allAdoptions.value.filter((a) => a.status === 'approved').length
+  const rejected = allAdoptions.value.filter((a) => a.status === 'rejected').length
+  const completed = allAdoptions.value.filter((a) => a.status === 'completed').length
+
   return [
     { id: 'all', name: 'Todas', count: allAdoptions.value.length },
     { id: 'pending', name: 'Pendientes', count: pending },
@@ -467,11 +484,16 @@ const statusColors = {
 const emptyMessage = computed(() => {
   if (searchQuery.value) return 'Intenta con otros términos de búsqueda.'
   switch (activeTab.value) {
-    case 'pending': return 'No tienes solicitudes pendientes por revisar. ¡Buen trabajo!'
-    case 'approved': return 'No hay adopciones en curso actualmente.'
-    case 'rejected': return 'No hay solicitudes rechazadas.'
-    case 'completed': return 'Aún no se ha completado ninguna adopción.'
-    default: return 'No hay solicitudes registradas.'
+    case 'pending':
+      return 'No tienes solicitudes pendientes por revisar. ¡Buen trabajo!'
+    case 'approved':
+      return 'No hay adopciones en curso actualmente.'
+    case 'rejected':
+      return 'No hay solicitudes rechazadas.'
+    case 'completed':
+      return 'Aún no se ha completado ninguna adopción.'
+    default:
+      return 'No hay solicitudes registradas.'
   }
 })
 
@@ -497,7 +519,8 @@ watch([activeTab, searchQuery], () => {
 // Obtener adopciones
 const loadAdoptions = async () => {
   try {
-    await fetchAllAdoptions()
+    // Usar RAW para ver todo (incluyendo test data)
+    await fetchAllAdoptionsRaw()
   } catch (err) {
     console.error('Error loading adoptions:', err)
   }
@@ -508,10 +531,11 @@ const filteredAdoptions = computed(() => {
   return allAdoptions.value.filter((adoption) => {
     // Filtrar por búsqueda
     const term = searchQuery.value.toLowerCase()
-    const searchMatch = !term || 
-        adoption.pet?.name?.toLowerCase().includes(term) ||
-        adoption.user?.name?.toLowerCase().includes(term) ||
-        adoption.user?.email?.toLowerCase().includes(term)
+    const searchMatch =
+      !term ||
+      adoption.pet?.name?.toLowerCase().includes(term) ||
+      adoption.user?.name?.toLowerCase().includes(term) ||
+      adoption.user?.email?.toLowerCase().includes(term)
 
     // Filtrar por tab
     const statusMatch = activeTab.value === 'all' || adoption.status === activeTab.value
@@ -523,11 +547,19 @@ const filteredAdoptions = computed(() => {
 // Paginación
 const totalPages = computed(() => Math.ceil(filteredAdoptions.value.length / pageSize))
 const paginationStart = computed(() => (currentPage.value - 1) * pageSize)
-const paginationEnd = computed(() => Math.min(paginationStart.value + pageSize, filteredAdoptions.value.length))
-const paginatedAdoptions = computed(() => filteredAdoptions.value.slice(paginationStart.value, paginationEnd.value))
+const paginationEnd = computed(() =>
+  Math.min(paginationStart.value + pageSize, filteredAdoptions.value.length)
+)
+const paginatedAdoptions = computed(() =>
+  filteredAdoptions.value.slice(paginationStart.value, paginationEnd.value)
+)
 
-const nextPage = () => { if (currentPage.value < totalPages.value) currentPage.value++ }
-const prevPage = () => { if (currentPage.value > 1) currentPage.value-- }
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) currentPage.value++
+}
+const prevPage = () => {
+  if (currentPage.value > 1) currentPage.value--
+}
 
 // Acciones
 const approveAdoption = async (adoption) => {
@@ -535,7 +567,7 @@ const approveAdoption = async (adoption) => {
   modalTitle.value = 'Aprobar adopción'
   modalMessage.value = `¿Aprobar solicitud de ${adoption.user?.name} para ${adoption.pet?.name}?`
   modalConfirmText.value = 'Sí, Aprobar'
-  
+
   confirmAction = async () => {
     showModal.value = false
     await updateAdoptionStatus(adoption.id, 'approved')
@@ -548,7 +580,7 @@ const rejectAdoption = async (adoption) => {
   modalTitle.value = 'Rechazar adopción'
   modalMessage.value = `¿Estás seguro de rechazar esta solicitud? Esta acción no se puede deshacer.`
   modalConfirmText.value = 'Rechazar'
-  
+
   confirmAction = async () => {
     showModal.value = false
     await updateAdoptionStatus(adoption.id, 'rejected')
@@ -561,7 +593,7 @@ const completeAdoption = async (adoption) => {
   modalTitle.value = 'Finalizar Adopción'
   modalMessage.value = `¿Confirmas que ${adoption.pet?.name} ha sido entregado a ${adoption.user?.name}?`
   modalConfirmText.value = '¡Sí, Adoptado!'
-  
+
   confirmAction = async () => {
     showModal.value = false
     await updateAdoptionStatus(adoption.id, 'completed')
@@ -582,7 +614,9 @@ const saveNotes = async () => {
 const formatDate = (timestamp) => {
   if (!timestamp) return 'N/A'
   return new Date(timestamp).toLocaleDateString('es-ES', {
-    day: 'numeric', month: 'short', year: 'numeric'
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
   })
 }
 

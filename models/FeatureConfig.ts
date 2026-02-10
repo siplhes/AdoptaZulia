@@ -15,6 +15,6 @@ export interface FeatureConfig {
 export const DEFAULT_FEATURES: FeatureConfig = {
   favorites: false,
   comments: false,
-  imageGeneration: false,
+  imageGeneration: true,
   adoption: true,
 }

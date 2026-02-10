@@ -1,19 +1,21 @@
 <template>
-  <header class="sticky top-0 z-50 bg-emerald-700/95 backdrop-blur-md shadow-lg transition-all duration-300">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3">
+  <header
+    class="sticky top-0 z-50 bg-emerald-700/95 shadow-lg backdrop-blur-md transition-all duration-300"
+  >
+    <div class="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between">
         <!-- Logo -->
         <NuxtLink to="/" class="group flex items-center gap-3 transition-transform hover:scale-105">
-          <NuxtPicture 
-            src="/logo.svg" 
-            class="h-10 w-10 lg:h-12 lg:w-12 drop-shadow-md" 
-            loading="eager" 
-            alt="Adopta Zulia Logo" 
-            width="48" 
-            height="48" 
-            placeholder 
+          <NuxtPicture
+            src="/logo.svg"
+            class="h-10 w-10 drop-shadow-md lg:h-12 lg:w-12"
+            loading="eager"
+            alt="Adopta Zulia Logo"
+            width="48"
+            height="48"
+            placeholder
           />
-          <h1 class="text-xl font-bold tracking-tight text-white md:text-2xl drop-shadow-sm">
+          <h1 class="text-xl font-bold tracking-tight text-white drop-shadow-sm md:text-2xl">
             Adopta Zulia
           </h1>
         </NuxtLink>
@@ -29,35 +31,50 @@
           >
             {{ link.name }}
             <!-- Active Indicator -->
-            <span v-if="$route.path === link.link" class="absolute -bottom-1 left-0 h-0.5 w-full bg-amber-400 rounded-full shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
+            <span
+              v-if="$route.path === link.link"
+              class="absolute -bottom-1 left-0 h-0.5 w-full rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]"
+            />
           </NuxtLink>
 
           <!-- Auth Section -->
-          <div v-if="isAuthenticated" class="relative flex items-center ml-4 pl-4 border-l border-emerald-600/50">
-            <NotificationsPanel class="mr-4 text-emerald-200 hover:text-white transition-colors" />
-            
+          <div
+            v-if="isAuthenticated"
+            class="relative ml-4 flex items-center border-l border-emerald-600/50 pl-4"
+          >
+            <NotificationsPanel class="mr-4 text-emerald-200 transition-colors hover:text-white" />
+
             <div class="relative">
-              <button 
-                class="flex items-center gap-2 rounded-full focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-emerald-700 transition-all hover:ring-2 hover:ring-emerald-500"
+              <button
+                class="flex items-center gap-2 rounded-full transition-all hover:ring-2 hover:ring-emerald-500 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 focus:ring-offset-emerald-700"
                 aria-haspopup="true"
                 aria-expanded="userMenuOpen"
-                @click="toggleUserMenu" 
+                @click="toggleUserMenu"
               >
-                <div class="h-9 w-9 overflow-hidden rounded-full border-2 border-amber-400 shadow-sm bg-emerald-800">
-                  <NuxtImg 
-                    v-if="user?.photoURL" 
-                    :src="user.photoURL" 
-                    :alt="user.displayName || 'Usuario'" 
+                <div
+                  class="h-9 w-9 overflow-hidden rounded-full border-2 border-amber-400 bg-emerald-800 shadow-sm"
+                >
+                  <NuxtImg
+                    v-if="user?.photoURL"
+                    :src="user.photoURL"
+                    :alt="user.displayName || 'Usuario'"
                     class="h-full w-full object-cover"
                     loading="lazy"
                     sizes="36px"
                     placeholder
                   />
-                  <div v-else class="flex h-full w-full items-center justify-center text-xs font-bold text-white">
+                  <div
+                    v-else
+                    class="flex h-full w-full items-center justify-center text-xs font-bold text-white"
+                  >
                     {{ getInitials(user.displayName || user.email || 'U') }}
                   </div>
                 </div>
-                <Icon name="heroicons:chevron-down" class="h-4 w-4 text-emerald-200" :class="{ 'rotate-180': userMenuOpen }" />
+                <Icon
+                  name="heroicons:chevron-down"
+                  class="h-4 w-4 text-emerald-200"
+                  :class="{ 'rotate-180': userMenuOpen }"
+                />
               </button>
 
               <!-- User Dropdown -->
@@ -69,9 +86,9 @@
                 leave-from-class="transform opacity-100 scale-100"
                 leave-to-class="transform opacity-0 scale-95"
               >
-                <div 
+                <div
                   v-show="userMenuOpen"
-                  class="absolute right-0 top-12 mt-2 w-56 origin-top-right rounded-xl bg-white py-2 shadow-xl ring-1 ring-black/5 focus:outline-none z-50 divide-y divide-gray-100"
+                  class="absolute right-0 top-12 z-50 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-xl bg-white py-2 shadow-xl ring-1 ring-black/5 focus:outline-none"
                   role="menu"
                 >
                   <div class="px-4 py-3">
@@ -80,30 +97,36 @@
                   </div>
 
                   <div class="py-1">
-                    <NuxtLink 
-                      :to="profileRoute" 
-                      class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700" 
+                    <NuxtLink
+                      :to="profileRoute"
+                      class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700"
                       role="menuitem"
                       @click="userMenuOpen = false"
                     >
-                      <Icon name="heroicons:user" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-emerald-500" />
+                      <Icon
+                        name="heroicons:user"
+                        class="mr-3 h-4 w-4 text-gray-400 group-hover:text-emerald-500"
+                      />
                       Mi perfil
                     </NuxtLink>
-                    <NuxtLink 
-                      to="/mis-publicaciones" 
-                      class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700" 
+                    <NuxtLink
+                      to="/mis-publicaciones"
+                      class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700"
                       role="menuitem"
                       @click="userMenuOpen = false"
                     >
-                      <Icon name="heroicons:photo" class="mr-3 h-4 w-4 text-gray-400 group-hover:text-emerald-500" />
+                      <Icon
+                        name="heroicons:photo"
+                        class="mr-3 h-4 w-4 text-gray-400 group-hover:text-emerald-500"
+                      />
                       Mis publicaciones
                     </NuxtLink>
                   </div>
 
                   <div v-if="isAdmin" class="py-1">
-                    <NuxtLink 
-                      to="/admin" 
-                      class="flex items-center px-4 py-2 text-sm text-purple-700 hover:bg-purple-50" 
+                    <NuxtLink
+                      to="/admin"
+                      class="flex items-center px-4 py-2 text-sm text-purple-700 hover:bg-purple-50"
                       role="menuitem"
                       @click="userMenuOpen = false"
                     >
@@ -113,12 +136,15 @@
                   </div>
 
                   <div class="py-1">
-                    <button 
-                      class="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50" 
+                    <button
+                      class="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                       role="menuitem"
                       @click="handleLogout"
                     >
-                      <Icon name="heroicons:arrow-right-on-rectangle" class="mr-3 h-4 w-4 text-red-400" />
+                      <Icon
+                        name="heroicons:arrow-right-on-rectangle"
+                        class="mr-3 h-4 w-4 text-red-400"
+                      />
                       Cerrar sesión
                     </button>
                   </div>
@@ -126,27 +152,27 @@
               </transition>
             </div>
           </div>
-          
-          <div v-else class="flex gap-4 items-center">
-             <NuxtLink 
-                to="/login" 
-                class="text-sm font-medium text-emerald-100 hover:text-white transition-colors"
-              >
-                Iniciar sesión
-              </NuxtLink>
-              <NuxtLink 
-                to="/registro" 
-                class="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-emerald-400 transition-all hover:shadow-emerald-500/30"
-              >
-                Registrarse
-              </NuxtLink>
+
+          <div v-else class="flex items-center gap-4">
+            <NuxtLink
+              to="/login"
+              class="text-sm font-medium text-emerald-100 transition-colors hover:text-white"
+            >
+              Iniciar sesión
+            </NuxtLink>
+            <NuxtLink
+              to="/registro"
+              class="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-bold text-white shadow-sm transition-all hover:bg-emerald-400 hover:shadow-emerald-500/30"
+            >
+              Registrarse
+            </NuxtLink>
           </div>
         </nav>
 
         <!-- Mobile Menu Button -->
         <button
           type="button"
-          class="inline-flex items-center justify-center rounded-lg p-2 text-emerald-100 hover:bg-emerald-800 transition-colors lg:hidden"
+          class="inline-flex items-center justify-center rounded-lg p-2 text-emerald-100 transition-colors hover:bg-emerald-800 lg:hidden"
           :aria-expanded="isMenuOpen"
           @click="isMenuOpen = !isMenuOpen"
         >
@@ -166,13 +192,16 @@
       leave-from-class="translate-y-0 opacity-100"
       leave-to-class="-translate-y-2 opacity-0"
     >
-      <div v-if="isMenuOpen" class="absolute inset-x-0 top-full border-t border-emerald-600 bg-emerald-800 shadow-xl lg:hidden max-h-[90vh] overflow-y-auto">
+      <div
+        v-if="isMenuOpen"
+        class="absolute inset-x-0 top-full max-h-[90vh] overflow-y-auto border-t border-emerald-600 bg-emerald-800 shadow-xl lg:hidden"
+      >
         <div class="space-y-1 px-4 py-6">
           <NuxtLink
             v-for="(link, index) in navigationLinks"
             :key="index"
             :to="link.link"
-            class="block rounded-lg px-4 py-3 text-base font-medium text-emerald-50 hover:bg-emerald-700 hover:text-white transition-colors"
+            class="block rounded-lg px-4 py-3 text-base font-medium text-emerald-50 transition-colors hover:bg-emerald-700 hover:text-white"
             active-class="bg-emerald-900/50 text-white font-bold"
             @click="isMenuOpen = false"
           >
@@ -191,7 +220,7 @@
             </NuxtLink>
             <NuxtLink
               to="/registro"
-              class="block mt-2 rounded-lg bg-amber-500 px-4 py-3 text-center text-base font-bold text-white hover:bg-amber-600 shadow-md"
+              class="mt-2 block rounded-lg bg-amber-500 px-4 py-3 text-center text-base font-bold text-white shadow-md hover:bg-amber-600"
               @click="isMenuOpen = false"
             >
               ¡Regístrate ahora!
@@ -243,12 +272,19 @@ const toggleUserMenu = () => {
 
 const getInitials = (name) => {
   if (!name) return 'U'
-  return name.split(' ').map(p => p.charAt(0)).join('').toUpperCase().substring(0, 2)
+  return name
+    .split(' ')
+    .map((p) => p.charAt(0))
+    .join('')
+    .toUpperCase()
+    .substring(0, 2)
 }
 
 const userName = computed(() => {
   if (!user.value) return 'Usuario'
-  return user.value.displayName || user.value.userName || user.value.email?.split('@')[0] || 'Usuario'
+  return (
+    user.value.displayName || user.value.userName || user.value.email?.split('@')[0] || 'Usuario'
+  )
 })
 
 const profileRoute = computed(() => {
@@ -259,10 +295,14 @@ const profileRoute = computed(() => {
 const closeUserMenuOnClickOutside = (event) => {
   const userMenu = document.querySelector('[role="menu"]')
   const userButton = document.querySelector('[aria-haspopup="true"]')
-  
-  if (userMenuOpen.value && userMenu && userButton && 
-      !userMenu.contains(event.target) && 
-      !userButton.contains(event.target)) {
+
+  if (
+    userMenuOpen.value &&
+    userMenu &&
+    userButton &&
+    !userMenu.contains(event.target) &&
+    !userButton.contains(event.target)
+  ) {
     userMenuOpen.value = false
   }
 }
@@ -286,7 +326,7 @@ const navigationLinks = computed(() => {
       link: profileRoute.value,
       alt: 'Perfil de usuario',
     })
-  } 
+  }
   if (isAdmin.value) {
     links.push({
       name: 'Admin',

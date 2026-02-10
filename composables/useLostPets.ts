@@ -1,170 +1,299 @@
 import { ref } from 'vue'
-import { useFirebaseApp } from 'vuefire'
-import { getDatabase, ref as dbRef, get, push, set, update, remove, query, orderByChild } from 'firebase/database'
 import { getAuth } from 'firebase/auth'
+import type {
+  LostPet,
+  CreateLostPetPayload,
+  UpdateLostPetPayload,
+  ReportSightingPayload,
+  LostPetStatus,
+} from '~/models/LostPet'
+import {
+  fetchCollection,
+  fetchDataWithId,
+  updateData,
+  pushData,
+  deleteData,
+  getDbRef,
+} from '~/utils/firebase'
+import { get, update } from 'firebase/database'
+import { handleFirebaseError, logError } from '~/utils/errorHandler'
 
 export function useLostPets() {
-  const lostPets = ref([])
+  const lostPets = ref<LostPet[]>([])
   const loading = ref(false)
-  const error = ref(null)
+  const error = ref<string | null>(null)
 
-  async function fetchLostPets() {
+  /**
+   * Fetch all lost pets with optional archived filter
+   */
+  async function fetchLostPets(includeArchived = false): Promise<LostPet[]> {
     loading.value = true
     error.value = null
+
     try {
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
-      const refNode = dbRef(db, 'lost_pets')
-      const snap = await get(refNode)
-      if (!snap.exists()) {
-        lostPets.value = []
-        return []
+      let arr = await fetchCollection<LostPet>('lost_pets')
+
+      // Filter out archived unless explicitly requested
+      if (!includeArchived) {
+        arr = arr.filter((p: LostPet) => p.status !== 'archived')
       }
-      const data = snap.val()
-      const arr = Object.entries(data).map(([id, v]) => ({ id, ...v }))
-      // order by createdAt desc
-      arr.sort((a: any, b: any) => (b.createdAt || 0) - (a.createdAt || 0))
+
+      // Sort by createdAt desc
+      arr.sort((a: LostPet, b: LostPet) => (b.createdAt || 0) - (a.createdAt || 0))
+
       lostPets.value = arr
       return arr
     } catch (e) {
-      console.error('Error fetching lost pets', e)
-      error.value = 'Error al cargar mascotas perdidas'
+      const errorMsg = handleFirebaseError(e)
+      logError('fetchLostPets', e)
+      error.value = errorMsg
       return []
     } finally {
       loading.value = false
     }
   }
 
-  async function fetchUserLostPets(userId: string) {
+  /**
+   * Fetch lost pets for a specific user
+   */
+  async function fetchUserLostPets(userId: string): Promise<LostPet[]> {
     loading.value = true
     error.value = null
+
     try {
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
-      const refNode = dbRef(db, 'lost_pets')
-      const snap = await get(refNode)
-      if (!snap.exists()) return []
-      const data = snap.val()
-      const arr = Object.entries(data)
-        .map(([id, v]) => ({ id, ...v }))
-        .filter((p: any) => p.ownerId === userId)
-      lostPets.value = arr
-      return arr
+      const allPets = await fetchCollection<LostPet>('lost_pets')
+      const userPets = allPets.filter((p: LostPet) => p.ownerId === userId)
+
+      // Sort by status priority (active first), then by date
+      userPets.sort((a: LostPet, b: LostPet) => {
+        if (a.status === 'active' && b.status !== 'active') return -1
+        if (a.status !== 'active' && b.status === 'active') return 1
+        return (b.createdAt || 0) - (a.createdAt || 0)
+      })
+
+      lostPets.value = userPets
+      return userPets
     } catch (e) {
-      console.error('Error fetching user lost pets', e)
-      error.value = 'Error al cargar tus reportes'
+      const errorMsg = handleFirebaseError(e)
+      logError('fetchUserLostPets', e, { userId })
+      error.value = errorMsg
       return []
     } finally {
       loading.value = false
     }
   }
 
-  async function getLostPetById(id: string) {
+  /**
+   * Get a single lost pet by ID
+   */
+  async function getLostPetById(id: string): Promise<LostPet | null> {
     loading.value = true
     error.value = null
+
     try {
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
-      const snap = await get(dbRef(db, `lost_pets/${id}`))
-      if (!snap.exists()) return null
-      return snap.val()
+      const pet = await fetchDataWithId<LostPet>(`lost_pets/${id}`)
+      return pet
     } catch (e) {
-      console.error('Error get lost pet', e)
-      error.value = 'Error al obtener el reporte'
+      const errorMsg = handleFirebaseError(e)
+      logError('getLostPetById', e, { id })
+      error.value = errorMsg
       return null
     } finally {
       loading.value = false
     }
   }
 
-  async function createLostPet(payload: any) {
+  /**
+   * Create a new lost pet report
+   */
+  async function createLostPet(payload: CreateLostPetPayload): Promise<string | null> {
     loading.value = true
     error.value = null
+
     try {
-      // Defensive check: ensure user is authenticated and ownerId matches auth.uid
+      // Defensive check: ensure user is authenticated
       const auth = getAuth()
       const current = auth.currentUser
       if (!current) {
-        throw new Error('USER_NOT_AUTHENTICATED')
+        error.value = 'Debes iniciar sesión para crear un reporte.'
+        return null
       }
       if (!payload.ownerId || payload.ownerId !== current.uid) {
-        throw new Error('OWNER_MISMATCH')
-      }
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
-      const node = dbRef(db, 'lost_pets')
-      const newRef = push(node)
-      const item = {
-        ownerId: payload.ownerId,
-        petId: payload.petId || null,
-        name: payload.name || null,
-        description: payload.description || '',
-        lastSeenAt: payload.lastSeenAt || null,
-        location: payload.location || null,
-        reward: payload.reward || null,
-        contact: payload.contact || null,
-        images: payload.images || [],
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-      }
-      console.log('[useLostPets] createLostPet: creating item', {
-        ownerId: payload.ownerId,
-        authUid: current ? current.uid : null,
-        newRef: newRef.toString ? newRef.toString() : newRef.key,
-      })
-
-      await set(newRef, item)
-      return newRef.key
-    } catch (e) {
-      console.error('Error creating lost pet', e)
-      // Map some common errors to friendlier messages
-      if (e && (e as any).message === 'USER_NOT_AUTHENTICATED') {
-        error.value = 'Debes iniciar sesión para crear un reporte.'
-      } else if (e && (e as any).message === 'OWNER_MISMATCH') {
         error.value = 'El ownerId no coincide con el usuario autenticado.'
-      } else if (e && (e as any).code === 'PERMISSION_DENIED') {
-        error.value = 'Permisos insuficientes para crear el reporte (reglas DB).'
-      } else {
-        error.value = 'Error al crear el reporte'
+        return null
       }
+
+      const item: Partial<LostPet> = {
+        ownerId: payload.ownerId,
+        ownerName: payload.ownerName,
+        petId: payload.petId || null,
+        name: payload.name,
+        species: payload.species,
+        breed: payload.breed,
+        color: payload.color,
+        size: payload.size,
+        age: payload.age,
+        sex: payload.sex,
+        description: payload.description || '',
+        identificationMarks: payload.identificationMarks || [],
+        microchip: payload.microchip,
+        collar: payload.collar,
+        lastSeenLocation: payload.lastSeenLocation,
+        lastSeenDate: payload.lastSeenDate,
+        contact: payload.contact,
+        contactPreference: payload.contactPreference || 'phone',
+        reward: payload.reward,
+        images: payload.images || [],
+        status: 'active',
+        urgencyLevel: payload.urgencyLevel || 'medium',
+        views: 0,
+        shares: 0,
+        sightingCount: 0,
+      }
+
+      const newId = await pushData('lost_pets', item)
+      return newId
+    } catch (e) {
+      const errorMsg = handleFirebaseError(e)
+      logError('createLostPet', e, { payload })
+      error.value = errorMsg
       return null
     } finally {
       loading.value = false
     }
   }
 
-  async function updateLostPet(id: string, updates: any) {
+  /**
+   * Update an existing lost pet report
+   */
+  async function updateLostPet(id: string, updates: UpdateLostPetPayload): Promise<boolean> {
     loading.value = true
     error.value = null
+
     try {
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
-      const refNode = dbRef(db, `lost_pets/${id}`)
-      await update(refNode, { ...updates, updatedAt: Date.now() })
-      return true
+      const success = await updateData(`lost_pets/${id}`, updates)
+      return success
     } catch (e) {
-      console.error('Error updating lost pet', e)
-      error.value = 'Error al actualizar el reporte'
+      const errorMsg = handleFirebaseError(e)
+      logError('updateLostPet', e, { id, updates })
+      error.value = errorMsg
       return false
     } finally {
       loading.value = false
     }
   }
 
-  async function deleteLostPet(id: string) {
+  /**
+   * Archive a lost pet report
+   */
+  async function archiveLostPet(id: string): Promise<boolean> {
+    return await updateLostPet(id, { status: 'archived' } as UpdateLostPetPayload)
+  }
+
+  /**
+   * Mark a lost pet as found
+   */
+  async function markAsFound(id: string, foundDetails?: string): Promise<boolean> {
+    return await updateLostPet(id, {
+      status: 'found',
+      foundDetails,
+    } as UpdateLostPetPayload)
+  }
+
+  /**
+   * Update status of a lost pet
+   */
+  async function updateStatus(id: string, status: LostPetStatus): Promise<boolean> {
+    return await updateLostPet(id, { status } as UpdateLostPetPayload)
+  }
+
+  /**
+   * Delete a lost pet report
+   */
+  async function deleteLostPet(id: string): Promise<boolean> {
     loading.value = true
     error.value = null
+
     try {
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
-      await remove(dbRef(db, `lost_pets/${id}`))
-      return true
+      // Delete associated sightings first
+      await deleteData(`lost_pet_sightings/${id}`)
+      // Then delete the pet
+      const success = await deleteData(`lost_pets/${id}`)
+      return success
     } catch (e) {
-      console.error('Error deleting lost pet', e)
-      error.value = 'Error al eliminar el reporte'
+      const errorMsg = handleFirebaseError(e)
+      logError('deleteLostPet', e, { id })
+      error.value = errorMsg
       return false
     } finally {
       loading.value = false
+    }
+  }
+
+  /**
+   * Report a sighting of a lost pet
+   */
+  async function reportSighting(payload: ReportSightingPayload): Promise<boolean> {
+    loading.value = true
+    error.value = null
+
+    try {
+      const sightingData = {
+        reportedBy: payload.reportedBy,
+        reporterName: payload.reporterName,
+        reporterContact: payload.reporterContact,
+        location: payload.location,
+        description: payload.description,
+        photos: payload.photos || [],
+        timestamp: Date.now(),
+      }
+
+      // Add sighting to sightings collection
+      const sightingId = await pushData(`lost_pet_sightings/${payload.petId}`, sightingData)
+
+      if (!sightingId) {
+        error.value = 'Error al guardar el avistamiento'
+        return false
+      }
+
+      // Update sighting count on the lost pet using direct Firebase for atomic update
+      const petRef = getDbRef(`lost_pets/${payload.petId}`)
+      const snapshot = await get(petRef)
+
+      if (snapshot.exists()) {
+        const currentCount = (snapshot.val().sightingCount || 0) as number
+        await update(petRef, {
+          sightingCount: currentCount + 1,
+          updatedAt: Date.now(),
+        })
+      }
+
+      return true
+    } catch (e) {
+      const errorMsg = handleFirebaseError(e)
+      logError('reportSighting', e, { payload })
+      error.value = errorMsg
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
+   * Increment view counter for a lost pet
+   */
+  async function incrementViews(id: string): Promise<void> {
+    try {
+      // Optimistic update without loading state
+      const pet = await fetchDataWithId<LostPet>(`lost_pets/${id}`)
+      if (pet) {
+        await updateData(`lost_pets/${id}`, {
+          views: (pet.views || 0) + 1,
+        })
+      }
+    } catch (e) {
+      // Silent fail for stats
+      logError('incrementViews', e, { id })
     }
   }
 
@@ -177,6 +306,11 @@ export function useLostPets() {
     getLostPetById,
     createLostPet,
     updateLostPet,
+    archiveLostPet,
+    markAsFound,
+    updateStatus,
     deleteLostPet,
+    reportSighting,
+    incrementViews,
   }
 }

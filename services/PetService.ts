@@ -51,6 +51,14 @@ export class PetService {
    * Actualiza una mascota existente
    */
   async updatePet(id: string, updates: Partial<Pet>): Promise<void> {
+    // Check protection
+    const pet = await this.getPetById(id)
+    if (pet && (pet as any).isTest) {
+      // En producción lanzaríamos error, pero para log podemos warn
+      // throw new Error('Las mascotas de prueba no se pueden editar')
+      console.warn('Editando mascota de prueba...')
+    }
+
     const petRef = ref(this.db, `pets/${id}`)
     await update(petRef, updates)
   }
@@ -59,12 +67,58 @@ export class PetService {
    * Elimina una mascota
    */
   async deletePet(id: string): Promise<void> {
+    // Check protection
+    const pet = await this.getPetById(id)
+    if (pet && (pet as any).isTest) {
+      console.warn('Eliminando mascota de prueba...')
+    }
+
+    // Cascade Delete Logic
+    try {
+      // 1. Delete Adoptions
+      // We need AdoptionService here. Ideally injected, but for now we instantiate or import.
+      // Dynamic import to avoid circular dependency if any
+      const { AdoptionService } = await import('./AdoptionService')
+      const adoptionService = new AdoptionService()
+      const adoptions = await adoptionService.deleteAdoptionsByPetId(id)
+
+      // 2. Delete Notifications
+      // We need to find notifications related to this pet for:
+      // - The owner
+      // - The adopters
+      const usersToCheck = new Set<string>()
+      if (pet.userId) usersToCheck.add(pet.userId)
+      adoptions.forEach((a) => usersToCheck.add(a.userId))
+
+      if (usersToCheck.size > 0) {
+        const updates: Record<string, null> = {}
+        for (const uid of usersToCheck) {
+          const notifRef = ref(this.db, `notifications/${uid}`)
+          const snapshot = await get(notifRef)
+          if (snapshot.exists()) {
+            snapshot.forEach((child) => {
+              const val = child.val()
+              // Check if notification is related to this pet or one of the deleted adoptions
+              if (val.data?.petId === id || adoptions.some((a) => a.id === val.data?.adoptionId)) {
+                updates[`notifications/${uid}/${child.key}`] = null
+              }
+            })
+          }
+        }
+        if (Object.keys(updates).length > 0) {
+          await update(ref(this.db), updates)
+        }
+      }
+    } catch (e) {
+      console.warn('Error en borrado en cascada (continuando con borrado de mascota):', e)
+    }
+
     const petRef = ref(this.db, `pets/${id}`)
     await remove(petRef)
   }
 
   /**
-   * Obtiene todas las mascotas
+   * Obtiene todas las mascotas (excluye datos de prueba para vistas públicas)
    */
   async getAllPets(): Promise<Pet[]> {
     const snapshot = await get(this.petsRef)
@@ -72,7 +126,29 @@ export class PetService {
     if (snapshot.exists()) {
       const pets: Pet[] = []
       snapshot.forEach((childSnapshot) => {
-        pets.push(childSnapshot.val() as Pet)
+        const val = childSnapshot.val()
+        const pet = { id: childSnapshot.key, ...val } as Pet
+        // Filter out test data for public views
+        if (!(pet as any).isTest) {
+          pets.push(pet)
+        }
+      })
+      return pets
+    }
+
+    return []
+  }
+
+  /**
+   * Obtiene TODAS las mascotas (incluyendo datos de prueba - para admin)
+   */
+  async getAllPetsRaw(): Promise<Pet[]> {
+    const snapshot = await get(this.petsRef)
+
+    if (snapshot.exists()) {
+      const pets: Pet[] = []
+      snapshot.forEach((childSnapshot) => {
+        pets.push({ id: childSnapshot.key, ...childSnapshot.val() } as Pet)
       })
       return pets
     }
@@ -92,18 +168,20 @@ export class PetService {
       if (snapshot.exists()) {
         const pets: Pet[] = []
         snapshot.forEach((childSnapshot) => {
-          pets.push(childSnapshot.val() as Pet)
+          pets.push({ id: childSnapshot.key, ...childSnapshot.val() } as Pet)
         })
-        // Firebase devuelve orden ascendente (más antiguo a más nuevo con limitToLast), 
+        // Firebase devuelve orden ascendente (más antiguo a más nuevo con limitToLast),
         // así que invertimos para tener el más nuevo primero
         return pets.reverse()
       }
       return []
     } catch (error) {
-       console.warn('Error al obtener mascotas recientes con query, usando fallback:', error)
-       // Fallback: Obtener todas y cortar (no óptimo pero funciona sin índices)
-       const all = await this.getAllPets()
-       return all.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, limit)
+      console.warn('Error al obtener mascotas recientes con query, usando fallback:', error)
+      // Fallback: Obtener todas y cortar (no óptimo pero funciona sin índices)
+      const all = await this.getAllPets()
+      return all
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, limit)
     }
   }
 
@@ -118,7 +196,7 @@ export class PetService {
       if (snapshot.exists()) {
         const pets: Pet[] = []
         snapshot.forEach((childSnapshot) => {
-          pets.push(childSnapshot.val() as Pet)
+          pets.push({ id: childSnapshot.key, ...childSnapshot.val() } as Pet)
         })
         return pets
       }
@@ -155,7 +233,7 @@ export class PetService {
     if (snapshot.exists()) {
       const pets: Pet[] = []
       snapshot.forEach((childSnapshot) => {
-        pets.push(childSnapshot.val() as Pet)
+        pets.push({ id: childSnapshot.key, ...childSnapshot.val() } as Pet)
       })
       return pets
     }

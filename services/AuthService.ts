@@ -9,7 +9,17 @@ import {
   browserLocalPersistence,
   setPersistence,
 } from 'firebase/auth'
-import { getDatabase, ref, set, get, update, query, orderByChild, equalTo, limitToFirst } from 'firebase/database'
+import {
+  getDatabase,
+  ref,
+  set,
+  get,
+  update,
+  query,
+  orderByChild,
+  equalTo,
+  limitToFirst,
+} from 'firebase/database'
 import { initializeApp, getApps, getApp } from 'firebase/app'
 import { useFirebaseApp } from 'vuefire'
 import { useRuntimeConfig } from '#app'
@@ -36,7 +46,9 @@ export class AuthService {
     try {
       const config = useRuntimeConfig()
       if (config.public.adminEmails) {
-        this.adminEmails = config.public.adminEmails.split(',').map((email: string) => email.trim().toLowerCase())
+        this.adminEmails = config.public.adminEmails
+          .split(',')
+          .map((email: string) => email.trim().toLowerCase())
       } else {
         this.adminEmails = ['admin@adoptazulia.com', 'soporte@adoptazulia.com']
       }
@@ -73,7 +85,6 @@ export class AuthService {
     }
   }
 
-
   /**
    * Inicia sesión con Google
    */
@@ -92,7 +103,11 @@ export class AuthService {
       // Generar un userName corto y único si no existe
       let userNameToSave = existingProfile?.userName
       if (!userNameToSave) {
-        userNameToSave = await this.generateUniqueUserName(result.user.displayName || '', result.user.email || '', result.user.uid)
+        userNameToSave = await this.generateUniqueUserName(
+          result.user.displayName || '',
+          result.user.email || '',
+          result.user.uid
+        )
       }
 
       // Guardar o actualizar datos de usuario en RTDB (no sobreescribe campos si ya existen)
@@ -106,7 +121,11 @@ export class AuthService {
 
       // Intentar actualizar el displayName en Auth si hace falta
       try {
-        if (auth.currentUser && (!auth.currentUser.displayName || auth.currentUser.displayName !== result.user.displayName)) {
+        if (
+          auth.currentUser &&
+          (!auth.currentUser.displayName ||
+            auth.currentUser.displayName !== result.user.displayName)
+        ) {
           await updateProfile(auth.currentUser, { displayName: result.user.displayName || '' })
         }
       } catch (err) {
@@ -119,8 +138,6 @@ export class AuthService {
       throw error
     }
   }
-
-
 
   /**
    * Actualiza la fecha de último login
@@ -195,8 +212,6 @@ export class AuthService {
     }
   }
 
-
-
   /**
    * Suscribe a cambios en el estado de autenticación
    * @param callback Función a ejecutar cuando cambia el estado de autenticación
@@ -235,12 +250,12 @@ export class AuthService {
     }
 
     // Solo agregar propiedades si no son undefined
-    if (bio !== undefined) userData.bio = bio || '';
-    if (phoneNumber !== undefined) userData.phoneNumber = phoneNumber || '';
-    if (userName !== undefined) userData.userName = userName || '';
+    if (bio !== undefined) userData.bio = bio || ''
+    if (phoneNumber !== undefined) userData.phoneNumber = phoneNumber || ''
+    if (userName !== undefined) userData.userName = userName || ''
 
     // Actualizar datos en RTDB
-    await this.saveUserData(user.uid, userData);
+    await this.saveUserData(user.uid, userData)
   }
 
   /**
@@ -327,7 +342,6 @@ export class AuthService {
 
       return false
     } catch (error) {
-    
       return false
     }
   }
@@ -344,7 +358,11 @@ export class AuthService {
    * Reglas: todo junto (sin espacios), minúsculas, máximo 8 caracteres.
    * Si existe conflicto, se añade un sufijo numérico (truncando la base si es necesario).
    */
-  private async generateUniqueUserName(displayName?: string | null, email?: string | null, currentUserId?: string | null): Promise<string> {
+  private async generateUniqueUserName(
+    displayName?: string | null,
+    email?: string | null,
+    currentUserId?: string | null
+  ): Promise<string> {
     const maxLen = 8
 
     const slugify = (s: string) =>
@@ -358,7 +376,7 @@ export class AuthService {
     // Preparar base desde displayName o email
     let base = ''
     if (displayName) base = slugify(displayName)
-    if (!base && email) base = slugify((email.split('@')[0]) || '')
+    if (!base && email) base = slugify(email.split('@')[0] || '')
     if (!base) base = 'user'
 
     // Asegurarnos que al menos tenga caracteres alfanuméricos
@@ -396,7 +414,10 @@ export class AuthService {
     }
 
     // Si no encontramos un nombre disponible con el método anterior, generar uno aleatorio alfanumérico de 8 chars
-    const randomCandidate = () => Math.random().toString(36).slice(2, 2 + maxLen)
+    const randomCandidate = () =>
+      Math.random()
+        .toString(36)
+        .slice(2, 2 + maxLen)
     for (let i = 0; i < 10; i++) {
       const c = randomCandidate()
       try {

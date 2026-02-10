@@ -14,7 +14,7 @@ vi.mock('firebase/database', () => ({
   query: vi.fn(),
   orderByChild: vi.fn(),
   equalTo: vi.fn(),
-  limitToLast: vi.fn()
+  limitToLast: vi.fn(),
 }))
 
 describe('PetService', () => {
@@ -33,7 +33,7 @@ describe('PetService', () => {
         name: 'Firulais',
         age: '2 years',
         breed: 'Mestizo',
-        description: 'Happy dog'
+        description: 'Happy dog',
       } as any
 
       const mockPushResult = { key: 'new-pet-id' }
@@ -54,7 +54,7 @@ describe('PetService', () => {
       const mockPet = { id: 'pet-123', name: 'Firulais' }
       const mockSnapshot = {
         exists: () => true,
-        val: () => mockPet
+        val: () => mockPet,
       }
       ;(get as any).mockResolvedValue(mockSnapshot)
 
@@ -66,7 +66,7 @@ describe('PetService', () => {
 
     it('should return null if pet does not exist', async () => {
       const mockSnapshot = {
-        exists: () => false
+        exists: () => false,
       }
       ;(get as any).mockResolvedValue(mockSnapshot)
 
@@ -101,13 +101,13 @@ describe('PetService', () => {
     it('should return all pets', async () => {
       const mockPets = {
         'pet-1': { id: 'pet-1', name: 'Pet 1' },
-        'pet-2': { id: 'pet-2', name: 'Pet 2' }
+        'pet-2': { id: 'pet-2', name: 'Pet 2' },
       }
       const mockSnapshot = {
         exists: () => true,
-        forEach: (callback: Function) => {
-           Object.values(mockPets).forEach(pet => callback({ val: () => pet }))
-        }
+        forEach: (callback: (snapshot: { val: () => any }) => void) => {
+          Object.values(mockPets).forEach((pet) => callback({ val: () => pet }))
+        },
       }
       ;(get as any).mockResolvedValue(mockSnapshot)
 
@@ -119,11 +119,11 @@ describe('PetService', () => {
     })
 
     it('should return empty array if no pets', async () => {
-       const mockSnapshot = { exists: () => false }
-       ;(get as any).mockResolvedValue(mockSnapshot)
+      const mockSnapshot = { exists: () => false }
+      ;(get as any).mockResolvedValue(mockSnapshot)
 
-       const result = await petService.getAllPets()
-       expect(result).toEqual([])
+      const result = await petService.getAllPets()
+      expect(result).toEqual([])
     })
   })
 
@@ -131,9 +131,9 @@ describe('PetService', () => {
     it('should filter pets by name', async () => {
       const mockPets = [
         { id: '1', name: 'Max', breed: 'Dog', location: 'Maracaibo', description: 'Good boy' },
-        { id: '2', name: 'Bella', breed: 'Cat', location: 'San Francisco', description: 'Cute' }
+        { id: '2', name: 'Bella', breed: 'Cat', location: 'San Francisco', description: 'Cute' },
       ]
-      
+
       // Mock getAllPets implementation for this test
       vi.spyOn(petService, 'getAllPets').mockResolvedValue(mockPets as any)
 
@@ -142,11 +142,17 @@ describe('PetService', () => {
       expect(result).toHaveLength(1)
       expect(result[0].name).toBe('Max')
     })
-    
-     it('should filter pets by breed', async () => {
+
+    it('should filter pets by breed', async () => {
       const mockPets = [
         { id: '1', name: 'Max', breed: 'Labrador', location: 'Maracaibo', description: 'Good boy' },
-        { id: '2', name: 'Bella', breed: 'Siamese', location: 'San Francisco', description: 'Cute' }
+        {
+          id: '2',
+          name: 'Bella',
+          breed: 'Siamese',
+          location: 'San Francisco',
+          description: 'Cute',
+        },
       ]
 
       vi.spyOn(petService, 'getAllPets').mockResolvedValue(mockPets as any)
@@ -158,20 +164,44 @@ describe('PetService', () => {
     })
 
     it('should return all pets if search text is empty', async () => {
-       const mockPets = [{ id: '1', name: 'Max' }]
-       vi.spyOn(petService, 'getAllPets').mockResolvedValue(mockPets as any)
-       
-       const result = await petService.searchPets('')
-       expect(result).toEqual(mockPets)
+      const mockPets = [{ id: '1', name: 'Max' }]
+      vi.spyOn(petService, 'getAllPets').mockResolvedValue(mockPets as any)
+
+      const result = await petService.searchPets('')
+      expect(result).toEqual(mockPets)
     })
   })
 
   describe('filterPets', () => {
     it('should filter by specific criteria', async () => {
-       const mockPets = [
-        { id: '1', typeValue: 'dog', ageValue: 'puppy', gender: 'male', vaccinated: true, urgent: true, location: 'Zulia' },
-        { id: '2', typeValue: 'cat', ageValue: 'adult', gender: 'female', vaccinated: false, urgent: false, location: 'Zulia' },
-        { id: '3', typeValue: 'dog', ageValue: 'senior', gender: 'male', vaccinated: true, urgent: false, location: 'Caracas' }
+      const mockPets = [
+        {
+          id: '1',
+          typeValue: 'dog',
+          ageValue: 'puppy',
+          gender: 'male',
+          vaccinated: true,
+          urgent: true,
+          location: 'Zulia',
+        },
+        {
+          id: '2',
+          typeValue: 'cat',
+          ageValue: 'adult',
+          gender: 'female',
+          vaccinated: false,
+          urgent: false,
+          location: 'Zulia',
+        },
+        {
+          id: '3',
+          typeValue: 'dog',
+          ageValue: 'senior',
+          gender: 'male',
+          vaccinated: true,
+          urgent: false,
+          location: 'Caracas',
+        },
       ] as any
 
       vi.spyOn(petService, 'getAllPets').mockResolvedValue(mockPets)

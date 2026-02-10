@@ -1,19 +1,21 @@
 import { ref, computed } from 'vue'
 import {
   getDatabase,
-  ref as dbRef,
+  ref as fbRef,
   get,
   query,
   orderByChild,
+  limitToLast,
   startAt,
   endAt,
-  set,
 } from 'firebase/database'
-import { useFirebaseApp } from 'vuefire'
 import { addMonths, subMonths, subDays, subQuarters, startOfYear, format } from 'date-fns'
 import { es } from 'date-fns/locale'
+import { useFirebaseApp } from 'vuefire'
 import { useAuth } from '~/composables/useAuth'
 import { useSecureLogger } from '~/composables/useSecureLogger'
+import { fetchData, setData } from '~/utils/firebase'
+import { handleFirebaseError } from '~/utils/errorHandler'
 
 // Interfaces para los datos de estadísticas
 export interface Stats {
@@ -76,7 +78,7 @@ export function useStats() {
 
   const loading = ref(false)
   const error = ref<string | null>(null)
-  
+
   // Usamos el composable de autenticación para verificar permisos de administrador
   const { isAdmin } = useAuth()
   const { error: logError, warn } = useSecureLogger()
@@ -87,7 +89,8 @@ export function useStats() {
    */
   function checkAdminPermission(): boolean {
     if (!isAdmin.value) {
-      error.value = 'No tienes permisos para acceder a esta información. Se requiere rol de administrador.'
+      error.value =
+        'No tienes permisos para acceder a esta información. Se requiere rol de administrador.'
       logError('Intento de acceso a estadísticas administrativas sin permisos')
       return false
     }
@@ -109,23 +112,19 @@ export function useStats() {
     error.value = null
 
     try {
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
-
       // Primero intentamos obtener estadísticas públicas ya almacenadas
-      const publicStatsRef = dbRef(db, 'statistics/public')
-      const publicStatsSnapshot = await get(publicStatsRef)
-      
-      if (publicStatsSnapshot.exists()) {
+      const publicStats = await fetchData<Stats>('statistics/public')
+
+      if (publicStats) {
         // Si ya existen estadísticas públicas, las usamos
-        stats.value = publicStatsSnapshot.val()
+        stats.value = publicStats
       } else {
         // Si no existen, obtenemos estadísticas básicas
-        await fetchGeneralStats(db)
-        
+        await fetchGeneralStats()
+
         // Guardamos las estadísticas en la ubicación pública para futuras consultas
         // Solo almacenamos los datos que queremos sean públicos
-        const publicStats = {
+        const publicStatsData = {
           totalPets: stats.value.totalPets,
           totalAdoptions: stats.value.totalAdoptions,
           totalUsers: stats.value.totalUsers,
@@ -137,24 +136,25 @@ export function useStats() {
             approved: 0,
             rejected: 0,
           },
-          adoptionSuccess: stats.value.adoptionSuccess
+          adoptionSuccess: stats.value.adoptionSuccess,
         }
-        
+
         try {
           if (isAdmin.value) {
-            await set(publicStatsRef, publicStats)
+            await setData('statistics/public', publicStatsData)
           }
-          stats.value = publicStats
+          stats.value = publicStatsData
         } catch (writeErr) {
           warn('No se pudieron guardar las estadísticas públicas:', writeErr)
           // Continuamos aunque no podamos guardarlas
         }
       }
-      
+
       return stats.value
     } catch (err: any) {
+      const errorMsg = handleFirebaseError(err)
       logError('Error al obtener estadísticas públicas:', err)
-      error.value = 'Error al cargar las estadísticas. Por favor, inténtalo de nuevo.'
+      error.value = errorMsg || 'Error al cargar estadísticas'
       return stats.value
     } finally {
       loading.value = false
@@ -171,12 +171,13 @@ export function useStats() {
       if (!isAdmin.value) {
         return await fetchPublicStats()
       }
-      
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
 
       // 1. Estadísticas generales
-      await fetchGeneralStats(db)
+      await fetchGeneralStats()
+
+      // Get database instance
+      const firebaseApp = useFirebaseApp()
+      const db = getDatabase(firebaseApp)
 
       // 2. Tendencias de adopción (solo para administradores)
       await fetchAdoptionTrends(db, period)
@@ -189,8 +190,7 @@ export function useStats() {
 
       // 5. Actualizar las estadísticas públicas con las más recientes
       try {
-        const publicStatsRef = dbRef(db, 'statistics/public')
-        const publicStats = {
+        const publicStatsData = {
           totalPets: stats.value.totalPets,
           totalAdoptions: stats.value.totalAdoptions,
           totalUsers: stats.value.totalUsers,
@@ -201,10 +201,10 @@ export function useStats() {
             approved: 0,
             rejected: 0,
           },
-          adoptionSuccess: stats.value.adoptionSuccess
+          adoptionSuccess: stats.value.adoptionSuccess,
         }
         if (isAdmin.value) {
-          await set(publicStatsRef, publicStats)
+          await setData('statistics/public', publicStatsData)
         }
       } catch (writeErr) {
         warn('No se pudieron actualizar las estadísticas públicas:', writeErr)
@@ -213,8 +213,9 @@ export function useStats() {
 
       return stats.value
     } catch (err: any) {
+      const errorMsg = handleFirebaseError(err)
       logError('Error al obtener estadísticas:', err)
-      error.value = 'Error al cargar las estadísticas. Por favor, inténtalo de nuevo.'
+      error.value = errorMsg || 'Error al cargar estadísticas'
       return stats.value
     } finally {
       loading.value = false
@@ -222,39 +223,35 @@ export function useStats() {
   }
 
   // Obtener estadísticas generales
-  async function fetchGeneralStats(db: any) {
-    // Total de mascotas
-    const petsRef = dbRef(db, 'pets')
-    const petsSnapshot = await get(petsRef)
+  async function fetchGeneralStats() {
+    // Total de mascotas (excluding isTest)
+    const petsData = await fetchData<Record<string, any>>('pets')
 
-    if (petsSnapshot.exists()) {
-      const petsData = petsSnapshot.val()
-      const pets = Object.values(petsData || {})
+    if (petsData) {
+      const pets = Object.values(petsData || {}).filter((pet: any) => !pet.isTest)
 
       stats.value.totalPets = pets.length
 
-      // Mascotas urgentes
+      // Mascotas urgentes (excluding isTest)
       stats.value.urgentPets = pets.filter((pet: any) => pet.urgent).length
 
-      // Mascotas adoptadas (estatus = adopted)
+      // Mascotas adoptadas (estatus = adopted, excluding isTest)
       stats.value.totalAdoptions = pets.filter((pet: any) => pet.status === 'adopted').length
     }
 
-    // Total de usuarios
-    const usersRef = dbRef(db, 'users')
-    const usersSnapshot = await get(usersRef)
+    // Total de usuarios (excluding isTest)
+    const usersData = await fetchData<Record<string, any>>('users')
 
-    if (usersSnapshot.exists()) {
-      const users = Object.values(usersSnapshot.val() || {})
+    if (usersData) {
+      const users = Object.values(usersData || {}).filter((user: any) => !user.isTest)
       stats.value.totalUsers = users.length
     }
 
-    // Solicitudes pendientes y distribución
-    const adoptionsRef = dbRef(db, 'adoptions')
-    const adoptionsSnapshot = await get(adoptionsRef)
+    // Solicitudes pendientes y distribución (excluding isTest)
+    const adoptionsData = await fetchData<Record<string, any>>('adoptions')
 
-    if (adoptionsSnapshot.exists()) {
-      const adoptions = Object.values(adoptionsSnapshot.val() || {}) as any[]
+    if (adoptionsData) {
+      const adoptions = Object.values(adoptionsData || {}).filter((adoption: any) => !adoption.isTest) as any[]
 
       // Solicitudes pendientes
       const pendingAdoptions = adoptions.filter((adoption) => adoption.status === 'pending')
@@ -277,12 +274,11 @@ export function useStats() {
       stats.value.adoptionSuccess = Math.round((approved / (approved + rejected || 1)) * 100)
     }
 
-    // Estadísticas de reportes de mascotas perdidas
+    // Estadísticas de reportes de mascotas perdidas (excluding isTest)
     try {
-      const lostRef = dbRef(db, 'lost_pets')
-      const lostSnap = await get(lostRef)
-      if (lostSnap.exists()) {
-        const lostArr = Object.values(lostSnap.val() || {}) as any[]
+      const lostPetsData = await fetchData<Record<string, any>>('lost_pets')
+      if (lostPetsData) {
+        const lostArr = Object.values(lostPetsData || {}).filter((pet: any) => !pet.isTest) as any[]
         const totalLost = lostArr.length
         const foundCount = lostArr.filter((l) => l.status === 'found').length
         const lostCount = lostArr.filter((l) => l.status === 'lost' || !l.status).length
@@ -356,7 +352,7 @@ export function useStats() {
 
     try {
       // Consultar adopciones completadas en el período
-      const adoptionsRef = dbRef(db, 'adoptions')
+      const adoptionsRef = fbRef(db, 'adoptions')
       const adoptionsQuery = query(
         adoptionsRef,
         orderByChild('createdAt'),
@@ -456,7 +452,7 @@ export function useStats() {
   // Obtener distribución de mascotas por tipo
   async function fetchPetDistribution(db: any) {
     try {
-      const petsRef = dbRef(db, 'pets')
+      const petsRef = fbRef(db, 'pets')
       const snapshot = await get(petsRef)
 
       if (snapshot.exists()) {
@@ -577,6 +573,6 @@ export function useStats() {
     detailedStats,
     maxAdoptionTrend,
     fetchStats,
-    fetchPublicStats
+    fetchPublicStats,
   }
 }

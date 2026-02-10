@@ -1,0 +1,132 @@
+/* =====================================================
+   ADOPTA ZULIA - COLOR SYSTEM
+   ===================================================== */
+
+/**
+ * Paleta oficial de colores - Sistema de diseño centralizado
+ * 
+ * PRIMARY: Emerald (Verde) - Representa crecimiento, vida nueva, adopción
+ * SECONDARY: Amber (Ámbar) - Representa calidez, compañía, hogar
+ * NEUTRAL: Gray - Para textos y fondos neutros
+ */
+
+:root {
+  /* ===== PRIMARY - Emerald (Adopción & Naturaleza) ===== */
+  --color-primary-50: #ecfdf5;
+  --color-primary-100: #d1fae5;
+  --color-primary-200: #a7f3d0;
+  --color-primary-300: #6ee7b7;
+  --color-primary-400: #34d399;
+  --color-primary-500: #10b981;
+  --color-primary-600: #059669;
+  --color-primary-700: #047857;
+  --color-primary-800: #065f46;
+  --color-primary-900: #064e3b;
+
+  /* ===== SECONDARY - Amber (Calidez & Compañía) ===== */
+  --color-secondary-50: #fffbeb;
+  --color-secondary-100: #fef3c7;
+  --color-secondary-200: #fde68a;
+  --color-secondary-300: #fcd34d;
+  --color-secondary-400: #fbbf24;
+  --color-secondary-500: #f59e0b;
+  --color-secondary-600: #d97706;
+  --color-secondary-700: #b45309;
+  --color-secondary-800: #92400e;
+  --color-secondary-900: #78350f;
+
+  /* ===== Neutrales - Gray ===== */
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #e5e5e5;
+  --color-neutral-300: #d4d4d4;
+  --color-neutral-400: #a3a3a3;
+  --color-neutral-500: #737373;
+  --color-neutral-600: #525252;
+  --color-neutral-700: #404040;
+  --color-neutral-800: #262626;
+  --color-neutral-900: #171717;
+
+  /* ===== Estados - Success/Warning/Error ===== */
+  --color-success-50: var(--color-primary-50);
+  --color-success-500: var(--color-primary-500);
+  --color-success-700: var(--color-primary-700);
+
+  --color-warning-50: var(--color-secondary-50);
+  --color-warning-500: var(--color-secondary-500);
+  --color-warning-700: var(--color-secondary-700);
+
+  --color-error-50: #fef2f2;
+  --color-error-500: #ef4444;
+  --color-error-700: #b91c1c;
+
+  --color-info-50: #eff6ff;
+  --color-info-500: #3b82f6;
+  --color-info-700: #1d4ed8;
+
+  /* ===== Backgrounds ===== */
+  --bg-page: #fafafa; /* Fondo principal de páginas */
+  --bg-card: #ffffff; /* Fondo de tarjetas y componentes */
+  --bg-elevated: #ffffff; /* Fondo elevado (modals, dropdowns) */
+  --bg-accent: #f0fdf4; /* Fondo con acento (emerald-50) */
+  --bg-muted: #f5f5f5; /* Fondo apagado (gray-100) */
+
+  /* ===== Borders ===== */
+  --border-default: #e5e5e5; /* gray-200 */
+  --border-muted: #f5f5f5; /* gray-100 */
+  --border-accent: #d1fae5; /* emerald-100 */
+
+  /* ===== Text ===== */
+  --text-primary: #171717; /* gray-900 - Texto principal */
+  --text-secondary: #525252; /* gray-600 - Texto secundario */
+  --text-muted: #a3a3a3; /* gray-400 - Texto apagado */
+  --text-inverse: #ffffff; /* Texto sobre fondos oscuros */
+
+  /* ===== Shadows ===== */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --shadow-primary: 0 10px 15px -3px rgb(5 150 105 / 0.2);
+}
+
+/* ===== Utilidades Rápidas ===== */
+.bg-page {
+  background-color: var(--bg-page);
+}
+.bg-card {
+  background-color: var(--bg-card);
+}
+.bg-accent {
+  background-color: var(--bg-accent);
+}
+.bg-muted {
+  background-color: var(--bg-muted);
+}
+
+.text-primary {
+  color: var(--text-primary);
+}
+.text-secondary {
+  color: var(--text-secondary);
+}
+.text-muted {
+  color: var(--text-muted);
+}
+
+.border-default {
+  border-color: var(--border-default);
+}
+.border-accent {
+  border-color: var(--border-accent);
+}
+
+/** 
+ * NOTA DE MIGRACIÓN:
+ * Para mantener compatibilidad durante la transición,
+ * las clases de Tailwind existentes seguirán funcionando.
+ * Gradualmente reemplazaremos:
+ * - bg-amber-50 → bg-page (o bg-accent si necesita énfasis)
+ * - bg-gray-50 → bg-page
+ * - bg-gray-100 → bg-muted
+ * - bg-emerald-600 → bg-primary-600 (Tailwind nativo o custom)
+ */

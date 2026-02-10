@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
     if (!imageUrl) {
       throw createError({
         statusCode: 400,
-        statusMessage: 'URL de imagen requerida'
+        statusMessage: 'URL de imagen requerida',
       })
     }
 
@@ -34,17 +34,22 @@ export default defineEventHandler(async (event) => {
       'unsplash.com',
       'pexels.com',
       'pixabay.com',
-      'googleusercontent.com'
+      'googleusercontent.com',
     ]
 
     const hostname = parsedUrl.hostname.toLowerCase()
 
     // Verificar que el hostname coincide exactamente o termina con uno de los dominios permitidos
-    const isAllowed = allowedDomains.some(domain => hostname === domain || hostname.endsWith('.' + domain))
+    const isAllowed = allowedDomains.some(
+      (domain) => hostname === domain || hostname.endsWith('.' + domain)
+    )
 
     if (!isAllowed) {
       console.warn('Intento de acceder a una imagen desde un dominio no permitido:', imageUrl)
-      throw createError({ statusCode: 403, statusMessage: 'Solo se permiten URLs de dominios confiables' })
+      throw createError({
+        statusCode: 403,
+        statusMessage: 'Solo se permiten URLs de dominios confiables',
+      })
     }
 
     // Obtener la imagen usando el fetch global disponible en Node/Nuxt
@@ -54,7 +59,10 @@ export default defineEventHandler(async (event) => {
       const status = response?.status || 502
       const statusText = response?.statusText || 'Error fetching image'
       console.error(`Error fetching image. Status: ${status} ${statusText}`, imageUrl)
-      throw createError({ statusCode: status, statusMessage: `Error al obtener la imagen (${status})` })
+      throw createError({
+        statusCode: status,
+        statusMessage: `Error al obtener la imagen (${status})`,
+      })
     }
 
     // Leer el body como arrayBuffer y convertir a Buffer para devolverlo desde el endpoint

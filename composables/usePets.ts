@@ -105,8 +105,8 @@ export function usePets() {
    * Actualiza el estado de una mascota (disponible, adoptada, perdida, etc.)
    */
   async function updatePetStatus(
-    petId: string, 
-    status: 'available' | 'adopted' | 'lost' | 'found', 
+    petId: string,
+    status: 'available' | 'adopted' | 'lost' | 'found',
     adoptedBy?: string
   ): Promise<boolean> {
     loading.value = true
@@ -114,16 +114,16 @@ export function usePets() {
 
     try {
       const updates: Partial<Pet> = { status }
-      
+
       // Si se proporciona adoptedBy, añadirlo a las actualizaciones
       if (status === 'adopted' && adoptedBy) {
         updates.adoptedBy = adoptedBy
         updates.adoptionDate = new Date().toISOString()
       }
-      
+
       // Actualizar la mascota usando la función existente
       const success = await updatePet(petId, updates)
-      
+
       return success
     } catch (err: any) {
       logError(`Error al actualizar el estado de la mascota ${petId}:`, err)
@@ -283,20 +283,20 @@ export function usePets() {
     try {
       // Obtener todas las mascotas disponibles
       const allPets = await petService.getAllPets()
-      const availablePets = allPets.filter(pet => pet.status === 'available' || !pet.status)
+      const availablePets = allPets.filter((pet) => pet.status === 'available' || !pet.status)
 
       // Separar mascotas urgentes y no urgentes
       const urgentPets = availablePets
-        .filter(pet => pet.urgent)
+        .filter((pet) => pet.urgent)
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) // Más recientes primero
 
       const nonUrgentPets = availablePets
-        .filter(pet => !pet.urgent)
+        .filter((pet) => !pet.urgent)
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) // Más recientes primero
 
       // Combinar ambos arrays: primero las urgentes, luego completar con no urgentes hasta el límite
       let result = [...urgentPets]
-      
+
       if (result.length < limit) {
         result = [...result, ...nonUrgentPets.slice(0, limit - result.length)]
       } else {
@@ -325,12 +325,12 @@ export function usePets() {
       if (!petIds || petIds.length === 0) {
         return []
       }
-      
-      const petPromises = petIds.map(id => petService.getPetById(id))
+
+      const petPromises = petIds.map((id) => petService.getPetById(id))
       const petsResults = await Promise.all(petPromises)
-      
+
       // Filtrar los resultados nulos (mascotas no encontradas)
-      return petsResults.filter(pet => pet !== null) as Pet[]
+      return petsResults.filter((pet) => pet !== null) as Pet[]
     } catch (err: any) {
       logError('Error al obtener mascotas por IDs:', err)
       error.value = 'Error al obtener las mascotas favoritas'
@@ -393,12 +393,65 @@ export function usePets() {
     }
   }
 
+  /**
+   * Obtiene todas las mascotas incluyendo datos de prueba (para Admin)
+   */
+  async function fetchAllPetsRaw() {
+    loading.value = true
+    error.value = null
+    try {
+      // Fetch all pets including test data
+      pets.value = await petService.getAllPetsRaw()
+      return pets.value
+    } catch (err: any) {
+      logError('Error al obtener mascotas (raw):', err)
+      error.value = 'Error al obtener las mascotas'
+      return []
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
+   * Verifica si una mascota está en favoritos del usuario
+   */
+  async function isPetFavorite(petId: string, userId: string): Promise<boolean> {
+    try {
+      return false
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Añade una mascota a favoritos
+   */
+  async function addFavorite(petId: string, userId: string): Promise<boolean> {
+    try {
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  /**
+   * Elimina una mascota de favoritos
+   */
+  async function removeFavorite(petId: string, userId: string): Promise<boolean> {
+    try {
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
   return {
     pets,
     pet,
     loading,
     error,
     fetchAllPets,
+    fetchAllPetsRaw,
     fetchPetById,
     fetchPetsByIds,
     createPet,
@@ -416,50 +469,5 @@ export function usePets() {
     isPetFavorite,
     addFavorite,
     removeFavorite,
-  }
-  
-  /**
-   * Verifica si una mascota está en favoritos del usuario
-   */
-  async function isPetFavorite(petId: string, userId: string): Promise<boolean> {
-     try {
-        // En una implementación real, esto consultaría 'users/{userId}/favorites/{petId}'
-        // Por ahora simularemos con localStorage o retornaremos false si no hay backend listo
-        // backend implementation:
-        // const db = getDatabase()
-        // const snapshot = await get(ref(db, `users/${userId}/favorites/${petId}`))
-        // return snapshot.exists()
-        
-        // Simulación segura para evitar errores:
-        return false 
-     } catch (e) {
-         return false
-     }
-  }
-
-  /**
-   * Añade una mascota a favoritos
-   */
-  async function addFavorite(petId: string, userId: string): Promise<boolean> {
-      try {
-          // const db = getDatabase()
-          // await set(ref(db, `users/${userId}/favorites/${petId}`), true)
-          return true
-      } catch (e) {
-          return false
-      }
-  }
-
-  /**
-   * Elimina una mascota de favoritos
-   */
-  async function removeFavorite(petId: string, userId: string): Promise<boolean> {
-      try {
-          // const db = getDatabase()
-          // await remove(ref(db, `users/${userId}/favorites/${petId}`))
-          return true
-      } catch (e) {
-          return false
-      }
   }
 }

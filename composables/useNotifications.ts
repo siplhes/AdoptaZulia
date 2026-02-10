@@ -1,14 +1,15 @@
 import { ref, computed, watch } from 'vue'
 import { useAuth } from './useAuth'
-import { getDatabase, ref as dbRef, onValue, update, get, push, remove, set } from 'firebase/database'
-import { useFirebaseApp } from 'vuefire'
+import { onValue } from 'firebase/database'
 import { useSecureLogger } from './useSecureLogger'
+import { useToast } from './useToast'
+import { getDbRef, updateData, deleteData, pushData } from '~/utils/firebase'
+import { handleFirebaseError } from '~/utils/errorHandler'
 
 export function useNotifications() {
   const { user, isAuthenticated } = useAuth()
-  const firebaseApp = useFirebaseApp()
-  const db = getDatabase(firebaseApp)
   const { debug, warn, error: logError } = useSecureLogger()
+  const toast = useToast()
 
   const notifications = ref<any[]>([])
   const unreadCount = ref<number>(0)
@@ -16,169 +17,151 @@ export function useNotifications() {
   const error = ref<string | null>(null)
 
   let notificationsListener: (() => void) | null = null
-  
+
+  // --- Email Sending Logic ---
+  const sendEmail = async (to: string, subject: string, html: string) => {
+    try {
+      await $fetch('/api/emails/send', {
+        method: 'POST',
+        body: { to, subject, html },
+      })
+      toast.success('Correo enviado correctamente')
+      return true
+    } catch (err: any) {
+      logError('Error enviando email:', err)
+      toast.error('Error al enviar el correo')
+      return false
+    }
+  }
+
+  // --- Notification Listener ---
   const listenToNotifications = () => {
     if (!isAuthenticated.value || !user.value) return
 
     loading.value = true
-
     try {
-      // Defensive: log current auth/user info to help debug permission issues
-      debug('listenToNotifications: current user', { uid: user.value?.uid, isAuthenticated: isAuthenticated.value })
+      const notificationsRef = getDbRef(`notifications/${user.value.uid}`)
 
-      const notificationsRef = dbRef(db, `notifications/${user.value.uid}`)
-
-      // Eliminar el listener anterior si existe
       if (notificationsListener) {
         notificationsListener()
       }
 
-      notificationsListener = onValue(notificationsRef, (snapshot) => {
-        if (snapshot.exists()) {
-          const data = snapshot.val()
-          const notificationsList = Object.entries(data).map(([id, notification]: [string, any]) => ({
-            id,
-            ...(notification as any)
-          }))
+      notificationsListener = onValue(
+        notificationsRef,
+        (snapshot) => {
+          if (snapshot.exists()) {
+            const data = snapshot.val()
+            const rawList = Object.entries(data).map(([id, val]: [string, any]) => ({
+              id,
+              ...val,
+            }))
 
-          // Defensive filter: ensure recipientId matches current user uid. If recipientId is missing
-          // keep the item but log a warning to help detect malformed notifications.
-          const uid = user?.value?.uid || null
-          const filtered = notificationsList.filter((n: any) => {
-            if (!n.recipientId) {
-              warn('notification without recipientId received', n)
-              // Auto-fix: add recipientId if missing (legacy notification migration)
-              n.recipientId = uid
-              return true
-            }
-            const ok = uid && n.recipientId === uid
-            if (!ok) {
-              warn('notification recipient mismatch — dropping item', { expected: uid, found: n.recipientId, id: n.id })
-            }
-            return ok
-          })
+            // Filter for current user (defensive)
+            const uid = user.value?.uid
+            const filtered = rawList.filter((n) => !n.recipientId || n.recipientId === uid)
 
-          notifications.value = filtered.sort((a: any, b: any) => b.createdAt - a.createdAt)
-
-          unreadCount.value = filtered.filter((n: any) => !n.read).length
-        } else {
-          notifications.value = []
-          unreadCount.value = 0
+            // Sort by date desc
+            notifications.value = filtered.sort((a: any, b: any) => b.createdAt - a.createdAt)
+            unreadCount.value = filtered.filter((n: any) => !n.read).length
+          } else {
+            notifications.value = []
+            unreadCount.value = 0
+          }
+          loading.value = false
+        },
+        (err) => {
+          logError('Error loading notifications', err)
+          error.value = handleFirebaseError(err)
+          loading.value = false
         }
-        loading.value = false
-      }, (err: any) => {
-        // Provide clearer message when rules block access
-        logError('Error al cargar notificaciones:', err)
-        const errCode = (err && (err as any).code) ? (err as any).code : null
-        if (errCode === 'permission_denied') {
-          error.value = 'Permiso denegado al leer notificaciones. Revisa las reglas de Realtime Database y asegúrate de que estén desplegadas.'
-        } else {
-          error.value = 'Error al cargar notificaciones'
-        }
-        loading.value = false
-      })
+      )
     } catch (err) {
-      logError('Error al configurar listener de notificaciones:', err)
-      error.value = 'Error al configurar notificaciones'
+      logError('Error setting up notification listener', err)
+      error.value = handleFirebaseError(err)
       loading.value = false
     }
   }
-  const markAsRead = async (notificationId: string) => {
-    if (!isAuthenticated.value || !user.value) return false
 
+  // --- Actions ---
+  const markAsRead = async (notificationId: string) => {
+    if (!user.value) return
     try {
-      const notificationRef = dbRef(db, `notifications/${user.value.uid}/${notificationId}`)
-      await update(notificationRef, { read: true })
-      return true
+      await updateData(`notifications/${user.value.uid}/${notificationId}`, { read: true })
     } catch (err) {
-      logError('Error al marcar notificación como leída:', err)
-      error.value = 'Error al actualizar notificación'
-      return false
+      logError('Error marking as read', err)
+      throw err
     }
   }
-  const markAllAsRead = async () => {
-    if (!isAuthenticated.value || !user.value) return false
 
+  const markAllAsRead = async () => {
+    if (!user.value) return
     try {
       const updates: Record<string, any> = {}
-      const uid = user.value.uid
-      notifications.value.forEach((notification: any) => {
-        if (!notification.read) {
-          updates[`notifications/${uid}/${notification.id}/read`] = true
-        }
+      notifications.value.forEach((n) => {
+        if (!n.read) updates[`notifications/${user.value?.uid}/${n.id}/read`] = true
       })
-
-      if (Object.keys(updates).length > 0) {
-        await update(dbRef(db), updates)
+      if (Object.keys(updates).length) {
+        await updateData('', updates) // Root update
+        toast.success('Todas las notificaciones marcadas como leídas')
       }
-
-      return true
     } catch (err) {
-      logError('Error al marcar todas las notificaciones como leídas:', err)
-      error.value = 'Error al actualizar notificaciones'
-      return false
+      logError('Error marking all as read', err)
+      toast.error('Error al actualizar notificaciones')
     }
   }
+
   const deleteNotification = async (notificationId: string) => {
-    if (!isAuthenticated.value || !user.value) return false
-
+    if (!user.value) return
     try {
-      const notificationRef = dbRef(db, `notifications/${user.value.uid}/${notificationId}`)
-      await remove(notificationRef)
-      return true
+      await deleteData(`notifications/${user.value.uid}/${notificationId}`)
+      toast.success('Notificación eliminada')
     } catch (err) {
-      logError('Error al eliminar notificación:', err)
-      error.value = 'Error al eliminar notificación'
-      return false
+      logError('Error deleting notification', err)
+      toast.error('No se pudo eliminar la notificación')
     }
   }
-  const createNotification = async (userId: string, data: Record<string, any>) => {
-    if (!userId) {
-      logError('No se pudo crear notificación: userId es undefined o null')
-      return false
-    }
 
+  const createNotification = async (targetUserId: string, data: any) => {
+    if (!targetUserId) return false
     try {
-      const notificationsRef = dbRef(db, `notifications/${userId}`)
-      const newNotification = {
+      await pushData(`notifications/${targetUserId}`, {
         ...data,
-        recipientId: userId,
-        senderId: user?.value?.uid || null,
+        recipientId: targetUserId,
+        senderId: user.value?.uid || 'system',
         read: false,
-        createdAt: Date.now()
-      }
-
-      const newNotificationRef = push(notificationsRef)
-      await set(newNotificationRef, newNotification)
+        createdAt: Date.now(),
+      })
       return true
     } catch (err) {
-      logError('Error al crear notificación:', err)
+      logError('Error creating notification', err)
       return false
     }
   }
-  
-  watch(() => isAuthenticated.value, (newValue) => {
-    if (newValue) {
-      listenToNotifications()
-    } else {
-      if (notificationsListener) {
-        notificationsListener()
-        notificationsListener = null
+
+  // --- Watchers ---
+  watch(
+    () => isAuthenticated.value,
+    (isAuth) => {
+      if (isAuth) {
+        listenToNotifications()
+      } else {
+        if (notificationsListener) notificationsListener()
+        notifications.value = []
+        unreadCount.value = 0
       }
-      notifications.value = []
-      unreadCount.value = 0
-    }
-  }, { immediate: true })
-  
+    },
+    { immediate: true }
+  )
+
   return {
     notifications,
     unreadCount,
     loading,
     error,
+    sendEmail,
     markAsRead,
     markAllAsRead,
     deleteNotification,
     createNotification,
-    listenToNotifications
   }
 }

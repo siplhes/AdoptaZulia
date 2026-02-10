@@ -17,10 +17,15 @@ export class S3Service {
 
   constructor(config: S3ServiceConfig) {
     // Validate required credentials
-    if (!config.region || !config.credentials.accessKeyId || !config.credentials.secretAccessKey || !config.bucketName) {
+    if (
+      !config.region ||
+      !config.credentials.accessKeyId ||
+      !config.credentials.secretAccessKey ||
+      !config.bucketName
+    ) {
       throw new Error('Missing required AWS configuration parameters')
     }
-    
+
     this.s3Client = new S3Client({
       region: config.region,
       credentials: {
@@ -37,21 +42,78 @@ export class S3Service {
     if (!file) {
       throw new Error('No file provided for upload')
     }
-    
+
     // Sanitize folder and filename to prevent path traversal attacks
     folder = this.sanitizePath(folder)
     fileName = this.sanitizeFileName(fileName)
-    
+
     const timestamp = Date.now()
     const key = `${folder}/${timestamp}_${fileName}`
 
+    console.log('🔧 S3Service.uploadFile - Input:', {
+      hasFile: !!file,
+      hasData: !!file.data,
+      dataType: file.data ? typeof file.data : 'N/A',
+      dataLength: file.data?.length,
+      isBuffer: file.data instanceof Buffer,
+      isUint8Array: file.data instanceof Uint8Array,
+      filename: file.filename,
+      type: file.type,
+      folder,
+      fileName,
+      key,
+    })
+
     try {
-      let contentType = file.type || 'application/octet-stream'
-      let fileBody = file
+      // Detect content type from file
+      let contentType = 'application/octet-stream'
+      let fileBody: any
+
+      // Handle multipart form data (from readMultipartFormData)
       if (file.data) {
-        contentType = file.type || file.filename?.split('.').pop() || 'application/octet-stream'
+        // file.data from readMultipartFormData is already a Buffer
         fileBody = file.data
+        
+        console.log('📄 Processing file.data:', {
+          isBuffer: fileBody instanceof Buffer,
+          isUint8Array: fileBody instanceof Uint8Array,
+          length: fileBody.length,
+          firstBytes: fileBody.slice(0, 20).toString('hex'),
+        })
+        
+        // Try to get content type from the file object
+        if (file.type) {
+          contentType = file.type
+        } else if (file.filename) {
+          // Determine content type from file extension
+          const ext = file.filename.toLowerCase().split('.').pop()
+          const mimeTypes: Record<string, string> = {
+            jpg: 'image/jpeg',
+            jpeg: 'image/jpeg',
+            png: 'image/png',
+            gif: 'image/gif',
+            webp: 'image/webp',
+            svg: 'image/svg+xml',
+            pdf: 'application/pdf',
+            mp4: 'video/mp4',
+            webm: 'video/webm',
+          }
+          contentType = mimeTypes[ext || ''] || 'application/octet-stream'
+        }
+      } else {
+        // Direct file/blob (from client-side File object)
+        fileBody = file
+        contentType = file.type || 'application/octet-stream'
       }
+
+      console.log('☁️ Uploading to S3:', {
+        bucket: this.bucketName,
+        key,
+        contentType,
+        bodyLength: fileBody?.length || fileBody?.size || 'unknown',
+        bodyType: typeof fileBody,
+      })
+
       const upload = new Upload({
         client: this.s3Client,
         params: {
@@ -59,13 +121,20 @@ export class S3Service {
           Key: key,
           Body: fileBody,
           ContentType: contentType,
-         // ACL: 'public-read',
         },
       })
-      await upload.done()
-      return `https://${this.bucketName}.s3.${this.region}.amazonaws.com/${key}`
+      
+      const result = await upload.done()
+      const fileUrl = `https://${this.bucketName}.s3.${this.region}.amazonaws.com/${key}`
+      
+      console.log('✅ S3 Upload successful:', {
+        fileUrl,
+        result: result,
+      })
+      
+      return fileUrl
     } catch (error) {
-      console.error('Error al subir archivo a S3:', error)
+      console.error('❌ Error al subir archivo a S3:', error)
       throw error
     }
   }
@@ -74,7 +143,7 @@ export class S3Service {
     if (!fileUrl) {
       throw new Error('No file URL provided for deletion')
     }
-    
+
     const key = fileUrl.split('.amazonaws.com/')[1]
 
     if (!key) {
@@ -98,7 +167,7 @@ export class S3Service {
       throw error
     }
   }
-  
+
   /**
    * Sanitize a path to prevent directory traversal attacks
    */
@@ -117,7 +186,7 @@ export class S3Service {
 
     return path
   }
-  
+
   /**
    * Sanitize a filename to ensure it's safe
    */

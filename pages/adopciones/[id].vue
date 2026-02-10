@@ -30,7 +30,8 @@
         <div class="mb-8">
           <h1 class="text-3xl font-bold text-emerald-800">Solicitudes de adopción</h1>
           <p v-if="pet" class="mt-2 text-gray-600">
-            Solicitudes para adoptar a <span class="font-semibold">{{ pet.name }}</span>
+            Solicitudes para adoptar a
+            <span class="font-semibold">{{ pet.name }}</span>
           </p>
           <p v-if="adoptionRequests.length === 0" class="mt-4 text-gray-500">
             Aún no has recibido solicitudes para esta mascota.
@@ -39,8 +40,8 @@
 
         <!-- Lista de solicitudes -->
         <div v-if="adoptionRequests.length > 0" class="grid gap-6">
-          <div 
-            v-for="request in adoptionRequests" 
+          <div
+            v-for="request in adoptionRequests"
             :key="request.id"
             class="overflow-hidden rounded-lg bg-white shadow-md"
           >
@@ -49,13 +50,16 @@
                 <div class="flex-1">
                   <div class="mb-4 flex items-center">
                     <div class="h-10 w-10 overflow-hidden rounded-full bg-emerald-100">
-                      <img 
-                        v-if="request.user?.photoURL" 
-                        :src="request.user.photoURL" 
-                        :alt="request.user?.name || 'Usuario'" 
+                      <img
+                        v-if="request.user?.photoURL"
+                        :src="request.user.photoURL"
+                        :alt="request.user?.name || 'Usuario'"
                         class="h-full w-full object-cover"
+                      />
+                      <div
+                        v-else
+                        class="flex h-full w-full items-center justify-center font-bold text-emerald-700"
                       >
-                      <div v-else class="flex h-full w-full items-center justify-center font-bold text-emerald-700">
                         {{ getInitials(request.user?.name || request.user?.email || 'U') }}
                       </div>
                     </div>
@@ -87,13 +91,19 @@
                   <div class="mb-4 grid grid-cols-1 gap-2 md:grid-cols-2">
                     <div class="flex items-center text-gray-700">
                       <Icon name="heroicons:envelope" class="mr-2 h-5 w-5 text-gray-400" />
-                      <a :href="`mailto:${request.user?.email}`" class="text-emerald-600 hover:text-emerald-800">
+                      <a
+                        :href="`mailto:${request.user?.email}`"
+                        class="text-emerald-600 hover:text-emerald-800"
+                      >
                         {{ request.user?.email || 'No disponible' }}
                       </a>
                     </div>
                     <div v-if="request.user?.phone" class="flex items-center text-gray-700">
                       <Icon name="heroicons:phone" class="mr-2 h-5 w-5 text-gray-400" />
-                      <a :href="`tel:${request.user.phone}`" class="text-emerald-600 hover:text-emerald-800">
+                      <a
+                        :href="`tel:${request.user.phone}`"
+                        class="text-emerald-600 hover:text-emerald-800"
+                      >
                         {{ request.user.phone }}
                       </a>
                     </div>
@@ -105,32 +115,43 @@
                     <div class="rounded-lg bg-gray-50 p-4">
                       <div class="flex items-center">
                         <div class="h-10 w-10 overflow-hidden rounded-full bg-emerald-100">
-                          <img 
-                            v-if="request.user.photoURL" 
-                            :src="request.user.photoURL" 
-                            :alt="request.user.name || 'Usuario'" 
+                          <img
+                            v-if="request.user.photoURL"
+                            :src="request.user.photoURL"
+                            :alt="request.user.name || 'Usuario'"
                             class="h-full w-full object-cover"
+                          />
+                          <div
+                            v-else
+                            class="flex h-full w-full items-center justify-center font-bold text-emerald-700"
                           >
-                          <div v-else class="flex h-full w-full items-center justify-center font-bold text-emerald-700">
                             {{ getInitials(request.user.name || request.user.email || 'U') }}
                           </div>
                         </div>
                         <div class="ml-4">
-                          <h3 class="font-semibold text-gray-900">{{ request.user.name || request.user.email || 'Usuario' }}</h3>
+                          <h3 class="font-semibold text-gray-900">
+                            {{ request.user.name || request.user.email || 'Usuario' }}
+                          </h3>
                           <p class="text-sm text-gray-500">Solicitante</p>
                         </div>
                       </div>
-                      
+
                       <div class="mt-4 grid grid-cols-1 gap-2 md:grid-cols-2">
                         <div class="flex items-center text-gray-700">
                           <Icon name="heroicons:envelope" class="mr-2 h-5 w-5 text-gray-400" />
-                          <a :href="`mailto:${request.user.email}`" class="text-emerald-600 hover:text-emerald-800">
+                          <a
+                            :href="`mailto:${request.user.email}`"
+                            class="text-emerald-600 hover:text-emerald-800"
+                          >
                             {{ request.user.email || 'No disponible' }}
                           </a>
                         </div>
                         <div v-if="request.user.phone" class="flex items-center text-gray-700">
                           <Icon name="heroicons:phone" class="mr-2 h-5 w-5 text-gray-400" />
-                          <a :href="`tel:${request.user.phone}`" class="text-emerald-600 hover:text-emerald-800">
+                          <a
+                            :href="`tel:${request.user.phone}`"
+                            class="text-emerald-600 hover:text-emerald-800"
+                          >
                             {{ request.user.phone }}
                           </a>
                         </div>
@@ -148,22 +169,27 @@
                     <div class="rounded-lg bg-blue-50 p-4">
                       <div class="flex items-center">
                         <div class="h-10 w-10 overflow-hidden rounded-full bg-blue-100">
-                          <img 
-                            v-if="user.photoURL" 
-                            :src="user.photoURL" 
-                            alt="Propietario" 
+                          <img
+                            v-if="user.photoURL"
+                            :src="user.photoURL"
+                            alt="Propietario"
                             class="h-full w-full object-cover"
+                          />
+                          <div
+                            v-else
+                            class="flex h-full w-full items-center justify-center font-bold text-blue-700"
                           >
-                          <div v-else class="flex h-full w-full items-center justify-center font-bold text-blue-700">
                             {{ getInitials(user.displayName || user.email || 'P') }}
                           </div>
                         </div>
                         <div class="ml-4">
-                          <h3 class="font-semibold text-gray-900">{{ user.displayName || user.email || 'Propietario' }}</h3>
+                          <h3 class="font-semibold text-gray-900">
+                            {{ user.displayName || user.email || 'Propietario' }}
+                          </h3>
                           <p class="text-sm text-gray-500">Propietario</p>
                         </div>
                       </div>
-                      
+
                       <div class="mt-4 grid grid-cols-1 gap-2 md:grid-cols-2">
                         <div class="flex items-center text-gray-700">
                           <Icon name="heroicons:envelope" class="mr-2 h-5 w-5 text-gray-400" />
@@ -180,8 +206,12 @@
                       </div>
 
                       <p class="mt-4 text-sm text-blue-600">
-                        Esta es la información que se comparte con el solicitante cuando apruebas su solicitud.
-                        Para actualizarla, ve a la <NuxtLink to="/perfil/configuracion" class="underline">configuración de tu perfil</NuxtLink>.
+                        Esta es la información que se comparte con el solicitante cuando apruebas su
+                        solicitud. Para actualizarla, ve a la
+                        <NuxtLink to="/perfil/configuracion" class="underline">
+                          configuración de tu perfil
+                        </NuxtLink>
+                        .
                       </p>
                     </div>
                   </div>
@@ -190,13 +220,13 @@
                 <!-- Estado y acciones -->
                 <div class="mt-4 flex-shrink-0 md:ml-6 md:mt-0 md:self-start">
                   <div class="mb-4 flex flex-col items-center">
-                    <span 
+                    <span
                       class="mb-2 inline-flex items-center rounded-full px-3 py-1 text-sm font-medium"
                       :class="{
                         'bg-yellow-100 text-yellow-800': request.status === 'pending',
                         'bg-green-100 text-green-800': request.status === 'approved',
                         'bg-red-100 text-red-800': request.status === 'rejected',
-                        'bg-blue-100 text-blue-800': request.status === 'completed'
+                        'bg-blue-100 text-blue-800': request.status === 'completed',
                       }"
                     >
                       {{ getStatusText(request.status) }}
@@ -207,37 +237,39 @@
                   </div>
 
                   <div class="space-y-2">
-                    <button 
+                    <button
                       v-if="request.status === 'pending'"
                       class="w-full rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700"
                       @click="updateStatus(request.id, 'approved')"
                     >
                       Aprobar
                     </button>
-                    <button 
+                    <button
                       v-if="request.status === 'pending'"
                       class="w-full rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700"
                       @click="updateStatus(request.id, 'rejected')"
                     >
                       Rechazar
                     </button>
-                    
+
                     <!-- Botón para completar adopción y generar certificado -->
-                    <button 
-                      v-if="request.status === 'approved' && (!pet.status || pet.status !== 'adopted')"
+                    <button
+                      v-if="
+                        request.status === 'approved' && (!pet.status || pet.status !== 'adopted')
+                      "
                       class="w-full rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
                       @click="completeAdoption(request)"
                     >
                       <Icon name="heroicons:check-badge" class="mr-1 h-5 w-5" />
                       Confirmar adopción
                     </button>
-                    
+
                     <!-- Acciones para adopciones completadas -->
                     <div v-if="request.status === 'completed'" class="space-y-2">
                       <!-- Enlace al certificado -->
-                      <NuxtLink 
+                      <NuxtLink
                         :to="`/certificados/${request.id}`"
-                        class="w-full rounded-lg bg-amber-600 px-4 py-2 text-center text-white hover:bg-amber-700 inline-flex items-center justify-center"
+                        class="inline-flex w-full items-center justify-center rounded-lg bg-amber-600 px-4 py-2 text-center text-white hover:bg-amber-700"
                       >
                         <Icon name="heroicons:document-text" class="mr-1 h-5 w-5" />
                         Ver certificado
@@ -246,22 +278,25 @@
                       <!-- Promover creación de historia de adopción -->
                       <div class="mt-2 rounded-lg border border-emerald-100 bg-emerald-50 p-3">
                         <p class="mb-2 text-sm text-emerald-800">
-                          <Icon name="heroicons:information-circle" class="inline-block mr-1 h-4 w-4" />
+                          <Icon
+                            name="heroicons:information-circle"
+                            class="mr-1 inline-block h-4 w-4"
+                          />
                           ¡La adopción ha sido completada exitosamente!
                         </p>
-                        <p class="text-xs text-emerald-700 mb-2">
+                        <p class="mb-2 text-xs text-emerald-700">
                           Invita al adoptante a compartir su historia de adopción.
                         </p>
-                        <NuxtLink 
+                        <NuxtLink
                           :to="`/historias/crear?petId=${request.petId}&adoptionId=${request.id}`"
-                          class="text-sm inline-flex w-full items-center justify-center rounded-md border border-emerald-600 px-3 py-1 font-medium text-emerald-600 hover:bg-emerald-50"
+                          class="inline-flex w-full items-center justify-center rounded-md border border-emerald-600 px-3 py-1 text-sm font-medium text-emerald-600 hover:bg-emerald-50"
                         >
                           <Icon name="heroicons:pencil-square" class="mr-1 h-4 w-4" />
                           Crear historia de adopción
                         </NuxtLink>
                       </div>
                     </div>
-                    
+
                     <button
                       class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50"
                       @click="openNotesModal(request)"
@@ -278,14 +313,14 @@
     </div>
 
     <!-- Modal para añadir/editar notas -->
-    <div v-if="showNotesModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+    <div
+      v-if="showNotesModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
+    >
       <div class="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
         <div class="mb-4 flex items-center justify-between">
           <h3 class="text-lg font-medium text-gray-900">Notas sobre esta solicitud</h3>
-          <button 
-            class="text-gray-400 hover:text-gray-500"
-            @click="closeNotesModal"
-          >
+          <button class="text-gray-400 hover:text-gray-500" @click="closeNotesModal">
             <Icon name="heroicons:x-mark" class="h-5 w-5" />
           </button>
         </div>
@@ -348,9 +383,15 @@ const router = useRouter()
 const petId = route.params.id
 
 // Composables
-const { fetchAdoptionsForOwner, updateAdoptionStatus, updateAdoptionNotes, getAdoptionById, confirmAdoptionAndVerify } = useAdoptions()
+const {
+  fetchAdoptionsForOwner,
+  updateAdoptionStatus,
+  updateAdoptionNotes,
+  getAdoptionById,
+  confirmAdoptionAndVerify,
+} = useAdoptions()
 const { fetchPetById } = usePets()
-const { isAuthenticated, user } = useAuth()
+const { isAuthenticated, user, isAdmin } = useAuth()
 
 // Estado
 const pet = ref(null)
@@ -398,8 +439,8 @@ onMounted(async () => {
       }
     }
 
-    // Verificar si el usuario es el propietario
-    if (!pet.value || pet.value.userId !== user.value.uid) {
+    // Verificar si el usuario es el propietario o admin
+    if (!pet.value || (pet.value.userId !== user.value.uid && !isAdmin.value)) {
       error.value = 'No tienes permiso para ver estas solicitudes'
       loading.value = false
       return
@@ -407,9 +448,9 @@ onMounted(async () => {
 
     // Cargar las solicitudes de adopción
     const adoptions = await fetchAdoptionsForOwner(user.value.uid)
-    
+
     // Filtrar solo las solicitudes para esta mascota
-    adoptionRequests.value = adoptions.filter(adoption => adoption.petId === petId)
+    adoptionRequests.value = adoptions.filter((adoption) => adoption.petId === petId)
   } catch (err) {
     console.error('Error al cargar solicitudes:', err)
     error.value = 'Error al cargar las solicitudes. Por favor, intenta de nuevo.'
@@ -421,7 +462,7 @@ onMounted(async () => {
 // Formatear fecha
 const formatDate = (timestamp) => {
   if (!timestamp) return 'Fecha desconocida'
-  
+
   const date = new Date(timestamp)
   const now = new Date()
   const diffMs = now - date
@@ -429,7 +470,7 @@ const formatDate = (timestamp) => {
   const diffMin = Math.floor(diffSec / 60)
   const diffHour = Math.floor(diffMin / 60)
   const diffDay = Math.floor(diffHour / 24)
-  
+
   if (diffSec < 60) {
     return 'hace unos segundos'
   } else if (diffMin < 60) {
@@ -442,7 +483,7 @@ const formatDate = (timestamp) => {
     return date.toLocaleDateString('es-ES', {
       day: 'numeric',
       month: 'short',
-      year: 'numeric'
+      year: 'numeric',
     })
   }
 }
@@ -468,7 +509,7 @@ const getInitials = (name) => {
   if (!name) return 'U'
   return name
     .split(' ')
-    .map(part => part.charAt(0))
+    .map((part) => part.charAt(0))
     .join('')
     .toUpperCase()
     .substring(0, 2)
@@ -488,21 +529,21 @@ const showAlert = (title, message) => {
 // Actualizar estado de una solicitud
 const updateStatus = (adoptionId, status) => {
   const action = status === 'approved' ? 'aprobar' : 'rechazar'
-  
+
   modalType.value = 'confirm'
   modalTitle.value = `Confirmar ${action}`
   modalMessage.value = `¿Estás seguro de que quieres ${action} esta solicitud?`
   modalConfirmText.value = 'Confirmar'
-  
+
   confirmAction = async () => {
     showModal.value = false
     try {
       loading.value = true
       const success = await updateAdoptionStatus(adoptionId, status)
-      
+
       if (success) {
         // Actualizar el estado en la UI
-        const index = adoptionRequests.value.findIndex(a => a.id === adoptionId)
+        const index = adoptionRequests.value.findIndex((a) => a.id === adoptionId)
         if (index !== -1) {
           adoptionRequests.value[index].status = status
           adoptionRequests.value[index].updatedAt = Date.now()
@@ -526,18 +567,18 @@ const completeAdoption = (adoption) => {
   modalTitle.value = 'Confirmar adopción'
   modalMessage.value = `¿Estás seguro de que quieres confirmar que ${pet.value.name} ha sido adoptado por ${adoption.user?.name || 'este usuario'}? Esto marcará la mascota como adoptada y generará un certificado de adopción.`
   modalConfirmText.value = 'Confirmar'
-  
+
   confirmAction = async () => {
     showModal.value = false
     try {
       loading.value = true
-      
+
       // Completar la adopción y crear verificación
       const verificationId = await confirmAdoptionAndVerify(adoption.id, null, false)
 
       if (verificationId) {
         // Actualizar el estado en la UI
-        const index = adoptionRequests.value.findIndex(a => a.id === adoption.id)
+        const index = adoptionRequests.value.findIndex((a) => a.id === adoption.id)
         if (index !== -1) {
           adoptionRequests.value[index].status = 'completed'
           adoptionRequests.value[index].updatedAt = Date.now()
@@ -582,20 +623,20 @@ const closeNotesModal = () => {
 // Guardar notas
 const saveNotes = async () => {
   if (!currentAdoption.value) return
-  
+
   try {
     loading.value = true
-    
+
     const success = await updateAdoptionNotes(currentAdoption.value.id, notesText.value)
-    
+
     if (success) {
       // Actualizar las notas en la UI
-      const index = adoptionRequests.value.findIndex(a => a.id === currentAdoption.value.id)
+      const index = adoptionRequests.value.findIndex((a) => a.id === currentAdoption.value.id)
       if (index !== -1) {
         adoptionRequests.value[index].notes = notesText.value
         adoptionRequests.value[index].updatedAt = Date.now()
       }
-      
+
       closeNotesModal()
     } else {
       error.value = 'Error al guardar las notas'

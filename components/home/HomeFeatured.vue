@@ -1,44 +1,54 @@
 <template>
-  <section class="relative overflow-hidden bg-gradient-to-b from-emerald-600 to-emerald-700 py-12 lg:py-16">
+  <section
+    class="relative overflow-hidden bg-gradient-to-b from-emerald-600 to-emerald-700 py-12 lg:py-16"
+  >
     <!-- Decorative Background Pattern -->
     <div class="absolute inset-0 opacity-10">
       <svg class="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
         <path d="M0 100 C 20 0 50 0 100 100 Z" fill="white" />
       </svg>
     </div>
-    
+
     <div class="container relative mx-auto px-4">
       <!-- Header Section -->
       <div class="mb-10 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
         <div class="max-w-xl">
-          <span class="mb-2 inline-block rounded-full bg-emerald-500/30 px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-100 backdrop-blur-sm">
+          <span
+            class="mb-2 inline-block rounded-full bg-emerald-500/30 px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-100 backdrop-blur-sm"
+          >
             Destacados de la semana
           </span>
           <h2 class="text-3xl font-black leading-tight text-white md:text-4xl lg:text-5xl">
             Amigos buscando hogar
           </h2>
           <p class="mt-4 text-lg text-emerald-100">
-            Estas mascotas han esperado mucho tiempo por una familia. <br class="hidden md:block" />
+            Estas mascotas han esperado mucho tiempo por una familia.
+            <br class="hidden md:block" />
             ¡Podrías ser tú quien cambie su vida hoy!
           </p>
         </div>
-        
+
         <NuxtLink
           to="/mascotas"
           class="group hidden items-center gap-2 rounded-full bg-white/10 px-6 py-3 font-semibold text-white transition-all hover:bg-white hover:text-emerald-700 md:flex"
         >
           Ver todos los peluditos
-          <Icon 
-            name="heroicons:arrow-right" 
-            class="h-5 w-5 transition-transform group-hover:translate-x-1" 
+          <Icon
+            name="heroicons:arrow-right"
+            class="h-5 w-5 transition-transform group-hover:translate-x-1"
           />
         </NuxtLink>
       </div>
 
       <!-- Loading State -->
-      <div v-if="loading" class="flex h-64 items-center justify-center rounded-3xl bg-white/5 backdrop-blur-sm">
+      <div
+        v-if="loading"
+        class="flex h-64 items-center justify-center rounded-3xl bg-white/5 backdrop-blur-sm"
+      >
         <div class="flex flex-col items-center gap-4">
-          <div class="h-12 w-12 animate-spin rounded-full border-4 border-white/20 border-t-white" />
+          <div
+            class="h-12 w-12 animate-spin rounded-full border-4 border-white/20 border-t-white"
+          />
           <p class="text-emerald-100">Buscando compañeros...</p>
         </div>
       </div>
@@ -48,7 +58,7 @@
         <Icon name="heroicons:face-frown" class="mx-auto mb-4 h-16 w-16 text-emerald-200" />
         <h3 class="text-xl font-bold text-white">Oops, hubo un problema</h3>
         <p class="mt-2 text-emerald-100">{{ error }}</p>
-        <button 
+        <button
           class="mt-6 rounded-xl bg-white px-6 py-2 font-bold text-emerald-700 shadow-lg transition-transform hover:scale-105"
           @click="loadFeaturedPets"
         >
@@ -57,7 +67,10 @@
       </div>
 
       <!-- Empty State -->
-      <div v-else-if="featuredPets.length === 0" class="rounded-3xl bg-white/5 p-8 text-center backdrop-blur-sm">
+      <div
+        v-else-if="featuredPets.length === 0"
+        class="rounded-3xl bg-white/5 p-8 text-center backdrop-blur-sm"
+      >
         <Icon name="heroicons:home" class="mx-auto mb-4 h-16 w-16 text-emerald-200" />
         <h3 class="text-xl font-bold text-white">No hay destacados por ahora</h3>
         <p class="mt-2 text-emerald-100">Explora nuestra lista completa para ver a todos.</p>
@@ -67,9 +80,11 @@
       <div v-else>
         <!-- Mobile: Horizontal Scroll (Snaps) -->
         <!-- Desktop: Grid -->
-        <div class="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-8 md:grid md:grid-cols-2 md:gap-6 md:overflow-visible md:pb-0 lg:grid-cols-4 scrollbar-hide">
-          <div 
-            v-for="pet in featuredPets" 
+        <div
+          class="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto pb-8 md:grid md:grid-cols-2 md:gap-6 md:overflow-visible md:pb-0 lg:grid-cols-4"
+        >
+          <div
+            v-for="pet in featuredPets"
             :key="pet.id"
             class="min-w-[85vw] snap-center sm:min-w-[300px] md:min-w-0"
           >
@@ -154,11 +169,11 @@ onMounted(async () => {
 <style scoped>
 /* Hide scrollbar for Chrome, Safari and Opera */
 .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 /* Hide scrollbar for IE, Edge and Firefox */
 .scrollbar-hide {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 </style>

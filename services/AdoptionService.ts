@@ -11,7 +11,7 @@ import {
   equalTo,
   limitToFirst,
   startAfter,
-  limitToLast
+  limitToLast,
 } from 'firebase/database'
 
 // Interfaz para una solicitud de adopción (Moved from composable)
@@ -45,31 +45,61 @@ export class AdoptionService {
    */
   async getAllAdoptions(page = 1, pageSize = 20, lastId?: string): Promise<Adoption[]> {
     let adoptionsQuery
-    
+
     // Si tenemos lastId, usamos startAfter para paginación
     if (lastId && page > 1) {
-       // Nota: Firebase Realtime Database no tiene paginación simple por página/tamaño sin un cursor
-       // Esta es una implementación aproximada basada en la lógica original
-       adoptionsQuery = query(
-        this.adoptionsRef, 
-        orderByChild('createdAt'), 
+      // Nota: Firebase Realtime Database no tiene paginación simple por página/tamaño sin un cursor
+      // Esta es una implementación aproximada basada en la lógica original
+      adoptionsQuery = query(
+        this.adoptionsRef,
+        orderByChild('createdAt'),
         limitToLast(pageSize) // Usamos limitToLast para obtener los más recientes
       )
     } else {
-      adoptionsQuery = query(
-        this.adoptionsRef, 
-        orderByChild('createdAt'), 
-        limitToLast(pageSize)
-      )
+      adoptionsQuery = query(this.adoptionsRef, orderByChild('createdAt'), limitToLast(pageSize))
     }
 
     const snapshot = await get(adoptionsQuery)
     if (snapshot.exists()) {
       const adoptions: Adoption[] = []
       snapshot.forEach((childSnapshot) => {
-        adoptions.push({ id: childSnapshot.key, ...childSnapshot.val() } as Adoption)
+        const val = childSnapshot.val()
+        // Filter out test items unless explicitly included (logic to include for admin would be separate,
+        // but for public safety we filter 'isTest' here. Admin page uses specific queries or client side filter if reusing this?)
+        // Actually, existing methods are used by Admin too.
+        // We should probably allow a flag or standard filter.
+        // For simplicity: Filter OUT if isTest is true.
+        // Admins will need a specific method or we rely on client-side filtering for Admin Panel
+        // (but Admin panel fetches ALL, so if we filter here, Admin won't see them either).
+        // WAIT: The requirement is "Only visible for administrators".
+        // Public pages use `getAllAdoptions`.
+        // Admin pages use `getAllAdoptions`.
+        // We need to differentiate context.
+        // Ideally, we pass `includeTest: boolean = false`.
+
+        if (!val.isTest) {
+          adoptions.push({ id: childSnapshot.key, ...val } as Adoption)
+        }
       })
       // Firebase devuelve en orden ascendente (más viejo a más nuevo), invertimos
+      return adoptions.reverse()
+    }
+    return []
+  }
+
+  /**
+   * Obtiene TODAS las adopciones (incluyendo test) - Para uso interno/admin
+   */
+  async getAllAdoptionsRaw(page = 1, pageSize = 20): Promise<Adoption[]> {
+    const adoptionsQuery = query(
+      this.adoptionsRef,
+      orderByChild('createdAt'),
+      limitToLast(pageSize)
+    )
+    const snapshot = await get(adoptionsQuery)
+    if (snapshot.exists()) {
+      const adoptions: Adoption[] = []
+      snapshot.forEach((child) => adoptions.push({ id: child.key, ...child.val() } as Adoption))
       return adoptions.reverse()
     }
     return []
@@ -88,10 +118,10 @@ export class AdoptionService {
       equalTo(status),
       limitToFirst(pageSize) // En este caso limitToFirst porque el índice es status
     )
-    
+
     // Nota: Para ordenar por fecha DENTRO del estado, se requeriría un índice compuesto 'status_createdAt'
     // Por ahora mantenemos la lógica simple
-    
+
     const snapshot = await get(adoptionsQuery)
     if (snapshot.exists()) {
       const adoptions: Adoption[] = []
@@ -114,25 +144,25 @@ export class AdoptionService {
     // Esto no es eficiente en Firebase RTDB si son muchas mascotas
     // Una mejor estructura sería tener `adoptionsByOwner/{ownerId}/{adoptionId}`
     // Pero basándonos en la estructura actual:
-    
+
     // Opción A: Consultar todas y filtrar (lento)
     // Opción B: Consultar por petId para cada mascota (N consultas)
-    
-    const promises = petIds.map(petId => 
+
+    const promises = petIds.map((petId) =>
       get(query(this.adoptionsRef, orderByChild('petId'), equalTo(petId)))
     )
-    
+
     const snapshots = await Promise.all(promises)
     const adoptions: Adoption[] = []
-    
-    snapshots.forEach(snapshot => {
+
+    snapshots.forEach((snapshot) => {
       if (snapshot.exists()) {
-        snapshot.forEach(child => {
-           adoptions.push({ id: child.key, ...child.val() } as Adoption)
+        snapshot.forEach((child) => {
+          adoptions.push({ id: child.key, ...child.val() } as Adoption)
         })
       }
     })
-    
+
     return adoptions.sort((a, b) => b.createdAt - a.createdAt)
   }
 
@@ -140,12 +170,8 @@ export class AdoptionService {
    * Obtiene solicitudes hechas POR un usuario
    */
   async getUserAdoptions(userId: string): Promise<Adoption[]> {
-    const adoptionsQuery = query(
-      this.adoptionsRef,
-      orderByChild('userId'),
-      equalTo(userId)
-    )
-    
+    const adoptionsQuery = query(this.adoptionsRef, orderByChild('userId'), equalTo(userId))
+
     const snapshot = await get(adoptionsQuery)
     if (snapshot.exists()) {
       const adoptions: Adoption[] = []
@@ -183,7 +209,7 @@ export class AdoptionService {
   async updateStatus(adoptionId: string, status: string, notes?: string): Promise<void> {
     const updates: any = { status, updatedAt: Date.now() }
     if (notes) updates.notes = notes
-    
+
     await update(dbRef(this.db, `adoptions/${adoptionId}`), updates)
   }
 
@@ -191,9 +217,9 @@ export class AdoptionService {
    * Actualiza notas
    */
   async updateNotes(adoptionId: string, notes: string): Promise<void> {
-    await update(dbRef(this.db, `adoptions/${adoptionId}`), { 
-      notes, 
-      updatedAt: Date.now() 
+    await update(dbRef(this.db, `adoptions/${adoptionId}`), {
+      notes,
+      updatedAt: Date.now(),
     })
   }
 
@@ -208,10 +234,10 @@ export class AdoptionService {
    * Busca adopciones por Pet ID
    */
   async getAdoptionsByPetId(petId: string): Promise<Adoption[]> {
-     const q = query(this.adoptionsRef, orderByChild('petId'), equalTo(petId))
-     const snapshot = await get(q)
-     
-     if (snapshot.exists()) {
+    const q = query(this.adoptionsRef, orderByChild('petId'), equalTo(petId))
+    const snapshot = await get(q)
+
+    if (snapshot.exists()) {
       const adoptions: Adoption[] = []
       snapshot.forEach((childSnapshot) => {
         adoptions.push({ id: childSnapshot.key, ...childSnapshot.val() } as Adoption)
@@ -228,6 +254,26 @@ export class AdoptionService {
     // Firebase RTDB no soporta queries compuestos nativamente (where userId = X AND petId = Y)
     // Buscamos por userId (que suele tener menos registros que petId en total) y filtramos
     const userAdoptions = await this.getUserAdoptions(userId)
-    return userAdoptions.find(a => a.petId === petId) || null
+    return userAdoptions.find((a) => a.petId === petId) || null
+  }
+
+  /**
+   * Elimina solicitudes por Pet ID y retorna las eliminadas
+   */
+  async deleteAdoptionsByPetId(petId: string): Promise<Adoption[]> {
+    const adoptionsQuery = query(this.adoptionsRef, orderByChild('petId'), equalTo(petId))
+
+    const snapshot = await get(adoptionsQuery)
+    const deletedAdoptions: Adoption[] = []
+
+    if (snapshot.exists()) {
+      const updates: Record<string, null> = {}
+      snapshot.forEach((child) => {
+        deletedAdoptions.push({ id: child.key, ...child.val() } as Adoption)
+        updates[child.key!] = null
+      })
+      await update(this.adoptionsRef, updates)
+    }
+    return deletedAdoptions
   }
 }

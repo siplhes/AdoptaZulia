@@ -225,8 +225,7 @@
 import { ref, computed } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 import { usePetComments } from '~/composables/usePetComments'
-import { format } from 'date-fns'
-import { es } from 'date-fns/locale'
+import { formatDateTime } from '~/utils/dateFormatter'
 
 const props = defineProps({
   petId: {
@@ -316,10 +315,7 @@ const deleteSelectedComment = async () => {
   }
 }
 
-const formatDate = (timestamp) => {
-  if (!timestamp) return ''
-  return format(new Date(timestamp), 'dd MMMM yyyy, HH:mm', { locale: es })
-}
+const formatDate = (timestamp) => formatDateTime(timestamp)
 
 // Computed
 const canSubmit = computed(() => {
