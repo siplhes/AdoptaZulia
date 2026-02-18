@@ -1,0 +1,142 @@
+/* Global Styles */
+
+:root {
+  --ion-dynamic-font: 1rem;
+}
+
+/* 1. Reset & Global Font */
+body {
+  font-family: 'Nunito', sans-serif !important;
+  font-size: var(--ion-dynamic-font);
+}
+
+ion-app, ion-content, p, h1, h2, h3, h4, h5, h6, ion-text, span, div, ion-item, ion-label, ion-input, ion-textarea, ion-button {
+  font-family: 'Nunito', sans-serif !important;
+  font-size: var(--ion-dynamic-font);
+}
+
+/* 2. Typography - Playful & Bold */
+h1 {
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+h2 {
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+/* 3. Cards - Rounded & Floating */
+ion-card {
+  border-radius: 20px !important;
+  box-shadow: 0 4px 0 var(--ion-color-light-shade) !important; /* "3D" button effect */
+  margin-bottom: 20px;
+  border: 2px solid var(--ion-color-light-shade);
+  background: var(--ion-card-background, white);
+  overflow: visible !important; /* Allow badges to pop out */
+  transition: transform 0.1s;
+}
+ion-card:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 var(--ion-color-light-shade) !important;
+}
+
+/* 4. Buttons - Duolingo Style (Chunky & 3D) */
+ion-button {
+  --border-radius: 16px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  --box-shadow: 0 4px 0 rgba(0,0,0,0.2) !important;
+  margin-bottom: 8px; /* Space for shadow */
+}
+ion-button[fill="clear"] {
+  --box-shadow: none !important;
+}
+ion-button.button-solid {
+  --background-hover: var(--ion-color-base); /* No hover change, just click */
+  --opacity: 1;
+}
+
+/* 5. Inputs - Rounded pills */
+ion-item {
+  --border-radius: 16px;
+  --background: var(--ion-color-light);
+  --border-color: transparent;
+  margin-bottom: 12px;
+  --padding-start: 16px;
+}
+ion-item.item-has-focus {
+  --border-color: var(--ion-color-primary);
+  border: 2px solid var(--ion-color-primary);
+}
+
+/* 7. Utilities */
+.text-center { text-align: center; }
+.w-full { width: 100%; }
+.mt-4 { margin-top: 1rem; }
+.mb-4 { margin-bottom: 1rem; }
+
+/* 8. Component Specific Overrides */
+/* Badge - Pill shape */
+ion-badge {
+  border-radius: 12px;
+  padding: 6px 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+/* Chip - Chunky */
+ion-chip {
+  --background: var(--ion-color-light);
+  --color: var(--ion-color-medium-contrast);
+  border-radius: 12px;
+  font-weight: 700;
+  border: 2px solid transparent;
+}
+ion-chip[outline] {
+  border-color: var(--ion-color-medium-shade);
+}
+ion-chip[color="primary"] {
+  --background: var(--ion-color-primary-tint);
+  --color: var(--ion-color-primary-contrast);
+}
+
+/* FAB - Floating Action Button */
+ion-fab-button {
+  --box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+}
+
+/* 9. Animations */
+.fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.fade-in-up {
+  opacity: 0;
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+/* Stagger delays (manual for now) */
+.fade-in-up:nth-child(1) { animation-delay: 0.1s; }
+.fade-in-up:nth-child(2) { animation-delay: 0.2s; }
+.fade-in-up:nth-child(3) { animation-delay: 0.3s; }
+.fade-in-up:nth-child(4) { animation-delay: 0.4s; }
+.fade-in-up:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
