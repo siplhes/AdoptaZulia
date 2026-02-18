@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "325688912375",
+    "firebase_url": "https://adopta-zulia-default-rtdb.firebaseio.com",
+    "project_id": "adopta-zulia",
+    "storage_bucket": "adopta-zulia.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:325688912375:android:dc448633b0eb6fa878a6f2",
+        "android_client_info": {
+          "package_name": "com.adoptazulia.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "325688912375-okjuaild32n0v41bmgp14or7utio0von.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAC3Wd7ntaxtgWLWvZu8TX75_JSdbOAyz8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "325688912375-okjuaild32n0v41bmgp14or7utio0von.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
