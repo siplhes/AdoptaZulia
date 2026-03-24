@@ -78,6 +78,9 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
+      htmlAttrs: {
+        lang: 'es',
+      },
       title: 'Adopta Zulia',
       meta: [
         { charset: 'utf-8' },

@@ -220,6 +220,7 @@ import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { useAuth } from '~/composables/useAuth'
 import { useStats } from '~/composables/useStats'
+import { useActivityTimeline } from '~/composables/useActivityTimeline'
 
 // Set layout and middleware
 definePageMeta({
@@ -229,8 +230,8 @@ definePageMeta({
 
 const { user } = useAuth()
 const { stats, loading, fetchStats, adoptionTrends, petDistribution } = useStats()
+const { activities: recentActivities, loading: loadingActivities, fetchActivities } = useActivityTimeline()
 
-const loadingActivities = ref(false)
 const selectedPeriod = ref('month')
 
 // Computed
@@ -309,42 +310,6 @@ const doughnutOptions = {
   },
 }
 
-// Recent Activities (mock data - replace with real data)
-const recentActivities = ref([
-  {
-    type: 'adoption',
-    title: 'Nueva adopción completada',
-    description: 'Usuario adoptó a Max',
-    timestamp: Date.now() - 3600000,
-    badge: 'Completada',
-  },
-  {
-    type: 'pet',
-    title: 'Nueva mascota publicada',
-    description: 'Perro Luna disponible para adopción',
-    timestamp: Date.now() - 7200000,
-  },
-  {
-    type: 'lost',
-    title: 'Mascota perdida reportada',
-    description: 'Gato en zona centro',
-    timestamp: Date.now() - 10800000,
-    badge: 'Urgente',
-  },
-  {
-    type: 'user',
-    title: 'Nuevo usuario registrado',
-    description: 'María González se unió a la plataforma',
-    timestamp: Date.now() - 14400000,
-  },
-  {
-    type: 'story',
-    title: 'Nueva historia publicada',
-    description: 'Historia de adopción de Rocky',
-    timestamp: Date.now() - 18000000,
-  },
-])
-
 // Methods
 const handlePeriodChange = async (period) => {
   selectedPeriod.value = period
@@ -353,6 +318,9 @@ const handlePeriodChange = async (period) => {
 
 // Load data on mount
 onMounted(async () => {
-  await fetchStats(selectedPeriod.value)
+  await Promise.all([
+    fetchStats(selectedPeriod.value),
+    fetchActivities(),
+  ])
 })
 </script>

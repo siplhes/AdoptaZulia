@@ -10,7 +10,7 @@
 
 <script setup>
 const config = useRuntimeConfig()
-const baseUrl = config.public.baseUrl || 'https://adopta-zulia.vercel.app'
+const baseUrl = config.public.baseUrl || 'https://www.adoptazulia.org.ve/'
 const route = useRoute()
 
 const canonicalUrl = computed(() => `${baseUrl}${route.path}`)
