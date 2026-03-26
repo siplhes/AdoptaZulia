@@ -632,6 +632,7 @@ useSeoMeta({
   ogTitle: 'Mascotas Perdidas y Encontradas - Adopta Zulia',
   ogDescription:
     'Comunidad de apoyo para encontrar mascotas perdidas en Zulia. Publica reportes y ayuda a difundir.',
+  ogSiteName: 'Adopta Zulia',
   ogImage,
   ogImageAlt: 'Mascotas perdidas en Zulia',
   ogUrl: canonicalUrl,

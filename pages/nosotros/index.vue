@@ -142,6 +142,7 @@ useSeoMeta({
   ogTitle: 'Sobre Nosotros - Adopta Zulia',
   ogDescription:
     'Conoce nuestra misión, visión y el equipo de voluntarios dedicados al bienestar animal en Zulia.',
+  ogSiteName: 'Adopta Zulia',
   ogImage,
   ogImageAlt: 'Equipo de Adopta Zulia',
   ogUrl: canonicalUrl,

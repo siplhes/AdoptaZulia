@@ -221,7 +221,7 @@ const toast = useToast()
 const { fetchStoryById, likeStory, deleteStory, loading, error } = useAdoptionStories()
 const { user, isAuthenticated } = useAuth()
 const config = useRuntimeConfig()
-const baseUrl = config.public.baseUrl || 'https://adopta-zulia.vercel.app'
+const baseUrl = config.public.baseUrl || 'https://www.adoptazulia.org.ve'
 
 // Estado local
 const story = ref(null)
@@ -246,6 +246,7 @@ useSeoMeta({
       ? `Historia de adopción de ${story.value.pet?.name || 'una mascota'}. ${story.value.content?.substring(0, 100)}...`
       : 'Historia de adopción'
   ),
+  ogSiteName: 'Adopta Zulia',
   ogImage: computed(() => useOgImage(story.value?.images?.[0] || story.value?.pet?.image, baseUrl)),
   ogUrl: computed(() => useCanonicalUrl(`/historias/${storyId}`, baseUrl)),
   ogType: 'article',

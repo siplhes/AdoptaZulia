@@ -770,6 +770,7 @@ useSeoMeta({
       ? `Ayuda a ${pet.value.name} a encontrar un hogar. ${pet.value.description?.substring(0, 100)}...`
       : 'Ayuda a esta mascota a encontrar un hogar'
   ),
+  ogSiteName: 'Adopta Zulia',
   ogImage: computed(() => useOgImage(pet.value?.image || pet.value?.photos?.[0])),
   ogUrl: computed(() => useCanonicalUrl(`/mascotas/${petId}`)),
   twitterTitle: computed(() => (pet.value ? `Adopta a ${pet.value.name}` : 'Mascota en adopción')),

@@ -458,6 +458,7 @@ useSeoMeta({
   ogTitle: 'Haz una Donación - Adopta Zulia',
   ogDescription:
     'Tu aporte transforma vidas. Ayúdanos a seguir rescatando, rehabilitando y encontrando hogares para mascotas en Zulia.',
+  ogSiteName: 'Adopta Zulia',
   ogImage,
   ogImageAlt: 'Ayuda a las mascotas de Zulia',
   ogUrl: canonicalUrl,

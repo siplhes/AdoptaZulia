@@ -22,6 +22,7 @@ useSeoMeta({
   ogTitle: 'Adopta Zulia | Adopta, no compres',
   ogDescription:
     'Plataforma de adopción de mascotas en el estado Zulia, Venezuela. Encuentra tu compañero perfecto, comparte historias de adopción y ayuda a mascotas que necesitan un hogar.',
+  ogSiteName: 'Adopta Zulia',
   ogImage: `${baseUrl}/og.jpg`,
   ogImageAlt: 'Adopta Zulia - Plataforma de adopción de mascotas',
   ogUrl: canonicalUrl,

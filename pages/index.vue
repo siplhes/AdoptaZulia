@@ -32,6 +32,7 @@ useSeoMeta({
   ogTitle: 'Adopta Zulia - Plataforma de adopción de mascotas',
   ogDescription:
     'Descubre mascotas en adopción en el estado Zulia. Encuentra tu compañero perfecto, lee historias inspiradoras y aprende cómo puedes ayudar.',
+  ogSiteName: 'Adopta Zulia',
   ogImage,
   ogImageAlt: 'Adopta Zulia - Mascotas buscando hogar',
   ogUrl: canonicalUrl,

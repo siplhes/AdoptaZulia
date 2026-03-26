@@ -213,6 +213,7 @@ useSeoMeta({
   ogTitle: 'Historias de Adopción - Adopta Zulia',
   ogDescription:
     'Historias reales de amor y segunda oportunidad. Descubre cómo una adopción puede cambiar vidas.',
+  ogSiteName: 'Adopta Zulia',
   ogImage,
   ogImageAlt: 'Finales felices en Adopta Zulia',
   ogUrl: canonicalUrl,

@@ -657,6 +657,7 @@ useSeoMeta({
   ogTitle: 'Mascotas en adopción - Adopta Zulia',
   ogDescription:
     'Explora nuestra lista de mascotas disponibles para adopción. Encuentra tu compañero ideal filtrando por tipo, tamaño, edad y ubicación.',
+  ogSiteName: 'Adopta Zulia',
   ogImage,
   ogImageAlt: 'Mascotas disponibles para adopción en Zulia',
   ogUrl: canonicalUrl,
