@@ -5,10 +5,13 @@
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
+    <Analytics />
   </div>
 </template>
 
 <script setup>
+import { Analytics } from '@vercel/analytics/nuxt'
+
 const config = useRuntimeConfig()
 const baseUrl = config.public.baseUrl || 'https://www.adoptazulia.org.ve/'
 const route = useRoute()
