@@ -14,8 +14,6 @@ export default defineEventHandler(async (event) => {
     })
     const formData = await readMultipartFormData(event)
 
-    console.log('📦 FormData recibido:', formData?.length, 'fields')
-
     if (!formData || formData.length === 0) {
       throw createError({
         statusCode: 400,
@@ -23,17 +21,9 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    const fileField = formData.find((field) => field.name === 'file')
-    const folderField = formData.find((field) => field.name === 'folder')
-    const fileNameField = formData.find((field) => field.name === 'fileName')
-
-    console.log('📎 File field:', {
-      exists: !!fileField,
-      name: fileField?.name,
-      filename: fileField?.filename,
-      type: fileField?.type,
-      dataLength: fileField?.data?.length,
-    })
+    const fileField    = formData.find((f) => f.name === 'file')
+    const folderField  = formData.find((f) => f.name === 'folder')
+    const fileNameField = formData.find((f) => f.name === 'fileName')
 
     if (!fileField || !fileField.data) {
       throw createError({
@@ -41,21 +31,45 @@ export default defineEventHandler(async (event) => {
         message: 'No se encontró el archivo en la solicitud',
       })
     }
-    const file = fileField
-    const folder = folderField?.data ? new TextDecoder().decode(folderField.data) : 'uploads'
-    const fileName = fileNameField?.data
-      ? new TextDecoder().decode(fileNameField.data)
-      : file.filename || 'file'
+
+    const folder   = folderField?.data   ? new TextDecoder().decode(folderField.data)   : 'uploads'
+    const fileName = fileNameField?.data ? new TextDecoder().decode(fileNameField.data) : (fileField.filename || 'file')
+
+    // Preserve the MIME type sent by the client (important for WebP files)
+    const file = {
+      ...fileField,
+      type: fileField.type || deriveContentType(fileName),
+    }
+
+    console.log('📤 [upload] Subiendo a S3:', { folder, fileName, type: file.type, bytes: file.data.length })
 
     const fileUrl = await s3Service.uploadFile(file, folder, fileName)
 
     return { fileUrl }
   } catch (error: any) {
-    console.error('Error en el endpoint de carga:', error)
-
+    console.error('[upload] Error:', error)
     throw createError({
       statusCode: 500,
       message: `Error al subir archivo: ${error.message}`,
     })
   }
 })
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function deriveContentType(fileName: string): string {
+  const ext = fileName.split('.').pop()?.toLowerCase() ?? ''
+  const map: Record<string, string> = {
+    webp: 'image/webp',
+    jpg:  'image/jpeg',
+    jpeg: 'image/jpeg',
+    png:  'image/png',
+    gif:  'image/gif',
+    avif: 'image/avif',
+    svg:  'image/svg+xml',
+    pdf:  'application/pdf',
+    mp4:  'video/mp4',
+    webm: 'video/webm',
+  }
+  return map[ext] ?? 'application/octet-stream'
+}

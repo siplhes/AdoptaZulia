@@ -1,82 +1,91 @@
-import { S3Service } from '~/services/S3Service'
 import { useImageOptimizer } from '~/composables/useImageOptimizer'
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface UploadOptions {
+  /** Whether to run the image optimizer before uploading. Default: true */
+  optimize?: boolean
+  /** Convert to WebP before uploading. Default: true (requires optimize: true) */
+  convertToWebP?: boolean
+  /** Max size in MB after optimization. Default: 1 */
+  maxSizeMB?: number
+  /** Max width or height in pixels. Default: 1920 */
+  maxWidthOrHeight?: number
+  /** WebP quality 0–1. Default: 0.82 */
+  quality?: number
+}
+
+// ─── Helper ───────────────────────────────────────────────────────────────────
+
+/** Replace or append the WebP extension on a filename */
+function toWebPName(name: string): string {
+  const dot = name.lastIndexOf('.')
+  const base = dot !== -1 ? name.slice(0, dot) : name
+  return `${base}.webp`
+}
+
+// ─── Composable ───────────────────────────────────────────────────────────────
+
 export const useS3 = () => {
-  const config = useRuntimeConfig()
   const { optimizeImage } = useImageOptimizer()
 
+  /**
+   * Optimize (and convert to WebP by default) an image File, then POST it
+   * to the server upload endpoint which streams it to AWS S3.
+   *
+   * Returns the public S3 URL.
+   */
   const uploadFile = async (
     file: File,
     folder: string,
     fileName: string,
-    options?: {
-      optimize?: boolean
-      maxSizeMB?: number
-      maxWidthOrHeight?: number
-      quality?: number
-    }
+    options?: UploadOptions
   ): Promise<string> => {
     try {
-      // Optimizar la imagen si la opción está habilitada (por defecto: true)
       const shouldOptimize = options?.optimize !== false
+      const shouldWebP = options?.convertToWebP !== false
       let fileToUpload = file
+      let uploadName = fileName
 
-      console.log('🖼️ [Frontend] Archivo original:', {
+      console.log('🖼️ [S3] Archivo original:', {
         name: file.name,
-        size: file.size,
+        size: formatBytes(file.size),
         type: file.type,
-        isFile: file instanceof File,
       })
 
       if (shouldOptimize && file.type.startsWith('image/')) {
-        // Configurar opciones de optimización
         const optimizationOptions = {
-          maxSizeMB: options?.maxSizeMB || 1,
-          maxWidthOrHeight: options?.maxWidthOrHeight || 1920,
-          quality: options?.quality || 0.8,
+          maxSizeMB: options?.maxSizeMB ?? 1,
+          maxWidthOrHeight: options?.maxWidthOrHeight ?? 1920,
+          quality: options?.quality ?? 0.82,
           useWebWorker: true,
+          fileType: shouldWebP ? ('image/webp' as const) : undefined,
         }
 
-        console.log('🔄 [Frontend] Optimizando imagen...')
-        
-        // Optimizar la imagen antes de subirla y extraer el archivo del resultado
         const result = await optimizeImage(file, optimizationOptions)
-        
-        // Convert Blob to File with proper filename
-        const compressedBlob = result.file
-        fileToUpload = new File([compressedBlob], file.name, {
-          type: compressedBlob.type || file.type,
-          lastModified: Date.now(),
-        })
-        
-        console.log('✨ [Frontend] Imagen optimizada:', {
-          originalSize: result.originalSize,
-          compressedSize: result.compressedSize,
-          savings: result.savingsPercent + '%',
-          fileIsFile: fileToUpload instanceof File,
-          fileIsBlob: fileToUpload instanceof Blob,
-          fileSize: fileToUpload.size,
-          fileName: fileToUpload.name,
+
+        fileToUpload = result.file
+
+        // Rename to .webp so Content-Type and filename are consistent
+        if (shouldWebP) {
+          uploadName = toWebPName(fileName)
+        }
+
+        console.log('✨ [S3] Imagen optimizada:', {
+          original: formatBytes(result.originalSize),
+          optimizada: formatBytes(result.compressedSize),
+          ahorro: `${result.savingsPercent}%`,
+          formato: fileToUpload.type,
+          nombre: uploadName,
         })
       }
 
-      console.log('📤 [Frontend] Archivo a subir:', {
-        isFile: fileToUpload instanceof File,
-        isBlob: fileToUpload instanceof Blob,
-        size: fileToUpload?.size,
-        type: fileToUpload?.type,
-        name: fileToUpload?.name,
-      })
-
-      // Crear un FormData para enviar el archivo
+      // Build FormData
       const formData = new FormData()
-      formData.append('file', fileToUpload)
+      formData.append('file', fileToUpload, uploadName)
       formData.append('folder', folder)
-      formData.append('fileName', fileName)
+      formData.append('fileName', uploadName)
 
-      console.log('📦 [Frontend] FormData creado, enviando...')
-
-      // Llamar al endpoint del servidor para subir el archivo
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
@@ -90,77 +99,86 @@ export const useS3 = () => {
       const data = await response.json()
       return data.fileUrl
     } catch (error) {
-      console.error('Error al subir archivo:', error)
+      console.error('[S3] Error al subir archivo:', error)
       throw error
     }
   }
 
-  // Upload with progress callback (onProgress receives 0-100)
+  /**
+   * Same as uploadFile but reports upload progress (0–100) via the onProgress
+   * callback using XHR. Optimization happens before the XHR transfer starts.
+   */
   const uploadFileWithProgress = async (
     file: File,
     folder: string,
     fileName: string,
-    onProgress: (p: number) => void,
-    options?: {
-      optimize?: boolean
-      maxSizeMB?: number
-      maxWidthOrHeight?: number
-      quality?: number
-    }
+    onProgress: ((p: number) => void) | null,
+    options?: UploadOptions
   ): Promise<string> => {
-    // Optimize if needed
     const shouldOptimize = options?.optimize !== false
+    const shouldWebP = options?.convertToWebP !== false
     let fileToUpload: File = file
+    let uploadName = fileName
+
     if (shouldOptimize && file.type.startsWith('image/')) {
       const optimizationOptions = {
-        maxSizeMB: options?.maxSizeMB || 1,
-        maxWidthOrHeight: options?.maxWidthOrHeight || 1920,
-        quality: options?.quality || 0.8,
+        maxSizeMB: options?.maxSizeMB ?? 1,
+        maxWidthOrHeight: options?.maxWidthOrHeight ?? 1920,
+        quality: options?.quality ?? 0.82,
         useWebWorker: true,
+        fileType: shouldWebP ? ('image/webp' as const) : undefined,
       }
-      
+
       const result = await optimizeImage(file, optimizationOptions)
-      
-      // Convert Blob to File with proper filename
-      const compressedBlob = result.file
-      fileToUpload = new File([compressedBlob], file.name, {
-        type: compressedBlob.type || file.type,
-        lastModified: Date.now(),
+      fileToUpload = result.file
+
+      if (shouldWebP) {
+        uploadName = toWebPName(fileName)
+      }
+
+      console.log('✨ [S3] Imagen optimizada (con progreso):', {
+        original: formatBytes(result.originalSize),
+        optimizada: formatBytes(result.compressedSize),
+        ahorro: `${result.savingsPercent}%`,
+        formato: fileToUpload.type,
+        nombre: uploadName,
       })
     }
+
+    // Report 0 % while optimization was happening
+    onProgress?.(0)
 
     return new Promise((resolve, reject) => {
       try {
         const formData = new FormData()
-        formData.append('file', fileToUpload)
+        formData.append('file', fileToUpload, uploadName)
         formData.append('folder', folder)
-        formData.append('fileName', fileName)
+        formData.append('fileName', uploadName)
 
         const xhr = new XMLHttpRequest()
         xhr.open('POST', '/api/upload')
+
         xhr.upload.onprogress = (ev) => {
           if (ev.lengthComputable) {
             const percent = Math.round((ev.loaded / ev.total) * 100)
-            try {
-              onProgress(percent)
-            } catch (e) {
-              /* ignore */
-            }
+            try { onProgress?.(percent) } catch { /* ignore */ }
           }
         }
+
         xhr.onload = () => {
           if (xhr.status >= 200 && xhr.status < 300) {
             try {
               const resp = JSON.parse(xhr.responseText)
               resolve(resp.fileUrl)
-            } catch (e) {
-              reject(new Error('Invalid response from upload'))
+            } catch {
+              reject(new Error('Respuesta inválida del servidor de carga'))
             }
           } else {
             reject(new Error(`Upload failed: ${xhr.status}`))
           }
         }
-        xhr.onerror = () => reject(new Error('Network error during upload'))
+
+        xhr.onerror = () => reject(new Error('Error de red durante la subida'))
         xhr.send(formData)
       } catch (err) {
         reject(err)
@@ -168,14 +186,14 @@ export const useS3 = () => {
     })
   }
 
+  /**
+   * Delete a file from S3 by its public URL.
+   */
   const deleteFile = async (fileUrl: string): Promise<void> => {
     try {
-      // Llamar al endpoint del servidor para eliminar el archivo
       const response = await fetch('/api/delete-file', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fileUrl }),
       })
 
@@ -184,7 +202,7 @@ export const useS3 = () => {
         throw new Error(errorData.message || 'Error al eliminar el archivo')
       }
     } catch (error) {
-      console.error('Error al eliminar archivo:', error)
+      console.error('[S3] Error al eliminar archivo:', error)
       throw error
     }
   }
@@ -194,4 +212,13 @@ export const useS3 = () => {
     uploadFileWithProgress,
     deleteFile,
   }
+}
+
+// ─── Formatting helper (local) ────────────────────────────────────────────────
+function formatBytes(bytes: number): string {
+  if (bytes === 0) return '0 B'
+  const k = 1024
+  const sizes = ['B', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`
 }
