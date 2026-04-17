@@ -42,10 +42,6 @@ useHead({
       rel: 'canonical',
       href: canonicalUrl,
     },
-    {
-      rel: 'stylesheet',
-      href: 'https://unpkg.com/balloon-css/balloon.min.css',
-    },
   ],
   script: [
     {

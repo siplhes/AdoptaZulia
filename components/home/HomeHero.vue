@@ -9,7 +9,9 @@
         class="animate-slow-zoom h-full w-full scale-105 object-cover object-center"
         alt="Mascotas felices"
         loading="eager"
-        placeholder
+        fetchpriority="high"
+        width="1200"
+        height="600"
       />
       <!-- Gradient Overlays -->
       <div
@@ -45,7 +47,7 @@
           </span>
         </h1>
 
-        <p class="mb-6 max-w-lg text-base leading-relaxed text-emerald-100/90 md:text-lg">
+        <p class="mb-6 max-w-lg text-base leading-relaxed text-white md:text-lg">
           Más de
           <span class="font-bold text-white">1,200 mascotas</span>
           en el estado Zulia esperan por una segunda oportunidad. Cambia una vida hoy y gana un
@@ -76,7 +78,7 @@
         </div>
 
         <!-- Trust Indicators -->
-        <div class="mt-8 flex items-center gap-6 text-xs font-medium text-emerald-100/60">
+        <div class="mt-8 flex items-center gap-6 text-xs font-semibold text-emerald-50">
           <div class="flex items-center gap-2">
             <Icon name="heroicons:check-badge" class="h-4 w-4" />
             <span>Verificados</span>

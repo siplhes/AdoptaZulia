@@ -6,4 +6,4 @@ Allow: /donaciones
 Allow: /publicar
 Allow: /nosotros
 
-Sitemap: https://nsfwclothes.store/sitemap.xml
+Sitemap: https://www.adoptazulia.org.ve/sitemap.xml

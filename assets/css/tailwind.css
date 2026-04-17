@@ -1,10 +1,12 @@
+/* Import our centralized color system */
+@import './colors.css';
+
+
 @import 'balloon-css/balloon.min.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Import our centralized color system */
-@import './colors.css';
 
 /* Additional global styles */
 @layer base {

@@ -100,12 +100,36 @@
               <!-- Raza -->
               <div>
                 <label class="mb-1 block text-sm font-medium text-gray-700">Raza (Opcional)</label>
-                <input
-                  v-model="petData.breed"
-                  type="text"
-                  class="w-full rounded-lg border-gray-300 py-2.5 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
-                  placeholder="Mestizo, Husky..."
-                />
+                <div class="space-y-2">
+                  <select
+                    v-model="petData.breed"
+                    class="w-full rounded-lg border-gray-300 py-2.5 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+                  >
+                    <option value="">Seleccionar</option>
+                    <template v-if="petData.typeValue === 'perro'">
+                      <option v-for="breed in DOG_BREEDS" :key="breed" :value="breed">
+                        {{ breed }}
+                      </option>
+                    </template>
+                    <template v-else-if="petData.typeValue === 'gato'">
+                      <option v-for="breed in CAT_BREEDS" :key="breed" :value="breed">
+                        {{ breed }}
+                      </option>
+                    </template>
+                    <template v-else>
+                      <option value="Mestizo">Mestizo</option>
+                      <option value="Otro">Otro</option>
+                    </template>
+                  </select>
+                  
+                  <input
+                    v-if="petData.breed === 'Otro'"
+                    v-model="otherBreed"
+                    type="text"
+                    class="w-full rounded-lg border-gray-300 py-2.5 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+                    placeholder="Especifique la raza"
+                  />
+                </div>
               </div>
               <!-- Género -->
               <div>
@@ -135,17 +159,46 @@
                 </div>
               </div>
               <!-- Ubicación -->
-              <div>
-                <label class="mb-1 block text-sm font-medium text-gray-700">
-                  Ubicación
-                  <span class="text-red-500">*</span>
-                </label>
-                <input
-                  v-model="petData.location"
-                  type="text"
-                  class="w-full rounded-lg border-gray-300 py-2.5 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
-                  placeholder="Ciudad / Municipio"
-                />
+              <div class="space-y-4">
+                <div>
+                  <label class="mb-1 block text-sm font-medium text-gray-700">
+                    Ubicación / Sector
+                    <span class="text-red-500">*</span>
+                  </label>
+                  <select
+                    v-model="petData.location"
+                    class="w-full rounded-lg border-gray-300 py-2.5 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+                  >
+                    <option value="" disabled>Seleccionar sector</option>
+                    <option v-for="loc in COMMON_LOCATIONS" :key="loc" :value="loc">
+                      {{ loc }}
+                    </option>
+                  </select>
+                </div>
+
+                <div v-if="petData.location === 'Otro'">
+                  <label class="mb-1 block text-sm font-medium text-gray-700">
+                    Especifique la ciudad/municipio
+                  </label>
+                  <input
+                    v-model="otherLocation"
+                    type="text"
+                    class="w-full rounded-lg border-gray-300 py-2.5 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+                    placeholder="Ej: Machiques, Perijá..."
+                  />
+                </div>
+
+                <div>
+                  <label class="mb-1 block text-sm font-medium text-gray-700">
+                    Dirección específica o punto de referencia
+                  </label>
+                  <input
+                    v-model="petData.address"
+                    type="text"
+                    class="w-full rounded-lg border-gray-300 py-2.5 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+                    placeholder="Ej: Frente al colegio San Vicente"
+                  />
+                </div>
               </div>
             </div>
 
@@ -156,12 +209,15 @@
                   Edad exacta
                   <span class="text-red-500">*</span>
                 </label>
-                <input
+                <select
                   v-model="petData.age"
-                  type="text"
                   class="w-full rounded-lg border-gray-300 py-2.5 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
-                  placeholder="Ej: 2 años, 5 meses"
-                />
+                >
+                  <option value="" disabled>Seleccionar edad</option>
+                  <option v-for="age in AGE_OPTIONS" :key="age" :value="age">
+                    {{ age }}
+                  </option>
+                </select>
               </div>
               <!-- Rango Edad -->
               <div>
@@ -608,6 +664,7 @@ import { usePets } from '~/composables/usePets'
 import { useS3 } from '~/composables/useS3'
 import ModalAlert from '~/components/common/ModalAlert.vue'
 import LoadingButton from '~/components/ui/LoadingButton.vue'
+import { COMMON_LOCATIONS, DOG_BREEDS, CAT_BREEDS, AGE_OPTIONS } from '~/utils/petData'
 
 // Router
 const router = useRouter()
@@ -617,6 +674,8 @@ const { user, isAuthenticated } = useAuth()
 const { createPet, loading: petsLoading } = usePets()
 const { uploadFileWithProgress } = useS3()
 const loading = ref(false)
+const otherBreed = ref('')
+const otherLocation = ref('')
 
 // Estados para previews de imágenes
 const mainImageInput = ref(null)
@@ -648,6 +707,7 @@ const petData = reactive({
   size: '',
   sizeValue: '',
   location: '',
+  address: '',
   description: '',
   urgent: false,
   vaccinated: false,
@@ -794,6 +854,18 @@ const submitForm = async () => {
   try {
     const userId = user.value?.uid || 'anonymous'
 
+    // Si la raza es "Otro", usar el valor del campo manual
+    const finalBreed = petData.breed === 'Otro' ? otherBreed.value || 'Otro' : petData.breed
+    
+    // Si la ubicación es "Otro", usar el valor del campo manual
+    const finalLocation = petData.location === 'Otro' ? otherLocation.value || 'Otro' : petData.location
+
+    const finalPetData = {
+      ...petData,
+      breed: finalBreed,
+      location: finalLocation,
+    }
+
     // Upload Main
     let mainImageUrl = ''
     if (mainImageFile.value) {
@@ -823,7 +895,7 @@ const submitForm = async () => {
 
     // Payload
     const petToSave = {
-      ...petData,
+      ...finalPetData,
       image: mainImageUrl,
       photos: [mainImageUrl, ...additionalUrls],
       createdAt: new Date().toISOString(),

@@ -49,8 +49,10 @@
             src="/lostpet.png"
             alt="Mascota perdida mirando a la cámara"
             class="h-full w-full object-cover mix-blend-multiply"
-            placeholder
             format="webp"
+            width="600"
+            height="400"
+            loading="lazy"
             fallback="/img/default-lost.jpg"
           />
           <div
