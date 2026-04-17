@@ -46,7 +46,7 @@
         <!-- Visual / Image -->
         <div class="relative bg-rose-100 md:w-2/5">
           <NuxtImg
-            src="/lostpet.png"
+            src="/lostpet.webp"
             alt="Mascota perdida mirando a la cámara"
             class="h-full w-full object-cover mix-blend-multiply"
             format="webp"
