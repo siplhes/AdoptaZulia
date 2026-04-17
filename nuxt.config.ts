@@ -97,11 +97,29 @@ export default defineNuxtConfig({
     },
   },
   image: {
-    domains: [process.env.AWS_S3_BUCKET_DOMAIN],
+    domains: [
+      process.env.AWS_S3_BUCKET_DOMAIN,
+      'img.youtube.com',
+      'i.vimeocdn.com',
+      'vimeocdn.com',
+    ].filter(Boolean) as string[],
+    alias: {
+      youtube: 'https://img.youtube.com',
+      vimeo: 'https://i.vimeocdn.com',
+    },
     ipx: {
       remote: {
-        domains: [process.env.AWS_S3_BUCKET_DOMAIN],
+        domains: [
+          process.env.AWS_S3_BUCKET_DOMAIN,
+          'img.youtube.com',
+          'i.vimeocdn.com',
+        ].filter(Boolean) as string[],
       },
+    },
+  },
+  vite: {
+    build: {
+      chunkSizeWarningLimit: 2000,
     },
   },
   booster: {

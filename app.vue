@@ -36,20 +36,4 @@ useSeoMeta({
   twitterSite: '@AdoptaZulia',
 })
 
-useHead({
-  link: [
-    {
-      rel: 'canonical',
-      href: canonicalUrl,
-    },
-  ],
-  script: [
-    {
-      src: 'https://storage.ko-fi.com/cdn/scripts/overlay-widget.js',
-      body: true,
-      defer: true,
-    },
-    useStructuredData(createOrganizationSchema()),
-  ],
-})
 </script>
