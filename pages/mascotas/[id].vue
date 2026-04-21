@@ -337,12 +337,30 @@
                 <p class="text-xs text-gray-600">
                   {{
                     adoptionStatus === 'pending'
-                      ? 'El dueño está revisando tu perfil.'
+                      ? 'El dueño está revisando tu perfil. Puedes contactarlo directamente:'
                       : adoptionStatus === 'approved'
                         ? '¡Contacta al dueño para coordinar!'
                         : 'Lo sentimos, no fue aceptada.'
                   }}
                 </p>
+
+                <div v-if="adoptionStatus === 'pending'" class="mt-3 flex flex-col gap-2">
+                  <button
+                    class="flex w-full items-center justify-center gap-2 rounded-xl bg-green-500 py-2 text-sm font-bold text-white transition-colors hover:bg-green-600"
+                    @click="contactWhatsapp"
+                  >
+                    <Icon name="heroicons:chat-bubble-oval-left" class="h-4 w-4" />
+                    WhatsApp
+                  </button>
+                  <a
+                    v-if="pet?.contact?.email"
+                    :href="`mailto:${pet.contact.email}?subject=Consulta sobre adopción de ${pet?.name}&body=Hola, he enviado una solicitud para adoptar a ${pet?.name} y me gustaría saber más.`"
+                    class="flex w-full items-center justify-center gap-2 rounded-xl border border-yellow-200 bg-white py-2 text-sm font-bold text-yellow-800 transition-colors hover:bg-yellow-50"
+                  >
+                    <Icon name="heroicons:envelope" class="h-4 w-4" />
+                    Correo
+                  </a>
+                </div>
               </div>
 
               <!-- Desktop Actions -->
@@ -921,6 +939,10 @@ const generatePoster = async () => {
 }
 
 const contactWhatsapp = () => {
+  if (!pet.value?.contact?.phone) {
+    alert('Número de WhatsApp no disponible para esta mascota.')
+    return
+  }
   const phone = pet.value.contact.phone.replace(/\D/g, '')
   const text = `Hola, estoy interesado en adoptar a ${pet.value.name} que vi en AdoptaZulia.`
   window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank')
