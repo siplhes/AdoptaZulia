@@ -42,7 +42,7 @@
         >
           Encuentra tu
           <br />
-          <span class="bg-gradient-to-r from-emerald-200 to-teal-400 bg-clip-text text-transparent">
+          <span class="text-emerald-300">
             compañero ideal
           </span>
         </h1>

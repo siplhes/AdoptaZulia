@@ -10,7 +10,6 @@ export interface AdoptionStory {
   images?: string[]
   createdAt: number
   updatedAt: number
-  likes?: number
   featured?: boolean
   approved?: boolean
   tags?: string[]

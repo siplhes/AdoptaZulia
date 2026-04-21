@@ -163,22 +163,7 @@
 
             <!-- Acciones -->
             <div class="mt-8 flex items-center justify-between">
-              <button
-                class="flex items-center gap-2 rounded-md border px-4 py-2"
-                :class="
-                  hasLiked
-                    ? 'border-pink-300 bg-pink-50 text-pink-700'
-                    : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-                "
-                @click="handleLike"
-              >
-                <Icon
-                  :name="hasLiked ? 'mdi:heart' : 'mdi:heart-outline'"
-                  size="20px"
-                  :class="hasLiked ? 'text-pink-600' : ''"
-                />
-                <span>{{ story.likes || 0 }} Me gusta</span>
-              </button>
+
 
               <div class="flex gap-2">
                 <button
@@ -218,14 +203,13 @@ import { es } from 'date-fns/locale'
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
-const { fetchStoryById, likeStory, deleteStory, loading, error } = useAdoptionStories()
+const { fetchStoryById, deleteStory, loading, error } = useAdoptionStories()
 const { user, isAuthenticated } = useAuth()
 const config = useRuntimeConfig()
 const baseUrl = config.public.baseUrl || 'https://www.adoptazulia.org.ve'
 
 // Estado local
 const story = ref(null)
-const hasLiked = ref(false)
 const storyId = route.params.id
 
 // SEO Meta Tags
@@ -310,25 +294,7 @@ const formatDate = (timestamp) => {
   return format(new Date(timestamp), 'dd MMMM yyyy', { locale: es })
 }
 
-// Manejar like
-const handleLike = async () => {
-  if (!isAuthenticated.value) {
-    // Podríamos redirigir al login o mostrar un mensaje
-    return
-  }
 
-  if (hasLiked.value) return // Evita múltiples likes
-
-  try {
-    await likeStory(storyId)
-    hasLiked.value = true
-    if (story.value) {
-      story.value.likes = (story.value.likes || 0) + 1
-    }
-  } catch (error) {
-    console.error('Error al dar like:', error)
-  }
-}
 
 // Compartir historia
 const shareStory = () => {
@@ -376,9 +342,7 @@ onMounted(async () => {
     if (storyData) {
       story.value = storyData
 
-      // Verificar likes en localStorage
-      const likedStories = JSON.parse(localStorage.getItem('likedStories') || '[]')
-      hasLiked.value = likedStories.includes(storyId)
+
     }
   } catch (error) {
     console.error('Error al cargar la historia:', error)

@@ -138,6 +138,9 @@ export function useNotifications() {
     }
   }
 
+    createNotification,
+  }
+
   // --- Watchers ---
   watch(
     () => isAuthenticated.value,

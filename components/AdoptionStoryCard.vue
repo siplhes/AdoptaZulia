@@ -56,18 +56,6 @@
             {{ story.user?.displayName || 'Usuario' }}
           </span>
         </div>
-
-        <!-- Contador de likes -->
-        <div class="flex items-center text-gray-500">
-          <button
-            class="flex items-center space-x-1 text-gray-500 hover:text-emerald-600"
-            :class="{ 'text-emerald-600': hasLiked }"
-            @click="handleLike"
-          >
-            <Icon name="mdi:heart" size="20px" />
-            <span>{{ totalLikes }}</span>
-          </button>
-        </div>
       </div>
 
       <!-- Link para leer más -->
@@ -86,8 +74,6 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useAdoptionStories } from '~/composables/useAdoptionStories'
-import { useAuth } from '~/composables/useAuth'
 
 const props = defineProps({
   story: {
@@ -96,28 +82,4 @@ const props = defineProps({
   },
 })
 
-const { likeStory } = useAdoptionStories()
-const { isAuthenticated } = useAuth()
-const hasLiked = ref(false)
-const additionalLikes = ref(0)
-
-// Computed property para mostrar el recuento de likes actualizado
-const totalLikes = computed(() => (props.story.likes || 0) + additionalLikes.value)
-
-const handleLike = async () => {
-  if (!isAuthenticated.value) {
-    // Podríamos redirigir al login o mostrar un mensaje
-    return
-  }
-
-  if (hasLiked.value) return // Evita múltiples likes
-
-  try {
-    await likeStory(props.story.id)
-    hasLiked.value = true
-    additionalLikes.value++ // Actualiza el contador local en lugar de mutar el prop
-  } catch (error) {
-    console.error('Error al dar like:', error)
-  }
-}
 </script>

@@ -41,33 +41,7 @@
 
         <!-- Content -->
         <div v-else class="space-y-6">
-          <!-- Feature Card: Favorites -->
-          <div
-            class="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all hover:shadow-md"
-          >
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-4">
-                <div class="rounded-xl bg-red-100 p-3 text-red-600">
-                  <Icon name="heroicons:heart" class="h-8 w-8" />
-                </div>
-                <div>
-                  <h3 class="text-lg font-bold text-gray-800">Sistema de Favoritos</h3>
-                  <p class="text-sm text-gray-500">Permite a los usuarios guardar mascotas.</p>
-                </div>
-              </div>
-              <!-- Toggle -->
-              <button
-                class="relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                :class="localFeatures.favorites ? 'bg-emerald-500' : 'bg-gray-200'"
-                @click="toggleFeature('favorites')"
-              >
-                <span
-                  class="inline-block h-5 w-5 transform rounded-full bg-white transition-transform"
-                  :class="localFeatures.favorites ? 'translate-x-6' : 'translate-x-1'"
-                />
-              </button>
-            </div>
-          </div>
+
 
           <!-- Feature Card: Comments -->
           <div
@@ -194,7 +168,6 @@ const { isAuthenticated } = useAuth()
 const { features, loading, error, fetchFeatures, updateFeatures } = useFeatures()
 
 const localFeatures = reactive({
-  favorites: false,
   comments: false,
   imageGeneration: false,
 })
@@ -213,7 +186,6 @@ onMounted(async () => {
 
 const syncLocalFeatures = () => {
   if (features.value) {
-    localFeatures.favorites = features.value.favorites === true
     localFeatures.comments = features.value.comments === true
     localFeatures.imageGeneration = features.value.imageGeneration === true
   }

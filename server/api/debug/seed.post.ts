@@ -87,8 +87,6 @@ export default defineEventHandler(async (event) => {
           petId: 'test-pet-id',
           userId: 'UwbbOhsBUhXa5HrKuEQk6fGhpzz2',
           featured: false,
-          likes: 0,
-          images: [],
           isTest: true,
           createdAt: Date.now(),
           updatedAt: Date.now(),

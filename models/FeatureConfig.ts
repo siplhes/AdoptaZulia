@@ -4,7 +4,6 @@
  */
 export interface FeatureConfig {
   id?: string
-  favorites: boolean
   comments: boolean
   imageGeneration: boolean
   adoption: boolean
@@ -13,7 +12,6 @@ export interface FeatureConfig {
 }
 
 export const DEFAULT_FEATURES: FeatureConfig = {
-  favorites: false,
   comments: false,
   imageGeneration: true,
   adoption: true,

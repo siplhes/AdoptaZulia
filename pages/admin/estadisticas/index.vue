@@ -53,7 +53,7 @@
 
       <template v-else>
         <!-- KPI Cards -->
-        <div class="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           <!-- Pets KPI -->
           <div
             class="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
@@ -178,9 +178,9 @@
               ></div>
             </div>
           </div>
-        </div>
 
-        <!-- Charts Section -->
+
+        </div>
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <!-- Adoption Trends (Bar Chart Visualization) -->
           <div class="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
@@ -298,6 +298,8 @@
             </table>
           </div>
         </div>
+
+
       </template>
     </div>
   </div>
@@ -346,6 +348,7 @@ const pieChartSegments = computed(() => {
     return segment
   })
 })
+
 
 async function selectPeriod(period) {
   currentPeriod.value = period

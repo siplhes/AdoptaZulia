@@ -35,7 +35,6 @@ export function useAdoptionStories() {
               content: storyData.content || '',
               images: storyData.images || [],
               featured: storyData.featured || false,
-              likes: storyData.likes || 0,
               createdAt: storyData.createdAt || Date.now(),
               updatedAt: storyData.updatedAt || storyData.createdAt || Date.now(),
             })
@@ -89,7 +88,6 @@ export function useAdoptionStories() {
             content: storyData.content || '',
             images: storyData.images || [],
             featured: storyData.featured || false,
-            likes: storyData.likes || 0,
             createdAt: storyData.createdAt || Date.now(),
             updatedAt: storyData.updatedAt || storyData.createdAt || Date.now(),
           }
@@ -219,7 +217,6 @@ export function useAdoptionStories() {
           content: storyData.content || '',
           images: storyData.images || [],
           featured: storyData.featured || false,
-          likes: storyData.likes || 0,
           createdAt: storyData.createdAt || Date.now(),
           updatedAt: storyData.updatedAt || storyData.createdAt || Date.now(),
         }
@@ -308,7 +305,6 @@ export function useAdoptionStories() {
         featured: storyData.featured || false,
         verified: storyData.verified || false,
         verificationId: storyData.verificationId || null,
-        likes: 0,
         createdAt: Date.now(),
         updatedAt: Date.now(),
       }
@@ -385,50 +381,7 @@ export function useAdoptionStories() {
     }
   }
 
-  /**
-   * Aumenta el contador de likes de una historia
-   */
-  async function likeStory(storyId: string): Promise<boolean> {
-    loading.value = true
-    error.value = null
 
-    try {
-      const firebaseApp = useFirebaseApp()
-      const db = getDatabase(firebaseApp)
-      const storyRef = dbRef(db, `adoption_stories/${storyId}`)
-
-      // Obtenemos los datos actuales
-      const snapshot = await get(storyRef)
-
-      if (snapshot.exists()) {
-        const currentLikes = snapshot.val().likes || 0
-
-        // Incrementamos y actualizamos
-        await update(storyRef, {
-          likes: currentLikes + 1,
-          updatedAt: Date.now(),
-        })
-
-        // Actualizamos también el estado local
-        const index = stories.value.findIndex((s) => s.id === storyId)
-        if (index !== -1) {
-          stories.value[index].likes = currentLikes + 1
-          stories.value[index].updatedAt = Date.now()
-        }
-
-        return true
-      } else {
-        error.value = 'Historia no encontrada'
-        return false
-      }
-    } catch (err: any) {
-      logError(`Error al dar like a historia (${storyId}):`, err)
-      error.value = 'Error al dar like. Por favor, intenta de nuevo.'
-      return false
-    } finally {
-      loading.value = false
-    }
-  }
 
   /**
    * Elimina una historia de adopción
@@ -458,7 +411,6 @@ export function useAdoptionStories() {
               content: storyData.content || '',
               images: storyData.images || [],
               featured: storyData.featured || false,
-              likes: storyData.likes || 0,
               createdAt: storyData.createdAt || Date.now(),
               updatedAt: storyData.updatedAt || storyData.createdAt || Date.now(),
             })
@@ -509,7 +461,6 @@ export function useAdoptionStories() {
               content: storyData.content || '',
               images: storyData.images || [],
               featured: storyData.featured || false,
-              likes: storyData.likes || 0,
               createdAt: storyData.createdAt || Date.now(),
               updatedAt: storyData.updatedAt || storyData.createdAt || Date.now(),
             })
@@ -563,7 +514,6 @@ export function useAdoptionStories() {
             content: storyData.content || '',
             images: storyData.images || [],
             featured: storyData.featured || false,
-            likes: storyData.likes || 0,
             createdAt: storyData.createdAt || Date.now(),
             updatedAt: storyData.updatedAt || storyData.createdAt || Date.now(),
           })
@@ -597,7 +547,6 @@ export function useAdoptionStories() {
     fetchStoryById,
     createStory,
     updateStory,
-    likeStory,
     deleteStory,
     fetchUserStories,
     fetchPetStories,

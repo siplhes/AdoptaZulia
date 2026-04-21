@@ -52,24 +52,6 @@
         @load="imageLoading = false"
       />
 
-      <!-- Botón de favorito con feedback táctil -->
-      <button
-        v-if="favoritesEnabled"
-        type="button"
-        class="absolute left-2 top-2 z-10 flex items-center justify-center rounded-full bg-white p-1.5 shadow-md transition-colors hover:bg-amber-50 active:scale-95"
-        :class="{ 'text-red-500': isFavorite, 'text-gray-400': !isFavorite }"
-        :aria-label="`Agregar ${pet.name} a favoritos`"
-        :aria-pressed="isFavorite"
-        @click.stop="toggleFavorite"
-      >
-        <Icon
-          :name="isFavorite ? 'heroicons:heart-solid' : 'heroicons:heart'"
-          class="h-7 w-7"
-          aria-label="Agregar a favoritos"
-          data-balloon-pos="up"
-        />
-      </button>
-
       <!-- Tiempo desde publicación con mejor visibilidad -->
       <div
         v-if="timeAgo"
@@ -159,13 +141,11 @@ const { isFeatureEnabled } = useFeatures()
 
 const props = defineProps<{
   pet: Pet
-  isFavorite?: boolean
   hasActiveAdoptionRequest?: boolean
 }>()
 
-const favoritesEnabled = computed(() => isFeatureEnabled('favorites'))
-
 const imageLoading = ref(true)
+
 const timeAgo = computed(() => {
   if (!props.pet.createdAt) return null
   return formatDistanceToNow(new Date(props.pet.createdAt), {
@@ -173,13 +153,6 @@ const timeAgo = computed(() => {
     locale: es,
   })
 })
-
-const emit = defineEmits(['toggleFavorite'])
-
-function toggleFavorite(e: Event) {
-  e.stopPropagation()
-  emit('toggleFavorite', props.pet.id)
-}
 
 function onImageError() {
   imageLoading.value = false
@@ -224,4 +197,6 @@ onMounted(() => {
   will-change: transform, box-shadow;
   backface-visibility: hidden;
 }
+
+
 </style>

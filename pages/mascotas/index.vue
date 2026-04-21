@@ -288,7 +288,7 @@
           <!-- Pets Grid -->
           <div v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <div v-for="pet in filteredPets" :key="pet.id">
-              <PetCard :pet="pet" :is-favorite="false" @toggle-favorite="toggleFavorite" />
+              <PetCard :pet="pet" />
             </div>
           </div>
 

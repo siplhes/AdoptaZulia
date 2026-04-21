@@ -172,13 +172,13 @@
         <!-- Mobile Menu Button -->
         <button
           type="button"
-          class="inline-flex items-center justify-center rounded-lg p-2 text-emerald-100 transition-colors hover:bg-emerald-800 lg:hidden"
+          class="inline-flex items-center justify-center rounded-lg p-2 text-white transition-colors hover:bg-emerald-800 lg:hidden"
           :aria-expanded="isMenuOpen"
           @click="isMenuOpen = !isMenuOpen"
         >
           <span class="sr-only">Abrir menú principal</span>
-          <Icon v-if="!isMenuOpen" name="heroicons:bars-3" class="h-7 w-7" />
-          <Icon v-else name="heroicons:x-mark" class="h-7 w-7" />
+          <Icon v-if="!isMenuOpen" name="heroicons:bars-3" class="h-7 w-7 text-white" />
+          <Icon v-else name="heroicons:x-mark" class="h-7 w-7 text-white" />
         </button>
       </div>
     </div>

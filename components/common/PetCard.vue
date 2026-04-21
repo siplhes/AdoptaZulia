@@ -75,16 +75,6 @@
         >
           {{ pet.name }}
         </h3>
-        <button
-          class="rounded-full p-1.5 text-gray-300 transition-colors hover:bg-red-50 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-red-200"
-          @click.prevent="$emit('toggle-favorite', pet.id)"
-        >
-          <Icon
-            :name="isFavorite ? 'heroicons:heart-solid' : 'heroicons:heart'"
-            class="h-6 w-6"
-            :class="{ 'text-red-500': isFavorite }"
-          />
-        </button>
       </div>
 
       <div class="mb-4 flex items-center text-sm font-medium text-gray-500">
@@ -140,17 +130,12 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-  isFavorite: {
-    type: Boolean,
-    default: false,
-  },
   basePath: {
     type: String,
     default: '/mascotas',
   },
 })
 
-defineEmits(['toggle-favorite'])
 
 const linkTo = computed(() => `${props.basePath}/${props.pet.id}`)
 </script>

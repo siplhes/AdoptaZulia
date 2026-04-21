@@ -285,9 +285,9 @@
                 </div>
                 <div
                   v-else
-                  class="mb-3 inline-flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 text-amber-600"
+                  class="mb-3 inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-600"
                 >
-                  <Icon name="heroicons:heart" class="h-8 w-8" />
+                  <Icon name="heroicons:home-modern" class="h-8 w-8" />
                 </div>
 
                 <h3 class="text-xl font-bold text-gray-900">
@@ -371,6 +371,13 @@
                       Ver Contacto
                     </button>
                   </template>
+
+                  <div v-if="!isAuthenticated && pet.status !== 'adopted'" class="mt-4 rounded-xl bg-gray-50 p-4 text-center">
+                    <p class="mb-3 text-sm text-gray-600">Inicia sesión para solicitar la adopción de {{ pet.name }}</p>
+                    <NuxtLink to="/login" class="inline-block w-full rounded-xl bg-emerald-600 py-2 font-bold text-white shadow-sm hover:bg-emerald-700">
+                      Iniciar Sesión
+                    </NuxtLink>
+                  </div>
                 </template>
 
                 <!-- Owner Actions -->
@@ -425,21 +432,7 @@
                     </template>
                   </button>
 
-                  <!-- Favorite and Share -->
                   <div class="flex gap-2">
-                    <button
-                      class="flex flex-1 items-center justify-center gap-2 rounded-lg border border-gray-200 py-2 transition-colors hover:bg-gray-50"
-                      :class="
-                        isFavorite ? 'border-red-100 bg-red-50 text-red-500' : 'text-gray-500'
-                      "
-                      @click="toggleFavorite"
-                    >
-                      <Icon
-                        :name="isFavorite ? 'heroicons:heart-solid' : 'heroicons:heart'"
-                        class="h-5 w-5"
-                      />
-                      {{ isFavorite ? 'Favorito' : 'Guardar' }}
-                    </button>
                     <button
                       class="flex flex-1 items-center justify-center gap-2 rounded-lg border border-gray-200 py-2 text-gray-500 transition-colors hover:bg-gray-50"
                       @click="sharePet"
@@ -505,25 +498,17 @@
                 Ver todas las solicitudes
               </button>
             </div>
+
+
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Mobile Sticky Action Bar -->
     <div
       class="fixed bottom-0 left-0 right-0 z-40 flex items-center gap-3 border-t border-gray-200 bg-white bg-white/95 px-4 py-3 backdrop-blur-md lg:hidden"
     >
-      <button
-        class="rounded-full bg-gray-100 p-3 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-500"
-        @click="toggleFavorite"
-      >
-        <Icon
-          :name="isFavorite ? 'heroicons:heart-solid' : 'heroicons:heart'"
-          class="h-6 w-6"
-          :class="{ 'text-red-500': isFavorite }"
-        />
-      </button>
+
 
       <template v-if="!isOwner">
         <button
@@ -547,6 +532,13 @@
           class="flex-1 rounded-xl bg-gray-100 py-3 text-sm font-bold text-gray-400"
         >
           Ya Adoptado
+        </button>
+        <button
+          v-else-if="!isAuthenticated && pet?.status !== 'adopted'"
+          class="flex-1 rounded-xl bg-emerald-600 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-200"
+          @click="router.push('/login')"
+        >
+          Iniciar Sesión para Adoptar
         </button>
         <button
           v-else
@@ -666,7 +658,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAdoptions } from '~/composables/useAdoptions'
 import { formatShortDate } from '~/utils/dateFormatter'
@@ -678,7 +670,7 @@ const router = useRouter()
 const petId = route.params.id
 
 // Composables
-const { fetchPetById, isPetFavorite, addFavorite, removeFavorite } = usePets()
+const { fetchPetById } = usePets()
 const { getAdoptionByPetAndUser, fetchAdoptionsForOwner, createAdoptionRequest } = useAdoptions()
 const { user, isAuthenticated, isAdmin } = useAuth()
 const { isFeatureEnabled } = useFeatures()
@@ -697,7 +689,7 @@ const currentPhoto = ref(null)
 const showImageModal = ref(false)
 const modalImage = ref('')
 const adoptionStatus = ref(null) // 'pending', 'approved', 'rejected', 'none'
-const isFavorite = ref(false)
+
 const ownerAdoptions = ref([])
 const loadingOwnerAdoptions = ref(false)
 const showAdoptionModal = ref(false)
@@ -706,7 +698,6 @@ const showShareModal = ref(false)
 const shareUrl = ref('')
 
 // Features
-const favoritesEnabled = isFeatureEnabled('favorites')
 const adoptionEnabled = isFeatureEnabled('adoption')
 const imageGenerationEnabled = computed(
   () => isFeatureEnabled('imageGeneration') || imageGenEnabled.value
@@ -830,10 +821,7 @@ onMounted(async () => {
     }
     pet.value = fetchedPet
 
-    // Check favorite
     if (isAuthenticated.value) {
-      isFavorite.value = await isPetFavorite(petId, user.value.uid)
-
       // Check application status
       if (!isOwner.value) {
         const adoption = await getAdoptionByPetAndUser(petId, user.value.uid)
@@ -854,6 +842,7 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
 
 // Actions & Helpers
 const goBack = () => router.back()
@@ -914,22 +903,6 @@ const submitAdoption = async () => {
   } catch (e) {
     console.error(e)
     alert('Error al enviar la solicitud')
-  }
-}
-
-const toggleFavorite = async () => {
-  if (!isAuthenticated.value) return router.push('/login')
-
-  try {
-    if (isFavorite.value) {
-      await removeFavorite(petId, user.value.uid)
-      isFavorite.value = false
-    } else {
-      await addFavorite(petId, user.value.uid)
-      isFavorite.value = true
-    }
-  } catch (e) {
-    console.error(e)
   }
 }
 

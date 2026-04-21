@@ -53,7 +53,6 @@ export default defineEventHandler(async (event) => {
       featured: storyData.featured || false,
       verified: storyData.verified || false,
       verificationId: storyData.verificationId || null,
-      likes: 0,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     }

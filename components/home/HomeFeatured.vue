@@ -90,8 +90,6 @@
           >
             <PetCard
               :pet="pet"
-              :is-favorite="isFavorite(pet.id)"
-              @toggle-favorite="toggleFavorite"
               class="h-full transform transition-all duration-300 hover:md:-translate-y-2"
             />
           </div>
@@ -121,23 +119,6 @@ const { fetchFeaturedPets } = usePets()
 const featuredPets = ref([])
 const loading = ref(true)
 const error = ref(null)
-const favorites = ref([])
-
-const isFavorite = (petId) => favorites.value.includes(petId)
-
-const toggleFavorite = (petId) => {
-  try {
-    const index = favorites.value.indexOf(petId)
-    if (index === -1) {
-      favorites.value.push(petId)
-    } else {
-      favorites.value.splice(index, 1)
-    }
-    localStorage.setItem('favorites', JSON.stringify(favorites.value))
-  } catch (err) {
-    console.error('Error managing favorites:', err)
-  }
-}
 
 const loadFeaturedPets = async () => {
   loading.value = true
@@ -156,12 +137,6 @@ const loadFeaturedPets = async () => {
 }
 
 onMounted(async () => {
-  try {
-    const savedFavorites = JSON.parse(localStorage.getItem('favorites') || '[]')
-    favorites.value = savedFavorites
-  } catch (err) {
-    console.error('Error loading favorites:', err)
-  }
   await loadFeaturedPets()
 })
 </script>

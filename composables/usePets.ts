@@ -412,38 +412,7 @@ export function usePets() {
     }
   }
 
-  /**
-   * Verifica si una mascota está en favoritos del usuario
-   */
-  async function isPetFavorite(petId: string, userId: string): Promise<boolean> {
-    try {
-      return false
-    } catch (e) {
-      return false
-    }
-  }
 
-  /**
-   * Añade una mascota a favoritos
-   */
-  async function addFavorite(petId: string, userId: string): Promise<boolean> {
-    try {
-      return true
-    } catch (e) {
-      return false
-    }
-  }
-
-  /**
-   * Elimina una mascota de favoritos
-   */
-  async function removeFavorite(petId: string, userId: string): Promise<boolean> {
-    try {
-      return true
-    } catch (e) {
-      return false
-    }
-  }
 
   return {
     pets,
@@ -466,8 +435,5 @@ export function usePets() {
     fetchFeaturedPets,
     fetchRecentPets,
     fetchAdoptionStories,
-    isPetFavorite,
-    addFavorite,
-    removeFavorite,
   }
 }

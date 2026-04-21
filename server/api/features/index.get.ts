@@ -2,7 +2,6 @@ import { getDatabase } from 'firebase-admin/database'
 import { getApps } from 'firebase-admin/app'
 
 const DEFAULT_FEATURES = {
-  favorites: false,
   comments: false,
   imageGeneration: true,
   adoption: true,
