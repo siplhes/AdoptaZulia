@@ -312,6 +312,7 @@ export function useAdoptions() {
         userId,
         status: 'pending',
         message,
+        isTest: false, // Requerido por las reglas de seguridad
         createdAt: Date.now(),
       })
 

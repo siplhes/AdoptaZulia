@@ -100,8 +100,8 @@
             <!-- Pet Image Header -->
             <div class="relative h-48 bg-gray-100">
               <NuxtImg
-                v-if="adoption.pet?.imageUrl"
-                :src="adoption.pet.imageUrl"
+                v-if="getPetImage(adoption.pet)"
+                :src="getPetImage(adoption.pet)"
                 class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
               />
@@ -117,7 +117,7 @@
                 <h3 class="text-xl font-bold leading-tight">
                   {{ adoption.pet?.name || 'Mascota' }}
                 </h3>
-                <p class="text-xs opacity-90">{{ adoption.pet?.breed || 'Raza desconocida' }}</p>
+                <p class="text-xs opacity-90">{{ getPetBreed(adoption.pet) }}</p>
               </div>
             </div>
 
@@ -274,8 +274,8 @@
               <div class="flex items-center">
                 <div class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md bg-gray-100">
                   <NuxtImg
-                    v-if="selectedAdoption.pet?.imageUrl"
-                    :src="selectedAdoption.pet.imageUrl"
+                    v-if="getPetImage(selectedAdoption.pet)"
+                    :src="getPetImage(selectedAdoption.pet)"
                     alt="Imagen de mascota"
                     class="h-full w-full object-cover"
                   />

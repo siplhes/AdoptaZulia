@@ -68,7 +68,7 @@
     </div>
 
     <!-- Quick Actions -->
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="grid gap-4 grid-cols-2 lg:grid-cols-5">
       <NuxtLink
         to="/admin/mascotas"
         class="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
@@ -77,7 +77,7 @@
           <Icon name="mdi:plus" class="h-5 w-5" />
         </div>
         <div>
-          <p class="font-semibold text-gray-800">Nueva Mascota</p>
+          <p class="font-semibold text-gray-800 text-sm">Nueva Mascota</p>
           <p class="text-xs text-gray-500">Publicar para adopción</p>
         </div>
       </NuxtLink>
@@ -90,8 +90,21 @@
           <Icon name="mdi:clipboard-check" class="h-5 w-5" />
         </div>
         <div>
-          <p class="font-semibold text-gray-800">Revisar Solicitudes</p>
+          <p class="font-semibold text-gray-800 text-sm">Revisar Solicitudes</p>
           <p class="text-xs text-gray-500">{{ stats.pendingRequests }} pendientes</p>
+        </div>
+      </NuxtLink>
+
+      <NuxtLink
+        to="/admin/comunidad"
+        class="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+      >
+        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+          <Icon name="ph:newspaper-duotone" class="h-5 w-5" />
+        </div>
+        <div>
+          <p class="font-semibold text-gray-800 text-sm">Comunidad</p>
+          <p class="text-xs text-gray-500">Noticias y eventos</p>
         </div>
       </NuxtLink>
 
@@ -103,7 +116,7 @@
           <Icon name="mdi:account-plus" class="h-5 w-5" />
         </div>
         <div>
-          <p class="font-semibold text-gray-800">Gestionar Usuarios</p>
+          <p class="font-semibold text-gray-800 text-sm">Usuarios</p>
           <p class="text-xs text-gray-500">Roles y permisos</p>
         </div>
       </NuxtLink>
@@ -116,7 +129,7 @@
           <Icon name="mdi:chart-line" class="h-5 w-5" />
         </div>
         <div>
-          <p class="font-semibold text-gray-800">Ver Analíticas</p>
+          <p class="font-semibold text-gray-800 text-sm">Analíticas</p>
           <p class="text-xs text-gray-500">Reportes detallados</p>
         </div>
       </NuxtLink>

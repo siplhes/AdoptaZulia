@@ -84,7 +84,8 @@ function generateRandomPet(index: number): any {
     goodWithKids,
     goodWithPets,
     userId: `test_user_${Math.floor(Math.random() * 5) + 1}`,
-    images: [`https://placehold.co/600x400/8B5CF6/FFF?text=${encodeURIComponent(name)}`],
+    image: `https://placehold.co/600x400/8B5CF6/FFF?text=${encodeURIComponent(name)}`,
+    photos: [`https://placehold.co/600x400/8B5CF6/FFF?text=${encodeURIComponent(name)}`],
     status: 'available',
     featured: Math.random() > 0.8,
     createdAt: Date.now() - Math.floor(Math.random() * 90 * 24 * 60 * 60 * 1000), // Last 90 days

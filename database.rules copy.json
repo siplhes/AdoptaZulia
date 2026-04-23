@@ -1,0 +1,149 @@
+{
+  "rules": {
+    // ---------------------------------------------------------
+    // USUARIOS: Solo admins ven todo. Usuarios ven su propio perfil.
+    // ---------------------------------------------------------
+        ".read": true,
+    ".write": true,
+    "users": {
+        ".read": "root.child('admins').child(auth.uid).exists()",
+        ".indexOn": ["userName"],
+        "$uid": {
+          ".read": "auth != null && (auth.uid == $uid || root.child('admins').child(auth.uid).exists())",
+          ".write": "auth != null && (auth.uid == $uid || root.child('admins').child(auth.uid).exists())"
+        }
+    },
+
+    // ---------------------------------------------------------
+    // MASCOTAS: Públicas, pero con control estricto de isTest.
+    // ---------------------------------------------------------
+    "pets": {
+      ".read": true,
+      ".indexOn": ["typeValue", "userId", "isTest"],
+      "$petId": {
+        ".write": "auth != null && (root.child('admins').child(auth.uid).exists() || ((!data.exists() && newData.child('userId').val() == auth.uid && newData.child('isTest').val() == false) || (data.exists() && data.child('userId').val() == auth.uid && data.child('isTest').val() == false)))"
+      }
+    },
+
+    // ---------------------------------------------------------
+    // ADOPCIONES: El solicitante, el dueño y el admin tienen acceso.
+    // ---------------------------------------------------------
+    "adoptions": {
+      ".read": "auth != null",
+      ".indexOn": ["userId", "petId", "createdAt", "isTest"],
+      "$adoptionId": {
+        ".read": "auth != null && (data.child('userId').val() == auth.uid || root.child('admins').child(auth.uid).exists() || root.child('pets').child(data.child('petId').val()).child('userId').val() == auth.uid)",
+        ".write": "auth != null && (root.child('admins').child(auth.uid).exists() || ((!data.exists() && newData.child('userId').val() == auth.uid && newData.child('isTest').val() == false) || (data.exists() && (data.child('userId').val() == auth.uid || root.child('pets').child(data.child('petId').val()).child('userId').val() == auth.uid))))"
+      }
+    },
+
+    // ---------------------------------------------------------
+    // MASCOTAS PERDIDAS Y AVISTAMIENTOS
+    // ---------------------------------------------------------
+    "lost_pets": {
+      ".read": true,
+      ".indexOn": ["ownerId", "isTest"],
+      "$reportId": {
+        ".write": "auth != null && (root.child('admins').child(auth.uid).exists() || ((!data.exists() && newData.child('ownerId').val() == auth.uid) || (data.exists() && data.child('ownerId').val() == auth.uid)))"
+      }
+    },
+
+    "lost_pet_sightings": {
+      ".read": true,
+      "$petId": {
+        ".write": "auth != null && (root.child('lost_pets').child($petId).child('ownerId').val() == auth.uid || root.child('admins').child(auth.uid).exists())",
+        "$sightingId": {
+           ".write": "auth != null && (root.child('admins').child(auth.uid).exists() || ((!data.exists() && newData.child('reportedBy').val() == auth.uid) || (data.exists() && data.child('reportedBy').val() == auth.uid)))"
+        }
+      }
+    },
+
+    // ---------------------------------------------------------
+    // CONTENIDO PÚBLICO: Historias y Comentarios
+    // ---------------------------------------------------------
+    "adoption_stories": {
+      ".read": true,
+      ".indexOn": ["createdAt", "featured", "isTest"],
+      "$storyId": {
+        ".write": "auth != null && (root.child('admins').child(auth.uid).exists() || ((!data.exists() && newData.child('userId').val() == auth.uid) || (data.exists() && data.child('userId').val() == auth.uid)))"
+      }
+    },
+
+    "petComments": {
+      ".read": true,
+      "$commentId": {
+        ".write": "auth != null && (root.child('admins').child(auth.uid).exists() || ((!data.exists() && newData.child('userId').val() == auth.uid) || (data.exists() && data.child('userId').val() == auth.uid)))"
+      }
+    },
+
+    // ---------------------------------------------------------
+    // ADMINISTRACIÓN Y SISTEMA
+    // ---------------------------------------------------------
+    "admins": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('admins').child(auth.uid).exists()"
+    },
+
+    "reports": {
+      ".read": "root.child('admins').child(auth.uid).exists()",
+      ".indexOn": ["status", "type", "createdAt"],
+      "$reportId": {
+        // Ajuste: Permitir resolver a admins (data.exists)
+        ".write": "auth != null && (!data.exists() || root.child('admins').child(auth.uid).exists())"
+      }
+    },
+
+    "notifications": {
+      "$uid": {
+        ".read": "auth != null && auth.uid == $uid",
+        ".write": "auth != null", 
+        ".indexOn": ["createdAt", "read"]
+      }
+    },
+
+    "statistics": {
+      "public": { 
+        ".read": true, 
+        ".write": "auth != null && root.child('admins').child(auth.uid).exists()" 
+      },
+      "admin": { 
+        ".read": "auth != null && root.child('admins').child(auth.uid).exists()", 
+        ".write": "auth != null && root.child('admins').child(auth.uid).exists()" 
+      }
+    },
+
+    "config": {
+      "maintenance": { 
+        ".read": true, 
+        ".write": "auth != null && root.child('admins').child(auth.uid).exists()" 
+      },
+      ".read": "auth != null && root.child('admins').child(auth.uid).exists()",
+      ".write": "auth != null && root.child('admins').child(auth.uid).exists()"
+    },
+
+    "admin_logs": {
+      ".read": "auth != null && root.child('admins').child(auth.uid).exists()",
+      ".write": "auth != null && root.child('admins').child(auth.uid).exists()",
+      ".indexOn": ["timestamp", "action", "module"]
+    },
+
+    "admin_notifications": {
+      ".read": "auth != null && root.child('admins').child(auth.uid).exists()",
+      ".write": "auth != null && root.child('admins').child(auth.uid).exists()",
+      ".indexOn": ["sentAt"]
+    },
+
+    "features": {
+      ".read": true,
+      ".write": "auth != null && root.child('admins').child(auth.uid).exists()"
+    },
+    
+    "adoptionVerifications": {
+      ".read": true,
+      "$vid": {
+        ".write": "auth != null && root.child('admins').child(auth.uid).exists()"
+      }
+    }
+  }
+}
+

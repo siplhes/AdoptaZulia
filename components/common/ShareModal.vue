@@ -68,7 +68,7 @@ const emit = defineEmits<{
   (e: 'update:isOpen', value: boolean): void
 }>()
 
-const { showToast } = useToast()
+const { success: toastSuccess } = useToast()
 
 function close() {
   emit('close')
@@ -77,7 +77,7 @@ function close() {
 
 function copyLink() {
   navigator.clipboard.writeText(props.shareData.url)
-  showToast('Enlace copiado al portapapeles', 'success')
+  toastSuccess('Enlace copiado al portapapeles')
 }
 
 function shareToWhatsApp() {

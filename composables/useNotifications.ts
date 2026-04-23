@@ -101,7 +101,10 @@ export function useNotifications() {
         if (!n.read) updates[`notifications/${user.value?.uid}/${n.id}/read`] = true
       })
       if (Object.keys(updates).length) {
-        await updateData('', updates) // Root update
+        // Usamos getDb() para obtener la instancia y update de firebase/database directamente
+        // para evitar que el helper updateData añada updatedAt en el root ('')
+        const { update: dbUpdate } = await import('firebase/database')
+        await dbUpdate(getDbRef(''), updates)
         toast.success('Todas las notificaciones marcadas como leídas')
       }
     } catch (err) {
@@ -122,7 +125,10 @@ export function useNotifications() {
   }
 
   const createNotification = async (targetUserId: string, data: any) => {
-    if (!targetUserId) return false
+    if (!targetUserId || typeof targetUserId !== 'string' || targetUserId.trim() === '') {
+      logError('Intento de crear notificación sin targetUserId válido')
+      return false
+    }
     try {
       await pushData(`notifications/${targetUserId}`, {
         ...data,

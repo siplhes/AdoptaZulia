@@ -623,22 +623,23 @@ const loadPets = async () => {
 
 // SEO Meta Tags
 const canonicalUrl = useCanonicalUrl('/perdidas')
-const ogImage = useOgImage('/og.jpg')
+const ogImage = useOgImage('/og-improved.png')
 
 useSeoMeta({
-  title: 'Mascotas Perdidas | Adopta Zulia',
+  title: 'Mascotas Perdidas en Zulia | Ayúdanos a Reunirlas con su Familia',
   description:
-    'Ayuda a reunir mascotas perdidas con sus dueños en el estado Zulia. Reporta mascotas encontradas o busca a tu compañero perdido.',
-  ogTitle: 'Mascotas Perdidas y Encontradas - Adopta Zulia',
+    'Comunidad de apoyo para encontrar mascotas perdidas en el estado Zulia. Reporta avistamientos, publica reportes de pérdida y ayuda a difundir.',
+  ogTitle: 'Mascotas Perdidas y Encontradas en el Zulia - Adopta Zulia',
   ogDescription:
-    'Comunidad de apoyo para encontrar mascotas perdidas en Zulia. Publica reportes y ayuda a difundir.',
+    '¿Has visto a estas mascotas? Ayúdanos a que vuelvan a casa. Publica reportes de mascotas perdidas o encontradas en el Zulia.',
   ogSiteName: 'Adopta Zulia',
   ogImage,
-  ogImageAlt: 'Mascotas perdidas en Zulia',
+  ogImageAlt: 'Mascotas perdidas buscando a sus familias en el estado Zulia',
   ogUrl: canonicalUrl,
   ogType: 'website',
-  twitterTitle: 'Mascotas Perdidas - Adopta Zulia',
-  twitterDescription: 'Ayuda a encontrar mascotas perdidas en el estado Zulia.',
+  twitterTitle: 'Mascotas Perdidas en Zulia - Adopta Zulia',
+  twitterDescription:
+    'Ayuda a mascotas perdidas a volver con sus familias en el estado Zulia. ¡Cada reporte cuenta!',
   twitterImage: ogImage,
   twitterCard: 'summary_large_image',
 })

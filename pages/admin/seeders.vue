@@ -159,6 +159,46 @@
             Limpiar Todo
           </button>
         </div>
+
+        <!-- Tablón Comunidad Seeder -->
+        <div class="rounded-lg bg-white p-6 shadow-md border-2 border-emerald-100">
+          <div class="mb-4 flex items-center justify-between">
+            <h2 class="text-xl font-bold text-gray-900">📢 Tablón Comunidad</h2>
+            <div class="flex flex-col items-end">
+              <span class="rounded-full bg-emerald-100 px-3 py-1 text-[10px] font-semibold text-emerald-800 mb-1">
+                {{ tablonNewsCount }} noticias
+              </span>
+              <span class="rounded-full bg-amber-100 px-3 py-1 text-[10px] font-semibold text-amber-800">
+                {{ tablonEventsCount }} eventos
+              </span>
+            </div>
+          </div>
+          <p class="mb-4 text-gray-600">Genera noticias y eventos para la comunidad</p>
+          <div class="mb-4 flex gap-2">
+            <input
+              v-model.number="tablonAmount"
+              type="number"
+              min="1"
+              max="20"
+              class="w-24 rounded border px-3 py-2"
+              placeholder="5"
+            />
+            <button
+              @click="seedTablon"
+              :disabled="loading.tablon || !isDevelopment"
+              class="flex-1 rounded bg-emerald-600 px-4 py-2 font-semibold text-white transition hover:bg-emerald-700 disabled:bg-gray-300"
+            >
+              {{ loading.tablon ? 'Creando...' : 'Crear' }}
+            </button>
+          </div>
+          <button
+            @click="clearTablon"
+            :disabled="loading.tablon || !isDevelopment"
+            class="w-full rounded bg-red-500 px-4 py-2 font-semibold text-white transition hover:bg-red-600 disabled:bg-gray-300"
+          >
+            Limpiar Todo
+          </button>
+        </div>
       </div>
 
       <!-- Bulk Actions -->
@@ -191,6 +231,8 @@
 </template>
 
 <script setup lang="ts">
+
+
 import { ref, computed, onMounted } from 'vue'
 import {
   seedLostPets,
@@ -200,6 +242,12 @@ import {
 import { seedAdoptions, clearAdoptionsTestData } from '~/utils/seeders/adoptionsSeeder'
 import { seedUsers, clearUsersTestData } from '~/utils/seeders/usersSeeder'
 import { seedPetComments, clearPetCommentsTestData } from '~/utils/seeders/petCommentsSeeder'
+import { seedTablonData, clearTablonTestData, getTablonCounts } from '~/utils/seeders/tablonSeeder'
+
+definePageMeta({
+  layout: 'admin',
+  middleware: ['admin'], // Ensure admin access only
+})
 
 // Check if development mode
 const isDevelopment = computed(() => process.env.NODE_ENV === 'development')
@@ -209,12 +257,15 @@ const lostPetsAmount = ref(30)
 const adoptionsAmount = ref(20)
 const usersAmount = ref(10)
 const commentsAmount = ref(30)
+const tablonAmount = ref(5)
 
 // Counts
 const lostPetsCount = ref(0)
 const adoptionsCount = ref(0)
 const usersCount = ref(0)
 const commentsCount = ref(0)
+const tablonNewsCount = ref(0)
+const tablonEventsCount = ref(0)
 
 // Loading states
 const loading = ref({
@@ -222,6 +273,7 @@ const loading = ref({
   adoptions: false,
   users: false,
   comments: false,
+  tablon: false,
 })
 const loadingAll = ref(false)
 
@@ -239,6 +291,9 @@ const statusClass = computed(() => ({
 async function refreshCounts() {
   try {
     lostPetsCount.value = await getTestLostPetsCount()
+    const tCounts = await getTablonCounts()
+    tablonNewsCount.value = tCounts.news
+    tablonEventsCount.value = tCounts.events
     // Add count functions for other seeders if needed
   } catch (error) {
     console.error('Error refreshing counts:', error)
@@ -385,6 +440,41 @@ async function clearComments() {
   }
 }
 
+// Tablon Actions
+async function seedTablon() {
+  loading.value.tablon = true
+  statusMessage.value = ''
+
+  try {
+    await seedTablonData(tablonAmount.value, tablonAmount.value)
+    statusMessage.value = `✅ ${tablonAmount.value} noticias y eventos creados`
+    statusType.value = 'success'
+    await refreshCounts()
+  } catch (error: any) {
+    statusMessage.value = `❌ Error: ${error.message}`
+    statusType.value = 'error'
+  } finally {
+    loading.value.tablon = false
+  }
+}
+
+async function clearTablon() {
+  loading.value.tablon = true
+  statusMessage.value = ''
+
+  try {
+    await clearTablonTestData()
+    statusMessage.value = '✅ Datos de comunidad de prueba eliminados'
+    statusType.value = 'success'
+    await refreshCounts()
+  } catch (error: any) {
+    statusMessage.value = `❌ Error: ${error.message}`
+    statusType.value = 'error'
+  } finally {
+    loading.value.tablon = false
+  }
+}
+
 // Bulk Actions
 async function seedAll() {
   loadingAll.value = true
@@ -392,10 +482,13 @@ async function seedAll() {
   statusType.value = 'info'
 
   try {
-    await seedLostPets(lostPetsAmount.value)
-    await seedAdoptions(adoptionsAmount.value)
-    await seedUsers(usersAmount.value)
-    await seedPetComments(commentsAmount.value)
+    await Promise.all([
+      seedLostPets(lostPetsAmount.value),
+      seedAdoptions(adoptionsAmount.value),
+      seedUsers(usersAmount.value),
+      seedPetComments(commentsAmount.value),
+      seedTablonData(tablonAmount.value, tablonAmount.value)
+    ])
 
     statusMessage.value = '✅ ¡Todos los datos de prueba creados exitosamente!'
     statusType.value = 'success'
@@ -418,10 +511,13 @@ async function clearAll() {
   statusType.value = 'info'
 
   try {
-    await clearLostPetsTestData()
-    await clearAdoptionsTestData()
-    await clearUsersTestData()
-    await clearPetCommentsTestData()
+    await Promise.all([
+      clearLostPetsTestData(),
+      clearAdoptionsTestData(),
+      clearUsersTestData(),
+      clearPetCommentsTestData(),
+      clearTablonTestData()
+    ])
 
     statusMessage.value = '✅ ¡Todos los datos de prueba eliminados!'
     statusType.value = 'success'

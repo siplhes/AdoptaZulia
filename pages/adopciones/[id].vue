@@ -98,13 +98,23 @@
                         {{ request.user?.email || 'No disponible' }}
                       </a>
                     </div>
-                    <div v-if="request.user?.phone" class="flex items-center text-gray-700">
-                      <Icon name="heroicons:phone" class="mr-2 h-5 w-5 text-gray-400" />
+                    <div v-if="request.user?.phone" class="flex items-center gap-4 text-gray-700">
+                      <div class="flex items-center">
+                        <Icon name="heroicons:phone" class="mr-2 h-5 w-5 text-gray-400" />
+                        <a
+                          :href="`tel:${request.user.phone}`"
+                          class="text-emerald-600 hover:text-emerald-800"
+                        >
+                          {{ request.user.phone }}
+                        </a>
+                      </div>
                       <a
-                        :href="`tel:${request.user.phone}`"
-                        class="text-emerald-600 hover:text-emerald-800"
+                        :href="`https://wa.me/${request.user.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${request.user.name}, te contacto desde AdoptaZulia 🐾 por tu solicitud para adoptar a *${pet?.name}*.\n\n¿Podemos conversar sobre los detalles?`)}`"
+                        target="_blank"
+                        class="flex items-center rounded-lg bg-green-500 px-3 py-1 text-xs font-bold text-white transition-colors hover:bg-green-600"
                       >
-                        {{ request.user.phone }}
+                        <Icon name="mdi:whatsapp" class="mr-1 h-4 w-4" />
+                        WhatsApp
                       </a>
                     </div>
                   </div>

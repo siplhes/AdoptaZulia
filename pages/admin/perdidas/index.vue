@@ -162,8 +162,8 @@
               <td class="px-6 py-4">
                 <div class="flex items-center gap-3">
                   <img
-                    v-if="report.photoURL"
-                    :src="report.photoURL"
+                    v-if="getPetImage(report)"
+                    :src="getPetImage(report)"
                     :alt="report.name"
                     class="h-12 w-12 rounded-lg object-cover"
                   />

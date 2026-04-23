@@ -460,14 +460,7 @@ function getStatusClass(status) {
   return map[status] || 'bg-gray-100 text-gray-800'
 }
 
-function getPetImage(pet) {
-  if (pet.image) return pet.image
-  if (pet.images && pet.images.length > 0) return pet.images[0]
-  if (pet.photos && pet.photos.length > 0) return pet.photos[0]
-  return '/img/placeholder-paw.webp'
-}
-
 function handleImageError(event) {
-  event.target.src = '/img/placeholder-paw.webp' // Fallback
+  event.target.src = '/placeholder.webp'
 }
 </script>

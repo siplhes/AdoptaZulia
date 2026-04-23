@@ -667,8 +667,8 @@
       title="Compartir Mascota"
       :description="`Ayuda a ${pet?.name} a encontrar un hogar.`"
       :shareData="{
-        title: `Adopta a ${pet?.name}`,
-        text: `Conoce a ${pet?.name}, busca un hogar en ${pet?.location}.`,
+        title: `🐾 ¡Adopta a ${pet?.name}!`,
+        text: `📍 Ubicación: ${pet?.location}\n🐕 Especie: ${formatType(pet?.type)}\n🦴 Raza: ${pet?.breed || 'Mestizo'}\n🎂 Edad: ${pet?.age}\n📏 Tamaño: ${formatSize(pet?.size)}\n\n✨ Conócelo aquí:`,
         url: shareUrl
       }"
     />
@@ -763,30 +763,31 @@ const ownerAdoptionCount = computed(() => ownerAdoptions.value.length)
 useSeoMeta({
   title: computed(() =>
     pet.value
-      ? `${pet.value.name} en adopción | Adopta Zulia`
-      : 'Mascota en adopción | Adopta Zulia'
+      ? `Adopta a ${pet.value.name} | Mascota en Adopción en Zulia`
+      : 'Mascota en Adopción | Adopta Zulia'
   ),
   description: computed(() =>
     pet.value
-      ? `Conoce a ${pet.value.name}, un ${pet.value.type} de raza ${pet.value.breed || 'mestiza'} que busca hogar en ${pet.value.location}. ${pet.value.description?.substring(0, 100)}...`
-      : 'Detalles de mascota en adopción'
+      ? `Conoce a ${pet.value.name}, un ${pet.value.type} que busca un hogar lleno de amor en ${pet.value.location}. ${pet.value.description?.substring(0, 150)}...`
+      : 'Detalles de mascota en adopción en el estado Zulia.'
   ),
   ogTitle: computed(() =>
-    pet.value ? `Adopta a ${pet.value.name} - Adopta Zulia` : 'Mascota en adopción'
+    pet.value ? `Adopta a ${pet.value.name} - Encuentra tu Compañero Ideal` : 'Mascota en Adopción'
   ),
   ogDescription: computed(() =>
     pet.value
-      ? `Ayuda a ${pet.value.name} a encontrar un hogar. ${pet.value.description?.substring(0, 100)}...`
-      : 'Ayuda a esta mascota a encontrar un hogar'
+      ? `¿Podrías darle un hogar a ${pet.value.name}? Descubre más sobre este noble compañero en Adopta Zulia.`
+      : 'Ayuda a esta mascota a encontrar un hogar amoroso.'
   ),
   ogSiteName: 'Adopta Zulia',
-  ogImage: computed(() => useOgImage(pet.value?.image || pet.value?.photos?.[0])),
+  ogImage: computed(() => useOgImage(pet.value?.image || pet.value?.photos?.[0] || '/og-improved.png')),
   ogUrl: computed(() => useCanonicalUrl(`/mascotas/${petId}`)),
-  twitterTitle: computed(() => (pet.value ? `Adopta a ${pet.value.name}` : 'Mascota en adopción')),
+  ogType: 'website',
+  twitterTitle: computed(() => (pet.value ? `Adopta a ${pet.value.name}` : 'Mascota en Adopción')),
   twitterDescription: computed(() =>
-    pet.value ? `${pet.value.name} busca un hogar en ${pet.value.location}.` : 'Mascota busca hogar'
+    pet.value ? `${pet.value.name} busca un hogar en ${pet.value.location}. ¡Ayúdanos a difundir!` : 'Mascota busca hogar.'
   ),
-  twitterImage: computed(() => useOgImage(pet.value?.image || pet.value?.photos?.[0])),
+  twitterImage: computed(() => useOgImage(pet.value?.image || pet.value?.photos?.[0] || '/og-improved.png')),
   twitterCard: 'summary_large_image',
 })
 
@@ -944,7 +945,7 @@ const contactWhatsapp = () => {
     return
   }
   const phone = pet.value.contact.phone.replace(/\D/g, '')
-  const text = `Hola, estoy interesado en adoptar a ${pet.value.name} que vi en AdoptaZulia.`
+  const text = `Hola ${pet.value.contact.name}, te contacto desde AdoptaZulia 🐾\n\nEstoy muy interesado en adoptar a *${pet.value.name}*.\n\n📍 Ubicación: ${pet.value.location}\n🐕 Especie: ${formatType(pet.value.type)}\n🦴 Raza: ${pet.value.breed || 'Mestizo'}\n\n¿Podrías darme más información? ¡Gracias!`
   window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank')
 }
 

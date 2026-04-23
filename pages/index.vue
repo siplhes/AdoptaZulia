@@ -4,11 +4,11 @@
     <HomeLostPetsHero />
     <HomeFeatured />
         <HomeCategories />
-            <HomeHowItWorks />
+    <HomeHowItWorks />
     <HomeDonation />
 
-
     <HomeAdoptionStories />
+    
     <HomeSocial />
   </div>
 </template>
@@ -24,24 +24,24 @@ import HomeSocial from '~/components/home/HomeSocial.vue'
 import HomeLostPetsHero from '~/components/home/HomeLostPetsHero.vue'
 
 const canonicalUrl = useCanonicalUrl('/')
-const ogImage = useOgImage('/og.jpg')
+const ogImage = useOgImage('/og-improved.png')
 
 // SEO Meta Tags - must be at top level for SSR
 useSeoMeta({
-  title: 'Inicio | Adopta Zulia - Adopta, no compres',
+  title: 'Adopta Zulia | Plataforma de Adopción de Mascotas en el Zulia',
   description:
     'Descubre mascotas en adopción en el estado Zulia, Venezuela. Encuentra perros, gatos y otras mascotas que buscan un hogar. Historias inspiradoras y cómo puedes ayudar.',
-  ogTitle: 'Adopta Zulia - Plataforma de adopción de mascotas',
+  ogTitle: 'Adopta Zulia - Encuentra a tu Compañero Perfecto en el Zulia',
   ogDescription:
-    'Descubre mascotas en adopción en el estado Zulia. Encuentra tu compañero perfecto, lee historias inspiradoras y aprende cómo puedes ayudar.',
+    'Descubre mascotas buscando hogar en el estado Zulia. Adopta perros, gatos y más. ¡Dales la oportunidad que se merecen!',
   ogSiteName: 'Adopta Zulia',
   ogImage,
-  ogImageAlt: 'Adopta Zulia - Mascotas buscando hogar',
+  ogImageAlt: 'Adopta Zulia - Mascotas buscando un hogar amoroso',
   ogUrl: canonicalUrl,
   ogType: 'website',
-  twitterTitle: 'Adopta Zulia - Plataforma de adopción de mascotas',
+  twitterTitle: 'Adopta Zulia - Encuentra a tu Compañero Perfecto en el Zulia',
   twitterDescription:
-    'Descubre mascotas en adopción en el estado Zulia. Encuentra tu compañero perfecto y ayuda a mascotas que necesitan un hogar.',
+    'Descubre mascotas buscando hogar en el estado Zulia. Adopta perros, gatos y más. ¡Dales la oportunidad que se merecen!',
   twitterImage: ogImage,
   twitterCard: 'summary_large_image',
 })

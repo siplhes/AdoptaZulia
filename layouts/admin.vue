@@ -3,213 +3,181 @@
     <!-- Sidebar -->
     <aside
       :class="[
-        'fixed inset-y-0 left-0 z-50 w-64 transform bg-gradient-to-b from-emerald-700 to-emerald-900 shadow-xl transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0',
+        'fixed inset-y-0 left-0 z-50 w-72 transform border-r-2 border-emerald-500/30 bg-[#021008] font-mono shadow-[0_0_20px_rgba(16,185,129,0.1)] transition-all duration-300 ease-in-out lg:relative lg:translate-x-0',
         sidebarOpen ? 'translate-x-0' : '-translate-x-full',
       ]"
     >
-      <!-- Logo/Header -->
-      <div class="flex h-16 items-center justify-between border-b border-emerald-600 px-6">
+      <!-- CRT Scanline Effect -->
+      <div class="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%] opacity-20"></div>
+
+      <!-- Header: Terminal Brand -->
+      <div class="relative flex h-20 items-center px-6 border-b border-emerald-500/20">
         <NuxtLink to="/admin" class="flex items-center gap-3">
-          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-white">
-            <Icon name="mdi:paw" class="h-6 w-6 text-emerald-600" />
+          <div class="flex h-10 w-10 items-center justify-center border-2 border-emerald-500 bg-emerald-500/10 shadow-[0_0_10px_rgba(16,185,129,0.3)]">
+            <Icon name="ph:terminal-fill" class="h-6 w-6 text-emerald-400" />
           </div>
-          <div class="text-white">
-            <h1 class="text-lg font-bold">AdoptaZulia</h1>
-            <p class="text-xs text-emerald-200">Panel Admin</p>
+          <div>
+            <h1 class="text-sm font-black tracking-tighter text-emerald-400">ROBCO INDUSTRIES</h1>
+            <p class="text-[10px] font-bold text-emerald-500/60 leading-none">OS v4.2.0 - ADMIN</p>
           </div>
         </NuxtLink>
-        <button
-          @click="sidebarOpen = false"
-          class="text-white lg:hidden"
-        >
-          <Icon name="mdi:close" class="h-6 w-6" />
-        </button>
       </div>
 
-      <!-- Navigation -->
-      <nav class="flex-1 space-y-1 overflow-y-auto p-4">
-        <!-- Dashboard -->
-        <NuxtLink
-          to="/admin"
-          :class="navItemClass"
-          @click="sidebarOpen = false"
-        >
-          <Icon name="mdi:view-dashboard" class="h-5 w-5" />
-          <span>Dashboard</span>
-        </NuxtLink>
-
-        <!-- Gestión -->
-        <div class="mt-6">
-          <p class="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-emerald-300">
-            Gestión
-          </p>
+      <!-- Navigation: Accordions -->
+      <nav class="relative flex-1 overflow-y-auto p-4 scrollbar-terminal">
+        <div class="space-y-2">
+          <!-- 01. DASHBOARD -->
           <NuxtLink
-            to="/admin/mascotas"
-            :class="navItemClass"
-            @click="sidebarOpen = false"
+            to="/admin"
+            :class="navItemClass('/admin')"
+            class="flex items-center gap-3 border border-transparent px-4 py-3 text-xs font-bold transition-all hover:bg-emerald-500/10 hover:border-emerald-500/30"
           >
-            <Icon name="mdi:paw" class="h-5 w-5" />
-            <span>Mascotas</span>
-            <span
-              v-if="stats.urgentPets > 0"
-              class="ml-auto rounded-full bg-amber-500 px-2 py-0.5 text-xs font-bold text-white"
+            <span class="text-emerald-500/40">></span>
+            <span>01 // DASHBOARD</span>
+          </NuxtLink>
+
+          <!-- 02. GESTIÓN (Accordion) -->
+          <div class="border border-emerald-500/20 bg-emerald-950/10 overflow-hidden">
+            <button 
+              @click="toggleAccordion('gestion')"
+              class="flex w-full items-center justify-between px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-emerald-400 hover:bg-emerald-500/5"
             >
-              {{ stats.urgentPets }}
-            </span>
-          </NuxtLink>
+              <span class="flex items-center gap-2">
+                <span class="text-emerald-500/40">#</span> 02 GESTIÓN_DATOS
+              </span>
+              <Icon 
+                :name="activeAccordion === 'gestion' ? 'ph:caret-up-bold' : 'ph:caret-down-bold'" 
+                class="h-3 w-3" 
+              />
+            </button>
+            <div v-show="activeAccordion === 'gestion'" class="border-t border-emerald-500/10 bg-black/40">
+              <NuxtLink to="/admin/mascotas" :class="navSubItemClass('/admin/mascotas')">
+                <span>[ MASCOTAS ]</span>
+                <span v-if="stats.urgentPets > 0" class="ml-auto text-amber-500">(!{{ stats.urgentPets }})</span>
+              </NuxtLink>
+              <NuxtLink to="/admin/perdidas" :class="navSubItemClass('/admin/perdidas')">
+                <span>[ EXTRAVIADAS ]</span>
+              </NuxtLink>
+              <NuxtLink to="/admin/adopciones" :class="navSubItemClass('/admin/adopciones')">
+                <span>[ SOLICITUDES ]</span>
+                <span v-if="stats.pendingRequests > 0" class="ml-auto animate-pulse text-red-500">*</span>
+              </NuxtLink>
+              <NuxtLink to="/admin/historias" :class="navSubItemClass('/admin/historias')">
+                <span>[ HISTORIAS ]</span>
+              </NuxtLink>
+              <NuxtLink to="/admin/usuarios" :class="navSubItemClass('/admin/usuarios')">
+                <span>[ USUARIOS ]</span>
+              </NuxtLink>
+            </div>
+          </div>
 
-          <NuxtLink
-            to="/admin/perdidas"
-            :class="navItemClass"
-            @click="sidebarOpen = false"
-          >
-            <Icon name="mdi:map-marker-alert" class="h-5 w-5" />
-            <span>Mascotas Perdidas</span>
-          </NuxtLink>
-
-          <NuxtLink
-            to="/admin/adopciones"
-            :class="navItemClass"
-            @click="sidebarOpen = false"
-          >
-            <Icon name="mdi:handshake" class="h-5 w-5" />
-            <span>Adopciones</span>
-            <span
-              v-if="stats.pendingRequests > 0"
-              class="ml-auto animate-pulse rounded-full bg-red-500 px-2 py-0.5 text-xs font-bold text-white"
+          <!-- 03. HERRAMIENTAS (Accordion) -->
+          <div class="border border-emerald-500/20 bg-emerald-950/10 overflow-hidden">
+            <button 
+              @click="toggleAccordion('tools')"
+              class="flex w-full items-center justify-between px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-emerald-400 hover:bg-emerald-500/5"
             >
-              {{ stats.pendingRequests }}
-            </span>
-          </NuxtLink>
+              <span class="flex items-center gap-2">
+                <span class="text-emerald-500/40">#</span> 03 HERRAMIENTAS
+              </span>
+              <Icon 
+                :name="activeAccordion === 'tools' ? 'ph:caret-up-bold' : 'ph:caret-down-bold'" 
+                class="h-3 w-3" 
+              />
+            </button>
+            <div v-show="activeAccordion === 'tools'" class="border-t border-emerald-500/10 bg-black/40">
+              <NuxtLink to="/admin/comunidad" :class="navSubItemClass('/admin/comunidad')">
+                <span>[ COMUNIDAD ]</span>
+              </NuxtLink>
+              <NuxtLink to="/admin/estadisticas" :class="navSubItemClass('/admin/estadisticas')">
+                <span>[ ESTADÍSTICAS ]</span>
+              </NuxtLink>
+              <NuxtLink to="/admin/reportes" :class="navSubItemClass('/admin/reportes')">
+                <span>[ REPORTES ]</span>
+              </NuxtLink>
+              <NuxtLink to="/admin/comunicacion" :class="navSubItemClass('/admin/comunicacion')">
+                <span>[ CHAT_MAILS ]</span>
+              </NuxtLink>
+            </div>
+          </div>
 
-          <NuxtLink
-            to="/admin/historias"
-            :class="navItemClass"
-            @click="sidebarOpen = false"
-          >
-            <Icon name="mdi:heart-multiple" class="h-5 w-5" />
-            <span>Historias</span>
-          </NuxtLink>
+          <!-- 04. SISTEMA (Accordion) -->
+          <div class="border border-emerald-500/20 bg-emerald-950/10 overflow-hidden">
+            <button 
+              @click="toggleAccordion('system')"
+              class="flex w-full items-center justify-between px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-emerald-400 hover:bg-emerald-500/5"
+            >
+              <span class="flex items-center gap-2">
+                <span class="text-emerald-500/40">#</span> 04 SISTEMA
+              </span>
+              <Icon 
+                :name="activeAccordion === 'system' ? 'ph:caret-up-bold' : 'ph:caret-down-bold'" 
+                class="h-3 w-3" 
+              />
+            </button>
+            <div v-show="activeAccordion === 'system'" class="border-t border-emerald-500/10 bg-black/40">
+              <NuxtLink to="/admin/features" :class="navSubItemClass('/admin/features')">
+                <span>[ MÓDULOS ]</span>
+              </NuxtLink>
+              <NuxtLink to="/admin/logs" :class="navSubItemClass('/admin/logs')">
+                <span>[ LOGS_AUDIT ]</span>
+              </NuxtLink>
+              <NuxtLink to="/admin/configuracion" :class="navSubItemClass('/admin/configuracion')">
+                <span>[ AJUSTES ]</span>
+              </NuxtLink>
+            </div>
+          </div>
 
-          <NuxtLink
-            to="/admin/usuarios"
-            :class="navItemClass"
-            @click="sidebarOpen = false"
-          >
-            <Icon name="mdi:account-group" class="h-5 w-5" />
-            <span>Usuarios</span>
-          </NuxtLink>
-        </div>
-
-        <!-- Herramientas -->
-        <div class="mt-6">
-          <p class="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-emerald-300">
-            Herramientas
-          </p>
-          <NuxtLink
-            to="/admin/estadisticas"
-            :class="navItemClass"
-            @click="sidebarOpen = false"
-          >
-            <Icon name="mdi:chart-bar" class="h-5 w-5" />
-            <span>Estadísticas</span>
-          </NuxtLink>
-
-          <NuxtLink
-            to="/admin/reportes"
-            :class="navItemClass"
-            @click="sidebarOpen = false"
-          >
-            <Icon name="mdi:flag" class="h-5 w-5" />
-            <span>Reportes</span>
-          </NuxtLink>
-
-          <NuxtLink
-            to="/admin/comunicacion"
-            :class="navItemClass"
-            @click="sidebarOpen = false"
-          >
-            <Icon name="mdi:email" class="h-5 w-5" />
-            <span>Comunicación</span>
-          </NuxtLink>
-        </div>
-
-        <!-- Sistema -->
-        <div class="mt-6">
-          <p class="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-emerald-300">
-            Sistema
-          </p>
-          <NuxtLink
-            to="/admin/features"
-            :class="navItemClass"
-            @click="sidebarOpen = false"
-          >
-            <Icon name="mdi:toggle-switch" class="h-5 w-5" />
-            <span>Features</span>
-          </NuxtLink>
-
-          <NuxtLink
-            to="/admin/configuracion"
-            :class="navItemClass"
-            @click="sidebarOpen = false"
-          >
-            <Icon name="mdi:cog" class="h-5 w-5" />
-            <span>Configuración</span>
-          </NuxtLink>
-
-          <NuxtLink
-            to="/admin/logs"
-            :class="navItemClass"
-            @click="sidebarOpen = false"
-          >
-            <Icon name="mdi:clipboard-text" class="h-5 w-5" />
-            <span>Logs</span>
-          </NuxtLink>
-        </div>
-
-        <!-- Desarrollo (Solo visible en dev o para admins) -->
-        <div class="mt-6">
-          <p class="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-emerald-300">
-            Desarrollo
-          </p>
-          <NuxtLink
-            to="/admin/pruebas"
-            :class="navItemClass"
-            @click="sidebarOpen = false"
-          >
-            <Icon name="mdi:test-tube" class="h-5 w-5" />
-            <span>Pruebas</span>
-          </NuxtLink>
-
-          <NuxtLink
-            to="/admin/seeders"
-            :class="navItemClass"
-            @click="sidebarOpen = false"
-          >
-            <Icon name="mdi:database-import" class="h-5 w-5" />
-            <span>Seeders</span>
-          </NuxtLink>
+          <!-- 05. DEV_TOOLS (Accordion) -->
+          <div v-if="isDevelopment" class="border border-amber-500/20 bg-amber-950/10 overflow-hidden">
+            <button 
+              @click="toggleAccordion('dev')"
+              class="flex w-full items-center justify-between px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-amber-500 hover:bg-amber-500/5"
+            >
+              <span class="flex items-center gap-2">
+                <span class="text-amber-500/40">#</span> 05 DEV_LAB
+              </span>
+              <Icon 
+                :name="activeAccordion === 'dev' ? 'ph:caret-up-bold' : 'ph:caret-down-bold'" 
+                class="h-3 w-3" 
+              />
+            </button>
+            <div v-show="activeAccordion === 'dev'" class="border-t border-amber-500/10 bg-black/40">
+              <NuxtLink to="/admin/pruebas" :class="navSubItemClass('/admin/pruebas', 'amber')">
+                <span>[ LAB_TESTS ]</span>
+              </NuxtLink>
+              <NuxtLink to="/admin/seeders" :class="navSubItemClass('/admin/seeders', 'amber')">
+                <span>[ SEED_DATABASE ]</span>
+              </NuxtLink>
+            </div>
+          </div>
         </div>
       </nav>
 
-      <!-- User Section -->
-      <div class="border-t border-emerald-600 p-4">
-        <div class="flex items-center gap-3">
-          <div class="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500 text-white font-bold">
-            {{ user?.displayName?.charAt(0) || 'A' }}
+      <!-- User Section: Low-Fi -->
+      <div class="relative border-t-2 border-emerald-500/30 p-6 bg-[#041a0d]">
+        <div class="flex items-center gap-4">
+          <div class="flex h-12 w-12 items-center justify-center border-2 border-emerald-500 bg-emerald-500/20 text-emerald-400 font-black shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+            {{ user?.displayName?.charAt(0) || 'U' }}
           </div>
-          <div class="flex-1">
-            <p class="text-sm font-semibold text-white">{{ user?.displayName || 'Admin' }}</p>
-            <p class="text-xs text-emerald-200">Administrador</p>
+          <div class="flex-1 min-w-0">
+            <p class="truncate text-xs font-black text-emerald-400 uppercase tracking-tighter">{{ user?.displayName || 'USER_01' }}</p>
+            <p class="text-[9px] font-bold text-emerald-600 uppercase tracking-widest leading-none mt-1">STATUS: ONLINE</p>
           </div>
         </div>
-        <NuxtLink
-          to="/"
-          class="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-500"
-        >
-          <Icon name="mdi:home" class="h-4 w-4" />
-          <span>Ver Sitio</span>
-        </NuxtLink>
+        <div class="mt-4 grid grid-cols-2 gap-2">
+          <NuxtLink
+            to="/"
+            class="flex items-center justify-center border border-emerald-500/40 bg-emerald-500/5 py-2 text-[10px] font-bold text-emerald-400 transition-all hover:bg-emerald-500/20"
+          >
+            SITIO_WEB
+          </NuxtLink>
+          <button
+            class="flex items-center justify-center border border-red-500/40 bg-red-500/5 py-2 text-[10px] font-bold text-red-500 transition-all hover:bg-red-500/20"
+          >
+            LOGOUT
+          </button>
+        </div>
       </div>
     </aside>
 
@@ -223,43 +191,57 @@
     <!-- Main Content -->
     <div class="flex flex-1 flex-col overflow-hidden">
       <!-- Top Navbar -->
-      <header class="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6 shadow-sm">
+      <header class="sticky top-0 z-40 flex h-20 items-center justify-between border-b border-gray-100 bg-white/80 px-8 backdrop-blur-md">
         <!-- Menu Button (Mobile) -->
         <button
           @click="sidebarOpen = true"
-          class="text-gray-600 lg:hidden"
+          class="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-50 text-gray-600 hover:bg-gray-100 lg:hidden"
         >
-          <Icon name="mdi:menu" class="h-6 w-6" />
+          <Icon name="ph:list-bold" class="h-6 w-6" />
         </button>
 
         <!-- Breadcrumbs / Page Title -->
-        <div class="flex items-center gap-3">
-          <h2 class="text-xl font-bold text-gray-800">
-            {{ pageTitle }}
-          </h2>
+        <div class="flex items-center gap-4">
+          <div class="hidden h-8 w-[1px] bg-gray-200 lg:block"></div>
+          <div>
+            <h2 class="text-xl font-black tracking-tight text-gray-900">
+              {{ pageTitle }}
+            </h2>
+            <div class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+              <span>Admin</span>
+              <Icon name="ph:caret-right-bold" class="h-2 w-2" />
+              <span class="text-emerald-500">{{ pageTitle }}</span>
+            </div>
+          </div>
         </div>
 
         <!-- Actions -->
-        <div class="flex items-center gap-4">
-          <!-- Search -->
-          <button class="rounded-lg p-2 text-gray-600 hover:bg-gray-100">
-            <Icon name="mdi:magnify" class="h-5 w-5" />
+        <div class="flex items-center gap-3">
+          <!-- Quick Search -->
+          <button class="hidden items-center gap-2 rounded-xl bg-gray-50 px-3 py-2 text-gray-400 transition-colors hover:bg-gray-100 lg:flex">
+            <Icon name="ph:magnifying-glass-bold" class="h-4 w-4" />
+            <span class="text-xs font-bold">Buscar...</span>
+            <span class="rounded bg-gray-200 px-1.5 py-0.5 text-[10px] font-black text-gray-500">⌘K</span>
           </button>
 
           <!-- Notifications -->
-          <button class="relative rounded-lg p-2 text-gray-600 hover:bg-gray-100">
-            <Icon name="mdi:bell" class="h-5 w-5" />
+          <button class="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gray-50 text-gray-500 transition-colors hover:bg-gray-100">
+            <Icon name="ph:bell-bold" class="h-5 w-5" />
             <span
               v-if="stats.pendingRequests > 0"
-              class="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white"
+              class="absolute right-2 top-2 flex h-4 w-4 items-center justify-center rounded-full border-2 border-white bg-red-500 text-[10px] font-black text-white"
             >
               {{ stats.pendingRequests }}
             </span>
           </button>
 
           <!-- User Menu -->
-          <div class="flex items-center gap-2">
-            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-sm font-bold text-white">
+          <div class="ml-2 flex items-center gap-3 pl-3 border-l border-gray-100">
+            <div class="hidden text-right lg:block">
+              <p class="text-xs font-black text-gray-900 leading-none">{{ user?.displayName || 'Admin' }}</p>
+              <p class="mt-1 text-[10px] font-bold text-emerald-600 leading-none">Online</p>
+            </div>
+            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 font-black text-white shadow-md">
               {{ user?.displayName?.charAt(0) || 'A' }}
             </div>
           </div>
@@ -287,56 +269,99 @@ const { stats } = useStats()
 
 // State
 const sidebarOpen = ref(false)
+const activeAccordion = ref('gestion')
+const isDevelopment = import.meta.dev
+
+// Actions
+const toggleAccordion = (section) => {
+  activeAccordion.value = activeAccordion.value === section ? null : section
+}
 
 // Computed
 const pageTitle = computed(() => {
   const path = route.path
-  if (path === '/admin') return 'Dashboard'
-  if (path.includes('/mascotas')) return 'Mascotas'
-  if (path.includes('/perdidas')) return 'Mascotas Perdidas'
-  if (path.includes('/adopciones')) return 'Adopciones'
-  if (path.includes('/historias')) return 'Historias'
-  if (path.includes('/usuarios')) return 'Usuarios'
-  if (path.includes('/estadisticas')) return 'Estadísticas'
-  if (path.includes('/reportes')) return 'Reportes'
-  if (path.includes('/comunicacion')) return 'Comunicación'
-  if (path.includes('/features')) return 'Features'
-  if (path.includes('/configuracion')) return 'Configuración'
-  if (path.includes('/logs')) return 'Logs'
-  if (path.includes('/pruebas')) return 'Zona de Pruebas'
-  if (path.includes('/seeders')) return 'Seeders'
-  return 'Admin'
+  if (path === '/admin') return 'DASHBOARD'
+  if (path.includes('/mascotas')) return 'DATABASE_MASCOTAS'
+  if (path.includes('/perdidas')) return 'EXT_REPORTS'
+  if (path.includes('/adopciones')) return 'ADOPTION_REQUESTS'
+  if (path.includes('/historias')) return 'STORY_LOGS'
+  if (path.includes('/usuarios')) return 'USER_REGISTRY'
+  if (path.includes('/estadisticas')) return 'SYS_STATS'
+  if (path.includes('/reportes')) return 'INCIDENT_REPORTS'
+  if (path.includes('/comunicacion')) return 'COMM_TERMINAL'
+  if (path.includes('/features')) return 'MODULE_CONFIG'
+  if (path.includes('/configuracion')) return 'CORE_SETTINGS'
+  if (path.includes('/logs')) return 'KERNEL_LOGS'
+  if (path.includes('/pruebas')) return 'LAB_FACILITY'
+  if (path.includes('/seeders')) return 'DATA_INJECTOR'
+  return 'ADMIN_SHELL'
 })
 
 const navItemClass = computed(() => {
   return (path) => {
+    const isActive = route.path === path
+    return isActive 
+      ? 'bg-emerald-500 text-[#021008] shadow-[0_0_15px_rgba(16,185,129,0.5)]' 
+      : 'text-emerald-500'
+  }
+})
+
+const navSubItemClass = computed(() => {
+  return (path, color = 'emerald') => {
     const isActive = route.path === path || route.path.startsWith(path + '/')
-    return [
-      'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
-      isActive
-        ? 'bg-emerald-600 text-white shadow-lg'
-        : 'text-emerald-100 hover:bg-emerald-600 hover:text-white',
-    ]
+    const base = 'flex w-full items-center gap-3 px-8 py-2.5 text-[10px] font-bold transition-all hover:pl-10'
+    const colors = {
+      emerald: isActive ? 'text-emerald-400 bg-emerald-500/10 border-l-2 border-emerald-500' : 'text-emerald-600 hover:text-emerald-400',
+      amber: isActive ? 'text-amber-400 bg-amber-500/10 border-l-2 border-amber-500' : 'text-amber-600 hover:text-amber-400'
+    }
+    return [base, colors[color]]
   }
 })
 </script>
 
 <style scoped>
-/* Custom scrollbar for sidebar */
-aside nav::-webkit-scrollbar {
-  width: 4px;
+/* Terminal Scrollbar */
+.scrollbar-terminal::-webkit-scrollbar {
+  width: 6px;
+}
+.scrollbar-terminal::-webkit-scrollbar-track {
+  background: #010804;
+}
+.scrollbar-terminal::-webkit-scrollbar-thumb {
+  background: #10b98144;
+  border: 1px solid #10b98166;
+}
+.scrollbar-terminal::-webkit-scrollbar-thumb:hover {
+  background: #10b98188;
 }
 
-aside nav::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
+/* Retro Terminal Animation */
+@keyframes pulse-border {
+  0% { border-color: rgba(16, 185, 129, 0.2); }
+  50% { border-color: rgba(16, 185, 129, 0.5); }
+  100% { border-color: rgba(16, 185, 129, 0.2); }
 }
 
-aside nav::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 2px;
+nav > div {
+  animation: pulse-border 4s infinite ease-in-out;
 }
 
-aside nav::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.5);
+/* Glassmorphism utility */
+.glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Animations */
+.nav-enter-active,
+.nav-leave-active {
+  transition: all 0.3s ease;
+}
+
+.nav-enter-from,
+.nav-leave-to {
+  opacity: 0;
+  transform: translateX(-20px);
 }
 </style>

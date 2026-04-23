@@ -1,5 +1,8 @@
 <template>
-  <section class="relative overflow-hidden bg-rose-50 py-6 md:py-8">
+  <section
+    v-if="hasActiveLostPets"
+    class="relative overflow-hidden bg-rose-50 py-6 md:py-8"
+  >
     <!-- Decorative Elements -->
     <div class="absolute -right-10 top-10 h-32 w-32 rounded-full bg-rose-200/50 blur-3xl" />
     <div class="absolute bottom-0 left-0 h-40 w-40 rounded-full bg-orange-200/50 blur-3xl" />
@@ -65,5 +68,20 @@
 </template>
 
 <script setup>
-// High impact component for lost pets visibility
+import { onMounted, computed } from 'vue'
+import { useLostPets } from '~/composables/useLostPets'
+
+const { lostPets, fetchLostPets } = useLostPets()
+
+// Filtrar mascotas que realmente están perdidas (no encontradas ni archivadas)
+// Soportamos tanto 'lost' (seeder) como 'active' (modelo)
+const hasActiveLostPets = computed(() => {
+  return lostPets.value.some(pet => 
+    (pet.status === 'lost' || pet.status === 'active') && !pet.isTest
+  )
+})
+
+onMounted(async () => {
+  await fetchLostPets()
+})
 </script>

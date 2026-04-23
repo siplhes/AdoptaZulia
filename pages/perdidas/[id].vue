@@ -331,6 +331,7 @@
           </p>
           <div class="space-y-3">
             <a
+              v-if="report?.contact"
               :href="`tel:${report.contact}`"
               class="flex items-center justify-center space-x-2 rounded-lg bg-emerald-600 px-6 py-3 text-white hover:bg-emerald-700"
             >
@@ -338,11 +339,12 @@
               <span>Llamar: {{ report.contact }}</span>
             </a>
             <a
-              :href="`https://wa.me/${report.contact.replace(/\D/g, '')}`"
+              v-if="report?.contact"
+              :href="`https://wa.me/${report.contact.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola, te contacto desde AdoptaZulia 🐾\n\nCreo haber visto a *${report.name}*, que se perdió en ${report.lastSeenLocation}.`)}`"
               target="_blank"
               class="flex items-center justify-center space-x-2 rounded-lg bg-green-600 px-6 py-3 text-white hover:bg-green-700"
             >
-              <Icon name="logos:whatsapp-icon" class="h-5 w-5" />
+              <Icon name="mdi:whatsapp" class="h-5 w-5" />
               <span>WhatsApp</span>
             </a>
             <button
@@ -536,7 +538,7 @@ const router = useRouter()
 const { getLostPetById, incrementViews, deleteLostPet, updateStatus, reportSighting } =
   useLostPets()
 const { user, isAdmin } = useAuth()
-const { showToast } = useToast()
+const { success: toastSuccess, error: toastError } = useToast()
 
 // State
 const report = ref<LostPet | null>(null)
@@ -601,10 +603,10 @@ async function handleMarkAsFound() {
   if (!report.value) return
   const success = await updateStatus(report.value.id!, 'found')
   if (success) {
-    showToast('Mascota marcada como encontrada', 'success')
-    report.value.status = 'found'
+    toastSuccess('Mascota marcada como encontrada')
+    if (report.value) report.value.status = 'found'
   } else {
-    showToast('Error al actualizar el estado', 'error')
+    toastError('Error al actualizar el estado')
   }
 }
 
@@ -612,10 +614,10 @@ async function handleReactivate() {
   if (!report.value) return
   const success = await updateStatus(report.value.id!, 'active')
   if (success) {
-    showToast('Reporte reactivado', 'success')
-    report.value.status = 'active'
+    toastSuccess('Reporte reactivado')
+    if (report.value) report.value.status = 'active'
   } else {
-    showToast('Error al reactivar', 'error')
+    toastError('Error al reactivar')
   }
 }
 
@@ -626,17 +628,17 @@ async function confirmDelete() {
   deleteLoading.value = false
 
   if (success) {
-    showToast('Reporte eliminado exitosamente', 'success')
+    toastSuccess('Reporte eliminado exitosamente')
     router.push('/perdidas')
   } else {
-    showToast('Error al eliminar el reporte', 'error')
+    toastError('Error al eliminar el reporte')
     showDeleteModal.value = false
   }
 }
 
 async function submitSighting() {
   if (!report.value || !user.value) {
-    showToast('Debes iniciar sesión para reportar un avistamiento', 'error')
+    toastError('Debes iniciar sesión para reportar un avistamiento')
     return
   }
 
@@ -653,7 +655,7 @@ async function submitSighting() {
   sightingLoading.value = false
 
   if (success) {
-    showToast('¡Gracias por tu reporte!', 'success')
+    toastSuccess('¡Gracias por tu reporte!')
     showSightingModal.value = false
     sightingForm.value = {
       reporterName: '',
@@ -666,17 +668,47 @@ async function submitSighting() {
       report.value.sightingCount++
     }
   } else {
-    showToast('Error al enviar el reporte', 'error')
+    toastError('Error al enviar el reporte')
   }
 }
 
 function copyContact() {
   if (!report.value?.contact) return
   navigator.clipboard.writeText(report.value.contact)
-  showToast('Contacto copiado al portapapeles', 'success')
+  toastSuccess('Contacto copiado al portapapeles')
 }
 
-// Share functions handled by ShareModal component
+// Share functions
+function copyLink() {
+  if (import.meta.client) {
+    const url = window.location.href
+    navigator.clipboard.writeText(url)
+    toastSuccess('Enlace copiado al portapapeles')
+  }
+}
+
+function shareToWhatsApp() {
+  if (!report.value || !import.meta.client) return
+  const text = `🔍 ¡SE BUSCA A *${report.value.name.toUpperCase()}*!\n\n📍 Última vez visto: ${report.value.lastSeenLocation}\n📅 Fecha: ${formatDate(report.value.lastSeenAt)}\n📝 Descripción: ${report.value.description}\n\n🙏 Por favor, ayúdanos a difundir para que vuelva a casa:\n${window.location.href}`
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank')
+}
+
+function shareToFacebook() {
+  if (!import.meta.client) return
+  window.open(
+    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`,
+    '_blank'
+  )
+}
+
+function shareToTwitter() {
+  if (!report.value || !import.meta.client) return
+  const text = `¡Ayúdanos a encontrar a ${report.value.name}! Se perdió en ${report.value.lastSeenLocation}.`
+  window.open(
+    `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`,
+    '_blank'
+  )
+}
 
 // Lifecycle
 onMounted(async () => {
@@ -693,20 +725,38 @@ onMounted(async () => {
 })
 
 // SEO
+useSeoMeta({
+  title: computed(() => `SE BUSCA: ${report.value?.name || 'Mascota'} | Adopta Zulia`),
+  description: computed(() => 
+    report.value 
+      ? `${report.value.name} está perdida en ${report.value.lastSeenLocation}. ${report.value.description?.substring(0, 150)}` 
+      : 'Ayúdanos a encontrar a esta mascota perdida en el Zulia.'
+  ),
+  ogTitle: computed(() => `🔍 SE BUSCA: ${report.value?.name || 'Mascota'} - Adopta Zulia`),
+  ogDescription: computed(() => 
+    report.value 
+      ? `¿Has visto a ${report.value.name}? Se perdió en ${report.value.lastSeenLocation}. ¡Ayúdanos a que vuelva a casa!` 
+      : 'Ayúdanos a encontrar a esta mascota perdida.'
+  ),
+  ogImage: computed(() => report.value?.images?.[0] || useOgImage('/og-improved.png')),
+  ogUrl: computed(() => useCanonicalUrl(`/perdidas/${route.params.id}`)),
+  ogType: 'website',
+  twitterTitle: computed(() => `SE BUSCA: ${report.value?.name || 'Mascota'}`),
+  twitterDescription: computed(() => 
+    report.value 
+      ? `Ayúdanos a encontrar a ${report.value.name}, perdida en ${report.value.lastSeenLocation}.` 
+      : 'Mascota perdida busca volver a casa.'
+  ),
+  twitterImage: computed(() => report.value?.images?.[0] || useOgImage('/og-improved.png')),
+  twitterCard: 'summary_large_image',
+})
+
 useHead({
-  title: computed(() => `${report.value?.name || 'Mascota'} - Mascota Perdida | Adopta Zulia`),
-  meta: computed(() => [
+  link: [
     {
-      name: 'description',
-      content: `${report.value?.name} está perdida. Última vez vista en ${report.value?.lastSeenLocation}. ${report.value?.description}`,
+      rel: 'canonical',
+      href: computed(() => useCanonicalUrl(`/perdidas/${route.params.id}`)),
     },
-    { property: 'og:title', content: `SE BUSCA: ${report.value?.name}` },
-    {
-      property: 'og:description',
-      content: `Ayúdanos a encontrar a ${report.value?.name}. Contacto: ${report.value?.contact}`,
-    },
-    { property: 'og:image', content: report.value?.images?.[0] || '' },
-    { property: 'og:type', content: 'website' },
-  ]),
+  ],
 })
 </script>

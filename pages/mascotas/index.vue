@@ -662,24 +662,24 @@ onMounted(async () => {
 })
 
 const canonicalUrl = useCanonicalUrl('/mascotas')
-const ogImage = useOgImage('/og.jpg')
+const ogImage = useOgImage('/og-improved.png')
 
 // SEO Meta Tags - must be at top level for SSR
 useSeoMeta({
-  title: 'Mascotas en adopción | Adopta Zulia',
+  title: 'Mascotas en Adopción en Zulia | Encuentra tu Compañero Ideal',
   description:
-    'Encuentra tu compañero perfecto entre perros, gatos y otras mascotas en adopción en el estado Zulia. Filtra por tamaño, edad, ubicación y más características.',
-  ogTitle: 'Mascotas en adopción - Adopta Zulia',
+    'Explora perros, gatos y otras mascotas en adopción en el estado Zulia. Filtra por tamaño, edad y ubicación para encontrar a tu nuevo mejor amigo.',
+  ogTitle: 'Mascotas en Adopción en Zulia - Adopta Zulia',
   ogDescription:
-    'Explora nuestra lista de mascotas disponibles para adopción. Encuentra tu compañero ideal filtrando por tipo, tamaño, edad y ubicación.',
+    'Encuentra a tu compañero perfecto entre cientos de mascotas que buscan un hogar amoroso en el Zulia. ¡Adopta hoy!',
   ogSiteName: 'Adopta Zulia',
   ogImage,
-  ogImageAlt: 'Mascotas disponibles para adopción en Zulia',
+  ogImageAlt: 'Mascotas disponibles para adopción en el estado Zulia',
   ogUrl: canonicalUrl,
   ogType: 'website',
-  twitterTitle: 'Mascotas en adopción - Adopta Zulia',
+  twitterTitle: 'Mascotas en Adopción en Zulia - Adopta Zulia',
   twitterDescription:
-    'Encuentra perros, gatos y otras mascotas disponibles para adopción en el estado Zulia.',
+    'Encuentra perros, gatos y más mascotas buscando hogar en el estado Zulia. ¡Dales una oportunidad!',
   twitterImage: ogImage,
   twitterCard: 'summary_large_image',
 })
