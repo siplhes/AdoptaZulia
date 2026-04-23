@@ -477,13 +477,13 @@ export function useStats() {
           }
         })
 
-        // Definir colores para tipos de mascotas
+        // Definir colores para tipos de mascotas (Paleta Emerald/Amber)
         const colors = {
-          perro: '#10b981', // emerald-600
+          perro: '#10b981', // emerald-500
           gato: '#f59e0b', // amber-500
-          conejo: '#6366f1', // indigo-500
-          ave: '#0ea5e9', // sky-500
-          otros: '#8b5cf6', // violet-500
+          conejo: '#047857', // emerald-700
+          ave: '#fbbf24', // amber-400
+          otros: '#d97706', // amber-600
         }
 
         // Crear distribución para el gráfico

@@ -1,5 +1,5 @@
 <template>
-  <section class="bg-emerald-600 pt-10 md:pt-12">
+  <section v-if="featuredStories.length > 0" class="bg-emerald-600 pt-10 md:pt-12">
     <div class="container mx-auto px-4 py-4">
       <div class="mb-8 pt-4 text-center">
         <h2 class="mb-2 text-2xl font-bold text-[#FEFFFA] md:text-3xl">Historias de adopción</h2>
@@ -19,11 +19,6 @@
       <!-- Error -->
       <div v-else-if="error" class="py-8 text-center text-red-600">
         {{ error }}
-      </div>
-
-      <!-- Sin historias -->
-      <div v-else-if="!featuredStories.length" class="py-8 text-center">
-        <p class="text-gray-100">Próximamente compartiremos historias de adopción exitosas.</p>
       </div>
 
       <!-- Lista de historias -->

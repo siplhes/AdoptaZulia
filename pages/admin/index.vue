@@ -48,9 +48,9 @@
         :value="stats.totalUsers"
         label="Usuarios"
         description="Registrados en plataforma"
-        icon-bg-class="bg-blue-100"
-        icon-color-class="text-blue-600"
-        bg-color-class="bg-blue-50"
+        icon-bg-class="bg-emerald-100"
+        icon-color-class="text-emerald-700"
+        bg-color-class="bg-emerald-50"
         :trend="15"
       />
 
@@ -60,10 +60,10 @@
         label="Mascotas Perdidas"
         description="Reportes activos"
         :badge="lostFoundRate"
-        badge-class="bg-green-100 text-green-700"
-        icon-bg-class="bg-red-100"
-        icon-color-class="text-red-600"
-        bg-color-class="bg-red-50"
+        badge-class="bg-amber-100 text-amber-700"
+        icon-bg-class="bg-amber-100"
+        icon-color-class="text-amber-600"
+        bg-color-class="bg-amber-50"
       />
     </div>
 
@@ -99,7 +99,7 @@
         to="/admin/usuarios"
         class="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
       >
-        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
+        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
           <Icon name="mdi:account-plus" class="h-5 w-5" />
         </div>
         <div>
@@ -112,7 +112,7 @@
         to="/admin/estadisticas"
         class="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
       >
-        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 text-purple-600">
+        <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-700">
           <Icon name="mdi:chart-line" class="h-5 w-5" />
         </div>
         <div>
@@ -168,11 +168,11 @@
 
           <div class="flex items-center justify-between">
             <span class="text-sm text-gray-600">Solicitudes Aprobadas</span>
-            <span class="font-bold text-blue-600">{{ requestApprovedPercentage }}%</span>
+            <span class="font-bold text-amber-600">{{ requestApprovedPercentage }}%</span>
           </div>
           <div class="h-2 overflow-hidden rounded-full bg-gray-100">
             <div
-              class="h-full bg-blue-500 transition-all duration-500"
+              class="h-full bg-amber-500 transition-all duration-500"
               :style="{ width: `${requestApprovedPercentage}%` }"
             />
           </div>
@@ -188,22 +188,22 @@
               </span>
             </div>
 
-            <div class="flex items-center justify-between rounded-lg bg-green-50 p-3">
+            <div class="flex items-center justify-between rounded-lg bg-emerald-50 p-3">
               <div class="flex items-center gap-2">
-                <Icon name="mdi:check-circle" class="h-5 w-5 text-green-600" />
-                <span class="text-sm font-medium text-green-900">Aprobadas</span>
+                <Icon name="mdi:check-circle" class="h-5 w-5 text-emerald-600" />
+                <span class="text-sm font-medium text-emerald-900">Aprobadas</span>
               </div>
-              <span class="font-bold text-green-600">
+              <span class="font-bold text-emerald-600">
                 {{ stats.requestDistribution?.approved || 0 }}
               </span>
             </div>
 
-            <div class="flex items-center justify-between rounded-lg bg-red-50 p-3">
+            <div class="flex items-center justify-between rounded-lg bg-gray-50 p-3">
               <div class="flex items-center gap-2">
-                <Icon name="mdi:close-circle" class="h-5 w-5 text-red-600" />
-                <span class="text-sm font-medium text-red-900">Rechazadas</span>
+                <Icon name="mdi:close-circle" class="h-5 w-5 text-gray-600" />
+                <span class="text-sm font-medium text-gray-900">Rechazadas</span>
               </div>
-              <span class="font-bold text-red-600">
+              <span class="font-bold text-gray-600">
                 {{ stats.requestDistribution?.rejected || 0 }}
               </span>
             </div>

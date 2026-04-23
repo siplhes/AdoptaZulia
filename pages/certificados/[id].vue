@@ -444,7 +444,7 @@ const route = useRoute()
 const router = useRouter()
 const adoptionId = route.params.id
 
-const { isAuthenticated, user, waitForAuth } = useAuth()
+const { isAuthenticated, user } = useAuth()
 
 const certificateRef = ref(null)
 const loading = ref(true)
@@ -456,8 +456,7 @@ const verificationId = ref(null)
 const hasSeenCertificate = ref(false)
 
 onMounted(async () => {
-  // Wait for auth to be ready
-  await waitForAuth()
+  // Component logic relies on middleware to ensure auth
 
   if (!isAuthenticated.value) {
     router.push('/login')

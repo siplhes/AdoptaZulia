@@ -42,7 +42,7 @@
         >
           Encuentra tu
           <br />
-          <span class="text-emerald-300">
+          <span class="text-yellow-400">
             compañero ideal
           </span>
         </h1>
@@ -57,7 +57,7 @@
         <div class="flex flex-col gap-3 sm:flex-row">
           <NuxtLink
             to="/mascotas"
-            class="group relative inline-flex items-center justify-center overflow-hidden rounded-xl bg-emerald-500 px-6 py-3 text-base font-bold text-white ring-emerald-400 ring-offset-2 transition-all hover:scale-105 hover:bg-emerald-400 hover:shadow-lg hover:shadow-emerald-500/30 focus:ring-2"
+            class="group relative inline-flex items-center justify-center overflow-hidden rounded-xl bg-emerald-600 px-6 py-3 text-base font-bold text-white ring-emerald-400 ring-offset-2 transition-all hover:scale-105 hover:bg-emerald-400 hover:shadow-lg hover:shadow-emerald-500/30 focus:ring-2"
           >
             <span class="mr-2">Ver mascotas</span>
             <Icon
@@ -71,7 +71,8 @@
 
           <NuxtLink
             to="/publicar"
-            class="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/10 px-6 py-3 text-base font-bold text-white backdrop-blur-sm transition-all hover:scale-105 hover:bg-white/20"
+            class="inline-flex items-center justify-center rounded-xl border border-white/10 
+            bg-yellow-500 px-6 py-3 text-base font-bold text-black transition-all hover:scale-105"
           >
             Dar en adopción
           </NuxtLink>

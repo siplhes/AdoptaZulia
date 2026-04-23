@@ -1,5 +1,8 @@
 <template>
-  <section class="bg-gradient-to-br from-emerald-500 to-emerald-700 py-16 md:py-24">
+  <section
+    v-if="testimonials.length > 0"
+    class="bg-gradient-to-br from-emerald-500 to-emerald-700 py-16 md:py-24"
+  >
     <div class="container mx-auto px-4">
       <div class="mb-12 text-center text-white">
         <h2 class="mb-4 text-3xl font-bold md:text-4xl">Historias que inspiran</h2>
@@ -85,40 +88,9 @@ onMounted(async () => {
     const stories = await fetchAdoptionStories(3)
     if (stories && stories.length > 0) {
       testimonials.value = stories
-    } else {
-      // Fallback mocks if no stories exist yet
-      testimonials.value = [
-        {
-          name: 'María González',
-          location: 'Maracaibo',
-          image: 'https://ui-avatars.com/api/?name=Maria+G&background=random',
-          quote:
-            'Luna cambió nuestra vida. El proceso de adopción fue súper sencillo y transparente. ¡Gracias por unirnos!',
-          petName: 'Luna',
-          petImage: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1',
-        },
-        {
-          name: 'Carlos Pérez',
-          location: 'San Francisco',
-          image: 'https://ui-avatars.com/api/?name=Carlos+P&background=random',
-          quote:
-            'Nunca pensé que adoptaría, pero ver a Rocky buscando hogar me rompió el corazón. Es el mejor compañero.',
-          petName: 'Rocky',
-          petImage: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e',
-        },
-        {
-          name: 'Ana Rodríguez',
-          location: 'Cabimas',
-          image: 'https://ui-avatars.com/api/?name=Ana+R&background=random',
-          quote:
-            'Adoptar a Mishi fue la mejor decisión. El equipo de Adopta Zulia me ayudó en todo momento.',
-          petName: 'Mishi',
-          petImage: 'https://images.unsplash.com/photo-1574158622682-e40e69881006',
-        },
-      ]
     }
   } catch (err) {
-    console.error(err)
+    console.error('Error al cargar historias de adopción:', err)
   }
 })
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-amber-50">
+  <div class="min-h-screen bg-page">
     <div class="container mx-auto px-4 py-8">
       <!-- Hero Section -->
       <div class="relative mb-8 overflow-hidden rounded-xl bg-emerald-700 p-6 text-white md:p-10">
@@ -137,99 +137,114 @@
                   </select>
                 </div>
                 <!-- Type Filter -->
-                <div class="mb-6">
-                  <h3 class="mb-3 font-medium text-gray-900">Tipo de mascota</h3>
-                  <div class="space-y-2">
-                    <label v-for="type in petTypes" :key="type.value" class="flex items-center">
+                <details class="group mb-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm" open>
+                  <summary class="flex cursor-pointer items-center justify-between font-medium text-gray-900 list-none outline-none">
+                    <h3 class="font-bold text-emerald-800">Tipo de mascota</h3>
+                    <Icon name="heroicons:chevron-down" class="h-5 w-5 text-emerald-600 transition-transform group-open:rotate-180" />
+                  </summary>
+                  <div class="mt-4 space-y-2">
+                    <label v-for="type in petTypes" :key="type.value" class="flex items-center cursor-pointer">
                       <input
                         v-model="filters.types"
                         type="checkbox"
                         :value="type.value"
                         class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                       />
-                      <span class="ml-2 text-gray-700">{{ type.label }}</span>
+                      <span class="ml-3 text-gray-700">{{ type.label }}</span>
                     </label>
                   </div>
-                </div>
+                </details>
 
                 <!-- Age Filter -->
-                <div class="mb-6">
-                  <h3 class="mb-3 font-medium text-gray-900">Edad</h3>
-                  <div class="space-y-2">
-                    <label v-for="age in ageRanges" :key="age.value" class="flex items-center">
+                <details class="group mb-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+                  <summary class="flex cursor-pointer items-center justify-between font-medium text-gray-900 list-none outline-none">
+                    <h3 class="font-bold text-emerald-800">Edad</h3>
+                    <Icon name="heroicons:chevron-down" class="h-5 w-5 text-emerald-600 transition-transform group-open:rotate-180" />
+                  </summary>
+                  <div class="mt-4 space-y-2">
+                    <label v-for="age in ageRanges" :key="age.value" class="flex items-center cursor-pointer">
                       <input
                         v-model="filters.ages"
                         type="checkbox"
                         :value="age.value"
                         class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                       />
-                      <span class="ml-2 text-gray-700">{{ age.label }}</span>
+                      <span class="ml-3 text-gray-700">{{ age.label }}</span>
                     </label>
                   </div>
-                </div>
+                </details>
 
                 <!-- Size Filter -->
-                <div class="mb-6">
-                  <h3 class="mb-3 font-medium text-gray-900">Tamaño</h3>
-                  <div class="space-y-2">
-                    <label v-for="size in sizes" :key="size.value" class="flex items-center">
+                <details class="group mb-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+                  <summary class="flex cursor-pointer items-center justify-between font-medium text-gray-900 list-none outline-none">
+                    <h3 class="font-bold text-emerald-800">Tamaño</h3>
+                    <Icon name="heroicons:chevron-down" class="h-5 w-5 text-emerald-600 transition-transform group-open:rotate-180" />
+                  </summary>
+                  <div class="mt-4 space-y-2">
+                    <label v-for="size in sizes" :key="size.value" class="flex items-center cursor-pointer">
                       <input
                         v-model="filters.sizes"
                         type="checkbox"
                         :value="size.value"
                         class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                       />
-                      <span class="ml-2 text-gray-700">{{ size.label }}</span>
+                      <span class="ml-3 text-gray-700">{{ size.label }}</span>
                     </label>
                   </div>
-                </div>
+                </details>
 
                 <!-- Gender Filter -->
-                <div class="mb-6">
-                  <h3 class="mb-3 font-medium text-gray-900">Género</h3>
-                  <div class="space-y-2">
-                    <label v-for="gender in genders" :key="gender.value" class="flex items-center">
+                <details class="group mb-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+                  <summary class="flex cursor-pointer items-center justify-between font-medium text-gray-900 list-none outline-none">
+                    <h3 class="font-bold text-emerald-800">Género</h3>
+                    <Icon name="heroicons:chevron-down" class="h-5 w-5 text-emerald-600 transition-transform group-open:rotate-180" />
+                  </summary>
+                  <div class="mt-4 space-y-2">
+                    <label v-for="gender in genders" :key="gender.value" class="flex items-center cursor-pointer">
                       <input
                         v-model="filters.gender"
                         type="radio"
                         :value="gender.value"
                         class="h-4 w-4 border-gray-300 text-emerald-600 focus:ring-emerald-500"
                       />
-                      <span class="ml-2 text-gray-700">{{ gender.label }}</span>
+                      <span class="ml-3 text-gray-700">{{ gender.label }}</span>
                     </label>
                   </div>
-                </div>
+                </details>
 
                 <!-- Additional Filters -->
-                <div class="mb-6">
-                  <h3 class="mb-3 font-medium text-gray-900">Características</h3>
-                  <div class="space-y-2">
-                    <label class="flex items-center">
+                <details class="group mb-6 rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+                  <summary class="flex cursor-pointer items-center justify-between font-medium text-gray-900 list-none outline-none">
+                    <h3 class="font-bold text-emerald-800">Características</h3>
+                    <Icon name="heroicons:chevron-down" class="h-5 w-5 text-emerald-600 transition-transform group-open:rotate-180" />
+                  </summary>
+                  <div class="mt-4 space-y-3">
+                    <label class="flex items-center cursor-pointer">
                       <input
                         v-model="filters.vaccinated"
                         type="checkbox"
                         class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                       />
-                      <span class="ml-2 text-gray-700">Vacunado</span>
+                      <span class="ml-3 text-gray-700">Vacunado</span>
                     </label>
-                    <label class="flex items-center">
+                    <label class="flex items-center cursor-pointer">
                       <input
                         v-model="filters.neutered"
                         type="checkbox"
                         class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                       />
-                      <span class="ml-2 text-gray-700">Esterilizado</span>
+                      <span class="ml-3 text-gray-700">Esterilizado</span>
                     </label>
-                    <label class="flex items-center">
+                    <label class="flex items-center cursor-pointer">
                       <input
                         v-model="filters.urgent"
                         type="checkbox"
                         class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                       />
-                      <span class="ml-2 text-gray-700">Casos urgentes</span>
+                      <span class="ml-3 text-amber-600 font-medium">Casos urgentes</span>
                     </label>
                   </div>
-                </div>
+                </details>
 
                 <button
                   class="w-full rounded-xl bg-emerald-600 py-3 font-bold text-white shadow-lg shadow-emerald-200 transition-transform hover:scale-[1.02] active:scale-95 lg:hover:bg-emerald-700"

@@ -1,11 +1,10 @@
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import type { UserInfo } from 'firebase/auth'
 import { AuthService } from '~/services/AuthService'
 import { useNuxtApp } from '#app'
 import type { UserProfile, UserData } from '~/models/User'
 import { useSecureLogger } from '~/composables/useSecureLogger'
-import { getAuth, setPersistence, browserLocalPersistence } from 'firebase/auth'
-import { useFirebaseApp } from 'vuefire'
+import { useCurrentUser } from 'vuefire'
 
 type User = UserInfo & {
   uid: string
@@ -22,47 +21,26 @@ type User = UserInfo & {
   refreshToken: string
 }
 
-const user = ref<User | null>(null)
 const userProfile = ref<UserProfile | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
 const isAdmin = ref(false)
 const needsProfileCompletion = ref(false)
-let unsubscribeAuth: (() => void) | null = null
-let isInitialized = false
 
-// Promise that resolves when initial auth state is determined
-let authReadyResolve: (() => void) | null = null
-const authReady = new Promise<void>((resolve) => {
-  authReadyResolve = resolve
-})
+export function useAuth() {
+  const nuxtApp = useNuxtApp()
+  const { error: logError, warn } = useSecureLogger()
+  const authService = new AuthService()
 
-// Configure global persistence before any auth operations
-async function configurePersistence() {
-  if (!import.meta.client) return
+  // Use Vuefire's reactive user synced with SSR
+  const firebaseUser = useCurrentUser()
+  const user = computed(() => firebaseUser.value as User | null)
+  const isAuthenticated = computed(() => !!user.value)
 
-  try {
-    const firebaseApp = useFirebaseApp()
-    const auth = getAuth(firebaseApp)
-    await setPersistence(auth, browserLocalPersistence)
-  } catch (err) {
-    console.error('Error configuring auth persistence:', err)
-  }
-}
-
-function initializeAuth() {
-  if (isInitialized || !import.meta.client) return
-  const { error: logError } = useSecureLogger()
-
-  // Configure persistence first
-  configurePersistence()
-
-  try {
-    const authService = new AuthService()
-    let isFirstCall = true
-
-    unsubscribeAuth = authService.onAuthStateChanged(async (currentUser: any) => {
-      user.value = currentUser
+  // Sync profile when user changes
+  watch(
+    user,
+    async (currentUser) => {
       if (currentUser) {
         try {
           isAdmin.value =
@@ -71,19 +49,19 @@ function initializeAuth() {
           const rtdbProfile = await authService.getUserProfile(currentUser.uid)
           userProfile.value = {
             uid: currentUser.uid,
-            displayName: currentUser.displayName,
+            displayName: currentUser.displayName || '',
             userName: rtdbProfile?.userName,
             email: currentUser.email,
             photoURL: currentUser.photoURL,
             isAdmin: isAdmin.value,
             ...rtdbProfile,
           }
-          needsProfileCompletion.value = !userProfile.value.userName
+          needsProfileCompletion.value = !userProfile.value?.userName
         } catch (err) {
           logError('Error al cargar perfil completo:', err)
           userProfile.value = {
             uid: currentUser.uid,
-            displayName: currentUser.displayName,
+            displayName: currentUser.displayName || '',
             userName: '',
             email: currentUser.email,
             photoURL: currentUser.photoURL,
@@ -96,55 +74,18 @@ function initializeAuth() {
         isAdmin.value = false
         needsProfileCompletion.value = false
       }
-
-      // Resolve authReady promise on first auth state determination
-      if (isFirstCall && authReadyResolve) {
-        authReadyResolve()
-        isFirstCall = false
-      }
-    })
-    isInitialized = true
-  } catch (err) {
-    const { error: logError } = useSecureLogger()
-    logError('Error al inicializar autenticación:', err)
-    // Resolve even on error so middleware doesn't hang
-    if (authReadyResolve) authReadyResolve()
-  }
-}
-
-export function useAuth() {
-  const nuxtApp = useNuxtApp()
-  const { error: logError, warn } = useSecureLogger()
-  // Initialize auth immediately on client so onAuthStateChanged is registered
-  // before page components run their onMounted checks. The previous 100ms
-  // delay could cause pages to redirect to /login before auth state was known.
-  if (import.meta.client && !isInitialized) {
-    initializeAuth()
-  }
-  const authService = new AuthService()
-  const isAuthenticated = computed(() => !!user.value)
+    },
+    { immediate: true }
+  )
 
   async function loginWithGoogle() {
     loading.value = true
     error.value = null
     try {
-      const authUser = await authService.loginWithGoogle()
-      user.value = authUser as User
-      if (user.value) {
-        isAdmin.value =
-          (await authService.isAdmin(user.value.uid)) ||
-          authService.isAdminEmail(user.value.email || '')
-        const rtdbProfile = await authService.getUserProfile(user.value.uid)
-        userProfile.value = {
-          uid: user.value.uid,
-          displayName: user.value.displayName || '',
-          email: user.value.email,
-          photoURL: user.value.photoURL || null,
-          isAdmin: isAdmin.value,
-          ...(rtdbProfile || {}),
-        }
-        needsProfileCompletion.value = !rtdbProfile?.userName
-      }
+      await authService.loginWithGoogle()
+      // Note: user state and profile fetching is handled by the watcher
+      // but we await a tick to ensure the watcher catches up if needed on the client
+      await new Promise(resolve => setTimeout(resolve, 100))
       return true
     } catch (err: any) {
       logError('Error al iniciar sesión con Google:', err)
@@ -160,15 +101,10 @@ export function useAuth() {
     error.value = null
     try {
       await authService.signOut()
-      user.value = null
-      userProfile.value = null
-      isAdmin.value = false
-      needsProfileCompletion.value = false
-      // Redirect to home after successful logout
+      // Vuefire will automatically update useCurrentUser() to null
       try {
         nuxtApp?.$router?.push('/')
       } catch (err) {
-        // Ignore navigation errors in environments without router
         warn('Logout: unable to navigate to home', err)
       }
       return true
@@ -214,9 +150,11 @@ export function useAuth() {
       loading.value = false
     }
   }
+
   function isLoggedIn() {
     return !!user.value
   }
+
   function traducirErrorFirebase(errorCode: string): string {
     switch (errorCode) {
       case 'auth/email-already-in-use':
@@ -245,6 +183,7 @@ export function useAuth() {
         return 'Error de autenticación: ' + errorCode
     }
   }
+
   async function getUserByUsername(username: string) {
     loading.value = true
     error.value = null
@@ -252,7 +191,6 @@ export function useAuth() {
       const userData = await authService.getUserByUsername(username)
 
       if (userData) {
-        // Asegurarnos de que todos los campos requeridos estén presentes
         return {
           ...userData,
           uid: userData.uid || '',
@@ -272,11 +210,6 @@ export function useAuth() {
     }
   }
 
-  /**
-   * Retrieves complete data for the currently authenticated user
-   * Includes both auth profile data and any additional user data from the database
-   * @returns {Promise<UserData | null>} Complete user data or null if not authenticated
-   */
   async function getCurrentUserData(): Promise<UserData | null> {
     loading.value = true
     error.value = null
@@ -284,12 +217,10 @@ export function useAuth() {
     try {
       if (!user.value) return null
 
-      // Get user data from database
       const userData = await authService.getUserById(user.value.uid)
 
       if (!userData) return null
 
-      // Combine auth profile with database data
       return {
         ...userData,
         uid: user.value.uid,
@@ -298,7 +229,6 @@ export function useAuth() {
         photoURL: user.value.photoURL || userData.photoURL || null,
         isAdmin: isAdmin.value,
         userName: userData.userName || userProfile.value?.userName || '',
-        // Asegurarse de que todos los campos opcionales estén definidos
         bio: userData.bio || userProfile.value?.bio || '',
         phoneNumber: userData.phoneNumber || userProfile.value?.phoneNumber || '',
         createdAt: userData.createdAt || userProfile.value?.createdAt || '',
@@ -312,12 +242,9 @@ export function useAuth() {
     }
   }
 
-  /**
-   * Wait for initial auth state to be determined
-   * Useful for middleware to avoid premature redirects
-   */
+  // Deprecated shim, resolves instantly since vuefire handles SSR state.
   async function waitForAuth(): Promise<void> {
-    await authReady
+    return Promise.resolve()
   }
 
   return {

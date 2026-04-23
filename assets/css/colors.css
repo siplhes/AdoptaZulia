@@ -36,7 +36,7 @@
   --color-secondary-900: #78350f;
 
   /* ===== Neutrales - Gray ===== */
-  --color-neutral-50: #fafafa;
+  --color-neutral-50: #fefffa;
   --color-neutral-100: #f5f5f5;
   --color-neutral-200: #e5e5e5;
   --color-neutral-300: #d4d4d4;
@@ -65,7 +65,7 @@
   --color-info-700: #1d4ed8;
 
   /* ===== Backgrounds ===== */
-  --bg-page: #fafafa; /* Fondo principal de páginas */
+  --bg-page: #fefffa; /* Fondo principal de páginas */
   --bg-card: #ffffff; /* Fondo de tarjetas y componentes */
   --bg-elevated: #ffffff; /* Fondo elevado (modals, dropdowns) */
   --bg-accent: #f0fdf4; /* Fondo con acento (emerald-50) */

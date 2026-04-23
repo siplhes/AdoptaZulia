@@ -294,7 +294,7 @@ definePageMeta({
 
 const route = useRoute()
 const router = useRouter()
-const { user, waitForAuth, isAdmin } = useAuth()
+const { user, isAdmin } = useAuth()
 const { getLostPetById, updateLostPet } = useLostPets()
 
 const petId = route.params.id
@@ -326,7 +326,7 @@ const canEditStatus = computed(() => {
 })
 
 onMounted(async () => {
-  await waitForAuth()
+  // Component logic relies on middleware to ensure auth
 
   if (!user.value) {
     router.push('/login')

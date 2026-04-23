@@ -3,9 +3,11 @@
     <HomeHero />
     <HomeLostPetsHero />
     <HomeFeatured />
-    <HomeCategories />
+        <HomeCategories />
+            <HomeHowItWorks />
     <HomeDonation />
-    <HomeHowItWorks />
+
+
     <HomeAdoptionStories />
     <HomeSocial />
   </div>

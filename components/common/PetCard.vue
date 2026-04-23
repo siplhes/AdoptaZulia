@@ -1,6 +1,6 @@
 <template>
   <div
-    class="group flex flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-md transition-all hover:-translate-y-1 hover:shadow-xl"
+    class="group flex flex-col overflow-hidden rounded-xl bg-white shadow-md transition-all hover:-translate-y-1 hover:shadow-xl"
   >
     <div class="relative aspect-[4/3] overflow-hidden bg-gray-100">
       <NuxtImg
@@ -61,7 +61,7 @@
       <!-- Urgent Badge -->
       <div v-if="pet.urgent && pet.status !== 'adopted'" class="absolute right-3 top-3 z-10">
         <span
-          class="animate-pulse rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white shadow-lg ring-2 ring-red-400"
+          class="animate-pulse rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white"
         >
           URGENTE
         </span>

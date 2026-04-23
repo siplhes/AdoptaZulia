@@ -46,7 +46,7 @@ const socialLinks = [
   },
   {
     name: 'Facebook',
-    link: 'https://facebook.com/adopta.zulia',
+    link: 'https://www.facebook.com/profile.php?id=61565329269465',
     icon: 'mdi:facebook',
     colorClasses: 'bg-white text-blue-600 hover:bg-blue-50',
   },
