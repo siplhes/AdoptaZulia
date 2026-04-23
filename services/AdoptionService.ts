@@ -34,6 +34,7 @@ export interface Adoption {
     address?: string
     photoURL?: string
   }
+  isTest?: boolean
 }
 
 export class AdoptionService {

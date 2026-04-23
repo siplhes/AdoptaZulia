@@ -326,21 +326,21 @@
       >
         <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl">
           <h3 class="mb-4 text-2xl font-bold text-gray-900">Contactar</h3>
-          <p class="mb-4 text-gray-600">
+          <p v-if="report" class="mb-4 text-gray-600">
             Contacta al dueño si has visto a {{ report.name }}
           </p>
           <div class="space-y-3">
             <a
               v-if="report?.contact"
-              :href="`tel:${report.contact}`"
+              :href="`tel:${normalizePhoneNumber(report.contact)}`"
               class="flex items-center justify-center space-x-2 rounded-lg bg-emerald-600 px-6 py-3 text-white hover:bg-emerald-700"
             >
               <Icon name="heroicons:phone" class="h-5 w-5" />
-              <span>Llamar: {{ report.contact }}</span>
+              <span>Llamar: {{ formatPhoneForDisplay(report.contact) }}</span>
             </a>
             <a
               v-if="report?.contact"
-              :href="`https://wa.me/${report.contact.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola, te contacto desde AdoptaZulia 🐾\n\nCreo haber visto a *${report.name}*, que se perdió en ${report.lastSeenLocation}.`)}`"
+              :href="`https://wa.me/${normalizePhoneNumber(report.contact)}?text=${encodeURIComponent(`Hola, te contacto desde AdoptaZulia 🐾\n\nCreo haber visto a *${report.name}*, que se perdió en ${report.lastSeenLocation}.`)}`"
               target="_blank"
               class="flex items-center justify-center space-x-2 rounded-lg bg-green-600 px-6 py-3 text-white hover:bg-green-700"
             >
@@ -373,7 +373,7 @@
       >
         <div class="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl">
           <h3 class="mb-4 text-2xl font-bold text-gray-900">Compartir</h3>
-          <p class="mb-4 text-gray-600">Ayuda a difundir para encontrar a {{ report.name }}</p>
+          <p v-if="report" class="mb-4 text-gray-600">Ayuda a difundir para encontrar a {{ report.name }}</p>
           <div class="space-y-3">
             <button
               @click="shareToWhatsApp"
@@ -423,7 +423,7 @@
       >
         <div class="w-full max-w-lg rounded-xl bg-white p-6 shadow-2xl">
           <h3 class="mb-4 text-2xl font-bold text-gray-900">Reportar Avistamiento</h3>
-          <p class="mb-4 text-gray-600">¿Viste a {{ report.name }}? Ayuda con tu información</p>
+          <p v-if="report" class="mb-4 text-gray-600">¿Viste a {{ report.name }}? Ayuda con tu información</p>
 
           <form @submit.prevent="submitSighting" class="space-y-4">
             <div>
@@ -531,6 +531,7 @@ import { useLostPets } from '~/composables/useLostPets'
 import { useAuth } from '~/composables/useAuth'
 import { useToast } from '~/composables/useToast'
 import { formatDate as formatFullDate } from '~/utils/dateFormatter'
+import { normalizePhoneNumber, formatPhoneForDisplay } from '~/utils/phoneFormatter'
 import type { LostPet } from '~/models/LostPet'
 
 const route = useRoute()
@@ -689,7 +690,7 @@ function copyLink() {
 
 function shareToWhatsApp() {
   if (!report.value || !import.meta.client) return
-  const text = `🔍 ¡SE BUSCA A *${report.value.name.toUpperCase()}*!\n\n📍 Última vez visto: ${report.value.lastSeenLocation}\n📅 Fecha: ${formatDate(report.value.lastSeenAt)}\n📝 Descripción: ${report.value.description}\n\n🙏 Por favor, ayúdanos a difundir para que vuelva a casa:\n${window.location.href}`
+  const text = `🔍 ¡SE BUSCA A *${report.value.name.toUpperCase()}*!\n\n📍 Última vez visto: ${report.value.lastSeenLocation}\n📅 Fecha: ${formatDate(report.value.lastSeenDate)}\n📝 Descripción: ${report.value.description}\n\n🙏 Por favor, ayúdanos a difundir para que vuelva a casa:\n${window.location.href}`
   window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank')
 }
 

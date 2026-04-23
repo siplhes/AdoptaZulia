@@ -516,17 +516,21 @@
                 Ver todas las solicitudes
               </button>
             </div>
-
-
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Mobile Action Bar (Fixed at bottom) -->
     <div
-      class="fixed bottom-0 left-0 right-0 z-40 flex items-center gap-3 border-t border-gray-200 bg-white bg-white/95 px-4 py-3 backdrop-blur-md lg:hidden"
+      class="fixed bottom-0 left-0 right-0 z-40 flex items-center gap-3 border-t border-gray-200 bg-white bg-white/95 px-4 py-3 pb-safe backdrop-blur-md lg:hidden"
     >
-
+      <button
+        class="flex h-12 w-12 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-500 shadow-sm transition-transform active:scale-90"
+        @click="sharePet"
+      >
+        <Icon name="heroicons:share" class="h-6 w-6" />
+      </button>
 
       <template v-if="!isOwner">
         <button
@@ -560,7 +564,7 @@
         </button>
         <button
           v-else
-          class="flex-1 rounded-xl bg-blue-600 py-3 text-sm font-bold text-white shadow-lg shadow-blue-200"
+          class="flex-1 rounded-xl bg-blue-600 py-3 text-sm font-bold text-white shadow-lg shadow-blue-200 transition-transform active:scale-95"
           @click="viewUserAdoption"
         >
           Ver Mi Solicitud
@@ -569,7 +573,7 @@
 
       <template v-if="isOwner">
         <button
-          class="flex-1 rounded-xl bg-blue-600 py-3 text-sm font-bold text-white"
+          class="flex-1 rounded-xl bg-blue-600 py-3 text-sm font-bold text-white shadow-lg shadow-blue-200"
           @click="viewAdoptionRequests"
         >
           Solicitudes ({{ ownerAdoptionCount }})
@@ -680,6 +684,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAdoptions } from '~/composables/useAdoptions'
 import { formatShortDate } from '~/utils/dateFormatter'
+import { normalizePhoneNumber, formatPhoneForDisplay } from '~/utils/phoneFormatter'
 import ShareModal from '~/components/common/ShareModal.vue'
 
 // Props & Route
@@ -707,6 +712,7 @@ const currentPhoto = ref(null)
 const showImageModal = ref(false)
 const modalImage = ref('')
 const adoptionStatus = ref(null) // 'pending', 'approved', 'rejected', 'none'
+const userAdoptionId = ref(null)
 
 const ownerAdoptions = ref([])
 const loadingOwnerAdoptions = ref(false)
@@ -844,7 +850,12 @@ onMounted(async () => {
       // Check application status
       if (!isOwner.value) {
         const adoption = await getAdoptionByPetAndUser(petId, user.value.uid)
-        adoptionStatus.value = adoption ? adoption.status : 'none'
+        if (adoption) {
+          adoptionStatus.value = adoption.status
+          userAdoptionId.value = adoption.id
+        } else {
+          adoptionStatus.value = 'none'
+        }
       } else {
         // Load owner adoptions
         loadingOwnerAdoptions.value = true
@@ -912,9 +923,10 @@ const submitAdoption = async () => {
   }
 
   try {
-    const success = await createAdoptionRequest(petId, user.value.uid, adoptionMessage.value)
-    if (success) {
+    const adoptionId = await createAdoptionRequest(petId, user.value.uid, adoptionMessage.value)
+    if (adoptionId) {
       adoptionStatus.value = 'pending'
+      userAdoptionId.value = adoptionId
       closeAdoptionModal()
       // Show success toast or alert
       alert('¡Solicitud enviada con éxito!')
@@ -944,7 +956,7 @@ const contactWhatsapp = () => {
     alert('Número de WhatsApp no disponible para esta mascota.')
     return
   }
-  const phone = pet.value.contact.phone.replace(/\D/g, '')
+  const phone = normalizePhoneNumber(pet.value.contact.phone)
   const text = `Hola ${pet.value.contact.name}, te contacto desde AdoptaZulia 🐾\n\nEstoy muy interesado en adoptar a *${pet.value.name}*.\n\n📍 Ubicación: ${pet.value.location}\n🐕 Especie: ${formatType(pet.value.type)}\n🦴 Raza: ${pet.value.breed || 'Mestizo'}\n\n¿Podrías darme más información? ¡Gracias!`
   window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank')
 }
@@ -959,13 +971,14 @@ const contactOwner = () => {
 }
 
 const viewUserAdoption = () => {
-  // View my application
-  // Logic to find adoption ID and navigate?
-  // For now we assume we just show status
-  alert(
-    'Ya has enviado una solicitud. Estado: ' +
-      (adoptionStatus.value === 'pending' ? 'Pendiente' : adoptionStatus.value)
-  )
+  if (userAdoptionId.value) {
+    router.push(`/mi-solicitud/${userAdoptionId.value}`)
+  } else {
+    alert(
+      'Ya has enviado una solicitud. Estado: ' +
+        (adoptionStatus.value === 'pending' ? 'Pendiente' : adoptionStatus.value)
+    )
+  }
 }
 
 const viewAdoptionRequests = () => {

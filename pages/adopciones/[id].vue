@@ -105,11 +105,11 @@
                           :href="`tel:${request.user.phone}`"
                           class="text-emerald-600 hover:text-emerald-800"
                         >
-                          {{ request.user.phone }}
+                          {{ formatPhoneForDisplay(request.user.phone) }}
                         </a>
                       </div>
                       <a
-                        :href="`https://wa.me/${request.user.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola ${request.user.name}, te contacto desde AdoptaZulia 🐾 por tu solicitud para adoptar a *${pet?.name}*.\n\n¿Podemos conversar sobre los detalles?`)}`"
+                        :href="`https://wa.me/${normalizePhoneNumber(request.user.phone)}?text=${encodeURIComponent(`Hola ${request.user.name}, te contacto desde AdoptaZulia 🐾 por tu solicitud para adoptar a *${pet?.name}*.\n\n¿Podemos conversar sobre los detalles?`)}`"
                         target="_blank"
                         class="flex items-center rounded-lg bg-green-500 px-3 py-1 text-xs font-bold text-white transition-colors hover:bg-green-600"
                       >
@@ -159,10 +159,10 @@
                         <div v-if="request.user.phone" class="flex items-center text-gray-700">
                           <Icon name="heroicons:phone" class="mr-2 h-5 w-5 text-gray-400" />
                           <a
-                            :href="`tel:${request.user.phone}`"
+                            :href="`tel:${normalizePhoneNumber(request.user.phone)}`"
                             class="text-emerald-600 hover:text-emerald-800"
                           >
-                            {{ request.user.phone }}
+                            {{ formatPhoneForDisplay(request.user.phone) }}
                           </a>
                         </div>
                         <div v-if="request.user.address" class="flex items-center text-gray-700">
@@ -207,7 +207,7 @@
                         </div>
                         <div v-if="user.phoneNumber" class="flex items-center text-gray-700">
                           <Icon name="heroicons:phone" class="mr-2 h-5 w-5 text-gray-400" />
-                          <span>{{ user.phoneNumber }}</span>
+                          <span>{{ formatPhoneForDisplay(user.phoneNumber) }}</span>
                         </div>
                         <div v-if="user.address" class="flex items-center text-gray-700">
                           <Icon name="heroicons:map-pin" class="mr-2 h-5 w-5 text-gray-400" />
@@ -386,6 +386,7 @@ import { useAdoptions } from '~/composables/useAdoptions'
 import { usePets } from '~/composables/usePets'
 import { useAuth } from '~/composables/useAuth'
 import ModalAlert from '~/components/common/ModalAlert.vue'
+import { normalizePhoneNumber, formatPhoneForDisplay } from '~/utils/phoneFormatter'
 
 // Obtener parámetros de ruta
 const route = useRoute()

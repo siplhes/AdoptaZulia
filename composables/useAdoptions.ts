@@ -1,4 +1,5 @@
 import { ref } from 'vue'
+import { getDatabase, get, ref as dbRef } from 'firebase/database'
 import { AdoptionService, type Adoption } from '~/services/AdoptionService'
 import { useNotifications } from './useNotifications'
 import { useSecureLogger } from './useSecureLogger'
@@ -6,6 +7,7 @@ import { useAuth } from './useAuth'
 import { getAdoptionUpdateEmail, getNewRequestEmail } from '~/utils/emailTemplates'
 import { fetchData } from '~/utils/firebase'
 import { handleFirebaseError } from '~/utils/errorHandler'
+import { normalizePhoneNumber } from '~/utils/phoneFormatter'
 
 // Re-export type for consumers
 export type { Adoption }
@@ -135,7 +137,7 @@ export function useAdoptions() {
           id: adoption.userId,
           name: userData.displayName || userData.name || userData.userName || '',
           email: userData.email || '',
-          phone: userData.phoneNumber || userData.phone || '',
+          phone: normalizePhoneNumber(userData.phoneNumber || userData.phone || ''),
           address: userData.address || '',
           photoURL: userData.photoURL || '',
         }
@@ -245,8 +247,11 @@ export function useAdoptions() {
       // Refetch or get from cache to have fresh data for notification
       let adoption = cache.adoptions.get(id)
       if (!adoption || !adoption.user) {
-        adoption = await adoptionService.getAdoptionById(id)
-        if (adoption) await enrichAdoptionsData([adoption])
+        const fetchedAdoption = await adoptionService.getAdoptionById(id)
+        if (fetchedAdoption) {
+          adoption = fetchedAdoption
+          await enrichAdoptionsData([adoption])
+        }
       }
 
       if (adoption) {
