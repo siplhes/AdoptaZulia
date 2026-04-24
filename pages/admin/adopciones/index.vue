@@ -505,7 +505,7 @@ const pageSize = 9
 const selectedAdoption = ref(null)
 const adminNotes = ref('')
 const showModal = ref(false)
-const modalType = ref('')
+const modalType = ref('info')
 const modalTitle = ref('')
 const modalMessage = ref('')
 const modalConfirmText = ref('')
@@ -563,7 +563,7 @@ const prevPage = () => {
 
 // Acciones
 const approveAdoption = async (adoption) => {
-  modalType.value = 'confirm'
+  modalType.value = 'info'
   modalTitle.value = 'Aprobar adopción'
   modalMessage.value = `¿Aprobar solicitud de ${adoption.user?.name} para ${adoption.pet?.name}?`
   modalConfirmText.value = 'Sí, Aprobar'
@@ -589,7 +589,7 @@ const rejectAdoption = async (adoption) => {
 }
 
 const completeAdoption = async (adoption) => {
-  modalType.value = 'confirm'
+  modalType.value = 'info'
   modalTitle.value = 'Finalizar Adopción'
   modalMessage.value = `¿Confirmas que ${adoption.pet?.name} ha sido entregado a ${adoption.user?.name}?`
   modalConfirmText.value = '¡Sí, Adoptado!'

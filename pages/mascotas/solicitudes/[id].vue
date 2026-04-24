@@ -480,7 +480,7 @@ const adminNotes = ref('')
 
 // Estados para el modal
 const showModal = ref(false)
-const modalType = ref('')
+const modalType = ref('info')
 const modalTitle = ref('')
 const modalMessage = ref('')
 const modalConfirmText = ref('')
@@ -512,7 +512,7 @@ const userCanAct = computed(() => {
 })
 
 const showAlert = (title, message) => {
-  modalType.value = 'alert'
+  modalType.value = 'warning'
   modalTitle.value = title
   modalMessage.value = message
   modalConfirmText.value = 'Aceptar'
@@ -636,7 +636,7 @@ const updateStatus = (newStatus) => {
     message = '¿Estás seguro de que deseas aprobar esta solicitud?'
   }
 
-  modalType.value = 'confirm'
+  modalType.value = 'info'
   modalTitle.value = 'Confirmar acción'
   modalMessage.value = message
   modalConfirmText.value = 'Confirmar'
@@ -712,7 +712,7 @@ const processStatusUpdate = async (newStatus) => {
 const cancelAdoption = () => {
   if (!adoption.value || !adoption.value.id) return
 
-  modalType.value = 'confirm'
+  modalType.value = 'info'
   modalTitle.value = 'Cancelar solicitud'
   modalMessage.value = '¿Estás seguro de que deseas cancelar tu solicitud de adopción?'
   modalConfirmText.value = 'Sí, cancelar'

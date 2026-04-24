@@ -94,6 +94,25 @@ export const getAdoptionUpdateEmail = (
   })
 }
 
+export const getAdoptionReminderEmail = (petName: string, actionUrl: string) => {
+  const content = `
+    <h2>Recordatorio de Adopción</h2>
+    <p>La solicitud de adopción para <strong>${petName}</strong> fue aprobada hace más de una semana, pero aún no ha sido confirmada como completada.</p>
+    
+    <div style="background-color: #fffbeb; border-left: 4px solid #f59e0b; padding: 16px; margin: 16px 0; border-radius: 4px;">
+      <p style="margin: 0; font-weight: 600; color: #92400e;">Por favor confirma si la adopción ya se realizó.</p>
+      <p style="margin: 8px 0 0 0; font-size: 14px; color: #78350f;">Si la mascota ya fue entregada, marca la adopción como completada. De lo contrario, ignora este mensaje o contacta al otro involucrado.</p>
+    </div>
+
+    <p>Puedes gestionar la solicitud directamente desde la plataforma.</p>
+  `
+
+  return getBaseEmailHtml('Recordatorio de Adopción - Adopta Zulia', content, {
+    text: 'Gestionar Adopción',
+    url: actionUrl,
+  })
+}
+
 export const getNewRequestEmail = (petName: string, message: string, actionUrl: string) => {
   const content = `
     <h2>¡Buenas noticias!</h2>

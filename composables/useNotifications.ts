@@ -35,12 +35,12 @@ export function useNotifications() {
   }
 
   // --- Notification Listener ---
-  const listenToNotifications = () => {
-    if (!isAuthenticated.value || !user.value) return
+  const listenToNotifications = async () => {
+    if (!isAuthenticated.value || !user.value?.uid) return
 
     loading.value = true
     try {
-      const notificationsRef = getDbRef(`notifications/${user.value.uid}`)
+      const notificationsRef = await getDbRef(`notifications/${user.value.uid}`)
 
       if (notificationsListener) {
         notificationsListener()
@@ -104,7 +104,7 @@ export function useNotifications() {
         // Usamos getDb() para obtener la instancia y update de firebase/database directamente
         // para evitar que el helper updateData añada updatedAt en el root ('')
         const { update: dbUpdate } = await import('firebase/database')
-        await dbUpdate(getDbRef(''), updates)
+        await dbUpdate(await getDbRef(''), updates)
         toast.success('Todas las notificaciones marcadas como leídas')
       }
     } catch (err) {
@@ -148,7 +148,9 @@ export function useNotifications() {
     () => isAuthenticated.value,
     (isAuth) => {
       if (isAuth) {
-        listenToNotifications()
+        listenToNotifications().catch((err) => {
+          logError('Error starting notification listener', err)
+        })
       } else {
         if (notificationsListener) notificationsListener()
         notifications.value = []

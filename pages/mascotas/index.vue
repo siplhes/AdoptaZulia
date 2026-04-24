@@ -461,6 +461,21 @@ const genders = [
 
 const locations = ['Maracaibo', 'San Francisco', 'Cabimas', 'Machiques', 'Lara', 'Falcon']
 
+const activeFiltersCount = computed(() => {
+  return (
+    (filters.value.types.length > 0 ? 1 : 0) +
+    (filters.value.ages.length > 0 ? 1 : 0) +
+    (filters.value.sizes.length > 0 ? 1 : 0) +
+    (filters.value.gender ? 1 : 0) +
+    (filters.value.vaccinated ? 1 : 0) +
+    (filters.value.neutered ? 1 : 0) +
+    (filters.value.urgent ? 1 : 0) +
+    (filters.value.location ? 1 : 0)
+  )
+})
+
+const hasActiveFilters = computed(() => activeFiltersCount.value > 0)
+
 const { data: allPetsData, pending: petsPending, error: petsError } = useAsyncData('pets', () => fetchAllPets())
 const allPets = ref(allPetsData.value || [])
 

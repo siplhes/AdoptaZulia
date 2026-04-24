@@ -201,7 +201,7 @@ export function useAdoptionStories() {
 
     try {
       const { useFirebaseApp } = await import('vuefire')
-      const { getDatabase, ref as dbRef, get } = await import('firebase/database')
+      const { getDatabase, ref: dbRef, get } = await import('firebase/database')
       const firebaseApp = useFirebaseApp()
       const db = getDatabase(firebaseApp)
       const storyRef = dbRef(db, `adoption_stories/${storyId}`)
@@ -475,7 +475,7 @@ export function useAdoptionStories() {
     error.value = null
     try {
       const { useFirebaseApp } = await import('vuefire')
-      const { getDatabase, ref as dbRef, query, orderByChild, get } = await import('firebase/database')
+      const { getDatabase, ref: dbRef, query, orderByChild, get } = await import('firebase/database')
       const firebaseApp = useFirebaseApp()
       const db = getDatabase(firebaseApp)
       const storiesRef = dbRef(db, 'adoption_stories')

@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/adoptions/reminders?secret=REPLACE_WITH_CRON_SECRET",
+      "schedule": "0 9 * * *"
+    }
+  ]
+}

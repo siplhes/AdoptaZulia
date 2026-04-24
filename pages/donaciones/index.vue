@@ -291,7 +291,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useStats } from '~/composables/useStats'
 
 // Estadísticas de impacto
@@ -300,41 +300,6 @@ const siteStats = ref({
   totalAdoptions: 0,
   totalUsers: 0,
 })
-
-// One-time donation
-const selectedAmount = ref(25)
-const customAmount = ref('')
-const donorInfo = ref({
-  name: '',
-  email: '',
-  message: '',
-  anonymous: false,
-})
-
-const finalAmount = computed(() => {
-  if (customAmount.value) {
-    return parseFloat(customAmount.value)
-  }
-  return selectedAmount.value
-})
-
-// Testimonials
-const testimonials = [
-  {
-    name: 'Carlos Rodríguez',
-    type: 'Donante mensual',
-    image: '/placeholder.webp?height=100&width=100',
-    quote:
-      'Me encanta saber que mi contribución mensual ayuda a tantas mascotas necesitadas. El equipo de AdoptaPet siempre me mantiene informado sobre cómo se utilizan mis donaciones.',
-  },
-  {
-    name: 'Laura Martínez',
-    type: 'Donante puntual',
-    image: '/placeholder.webp?height=100&width=100',
-    quote:
-      'Después de donar, recibí un correo electrónico detallado sobre cómo mi donación había ayudado a un perro llamado Max a recibir tratamiento veterinario. ¡Increíble transparencia!',
-  },
-]
 
 // FAQs
 const faqs = [
@@ -356,7 +321,6 @@ const faqs = [
 ]
 
 const openFaq = ref(null)
-const paypalButtonRendered = ref(false)
 
 const toggleFaq = (index) => {
   if (openFaq.value === index) {
@@ -366,9 +330,7 @@ const toggleFaq = (index) => {
   }
 }
 
-// Mejorado: Configuración del botón de PayPal
 onMounted(async () => {
-  // Cargar estadísticas
   try {
     const { fetchPublicStats, stats } = useStats()
     await fetchPublicStats()
@@ -379,72 +341,6 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error('Error al cargar estadísticas:', error)
-  }
-
-  // Solo renderizar el botón si no se ha renderizado ya
-  if (!paypalButtonRendered.value) {
-    usePaypalButton({
-      style: {
-        layout: 'vertical',
-        color: 'gold',
-        shape: 'rect',
-        label: 'donate',
-      },
-      // Configurar el botón para procesar donaciones
-      createOrder: (data, actions) => {
-        return actions.order.create({
-          purchase_units: [
-            {
-              amount: {
-                value: finalAmount.value.toString(),
-                currency_code: 'USD',
-                breakdown: {
-                  item_total: {
-                    currency_code: 'USD',
-                    value: finalAmount.value.toString(),
-                  },
-                },
-              },
-              description: 'Donación para AdoptaZulia',
-              items: [
-                {
-                  name: 'Donación para mascotas',
-                  quantity: '1',
-                  unit_amount: {
-                    currency_code: 'USD',
-                    value: finalAmount.value.toString(),
-                  },
-                  category: 'DONATION',
-                },
-              ],
-            },
-          ],
-        })
-      },
-      // Manejar la aprobación del pago
-      onApprove: async (data, actions) => {
-        try {
-          const details = await actions.order.capture()
-
-          // Mostrar mensaje de agradecimiento
-          alert(
-            `¡Gracias por tu donación de $${finalAmount.value}! Tu apoyo ayudará a nuestras mascotas.`
-          )
-        } catch (error) {
-          console.error('Error al procesar la donación:', error)
-          alert('Hubo un problema al procesar tu donación. Por favor, intenta nuevamente.')
-        }
-      },
-      // Manejar cancelaciones
-      onCancel: () => {},
-      // Manejar errores
-      onError: (err) => {
-        console.error('Error en el proceso de PayPal:', err)
-        alert('Ocurrió un error durante el proceso de donación. Por favor, intenta más tarde.')
-      },
-    }).then(() => {
-      paypalButtonRendered.value = true
-    })
   }
 })
 

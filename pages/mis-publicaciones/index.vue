@@ -403,7 +403,7 @@ const adoptionType = ref('platform')
 
 // Estados para el modal de confirmación/alerta
 const showModal = ref(false)
-const modalType = ref('')
+const modalType = ref('info')
 const modalTitle = ref('')
 const modalMessage = ref('')
 const modalConfirmText = ref('')
@@ -496,7 +496,7 @@ const getFilterLabel = (filterValue) => {
 
 // Funciones de gestión de publicaciones
 const confirmDeletePet = (petId) => {
-  modalType.value = 'confirm'
+  modalType.value = 'info'
   modalTitle.value = 'Eliminar publicación'
   modalMessage.value =
     '¿Estás seguro de que quieres eliminar esta publicación? Esta acción no se puede deshacer.'
@@ -523,7 +523,7 @@ const confirmDeletePet = (petId) => {
 }
 
 const showAlert = (title, message) => {
-  modalType.value = 'alert'
+  modalType.value = 'warning'
   modalTitle.value = title
   modalMessage.value = message
   modalConfirmText.value = 'Aceptar'

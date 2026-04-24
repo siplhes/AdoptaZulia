@@ -417,7 +417,7 @@ const currentAdoption = ref(null)
 
 // Estados para el modal global
 const showModal = ref(false)
-const modalType = ref('')
+const modalType = ref('info')
 const modalTitle = ref('')
 const modalMessage = ref('')
 const modalConfirmText = ref('')
@@ -527,7 +527,7 @@ const getInitials = (name) => {
 }
 
 const showAlert = (title, message) => {
-  modalType.value = 'alert'
+  modalType.value = 'warning'
   modalTitle.value = title
   modalMessage.value = message
   modalConfirmText.value = 'Aceptar'
@@ -541,7 +541,7 @@ const showAlert = (title, message) => {
 const updateStatus = (adoptionId, status) => {
   const action = status === 'approved' ? 'aprobar' : 'rechazar'
 
-  modalType.value = 'confirm'
+  modalType.value = 'info'
   modalTitle.value = `Confirmar ${action}`
   modalMessage.value = `¿Estás seguro de que quieres ${action} esta solicitud?`
   modalConfirmText.value = 'Confirmar'
@@ -574,7 +574,7 @@ const updateStatus = (adoptionId, status) => {
 
 // Completar adopción y generar certificado
 const completeAdoption = (adoption) => {
-  modalType.value = 'confirm'
+  modalType.value = 'info'
   modalTitle.value = 'Confirmar adopción'
   modalMessage.value = `¿Estás seguro de que quieres confirmar que ${pet.value.name} ha sido adoptado por ${adoption.user?.name || 'este usuario'}? Esto marcará la mascota como adoptada y generará un certificado de adopción.`
   modalConfirmText.value = 'Confirmar'

@@ -318,7 +318,7 @@ const pageSize = 12 // Cards per page
 
 // Estado para el modal global
 const showModal = ref(false)
-const modalType = ref('')
+const modalType = ref('info')
 const modalTitle = ref('')
 const modalMessage = ref('')
 const modalConfirmText = ref('')

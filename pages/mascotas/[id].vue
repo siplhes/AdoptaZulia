@@ -3,7 +3,7 @@
     <div class="container mx-auto max-w-6xl px-4">
       <!-- Back Navigation -->
       <button
-        class="mb-6 inline-flex items-center font-medium text-emerald-600 transition-colors hover:text-emerald-700"
+        class="inline-flex items-center font-medium text-emerald-600 transition-colors hover:text-emerald-700"
         @click="goBack"
       >
         <Icon name="heroicons:arrow-left" class="mr-1 h-5 w-5" />
@@ -42,7 +42,7 @@
       <!-- Content -->
       <div v-else class="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <!-- Left Column: Gallery & Details -->
-        <div class="space-y-8 lg:col-span-2">
+        <div class="space-y-4 lg:col-span-2">
           <!-- Mobile Gallery (Swipeable) -->
           <div class="-mx-4 lg:hidden">
             <div class="scrollbar-hide flex snap-x snap-mandatory gap-1 overflow-x-auto px-4 pb-4">
@@ -51,7 +51,7 @@
                   ? pet.photos
                   : []"
                 :key="index"
-                class="relative h-80 w-[90vw] shrink-0 snap-center overflow-hidden rounded-2xl shadow-sm"
+                class="relative h-80 w-[90vw] shrink-0 snap-start overflow-hidden rounded-2xl shadow-sm"
               >
                 <NuxtImg
                   :src="photo"
@@ -74,7 +74,7 @@
             class="hidden overflow-hidden rounded-2xl border border-gray-100 bg-white p-2 shadow-sm lg:block"
           >
             <div
-              class="group relative mb-2 h-[500px] w-full cursor-zoom-in overflow-hidden rounded-xl"
+              class="group relative mb-2 aspect-[4/3] h-[700px] w-full cursor-zoom-in overflow-hidden rounded-xl"
               @click="openImageModal(currentPhoto || (pet.photos && pet.photos[0]))"
             >
               <NuxtImg

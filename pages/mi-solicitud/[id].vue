@@ -529,7 +529,7 @@ const error = ref(null)
 
 // Estados para el modal
 const showModal = ref(false)
-const modalType = ref('')
+const modalType = ref('info')
 const modalTitle = ref('')
 const modalMessage = ref('')
 const modalConfirmText = ref('')
@@ -701,7 +701,7 @@ const getInitials = (name) => {
 }
 
 const showAlert = (title, message) => {
-  modalType.value = 'alert'
+  modalType.value = 'warning'
   modalTitle.value = title
   modalMessage.value = message
   modalConfirmText.value = 'Aceptar'
@@ -713,7 +713,7 @@ const showAlert = (title, message) => {
 
 // Confirmar adopción completada
 const confirmAdoption = () => {
-  modalType.value = 'confirm'
+  modalType.value = 'info'
   modalTitle.value = 'Confirmar adopción'
   modalMessage.value = `¿Estás seguro de que quieres confirmar la adopción de ${pet.value.name}? Esto marcará la mascota como adoptada y generará un certificado de adopción.`
   modalConfirmText.value = 'Confirmar'

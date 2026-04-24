@@ -402,7 +402,7 @@ const userForm = ref({
 })
 
 const showModal = ref(false)
-const modalType = ref('')
+const modalType = ref('info')
 const modalTitle = ref('')
 const modalMessage = ref('')
 const modalConfirmText = ref('')
@@ -505,7 +505,7 @@ const saveUser = async () => {
 }
 
 const confirmSuspendUser = (user) => {
-  modalType.value = 'confirm'
+  modalType.value = 'info'
   modalTitle.value = 'Suspender usuario'
   modalMessage.value = `¿Suspender a ${user.displayName || user.email}?`
   modalConfirmText.value = 'Suspender'
@@ -539,7 +539,7 @@ const confirmDeleteUser = (user) => {
 }
 
 const reactivateUser = async (user) => {
-  modalType.value = 'confirm'
+  modalType.value = 'info'
   modalTitle.value = 'Reactivar usuario'
   modalMessage.value = `¿Reactivar a ${user.displayName || user.email}?`
   modalConfirmText.value = 'Reactivar'

@@ -24,6 +24,8 @@ export interface Adoption {
   notes?: string
   createdAt: number
   updatedAt?: number
+  approvedAt?: number
+  lastReminderAt?: number
   // Expanded data
   pet?: any
   user?: {
@@ -100,7 +102,9 @@ export class AdoptionService {
     const snapshot = await get(adoptionsQuery)
     if (snapshot.exists()) {
       const adoptions: Adoption[] = []
-      snapshot.forEach((child) => adoptions.push({ id: child.key, ...child.val() } as Adoption))
+      snapshot.forEach((child) => {
+        adoptions.push({ id: child.key, ...child.val() } as Adoption)
+      })
       return adoptions.reverse()
     }
     return []
@@ -210,6 +214,14 @@ export class AdoptionService {
   async updateStatus(adoptionId: string, status: string, notes?: string): Promise<void> {
     const updates: any = { status, updatedAt: Date.now() }
     if (notes) updates.notes = notes
+
+    if (status === 'approved') {
+      updates.approvedAt = Date.now()
+      updates.lastReminderAt = null
+    } else if (status === 'completed' || status === 'rejected' || status === 'pending') {
+      updates.approvedAt = null
+      updates.lastReminderAt = null
+    }
 
     await update(dbRef(this.db, `adoptions/${adoptionId}`), updates)
   }

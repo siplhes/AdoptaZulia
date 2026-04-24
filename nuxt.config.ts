@@ -27,6 +27,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     awsSecretKey: process.env.AWS_SECRET_ACCESS_KEY,
+    cronSecret: process.env.CRON_SECRET,
     public: {
       recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
       awsRegion: process.env.AWS_REGION,
