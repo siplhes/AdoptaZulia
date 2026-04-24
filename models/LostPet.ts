@@ -62,6 +62,7 @@ export interface LostPet {
   archivedAt?: number
   foundAt?: number
   foundDetails?: string
+  lastReminderAt?: number
 
   // Sightings - reportes de avistamientos
   sightings?: Record<string, LostPetSighting>

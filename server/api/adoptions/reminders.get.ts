@@ -1,4 +1,4 @@
-import { defineEventHandler, getQuery, createError } from 'h3'
+import { defineEventHandler, getHeader, createError } from 'h3'
 import { getDatabase } from 'firebase-admin/database'
 import { getApps } from 'firebase-admin/app'
 import { Resend } from 'resend'
@@ -9,12 +9,12 @@ const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000
 
 export default defineEventHandler(async (event) => {
   try {
-    const query = getQuery(event)
-    const rawSecret = query.secret
-    const secret = Array.isArray(rawSecret) ? rawSecret[0] : rawSecret
+    const authHeader = getHeader(event, 'authorization') || ''
+    const token = authHeader.replace(/^Bearer\s+/i, '')
 
-    const expectedSecret = process.env.CRON_SECRET || ''
-    if (!expectedSecret || secret !== expectedSecret) {
+    // Vercel auto-generates CRONS_SECRET for cron jobs; fallback to manual CRON_SECRET
+    const expectedSecret = process.env.CRONS_SECRET || process.env.CRON_SECRET || ''
+    if (!expectedSecret || token !== expectedSecret) {
       throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
     }
 

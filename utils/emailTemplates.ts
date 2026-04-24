@@ -113,6 +113,48 @@ export const getAdoptionReminderEmail = (petName: string, actionUrl: string) => 
   })
 }
 
+export const getLostPetReminderEmail = (petName: string, actionUrl: string) => {
+  const content = `
+    <h2>¿Ya encontraste a ${petName}?</h2>
+    <p>Hace tiempo que reportaste a <strong>${petName}</strong> como perdido/a y aún no has actualizado el estado.</p>
+
+    <div style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 16px; margin: 16px 0; border-radius: 4px;">
+      <p style="margin: 0; font-weight: 600; color: #991b1b;">Por favor actualiza el estado si ya fue encontrado/a.</p>
+      <p style="margin: 8px 0 0 0; font-size: 14px; color: #7f1d1d;">Esto ayuda a mantener la plataforma actualizada y a otros usuarios informados.</p>
+    </div>
+
+    <p>Si aún no has tenido noticias, considera actualizar la información o compartir el reporte en redes sociales.</p>
+  `
+
+  return getBaseEmailHtml('Recordatorio: Mascota Perdida - Adopta Zulia', content, {
+    text: 'Actualizar Reporte',
+    url: actionUrl,
+  })
+}
+
+export const getStuckPetReminderEmail = (petName: string, actionUrl: string) => {
+  const content = `
+    <h2>¿Necesitas ayuda con ${petName}?</h2>
+    <p><strong>${petName}</strong> lleva varias semanas publicado/a para adopción sin recibir solicitudes.</p>
+
+    <div style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 16px; margin: 16px 0; border-radius: 4px;">
+      <p style="margin: 0; font-weight: 600; color: #1e40af;">Sugerencias para aumentar visibilidad:</p>
+      <ul style="margin: 8px 0 0 0; font-size: 14px; color: #1e3a8a; padding-left: 20px;">
+        <li>Sube fotos más recientes o de mejor calidad.</li>
+        <li>Actualiza la descripción con más detalles.</li>
+        <li>Comparte el perfil en redes sociales.</li>
+      </ul>
+    </div>
+
+    <p>Puedes editar la publicación directamente desde la plataforma.</p>
+  `
+
+  return getBaseEmailHtml('Sugerencia: Publicación de Adopción - Adopta Zulia', content, {
+    text: 'Editar Publicación',
+    url: actionUrl,
+  })
+}
+
 export const getNewRequestEmail = (petName: string, message: string, actionUrl: string) => {
   const content = `
     <h2>¡Buenas noticias!</h2>

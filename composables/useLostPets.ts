@@ -148,6 +148,7 @@ export function useLostPets() {
         views: 0,
         shares: 0,
         sightingCount: 0,
+        lastReminderAt: undefined,
       }
 
       const newId = await pushData('lost_pets', item)
