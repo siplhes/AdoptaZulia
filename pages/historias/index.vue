@@ -134,7 +134,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useAdoptionStories } from '~/composables/useAdoptionStories'
 import { useAuth } from '~/composables/useAuth'
