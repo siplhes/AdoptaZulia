@@ -104,3 +104,5 @@ firebase-adminsdk-*.json
 # pnpm-lock.yaml
 
 
+reglas
+reglas.json

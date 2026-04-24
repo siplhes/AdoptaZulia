@@ -184,62 +184,16 @@
               <p class="whitespace-pre-line leading-relaxed text-gray-700">{{ pet.description }}</p>
             </div>
 
-            <!-- Health -->
-            <div v-if="pet.healthDescription || pet.healthStatus" class="mt-8">
-              <h2 class="mb-4 flex items-center text-xl font-bold text-gray-900">
-                <Icon name="heroicons:heart" class="mr-2 h-6 w-6 text-rose-500" />
-                Salud
-              </h2>
-
-              <div v-if="pet.healthStatus" class="mb-4">
-                <div class="mb-1 flex justify-between text-sm font-medium">
-                  <span>Estado General</span>
-                  <span :class="getHealthColorText(pet.healthStatus)">
-                    {{ getHealthLabel(pet.healthStatus) }}
-                  </span>
-                </div>
-                <div class="h-2.5 w-full rounded-full bg-gray-100">
-                  <div
-                    class="h-2.5 rounded-full transition-all duration-1000"
-                    :class="getHealthColor(pet.healthStatus)"
-                    :style="{ width: `${pet.healthStatus}%` }"
-                  />
-                </div>
-              </div>
-
-              <p class="rounded-xl border border-rose-100 bg-rose-50 p-4 text-gray-700">
-                {{ pet.healthDescription }}
-              </p>
-
-              <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <div class="flex items-center rounded-lg bg-gray-50 p-3">
-                  <Icon
-                    :name="pet.vaccinated ? 'heroicons:check-circle' : 'heroicons:x-circle'"
-                    class="mr-3 h-5 w-5"
-                    :class="pet.vaccinated ? 'text-green-500' : 'text-gray-400'"
-                  />
-                  <div>
-                    <span class="block text-sm font-medium text-gray-900">Vacunado</span>
-                    <span v-if="pet.vaccineInfo" class="text-xs text-gray-500">
-                      {{ pet.vaccineInfo }}
-                    </span>
-                  </div>
-                </div>
-                <div class="flex items-center rounded-lg bg-gray-50 p-3">
-                  <Icon
-                    :name="pet.neutered ? 'heroicons:check-circle' : 'heroicons:x-circle'"
-                    class="mr-3 h-5 w-5"
-                    :class="pet.neutered ? 'text-green-500' : 'text-gray-400'"
-                  />
-                  <div>
-                    <span class="block text-sm font-medium text-gray-900">Esterilizado</span>
-                    <span v-if="pet.neuterDate" class="text-xs text-gray-500">
-                      {{ pet.neuterDate }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <!-- Health Component -->
+            <PetHealthInfo 
+              v-if="pet.healthDescription || pet.healthStatus || pet.vaccinated || pet.neutered"
+              :healthStatus="pet.healthStatus"
+              :healthDescription="pet.healthDescription"
+              :vaccinated="pet.vaccinated"
+              :vaccineInfo="pet.vaccineInfo"
+              :neutered="pet.neutered"
+              :neuterDate="pet.neuterDate"
+            />
 
             <!-- Adoption Requirements (Desktop View mainly, but inline for all) -->
             <div v-if="hasAdoptionRequirements" class="mt-8 border-t border-gray-100 pt-8">
@@ -680,12 +634,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAdoptions } from '~/composables/useAdoptions'
 import { formatShortDate } from '~/utils/dateFormatter'
 import { normalizePhoneNumber, formatPhoneForDisplay } from '~/utils/phoneFormatter'
 import ShareModal from '~/components/common/ShareModal.vue'
+import PetHealthInfo from '~/components/pet/PetHealthInfo.vue'
 
 // Props & Route
 const route = useRoute()
@@ -837,19 +792,32 @@ useHead({
 })
 
 // Life Cycle
-onMounted(async () => {
-  try {
-    const fetchedPet = await fetchPetById(petId)
-    if (!fetchedPet) {
-      error.value = 'Mascota no encontrada'
-      return
-    }
-    pet.value = fetchedPet
+// Fetch Pet with SSR
+const { data: fetchedPet, error: fetchError, pending: fetchLoading } = await useAsyncData(
+  `pet-${petId}`,
+  () => fetchPetById(petId)
+)
 
-    if (isAuthenticated.value) {
-      // Check application status
+// Sync SSR data with reactive ref
+watch(fetchedPet, (newPet) => {
+  if (newPet) pet.value = newPet
+}, { immediate: true })
+
+watch(fetchError, (newErr) => {
+  if (newErr) error.value = 'Error cargando la mascota'
+})
+
+watch(fetchLoading, (val) => {
+  loading.value = val
+}, { immediate: true })
+
+// Secondary data (Auth-dependent) in onMounted
+onMounted(async () => {
+  if (isAuthenticated.value && pet.value) {
+    try {
+      const uid = user.value.uid
       if (!isOwner.value) {
-        const adoption = await getAdoptionByPetAndUser(petId, user.value.uid)
+        const adoption = await getAdoptionByPetAndUser(petId, uid)
         if (adoption) {
           adoptionStatus.value = adoption.status
           userAdoptionId.value = adoption.id
@@ -857,19 +825,14 @@ onMounted(async () => {
           adoptionStatus.value = 'none'
         }
       } else {
-        // Load owner adoptions
         loadingOwnerAdoptions.value = true
-        ownerAdoptions.value = await fetchAdoptionsForOwner(user.value.uid)
-        // Filter specifically for this pet if the API returns all
-        ownerAdoptions.value = ownerAdoptions.value.filter((a) => a.petId === petId)
+        const adoptions = await fetchAdoptionsForOwner(uid)
+        ownerAdoptions.value = adoptions.filter((a) => a.petId === petId)
         loadingOwnerAdoptions.value = false
       }
+    } catch (e) {
+      console.error('Error fetching adoption status:', e)
     }
-  } catch (e) {
-    console.error(e)
-    error.value = 'Error cargando la mascota: ' + e.message
-  } finally {
-    loading.value = false
   }
 })
 
@@ -885,21 +848,6 @@ const closeImageModal = () => (showImageModal.value = false)
 const formatDate = (ts) => formatShortDate(ts)
 const formatType = (t) => (t ? t.charAt(0).toUpperCase() + t.slice(1) : '')
 const formatSize = (s) => s // Map if needed
-const getHealthLabel = (val) => {
-  if (val > 80) return 'Excelente'
-  if (val > 50) return 'Bueno'
-  return 'Requiere Atención'
-}
-const getHealthColor = (val) => {
-  if (val > 80) return 'bg-green-500'
-  if (val > 50) return 'bg-yellow-500'
-  return 'bg-red-500'
-}
-const getHealthColorText = (val) => {
-  if (val > 80) return 'text-green-600'
-  if (val > 50) return 'text-yellow-600'
-  return 'text-red-600'
-}
 const formatContactType = (t) => (t === 'organization' ? 'Organización / Refugio' : 'Particular')
 
 // Action Buttons

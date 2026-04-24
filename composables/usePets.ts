@@ -341,59 +341,6 @@ export function usePets() {
   }
 
   /**
-   * Obtiene historias de adopción exitosas
-   */
-  async function fetchAdoptionStories(limit: number = 3): Promise<any[]> {
-    loading.value = true
-    error.value = null
-
-    try {
-      // En un escenario real, estas historias vendrían de una colección específica en la base de datos
-      // Por ahora, simulamos este comportamiento con datos estáticos
-      const stories = [
-        {
-          id: 1,
-          name: 'María García',
-          location: 'Maracaibo',
-          image: '/placeholder.webp?height=100&width=100',
-          quote:
-            'Adoptar a Rocky fue la mejor decisión que tomamos como familia. El proceso fue sencillo y el equipo de AdoptaZulia nos apoyó en cada paso.',
-          petName: 'Rocky',
-          petImage: '/placeholder.webp?height=100&width=100',
-        },
-        {
-          id: 2,
-          name: 'Carlos Rodríguez',
-          location: 'San Francisco',
-          image: '/placeholder.webp?height=100&width=100',
-          quote:
-            'Después de perder a mi gato de 15 años, pensé que nunca volvería a tener una mascota. Gracias a AdoptaZulia, encontré a Milo y ha llenado mi vida de alegría.',
-          petName: 'Milo',
-          petImage: '/placeholder.webp?height=100&width=100',
-        },
-        {
-          id: 3,
-          name: 'Laura Martínez',
-          location: 'Cabimas',
-          image: '/placeholder.webp?height=100&width=100',
-          quote:
-            'El proceso de adopción fue muy profesional. Me encantó que hicieran un seguimiento después para asegurarse de que Luna se estaba adaptando bien.',
-          petName: 'Luna',
-          petImage: '/placeholder.webp?height=100&width=100',
-        },
-      ]
-
-      return stories.slice(0, limit)
-    } catch (err: any) {
-      logError('Error al obtener historias de adopción:', err)
-      error.value = 'Error al obtener historias de adopción'
-      return []
-    } finally {
-      loading.value = false
-    }
-  }
-
-  /**
    * Obtiene todas las mascotas incluyendo datos de prueba (para Admin)
    */
   async function fetchAllPetsRaw() {
@@ -411,8 +358,6 @@ export function usePets() {
       loading.value = false
     }
   }
-
-
 
   return {
     pets,
@@ -434,6 +379,5 @@ export function usePets() {
     fetchTotalPetsByCategory,
     fetchFeaturedPets,
     fetchRecentPets,
-    fetchAdoptionStories,
   }
 }
