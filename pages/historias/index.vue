@@ -135,72 +135,61 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useAdoptionStories } from '~/composables/useAdoptionStories'
 import { useAuth } from '~/composables/useAuth'
+import type { AdoptionStory } from '~/models/AdoptionStory'
 
-// Composables
-const {
-  stories,
-  featuredStories,
-  loading,
-  error,
-  fetchAllStories,
-  fetchFeaturedStories,
-  fetchUserStories,
-} = useAdoptionStories()
 const { user, isAuthenticated } = useAuth()
+const { fetchUserStories, loading: userStoriesLoading, error: userStoriesError } = useAdoptionStories()
 
-// Estado local
+const { data: allStoriesResponse, pending: allStoriesPending, error: allStoriesError } = useAsyncData('stories-all', () => $fetch('/api/stories?filter=all'))
+const { data: featuredStoriesResponse, pending: featuredStoriesPending, error: featuredStoriesError } = useAsyncData('stories-featured', () => $fetch('/api/stories?filter=featured&limit=100'))
+
+const stories = computed(() => allStoriesResponse.value?.stories ?? [])
+const featuredStories = computed(() => featuredStoriesResponse.value?.stories ?? [])
+const myStories = ref<AdoptionStory[]>([])
+
 const activeFilter = ref('all')
 const currentPage = ref(1)
 const itemsPerPage = 9
 
-// Función para cargar historias según el filtro activo
-const loadStories = async () => {
+const loadMyStories = async () => {
+  if (!user.value) return
+  myStories.value = await fetchUserStories(user.value.uid)
   currentPage.value = 1
-
-  if (activeFilter.value === 'all') {
-    await fetchAllStories()
-  } else if (activeFilter.value === 'featured') {
-    await fetchFeaturedStories(100) // Cargar un número alto para tener todas
-  } else if (activeFilter.value === 'mine' && user.value) {
-    await fetchUserStories(user.value.uid)
-  }
 }
 
-// Historias a mostrar según filtro y paginación
 const filteredStories = computed(() => {
   if (activeFilter.value === 'all') {
     return stories.value
   } else if (activeFilter.value === 'featured') {
     return featuredStories.value
-  } else if (activeFilter.value === 'mine' && user.value) {
-    return stories.value.filter((story) => story.userId === user.value.uid)
+  } else if (activeFilter.value === 'mine') {
+    return myStories.value
   }
   return []
 })
 
-// Historias paginadas
 const displayedStories = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage
   const end = start + itemsPerPage
   return filteredStories.value.slice(start, end)
 })
 
-// Total de páginas
-const totalPages = computed(() => {
-  return Math.ceil(filteredStories.value.length / itemsPerPage)
-})
+const totalPages = computed(() => Math.ceil(filteredStories.value.length / itemsPerPage))
 
-// Observar cambios en el filtro activo
-watch(activeFilter, () => {
-  loadStories()
-})
+const loading = computed(() => allStoriesPending.value || featuredStoriesPending.value || userStoriesLoading.value)
+const error = computed(
+  () =>
+    String(userStoriesError.value || allStoriesError.value || featuredStoriesError.value || '') || null
+)
 
-// Cargar historias al montar el componente
-onMounted(() => {
-  loadStories()
+watch(activeFilter, async (newFilter) => {
+  currentPage.value = 1
+  if (newFilter === 'mine' && user.value) {
+    await loadMyStories()
+  }
 })
 
 const canonicalUrl = useCanonicalUrl('/historias')

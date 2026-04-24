@@ -520,97 +520,34 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { useAuth } from '~/composables/useAuth'
-import { usePets } from '~/composables/usePets'
-import { useAdoptionStories } from '~/composables/useAdoptionStories'
-import { useLostPets } from '~/composables/useLostPets'
-import { useAdoptions } from '~/composables/useAdoptions'
+import { useUserProfilePage } from '~/composables/useUserProfile'
 import ShareModal from '~/components/common/ShareModal.vue'
 
 const route = useRoute()
 const usernameParam = route.params.username
 const username = Array.isArray(usernameParam) ? usernameParam[0] : usernameParam
-const { getUserByUsername, user, isAuthenticated } = useAuth()
-const { fetchUserPets } = usePets()
-const { fetchUserStories } = useAdoptionStories()
-const { fetchUserLostPets } = useLostPets()
-const { fetchAdoptionsForOwner, fetchUserAdoptions } = useAdoptions()
 
-// State
-const loading = ref(true)
-const error = ref(null)
-const userProfile = ref(null)
-const userPets = ref([])
-const userLostReports = ref([])
-const userStories = ref([])
-const verifiedAdoptions = ref([])
-const receivedAdoptions = ref([]) // For owner only: Requests received
-const sentAdoptions = ref([]) // For owner only: Requests sent
-const activeTab = ref('pets')
+const {
+  loading,
+  error,
+  userProfile,
+  userPets,
+  userLostReports,
+  userStories,
+  verifiedAdoptions,
+  receivedAdoptions,
+  sentAdoptions,
+  activeTab,
+  isOwnProfile,
+  tabs,
+  mappedUserLost,
+  getTabCount,
+  verifiedCount,
+  loadProfile,
+} = useUserProfilePage()
 
-// Computed
-const isOwnProfile = computed(
-  () => isAuthenticated.value && user.value?.uid === userProfile.value?.uid
-)
-const verifiedCount = computed(() => verifiedAdoptions.value.length)
+useAsyncData(`profile-${username}`, () => loadProfile(username || ''))
 
-// Mapped Data
-const mappedUserLost = computed(() => {
-  return userLostReports.value.map((r) => ({
-    id: r.id,
-    image: r.images?.[0] || r.image || '/placeholder.webp',
-    name: r.name || 'Sin nombre',
-    status: r.status || 'lost',
-    createdAt: r.createdAt || r.lastSeenAt || Date.now(),
-    breed: r.breed || null,
-    age: r.age || null,
-    location: r.location || null,
-    urgent: r.urgent || false,
-    vaccinated: false,
-    neutered: false,
-    size: r.size || null,
-    gender: r.gender || null,
-  }))
-})
-
-// Tabs
-const tabs = computed(() => {
-  const baseTabs = [
-    { id: 'pets', label: 'En Adopción' },
-    { id: 'lost', label: 'Reportes Perdidos' },
-    { id: 'stories', label: 'Historias' },
-    { id: 'adopted', label: 'Adoptados' },
-  ]
-
-  // Add private tabs if owner
-  if (isOwnProfile.value) {
-    baseTabs.push({ id: 'received', label: 'Solicitudes Recibidas' })
-    baseTabs.push({ id: 'sent', label: 'Solicitudes Enviadas' })
-  }
-
-  return baseTabs
-})
-
-const getTabCount = (id) => {
-  switch (id) {
-    case 'pets':
-      return userPets.value.length
-    case 'lost':
-      return userLostReports.value.length
-    case 'stories':
-      return userStories.value.length
-    case 'adopted':
-      return verifiedAdoptions.value.length
-    case 'received':
-      return receivedAdoptions.value.length
-    case 'sent':
-      return sentAdoptions.value.length
-    default:
-      return 0
-  }
-}
-
-// Helpers
 const formatDate = (ts) => {
   if (!ts) return 'fecha desconocida'
   try {
@@ -657,60 +594,6 @@ const statusLabel = (status) => {
   return labels[status] || status
 }
 
-// Load Data
-onMounted(async () => {
-  try {
-    const profile = await getUserByUsername(username)
-    if (!profile) {
-      error.value = 'User not found'
-      return
-    }
-
-    userProfile.value = profile
-    // Fix ID/UID mismatch if any
-    const uid = profile.uid || profile.id
-
-    if (uid) {
-      const promises = [
-        fetchUserPets(uid),
-        fetchUserLostPets(uid),
-        fetchUserStories(uid),
-        fetchAdoptionsForOwner(uid), // Always fetch owner's received requests (publicly used for 'completed', privately for 'received')
-      ]
-
-      // If viewing own profile, also fetch SENT requests
-      const currentUser = user.value
-      if (currentUser && currentUser.uid === uid) {
-        promises.push(fetchUserAdoptions(uid))
-      } else {
-        promises.push(Promise.resolve([]))
-      }
-
-      // Parallel fetch for efficiency
-      const [pets, lost, stories, received, sent] = await Promise.all(promises)
-
-      userPets.value = pets || []
-      userLostReports.value = lost || []
-      userStories.value = stories || []
-
-      // "Recibidas" (Private): All requests received
-      receivedAdoptions.value = received || []
-
-      // "Enviadas" (Private): Requests sent by me
-      sentAdoptions.value = sent || []
-
-      // "Adopted" (Public): Completed adoptions from what I received (i.e., my pets that were adopted)
-      verifiedAdoptions.value = (received || []).filter((a) => a.status === 'completed')
-    }
-  } catch (e) {
-    console.error(e)
-    error.value = e.message
-  } finally {
-    loading.value = false
-  }
-})
-
-// Share Logic
 const showShareModal = ref(false)
 const shareUrl = ref('')
 

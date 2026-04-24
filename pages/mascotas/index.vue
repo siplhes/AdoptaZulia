@@ -461,8 +461,12 @@ const genders = [
 
 const locations = ['Maracaibo', 'San Francisco', 'Cabimas', 'Machiques', 'Lara', 'Falcon']
 
-const allPets = ref([])
-const isLoading = ref(false)
+const { data: allPetsData, pending: petsPending, error: petsError } = useAsyncData('pets', () => fetchAllPets())
+const allPets = ref(allPetsData.value || [])
+
+watch(allPetsData, (value) => {
+  allPets.value = value || []
+})
 
 const filteredPets = computed(() => {
   let result = [...allPets.value]
@@ -619,21 +623,7 @@ const goToPage = (page) => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-const loadPets = async () => {
-  isLoading.value = true
-  try {
-    const petsData = await fetchAllPets()
-    allPets.value = petsData
-  } catch (err) {
-    console.error('Error al cargar mascotas:', err)
-  } finally {
-    isLoading.value = false
-  }
-}
-
 onMounted(async () => {
-  await loadPets()
-
   const queryParams = route.query
 
   if (queryParams.tipo) {

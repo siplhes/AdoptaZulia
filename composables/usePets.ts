@@ -22,7 +22,8 @@ export function usePets() {
     error.value = null
 
     try {
-      pets.value = await petService.getAllPets()
+      const response = await $fetch<{ pets: Pet[] }>('/api/pets')
+      pets.value = response.pets || []
       return pets.value
     } catch (err: any) {
       logError('Error al obtener mascotas:', err)

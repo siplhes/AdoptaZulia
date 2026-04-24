@@ -60,32 +60,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useTablon, type TablonNoticia, type TablonEvento } from '~/composables/useTablon'
+import { ref, computed } from 'vue'
 import TablonNewsCard from '~/components/tablon/NewsCard.vue'
 import TablonEventCard from '~/components/tablon/EventCard.vue'
 
 definePageMeta({
-  layout: 'default'
+  layout: 'default',
 })
 
 useHead({
   title: 'Comunidad | Adopta Zulia',
 })
 
-const { fetchNoticias, fetchEventos, loading } = useTablon()
-
 const activeTab = ref('noticias')
-const noticias = ref<TablonNoticia[]>([])
-const eventos = ref<TablonEvento[]>([])
 
-onMounted(async () => {
-  // Parallel fetch for better performance
-  const [fetchedNoticias, fetchedEventos] = await Promise.all([
-    fetchNoticias(),
-    fetchEventos()
-  ])
-  noticias.value = fetchedNoticias
-  eventos.value = fetchedEventos
-})
+const { data: noticiasResponse, pending: noticiasPending } = useAsyncData('tablon-noticias', () => $fetch('/api/tablon/noticias'))
+const { data: eventosResponse, pending: eventosPending } = useAsyncData('tablon-eventos', () => $fetch('/api/tablon/eventos'))
+
+const noticias = computed(() => noticiasResponse.value?.noticias ?? [])
+const eventos = computed(() => eventosResponse.value?.eventos ?? [])
+const loading = computed(() => noticiasPending.value || eventosPending.value)
 </script>

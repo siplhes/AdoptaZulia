@@ -1,5 +1,4 @@
 import { ref } from 'vue'
-import { getAuth } from 'firebase/auth'
 import type {
   LostPet,
   CreateLostPetPayload,
@@ -15,7 +14,6 @@ import {
   deleteData,
   getDbRef,
 } from '~/utils/firebase'
-import { get, update } from 'firebase/database'
 import { handleFirebaseError, logError } from '~/utils/errorHandler'
 
 export function useLostPets() {
@@ -112,6 +110,7 @@ export function useLostPets() {
 
     try {
       // Defensive check: ensure user is authenticated
+      const { getAuth } = await import('firebase/auth')
       const auth = getAuth()
       const current = auth.currentUser
       if (!current) {
@@ -257,7 +256,8 @@ export function useLostPets() {
       }
 
       // Update sighting count on the lost pet using direct Firebase for atomic update
-      const petRef = getDbRef(`lost_pets/${payload.petId}`)
+      const { get, update } = await import('firebase/database')
+      const petRef = await getDbRef(`lost_pets/${payload.petId}`)
       const snapshot = await get(petRef)
 
       if (snapshot.exists()) {

@@ -171,6 +171,7 @@ export function useAdoptions() {
       logError('Error fetching adoptions:', err)
       error.value = 'Error al cargar adopciones.'
       return []
+    } finally {
       loading.value = false
     }
   }
@@ -383,6 +384,43 @@ export function useAdoptions() {
     return res
   }
 
+  async function findAdoptionsByPetId(petId: string): Promise<Adoption[]> {
+    loading.value = true
+    error.value = null
+    try {
+      const results = await adoptionService.getAdoptionsByPetId(petId)
+      await enrichAdoptionsData(results)
+      return results
+    } catch (err: any) {
+      logError('Error fetching adoptions by pet id', err)
+      return []
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function findAdoptionRequestsForPets(
+    petIds: string[]
+  ): Promise<Record<string, Adoption[]>> {
+    loading.value = true
+    error.value = null
+    try {
+      const results = await adoptionService.getAdoptionsForPets(petIds)
+      await enrichAdoptionsData(results)
+
+      return results.reduce((acc: Record<string, Adoption[]>, adoption) => {
+        if (!acc[adoption.petId]) acc[adoption.petId] = []
+        acc[adoption.petId].push(adoption)
+        return acc
+      }, {})
+    } catch (err: any) {
+      logError('Error fetching adoption requests for pets', err)
+      return {}
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function deleteAdoptionRequest(id: string) {
     try {
       await adoptionService.deleteAdoption(id)
@@ -466,6 +504,8 @@ export function useAdoptions() {
     updateAdoptionNotes,
     createAdoptionRequest,
     getAdoptionById,
+    findAdoptionsByPetId,
+    findAdoptionRequestsForPets,
     getAdoptionByPetAndUser,
     deleteAdoptionRequest,
     confirmAdoptionAndVerify,

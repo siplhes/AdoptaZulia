@@ -407,10 +407,8 @@
 <script setup>
 import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
-import { useLostPets } from '~/composables/useLostPets'
 
 const route = useRoute()
-const { fetchLostPets } = useLostPets()
 
 const searchQuery = ref('')
 const filters = ref({
@@ -489,8 +487,36 @@ const sizes = []
 const genders = []
 const locations = ['Maracaibo', 'San Francisco', 'Cabimas', 'Machiques', 'Lara', 'Falcon']
 
-const allPets = ref([])
-const isLoading = ref(false)
+const { data: lostPetsResponse, pending: lostPetsPending } = useAsyncData('lost-pets', () => $fetch('/api/lost-pets'))
+const allPets = computed(() => lostPetsResponse.value?.lostPets ?? [])
+const isLoading = computed(() => lostPetsPending.value)
+
+const queryStringValue = (value) => Array.isArray(value) ? value[0] : value
+const queryParams = route.query
+
+if (queryParams.tipo) {
+  filters.value.types = [queryStringValue(queryParams.tipo)]
+}
+
+if (queryParams.edad) {
+  filters.value.ages = [queryStringValue(queryParams.edad)]
+}
+
+if (queryParams.tamaño) {
+  filters.value.sizes = [queryStringValue(queryParams.tamaño)]
+}
+
+if (queryParams.genero) {
+  filters.value.gender = queryStringValue(queryParams.genero)
+}
+
+if (queryParams.ubicacion) {
+  filters.value.location = queryStringValue(queryParams.ubicacion)
+}
+
+if (queryParams.buscar) {
+  searchQuery.value = queryStringValue(queryParams.buscar)
+}
 
 const filteredPets = computed(() => {
   let result = [...allPets.value]
@@ -609,18 +635,6 @@ const goToPage = (page) => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-const loadPets = async () => {
-  isLoading.value = true
-  try {
-    const petsData = await fetchLostPets()
-    allPets.value = petsData
-  } catch (err) {
-    console.error('Error al cargar mascotas:', err)
-  } finally {
-    isLoading.value = false
-  }
-}
-
 // SEO Meta Tags
 const canonicalUrl = useCanonicalUrl('/perdidas')
 const ogImage = useOgImage('/og-improved.png')
@@ -661,35 +675,6 @@ useHead({
   ],
 })
 
-onMounted(async () => {
-  await loadPets()
-
-  const queryParams = route.query
-
-  if (queryParams.tipo) {
-    filters.value.types = [queryParams.tipo]
-  }
-
-  if (queryParams.edad) {
-    filters.value.ages = [queryParams.edad]
-  }
-
-  if (queryParams.tamaño) {
-    filters.value.sizes = [queryParams.tamaño]
-  }
-
-  if (queryParams.genero) {
-    filters.value.gender = queryParams.genero
-  }
-
-  if (queryParams.ubicacion) {
-    filters.value.location = queryParams.ubicacion
-  }
-
-  if (queryParams.buscar) {
-    searchQuery.value = queryParams.buscar
-  }
-})
 </script>
 
 <style scoped>

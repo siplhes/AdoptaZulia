@@ -366,8 +366,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { usePets } from '~/composables/usePets'
 import { useAdoptions } from '~/composables/useAdoptions'
 import { useAuth } from '~/composables/useAuth'
-import { useFirebaseApp } from 'vuefire'
-import { getDatabase, ref as dbRef, update } from 'firebase/database'
 import UserPetCard from '~/components/user/UserPetCard.vue'
 
 // Rutas y autenticación
@@ -380,7 +378,12 @@ const {
   deletePet: deletePetAction,
   updatePetStatus: updatePetStatusAction,
 } = usePets()
-const { findAdoptionsByPetId, updateAdoptionStatus, confirmAdoptionAndVerify } = useAdoptions()
+const {
+  findAdoptionsByPetId,
+  findAdoptionRequestsForPets,
+  updateAdoptionStatus,
+  confirmAdoptionAndVerify,
+} = useAdoptions()
 
 // Estados
 const loading = ref(true)
@@ -450,19 +453,15 @@ onMounted(async () => {
 
     // Obtener las mascotas del usuario
     const pets = await fetchUserPets(user.value.uid)
+    const petIds = pets.map((pet) => pet.id)
+    const requestsByPet = await findAdoptionRequestsForPets(petIds)
 
-    // Para cada mascota, obtener el conteo de solicitudes
     for (const pet of pets) {
-      try {
-        const requests = await findAdoptionsByPetId(pet.id)
-        pet.adoptionRequestsCount = requests.length
-        // Guardar una vista previa (hasta 2) para mostrar inline rápidamente
-        requestsCache.value[pet.id] = requests
-        pet.adoptionRequestsPreview = requests.slice(0, 2)
-      } catch (err) {
-        console.error(`Error al obtener solicitudes para mascota ${pet.id}:`, err)
-        pet.adoptionRequestsCount = 0
-      }
+      const requests = requestsByPet[pet.id] || []
+      pet.adoptionRequestsCount = requests.length
+      // Guardar una vista previa (hasta 2) para mostrar inline rápidamente
+      requestsCache.value[pet.id] = requests
+      pet.adoptionRequestsPreview = requests.slice(0, 2)
     }
 
     userPets.value = pets

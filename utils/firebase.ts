@@ -3,27 +3,25 @@
  * Centralized Firebase database access to follow DRY principle
  */
 
-import { useFirebaseApp } from 'vuefire'
-import {
-  getDatabase,
-  ref as dbRef,
-  get,
-  set,
-  update,
-  remove,
-  push,
-  type DatabaseReference,
-} from 'firebase/database'
+import type { DatabaseReference } from 'firebase/database'
+
+async function getDatabaseInstance() {
+  const { useFirebaseApp } = await import('vuefire')
+  const { getDatabase } = await import('firebase/database')
+
+  const firebaseApp = useFirebaseApp()
+  return getDatabase(firebaseApp)
+}
 
 /**
  * Get a Firebase database reference for a given path
  * @param path - Database path (e.g., 'users', 'pets/123')
  * @returns DatabaseReference
  */
-export function getDbRef(path: string): DatabaseReference {
-  const firebaseApp = useFirebaseApp()
-  const db = getDatabase(firebaseApp)
-  return dbRef(db, path)
+export async function getDbRef(path: string): Promise<DatabaseReference> {
+  const db = await getDatabaseInstance()
+  const { ref } = await import('firebase/database')
+  return ref(db, path)
 }
 
 /**
@@ -33,7 +31,8 @@ export function getDbRef(path: string): DatabaseReference {
  */
 export async function fetchData<T = any>(path: string): Promise<T | null> {
   try {
-    const ref = getDbRef(path)
+    const ref = await getDbRef(path)
+    const { get } = await import('firebase/database')
     const snapshot = await get(ref)
 
     if (!snapshot.exists()) {
@@ -54,7 +53,8 @@ export async function fetchData<T = any>(path: string): Promise<T | null> {
  */
 export async function fetchDataWithId<T = any>(path: string): Promise<(T & { id: string }) | null> {
   try {
-    const ref = getDbRef(path)
+    const ref = await getDbRef(path)
+    const { get } = await import('firebase/database')
     const snapshot = await get(ref)
 
     if (!snapshot.exists()) {
@@ -78,7 +78,8 @@ export async function fetchDataWithId<T = any>(path: string): Promise<(T & { id:
  */
 export async function fetchCollection<T = any>(path: string): Promise<Array<T & { id: string }>> {
   try {
-    const ref = getDbRef(path)
+    const ref = await getDbRef(path)
+    const { get } = await import('firebase/database')
     const snapshot = await get(ref)
 
     if (!snapshot.exists()) {
@@ -96,6 +97,45 @@ export async function fetchCollection<T = any>(path: string): Promise<Array<T & 
   }
 }
 
+function isMissingIndexError(error: any): boolean {
+  const message = String(error?.message || error || '')
+  return /Index not defined|\.indexOn|add ".indexOn"/i.test(message)
+}
+
+export async function fetchCollectionByChild<T = any>(
+  path: string,
+  child: string,
+  value: string
+): Promise<Array<T & { id: string }>> {
+  const ref = await getDbRef(path)
+  const { query, orderByChild, equalTo, get } = await import('firebase/database')
+  const q = query(ref, orderByChild(child), equalTo(value))
+
+  try {
+    const snapshot = await get(q)
+    if (!snapshot.exists()) return []
+
+    const data = snapshot.val()
+    return Object.entries(data).map(([id, value]) => ({
+      ...(value as T),
+      id,
+    }))
+  } catch (error: any) {
+    if (!isMissingIndexError(error)) {
+      console.error(`Error fetching collection by child from ${path}:`, error)
+      throw error
+    }
+
+    const fallbackSnapshot = await get(ref)
+    if (!fallbackSnapshot.exists()) return []
+
+    const fallbackData = fallbackSnapshot.val()
+    return Object.entries(fallbackData)
+      .map(([id, item]) => ({ ...(item as T), id }))
+      .filter((item) => item[child] === value)
+  }
+}
+
 /**
  * Update data in Firebase database
  * @param path - Database path
@@ -104,7 +144,8 @@ export async function fetchCollection<T = any>(path: string): Promise<Array<T & 
  */
 export async function updateData(path: string, data: any): Promise<boolean> {
   try {
-    const ref = getDbRef(path)
+    const ref = await getDbRef(path)
+    const { update } = await import('firebase/database')
     await update(ref, {
       ...data,
       updatedAt: Date.now(),
@@ -124,7 +165,8 @@ export async function updateData(path: string, data: any): Promise<boolean> {
  */
 export async function setData(path: string, data: any): Promise<boolean> {
   try {
-    const ref = getDbRef(path)
+    const ref = await getDbRef(path)
+    const { set } = await import('firebase/database')
     await set(ref, data)
     return true
   } catch (error) {
@@ -140,7 +182,8 @@ export async function setData(path: string, data: any): Promise<boolean> {
  */
 export async function deleteData(path: string): Promise<boolean> {
   try {
-    const ref = getDbRef(path)
+    const ref = await getDbRef(path)
+    const { remove } = await import('firebase/database')
     await remove(ref)
     return true
   } catch (error) {
@@ -157,7 +200,8 @@ export async function deleteData(path: string): Promise<boolean> {
  */
 export async function pushData(path: string, data: any): Promise<string | null> {
   try {
-    const ref = getDbRef(path)
+    const ref = await getDbRef(path)
+    const { push, set } = await import('firebase/database')
     const newRef = push(ref)
 
     await set(newRef, {
@@ -180,7 +224,8 @@ export async function pushData(path: string, data: any): Promise<string | null> 
  */
 export async function dataExists(path: string): Promise<boolean> {
   try {
-    const ref = getDbRef(path)
+    const ref = await getDbRef(path)
+    const { get } = await import('firebase/database')
     const snapshot = await get(ref)
     return snapshot.exists()
   } catch (error) {
@@ -193,7 +238,6 @@ export async function dataExists(path: string): Promise<boolean> {
  * Get database instance (if needed for advanced operations)
  * @returns Firebase Database instance
  */
-export function getDb() {
-  const firebaseApp = useFirebaseApp()
-  return getDatabase(firebaseApp)
+export async function getDb() {
+  return await getDatabaseInstance()
 }

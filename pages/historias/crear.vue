@@ -216,13 +216,11 @@ import { usePets } from '~/composables/usePets'
 import { useS3 } from '~/composables/useS3'
 import LoadingButton from '~/components/ui/LoadingButton.vue'
 import { useToast } from '~/composables/useToast'
-import { useFirebaseApp } from 'vuefire'
-import { getDatabase, ref as dbRef, query, orderByChild, equalTo, get } from 'firebase/database'
 
 // Router & Composables
 const router = useRouter()
 const { user, isAuthenticated } = useAuth()
-const { createStory } = useAdoptionStories()
+const { createStory, hasUserStoryForPet } = useAdoptionStories()
 const { fetchUserPets } = usePets()
 const { uploadFileWithProgress } = useS3() // Updated to use progress capable uploader
 const { success: toastSuccess, error: toastError } = useToast()
@@ -261,16 +259,7 @@ async function checkSelectedPetStory(petId) {
   selectedPetHasStory.value = false
   if (!petId || !user.value) return
   try {
-    const db = getDatabase(useFirebaseApp())
-    const storiesQuery = query(dbRef(db, 'adoption_stories'), orderByChild('petId'), equalTo(petId))
-    const snap = await get(storiesQuery)
-
-    if (snap.exists()) {
-      const stories = snap.val()
-      // Check if THIS user has written a story
-      const hasUserStory = Object.values(stories).some((s) => s.userId === user.value.uid)
-      if (hasUserStory) selectedPetHasStory.value = true
-    }
+    selectedPetHasStory.value = await hasUserStoryForPet(petId, user.value.uid)
   } catch (e) {
     console.warn(e)
   }

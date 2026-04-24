@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue'
 import type { AdoptionStory } from '../models/AdoptionStory'
 import { useSecureLogger } from '~/composables/useSecureLogger'
-import { fetchData, updateData, deleteData, pushData, setData } from '~/utils/firebase'
+import { fetchData, fetchCollectionByChild, updateData, deleteData, pushData, setData } from '~/utils/firebase'
 import { handleFirebaseError } from '~/utils/errorHandler'
 
 export function useAdoptionStories() {
@@ -200,6 +200,8 @@ export function useAdoptionStories() {
     error.value = null
 
     try {
+      const { useFirebaseApp } = await import('vuefire')
+      const { getDatabase, ref as dbRef, get } = await import('firebase/database')
       const firebaseApp = useFirebaseApp()
       const db = getDatabase(firebaseApp)
       const storyRef = dbRef(db, `adoption_stories/${storyId}`)
@@ -395,38 +397,24 @@ export function useAdoptionStories() {
     error.value = null
 
     try {
-      const rawData = await fetchData<Record<string, any>>('adoption_stories')
+      const rawStories = await fetchCollectionByChild<any>('adoption_stories', 'userId', userId)
+      const storiesData: AdoptionStory[] = rawStories
+        .filter((story) => !story.isTest)
+        .map((story) => ({
+          id: story.id,
+          petId: story.petId,
+          userId: story.userId,
+          title: story.title || '',
+          content: story.content || '',
+          images: story.images || [],
+          featured: story.featured || false,
+          createdAt: story.createdAt || Date.now(),
+          updatedAt: story.updatedAt || story.createdAt || Date.now(),
+        }))
 
-      if (rawData) {
-        const storiesData: AdoptionStory[] = []
-
-        // Filtramos por el ID de usuario
-        for (const [id, storyData] of Object.entries(rawData)) {
-          if (storyData.userId === userId) {
-            storiesData.push({
-              id,
-              petId: storyData.petId,
-              userId: storyData.userId,
-              title: storyData.title || '',
-              content: storyData.content || '',
-              images: storyData.images || [],
-              featured: storyData.featured || false,
-              createdAt: storyData.createdAt || Date.now(),
-              updatedAt: storyData.updatedAt || storyData.createdAt || Date.now(),
-            })
-          }
-        }
-
-        // Enriquecemos los datos con información de mascotas y usuarios
-        await enrichStoriesData(storiesData)
-
-        // Ordenamos por fecha de creación (más recientes primero)
-        storiesData.sort((a, b) => b.createdAt - a.createdAt)
-
-        return storiesData
-      } else {
-        return []
-      }
+      await enrichStoriesData(storiesData)
+      storiesData.sort((a, b) => b.createdAt - a.createdAt)
+      return storiesData
     } catch (err: any) {
       const errorMsg = handleFirebaseError(err)
       logError(`Error al obtener historias del usuario (${userId}):`, err)
@@ -445,38 +433,24 @@ export function useAdoptionStories() {
     error.value = null
 
     try {
-      const rawData = await fetchData<Record<string, any>>('adoption_stories')
+      const rawStories = await fetchCollectionByChild<any>('adoption_stories', 'petId', petId)
+      const storiesData: AdoptionStory[] = rawStories
+        .filter((story) => !story.isTest)
+        .map((story) => ({
+          id: story.id,
+          petId: story.petId,
+          userId: story.userId,
+          title: story.title || '',
+          content: story.content || '',
+          images: story.images || [],
+          featured: story.featured || false,
+          createdAt: story.createdAt || Date.now(),
+          updatedAt: story.updatedAt || story.createdAt || Date.now(),
+        }))
 
-      if (rawData) {
-        const storiesData: AdoptionStory[] = []
-
-        // Filtramos por el ID de mascota
-        for (const [id, storyData] of Object.entries(rawData)) {
-          if (storyData.petId === petId) {
-            storiesData.push({
-              id,
-              petId: storyData.petId,
-              userId: storyData.userId,
-              title: storyData.title || '',
-              content: storyData.content || '',
-              images: storyData.images || [],
-              featured: storyData.featured || false,
-              createdAt: storyData.createdAt || Date.now(),
-              updatedAt: storyData.updatedAt || storyData.createdAt || Date.now(),
-            })
-          }
-        }
-
-        // Enriquecemos los datos con información de mascotas y usuarios
-        await enrichStoriesData(storiesData)
-
-        // Ordenamos por fecha de creación (más recientes primero)
-        storiesData.sort((a, b) => b.createdAt - a.createdAt)
-
-        return storiesData
-      } else {
-        return []
-      }
+      await enrichStoriesData(storiesData)
+      storiesData.sort((a, b) => b.createdAt - a.createdAt)
+      return storiesData
     } catch (err: any) {
       const errorMsg = handleFirebaseError(err)
       logError(`Error al obtener historias de la mascota (${petId}):`, err)
@@ -487,6 +461,12 @@ export function useAdoptionStories() {
     }
   }
 
+  async function hasUserStoryForPet(petId: string, userId: string): Promise<boolean> {
+    if (!petId || !userId) return false
+    const stories = await fetchPetStories(petId)
+    return stories.some((story) => story.userId === userId)
+  }
+
   /**
    * Obtiene todas las historias incluyendo datos de prueba (para Admin)
    */
@@ -494,6 +474,8 @@ export function useAdoptionStories() {
     loading.value = true
     error.value = null
     try {
+      const { useFirebaseApp } = await import('vuefire')
+      const { getDatabase, ref as dbRef, query, orderByChild, get } = await import('firebase/database')
       const firebaseApp = useFirebaseApp()
       const db = getDatabase(firebaseApp)
       const storiesRef = dbRef(db, 'adoption_stories')
@@ -550,5 +532,6 @@ export function useAdoptionStories() {
     deleteStory,
     fetchUserStories,
     fetchPetStories,
+    hasUserStoryForPet,
   }
 }
