@@ -80,11 +80,22 @@
                   Nombre
                   <span class="text-red-500">*</span>
                 </label>
-                <input
-                  v-model="petData.name"
-                  type="text"
-                  class="w-full rounded-lg border-gray-300 py-2.5 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
-                />
+                <div class="flex gap-2">
+                  <input
+                    v-model="petData.name"
+                    type="text"
+                    class="w-full rounded-lg border-gray-300 py-2.5 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+                  />
+                  <button
+                    type="button"
+                    @click="generateRandomName"
+                    class="shrink-0 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-100"
+                    title="Generar nombre aleatorio"
+                  >
+                    <Icon name="heroicons:sparkles" class="h-4 w-4" />
+                  </button>
+                </div>
+                <p class="mt-1 text-xs text-gray-500">Si la mascota no tiene nombre, puedes generar uno aleatorio.</p>
               </div>
 
               <!-- Tipo -->
@@ -149,8 +160,7 @@
               <!-- Ubicación -->
               <div>
                 <label class="mb-1 block text-sm font-medium text-gray-700">
-                  Ubicación
-                  <span class="text-red-500">*</span>
+                  Ubicación (Opcional)
                 </label>
                 <input
                   v-model="petData.location"
@@ -164,8 +174,7 @@
               <!-- Edad -->
               <div>
                 <label class="mb-1 block text-sm font-medium text-gray-700">
-                  Edad exacta
-                  <span class="text-red-500">*</span>
+                  Edad exacta (Opcional)
                 </label>
                 <input
                   v-model="petData.age"
@@ -413,17 +422,6 @@
             <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
               <div>
                 <label class="mb-1 block text-sm font-medium text-gray-700">
-                  Email
-                  <span class="text-red-500">*</span>
-                </label>
-                <input
-                  v-model="petData.contact.email"
-                  type="email"
-                  class="w-full rounded-lg border-gray-300 py-2.5 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
-                />
-              </div>
-              <div>
-                <label class="mb-1 block text-sm font-medium text-gray-700">
                   Teléfono
                   <span class="text-red-500">*</span>
                 </label>
@@ -431,40 +429,33 @@
                   v-model="petData.contact.phone"
                   type="tel"
                   class="w-full rounded-lg border-gray-300 py-2.5 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+                  placeholder="Ej: 0412-1234567"
                 />
               </div>
-            </div>
-
-            <div>
-              <label class="mb-1 block text-sm font-medium text-gray-700">Preferencia</label>
-              <div class="flex gap-4">
-                <label class="inline-flex items-center">
-                  <input
-                    v-model="petData.contact.preferredMethod"
-                    type="radio"
-                    value="email"
-                    class="text-emerald-600 focus:ring-emerald-500"
-                  />
-                  <span class="ml-2 text-sm text-gray-700">Email</span>
+              <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700">
+                  Preferencia de contacto
                 </label>
-                <label class="inline-flex items-center">
-                  <input
-                    v-model="petData.contact.preferredMethod"
-                    type="radio"
-                    value="phone"
-                    class="text-emerald-600 focus:ring-emerald-500"
-                  />
-                  <span class="ml-2 text-sm text-gray-700">Llamada</span>
-                </label>
-                <label class="inline-flex items-center">
-                  <input
-                    v-model="petData.contact.preferredMethod"
-                    type="radio"
-                    value="whatsapp"
-                    class="text-emerald-600 focus:ring-emerald-500"
-                  />
-                  <span class="ml-2 text-sm text-gray-700">WhatsApp</span>
-                </label>
+                <div class="flex h-[42px] items-center gap-4">
+                  <label class="inline-flex items-center">
+                    <input
+                      v-model="petData.contact.preferredMethod"
+                      type="radio"
+                      value="phone"
+                      class="text-emerald-600 focus:ring-emerald-500"
+                    />
+                    <span class="ml-2 text-sm text-gray-700">Llamada</span>
+                  </label>
+                  <label class="inline-flex items-center">
+                    <input
+                      v-model="petData.contact.preferredMethod"
+                      type="radio"
+                      value="whatsapp"
+                      class="text-emerald-600 focus:ring-emerald-500"
+                    />
+                    <span class="ml-2 text-sm text-gray-700">WhatsApp</span>
+                  </label>
+                </div>
               </div>
             </div>
           </div>
@@ -598,6 +589,8 @@ import { usePets } from '~/composables/usePets'
 import { useS3 } from '~/composables/useS3'
 import ModalAlert from '~/components/common/ModalAlert.vue'
 import LoadingButton from '~/components/ui/LoadingButton.vue'
+import { getRandomPetName } from '~/utils/petNames'
+import { cropImageToAspectRatio, resizeImageToExactSize } from '~/utils/imageCrop'
 
 // Utils
 const router = useRouter()
@@ -619,6 +612,8 @@ const mainImageInput = ref(null)
 const additionalImagesInput = ref(null)
 const mainImagePreview = ref('')
 const mainImageFile = ref(null)
+const mainImageFileWeb = ref(null)
+const mainImageFileOg = ref(null)
 const additionalImagePreviews = ref([]) // For NEW images
 const additionalImageFiles = ref([]) // For NEW images
 const deletedPhotos = ref([]) // To track URL removals
@@ -659,7 +654,7 @@ const petData = reactive({
     email: '',
     phone: '',
     type: '',
-    preferredMethod: 'email',
+    preferredMethod: 'phone',
   },
   userId: '',
   status: 'available',
@@ -724,7 +719,7 @@ onMounted(async () => {
       petData.contact.email = pet.contact.email || ''
       petData.contact.phone = pet.contact.phone || ''
       petData.contact.type = pet.contact.type || ''
-      petData.contact.preferredMethod = pet.contact.preferredMethod || 'email'
+      petData.contact.preferredMethod = pet.contact.preferredMethod || 'phone'
     }
 
     // If typeValue is missing but type exists (legacy data), try to map it
@@ -741,6 +736,15 @@ onMounted(async () => {
     initialLoading.value = false
   }
 })
+
+// === Generador de nombres ===
+const generateRandomName = async () => {
+  if (!petData.gender) {
+    showModalAlert('warning', 'Selecciona género', 'Por favor selecciona el género de la mascota antes de generar un nombre.')
+    return
+  }
+  petData.name = getRandomPetName(petData.gender)
+}
 
 // === Helpers ===
 const updateTypeLabel = () => {
@@ -767,7 +771,7 @@ const getAllAdditionalImages = () => {
 }
 
 // === Image Logic ===
-const handleMainImageChange = (event) => {
+const handleMainImageChange = async (event) => {
   const file = event.target.files[0]
   if (!file) return
   if (file.size > 5 * 1024 * 1024) {
@@ -780,6 +784,15 @@ const handleMainImageChange = (event) => {
     mainImagePreview.value = e.target.result
   }
   reader.readAsDataURL(file)
+
+  try {
+    mainImageFileWeb.value = await cropImageToAspectRatio(file, { aspectRatio: 4 / 3, mimeType: 'image/jpeg', quality: 0.9 })
+    mainImageFileOg.value = await resizeImageToExactSize(file, 1200, 630, { mimeType: 'image/jpeg', quality: 0.9 })
+  } catch (err) {
+    console.warn('No se pudo recortar la imagen, se usará original:', err)
+    mainImageFileWeb.value = file
+    mainImageFileOg.value = file
+  }
 }
 
 const handleAdditionalImagesChange = (event) => {
@@ -856,17 +869,32 @@ const submitUpdate = async () => {
   try {
     let newMainUrl = petData.image
 
-    // 1. Upload new Main Image if changed
+    // 1. Upload new Main Image if changed (versión 4:3 para web)
+    let ogImageUrl = petData.ogImage || ''
     if (mainImageFile.value) {
-      const ext = mainImageFile.value.name.split('.').pop()
+      const fileToUpload = mainImageFileWeb.value || mainImageFile.value
+      const ext = 'jpg'
       const fileName = `${petData.userId}-main-${Date.now()}.${ext}`
       newMainUrl = await uploadFileWithProgress(
-        mainImageFile.value,
+        fileToUpload,
         `pets/${petData.userId}`,
         fileName,
         null,
-        { optimize: true }
+        { optimize: true, quality: 0.9, maxWidthOrHeight: 1200 }
       )
+
+      // Upload OG Image (1200x630)
+      const ogFile = mainImageFileOg.value || mainImageFile.value
+      if (ogFile) {
+        const ogFileName = `${petData.userId}-og-${Date.now()}.jpg`
+        ogImageUrl = await uploadFileWithProgress(
+          ogFile,
+          `pets/${petData.userId}`,
+          ogFileName,
+          null,
+          { optimize: true, quality: 0.92, maxWidthOrHeight: 1300 }
+        )
+      }
     }
 
     // 2. Upload new Additional Images
@@ -902,6 +930,7 @@ const submitUpdate = async () => {
     const updatePayload = {
       ...petData,
       image: newMainUrl,
+      ogImage: ogImageUrl || undefined,
       photos: finalPhotos,
       updatedAt: new Date().toISOString(),
     }

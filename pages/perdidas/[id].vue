@@ -443,7 +443,7 @@
                 type="text"
                 required
                 class="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2"
-                placeholder="Teléfono o email"
+                placeholder="Teléfono o WhatsApp"
               />
             </div>
             <div>
@@ -690,7 +690,24 @@ function copyLink() {
 
 function shareToWhatsApp() {
   if (!report.value || !import.meta.client) return
-  const text = `🔍 ¡SE BUSCA A *${report.value.name.toUpperCase()}*!\n\n📍 Última vez visto: ${report.value.lastSeenLocation}\n📅 Fecha: ${formatDate(report.value.lastSeenDate)}\n📝 Descripción: ${report.value.description}\n\n🙏 Por favor, ayúdanos a difundir para que vuelva a casa:\n${window.location.href}`
+  const lines = [
+    `🔍 ¡SE BUSCA A *${report.value.name.toUpperCase()}*!`,
+    '',
+    report.value.sex ? `� Sexo: ${report.value.sex === 'female' ? 'Hembra ♀️' : 'Macho ♂️'}` : '',
+    `�📍 Última vez visto: ${report.value.lastSeenLocation || 'Ubicación no especificada'}`,
+    `📅 Fecha: ${formatDate(report.value.lastSeenDate)}`,
+    '',
+    `📝 Descripción:`,
+    report.value.description || '',
+    '',
+    report.value.reward ? `💰 *RECOMPENSA: $${report.value.reward}*` : '',
+    '',
+    report.value.contact ? `📞 Contacto: ${report.value.contact}` : '',
+    '',
+    '🙏 Por favor, ayúdanos a difundir para que vuelva a casa:',
+    window.location.href,
+  ]
+  const text = lines.filter(Boolean).join('\n')
   window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank')
 }
 
@@ -727,28 +744,40 @@ onMounted(async () => {
 
 // SEO
 useSeoMeta({
-  title: computed(() => `SE BUSCA: ${report.value?.name || 'Mascota'} | Adopta Zulia`),
-  description: computed(() => 
-    report.value 
-      ? `${report.value.name} está perdida en ${report.value.lastSeenLocation}. ${report.value.description?.substring(0, 150)}` 
-      : 'Ayúdanos a encontrar a esta mascota perdida en el Zulia.'
-  ),
-  ogTitle: computed(() => `🔍 SE BUSCA: ${report.value?.name || 'Mascota'} - Adopta Zulia`),
-  ogDescription: computed(() => 
-    report.value 
-      ? `¿Has visto a ${report.value.name}? Se perdió en ${report.value.lastSeenLocation}. ¡Ayúdanos a que vuelva a casa!` 
-      : 'Ayúdanos a encontrar a esta mascota perdida.'
-  ),
-  ogImage: computed(() => report.value?.images?.[0] || useOgImage('/og-improved.png')),
+  title: computed(() => `🔍 SE BUSCA: ${report.value?.name || 'Mascota'} | Adopta Zulia`),
+  description: computed(() => {
+    if (!report.value) return 'Ayúdanos a encontrar a esta mascota perdida en el Zulia.'
+    const parts = [
+      `${report.value.name} está perdida/o 📍 ${report.value.lastSeenLocation || ''}`,
+      report.value.sex ? `Sexo: ${report.value.sex === 'female' ? 'Hembra ♀️' : 'Macho ♂️'}` : '',
+      report.value.reward ? `💰 Recompensa: $${report.value.reward}` : '',
+      report.value.description?.substring(0, 120) || '',
+    ].filter(Boolean)
+    return parts.join(' • ')
+  }),
+  ogTitle: computed(() => `🔍 SE BUSCA: ${report.value?.name || 'Mascota'}${report.value?.lastSeenLocation ? ` en ${report.value.lastSeenLocation}` : ''} | Adopta Zulia`),
+  ogDescription: computed(() => {
+    if (!report.value) return 'Ayúdanos a encontrar a esta mascota perdida.'
+    const parts = [
+      `🔍 ¡Se busca a ${report.value.name}!`,
+      report.value.lastSeenLocation ? `📍 Último lugar visto: ${report.value.lastSeenLocation}` : '',
+      report.value.sex ? `Sexo: ${report.value.sex === 'female' ? 'Hembra' : 'Macho'}` : '',
+      report.value.reward ? `💰 Recompensa: $${report.value.reward}` : '',
+      report.value.description?.substring(0, 140) || '',
+      report.value.contact ? `📞 Contacto: ${report.value.contact}` : '',
+    ].filter(Boolean)
+    return parts.join(' | ')
+  }),
+  ogImage: computed(() => report.value?.ogImage || report.value?.images?.[0] || useOgImage('/og-improved.png')),
   ogUrl: computed(() => useCanonicalUrl(`/perdidas/${route.params.id}`)),
   ogType: 'website',
   twitterTitle: computed(() => `SE BUSCA: ${report.value?.name || 'Mascota'}`),
-  twitterDescription: computed(() => 
-    report.value 
-      ? `Ayúdanos a encontrar a ${report.value.name}, perdida en ${report.value.lastSeenLocation}.` 
+  twitterDescription: computed(() =>
+    report.value
+      ? `Ayúdanos a encontrar a ${report.value.name}${report.value?.lastSeenLocation ? ` en ${report.value.lastSeenLocation}` : ''}.`
       : 'Mascota perdida busca volver a casa.'
   ),
-  twitterImage: computed(() => report.value?.images?.[0] || useOgImage('/og-improved.png')),
+  twitterImage: computed(() => report.value?.ogImage || report.value?.images?.[0] || useOgImage('/og-improved.png')),
   twitterCard: 'summary_large_image',
 })
 

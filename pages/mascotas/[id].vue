@@ -306,14 +306,6 @@
                     <Icon name="heroicons:chat-bubble-oval-left" class="h-4 w-4" />
                     WhatsApp
                   </button>
-                  <a
-                    v-if="pet?.contact?.email"
-                    :href="`mailto:${pet.contact.email}?subject=Consulta sobre adopción de ${pet?.name}&body=Hola, he enviado una solicitud para adoptar a ${pet?.name} y me gustaría saber más.`"
-                    class="flex w-full items-center justify-center gap-2 rounded-xl border border-yellow-200 bg-white py-2 text-sm font-bold text-yellow-800 transition-colors hover:bg-yellow-50"
-                  >
-                    <Icon name="heroicons:envelope" class="h-4 w-4" />
-                    Correo
-                  </a>
                 </div>
               </div>
 
@@ -445,13 +437,6 @@
                   >
                     <Icon name="heroicons:phone" class="mr-3 h-4 w-4 text-gray-400" />
                     {{ pet.contact.phone }}
-                  </a>
-                  <a
-                    :href="`mailto:${pet.contact.email}`"
-                    class="flex items-center text-sm text-gray-600 hover:text-emerald-600"
-                  >
-                    <Icon name="heroicons:envelope" class="mr-3 h-4 w-4 text-gray-400" />
-                    {{ pet.contact.email }}
                   </a>
                 </div>
               </div>
@@ -625,8 +610,8 @@
       title="Compartir Mascota"
       :description="`Ayuda a ${pet?.name} a encontrar un hogar.`"
       :shareData="{
-        title: `🐾 ¡Adopta a ${pet?.name}!`,
-        text: `📍 Ubicación: ${pet?.location}\n🐕 Especie: ${formatType(pet?.type)}\n🦴 Raza: ${pet?.breed || 'Mestizo'}\n🎂 Edad: ${pet?.age}\n📏 Tamaño: ${formatSize(pet?.size)}\n\n✨ Conócelo aquí:`,
+        title: `🐾 ${pet?.urgent ? '¡URGENTE! ' : ''}Adopta a ${pet?.name}`,
+        text: buildShareText(pet),
         url: shareUrl
       }"
     />
@@ -682,6 +667,27 @@ const imageGenerationEnabled = computed(
   () => isFeatureEnabled('imageGeneration') || imageGenEnabled.value
 )
 
+const buildShareText = (p) => {
+  if (!p) return ''
+  const lines = [
+    p.urgent ? '⚠️ ¡ADOPCIÓN URGENTE! ⚠️' : '',
+    `🐾 ${p.name} busca un hogar 🏠`,
+    p.type ? `Especie: ${formatType(p.type)}` : '',
+    p.gender ? `Género: ${p.gender === 'macho' ? 'Macho ♂️' : 'Hembra ♀️'}` : '',
+    p.breed ? `Raza: ${p.breed}` : '',
+    p.age ? `Edad: ${p.age}` : '',
+    p.size ? `Tamaño: ${formatSize(p.size)}` : '',
+    p.location ? `📍 Ubicación: ${p.location}` : '',
+    p.vaccinated ? '💉 Vacunado' : '',
+    p.neutered ? '✂️ Esterilizado' : '',
+    p.contact?.phone ? `📞 Contacto: ${p.contact.phone}` : '',
+    p.description?.substring(0, 160) || '',
+    '',
+    '✨ Conócelo aquí 👇',
+  ]
+  return lines.filter(Boolean).join('\n')
+}
+
 function sharePet() {
   shareUrl.value = window.location.href
   showShareModal.value = true
@@ -727,28 +733,47 @@ useSeoMeta({
       ? `Adopta a ${pet.value.name} | Mascota en Adopción en Zulia`
       : 'Mascota en Adopción | Adopta Zulia'
   ),
-  description: computed(() =>
-    pet.value
-      ? `Conoce a ${pet.value.name}, un ${pet.value.type} que busca un hogar lleno de amor en ${pet.value.location}. ${pet.value.description?.substring(0, 150)}...`
-      : 'Detalles de mascota en adopción en el estado Zulia.'
-  ),
+  description: computed(() => {
+    if (!pet.value) return 'Detalles de mascota en adopción en el estado Zulia.'
+    const parts = [
+      `${pet.value.name} — ${formatType(pet.value.type)}${pet.value.gender ? ` ${pet.value.gender === 'macho' ? '♂️' : '♀️'}` : ''}`,
+      pet.value.breed ? `Raza: ${pet.value.breed}` : '',
+      pet.value.age ? `Edad: ${pet.value.age}` : '',
+      pet.value.size ? `Tamaño: ${formatSize(pet.value.size)}` : '',
+      pet.value.location ? `📍 ${pet.value.location}` : '',
+      pet.value.urgent ? '⚠️ ¡URGENTE!' : '',
+      pet.value.description?.substring(0, 120),
+    ].filter(Boolean)
+    return parts.join(' • ')
+  }),
   ogTitle: computed(() =>
-    pet.value ? `Adopta a ${pet.value.name} - Encuentra tu Compañero Ideal` : 'Mascota en Adopción'
+    pet.value ? `🐾 Adopta a ${pet.value.name} — ${formatType(pet.value.type)} en ${pet.value.location || 'Zulia'}` : '🐾 Mascota en Adopción'
   ),
-  ogDescription: computed(() =>
-    pet.value
-      ? `¿Podrías darle un hogar a ${pet.value.name}? Descubre más sobre este noble compañero en Adopta Zulia.`
-      : 'Ayuda a esta mascota a encontrar un hogar amoroso.'
-  ),
+  ogDescription: computed(() => {
+    if (!pet.value) return 'Ayuda a esta mascota a encontrar un hogar amoroso.'
+    const parts = [
+      `${pet.value.name} busca un hogar 🏠`,
+      formatType(pet.value.type) + (pet.value.gender ? ` · ${pet.value.gender === 'macho' ? 'Macho' : 'Hembra'}` : ''),
+      pet.value.breed ? `Raza: ${pet.value.breed}` : '',
+      pet.value.age ? `Edad: ${pet.value.age}` : '',
+      pet.value.size ? `Tamaño: ${formatSize(pet.value.size)}` : '',
+      pet.value.location ? `📍 Ubicación: ${pet.value.location}` : '',
+      pet.value.urgent ? '⚠️ CASO URGENTE' : '',
+      pet.value.vaccinated ? '💉 Vacunado' : '',
+      pet.value.neutered ? '✂️ Esterilizado' : '',
+      pet.value.contact?.phone ? `📞 ${pet.value.contact.phone}` : '',
+    ].filter(Boolean)
+    return parts.join(' | ')
+  }),
   ogSiteName: 'Adopta Zulia',
-  ogImage: computed(() => useOgImage(pet.value?.image || pet.value?.photos?.[0] || '/og-improved.png')),
+  ogImage: computed(() => useOgImage(pet.value?.ogImage || pet.value?.image || pet.value?.photos?.[0] || '/og-improved.png')),
   ogUrl: computed(() => useCanonicalUrl(`/mascotas/${petId}`)),
   ogType: 'website',
   twitterTitle: computed(() => (pet.value ? `Adopta a ${pet.value.name}` : 'Mascota en Adopción')),
   twitterDescription: computed(() =>
     pet.value ? `${pet.value.name} busca un hogar en ${pet.value.location}. ¡Ayúdanos a difundir!` : 'Mascota busca hogar.'
   ),
-  twitterImage: computed(() => useOgImage(pet.value?.image || pet.value?.photos?.[0] || '/og-improved.png')),
+  twitterImage: computed(() => useOgImage(pet.value?.ogImage || pet.value?.image || pet.value?.photos?.[0] || '/og-improved.png')),
   twitterCard: 'summary_large_image',
 })
 

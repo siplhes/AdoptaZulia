@@ -38,13 +38,51 @@
                   Nombre de la mascota
                   <span class="text-red-500">*</span>
                 </label>
-                <input
-                  v-model="form.name"
-                  type="text"
-                  placeholder="Ej: Max, Luna..."
-                  class="w-full rounded-lg border-gray-300 py-2.5 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
-                  autofocus
-                />
+                <div class="flex gap-2">
+                  <input
+                    v-model="form.name"
+                    type="text"
+                    placeholder="Ej: Max, Luna..."
+                    class="w-full rounded-lg border-gray-300 py-2.5 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+                    autofocus
+                  />
+                  <button
+                    type="button"
+                    @click="generateRandomName"
+                    class="shrink-0 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-100"
+                    title="Generar nombre aleatorio"
+                  >
+                    <Icon name="heroicons:sparkles" class="h-4 w-4" />
+                  </button>
+                </div>
+                <p class="mt-1 text-xs text-gray-500">Si la mascota no tiene nombre, puedes generar uno aleatorio.</p>
+              </div>
+
+              <div>
+                <label class="mb-1 block text-sm font-medium text-gray-700">
+                  Género
+                  <span class="text-red-500">*</span>
+                </label>
+                <div class="flex h-[42px] items-center space-x-4">
+                  <label class="inline-flex items-center">
+                    <input
+                      type="radio"
+                      v-model="form.sex"
+                      value="male"
+                      class="border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                    />
+                    <span class="ml-2 text-gray-700">Macho</span>
+                  </label>
+                  <label class="inline-flex items-center">
+                    <input
+                      type="radio"
+                      v-model="form.sex"
+                      value="female"
+                      class="border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                    />
+                    <span class="ml-2 text-gray-700">Hembra</span>
+                  </label>
+                </div>
               </div>
 
               <div>
@@ -118,8 +156,7 @@
 
               <div>
                 <label class="mb-1 block text-sm font-medium text-gray-700">
-                  Ubicación
-                  <span class="text-red-500">*</span>
+                  Ubicación (Opcional)
                 </label>
                 <div class="relative">
                   <Icon
@@ -266,8 +303,8 @@
                 </label>
                 <input
                   v-model="form.contact"
-                  type="text"
-                  placeholder="Teléfono, Email, Instagram..."
+                  type="tel"
+                  placeholder="Teléfono o WhatsApp..."
                   class="w-full rounded-lg border-gray-300 py-2.5 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
                 />
                 <p class="mt-1 text-xs text-gray-500">
@@ -389,6 +426,8 @@ import LoadingButton from '~/components/ui/LoadingButton.vue'
 import { useToast } from '~/composables/useToast'
 import { useS3 } from '~/composables/useS3'
 import ModalAlert from '~/components/common/ModalAlert.vue'
+import { getRandomPetName } from '~/utils/petNames'
+import { resizeImageToExactSize } from '~/utils/imageCrop'
 
 // -- Composables --
 const { createLostPet, updateLostPet, getLostPetById, deleteLostPet } = useLostPets()
@@ -413,6 +452,7 @@ const currentStepTitle = computed(() => titles[currentStep.value])
 // -- Form Data --
 const form = ref({
   name: '',
+  sex: '',
   description: '',
   lastSeenAt: '',
   location: '',
@@ -432,9 +472,9 @@ const rewardValid = computed(() => {
 const isStepValid = computed(() => {
   switch (currentStep.value) {
     case 1:
-      return form.value.name.trim().length > 0 && form.value.description.trim().length > 0
+      return form.value.name.trim().length > 0 && form.value.description.trim().length > 0 && !!form.value.sex
     case 2:
-      return form.value.lastSeenAt && form.value.location.trim().length > 0 && rewardValid.value
+      return form.value.lastSeenAt && rewardValid.value
     case 3:
       return true // Photos are optional but recommended
     case 4:
@@ -449,7 +489,6 @@ const isFormValid = computed(() => {
     form.value.name.trim() &&
     form.value.description.trim() &&
     form.value.lastSeenAt &&
-    form.value.location.trim() &&
     form.value.contact.trim() &&
     rewardValid.value
   )
@@ -561,6 +600,16 @@ function previewProgress(i) {
   return progress.value[i]
 }
 
+// === Generador de nombres ===
+const generateRandomName = async () => {
+  if (!form.value.sex) {
+    toastError('Selecciona género', 'Por favor selecciona el género de la mascota antes de generar un nombre.')
+    return
+  }
+  const genderMap = { male: 'macho', female: 'hembra' }
+  form.value.name = getRandomPetName(genderMap[form.value.sex])
+}
+
 // -- Initialization & Editing --
 const isEdit = computed(() => !!route.query.edit)
 const editingId = computed(() => route.query.edit || null)
@@ -593,8 +642,8 @@ onMounted(async () => {
     form.value.archived = !!data.archived
     existingImages.value = Array.isArray(data.images) ? data.images.slice() : []
     previews.value = existingImages.value.slice()
-  } else if (user.value?.email) {
-    form.value.contact = user.value.email
+  } else if (user.value?.phoneNumber) {
+    form.value.contact = user.value.phoneNumber
   }
 })
 
@@ -641,15 +690,35 @@ async function onConfirmPublish() {
       }
     }
 
+    // Si hay imágenes nuevas, usar la primera como OG recortada a 1200x630
+    let ogImageUrl = ''
+    if (files.value.length > 0) {
+      try {
+        const ogFile = await resizeImageToExactSize(files.value[0], 1200, 630, { mimeType: 'image/jpeg', quality: 0.9 })
+        const ogFileName = `${user.value.uid}-og-${Date.now()}.jpg`
+        ogImageUrl = await uploadFileWithProgress(
+          ogFile,
+          'lost-pets',
+          ogFileName,
+          null,
+          { optimize: true, maxSizeMB: 1, quality: 0.85 }
+        )
+      } catch (err) {
+        console.warn('No se pudo generar imagen OG:', err)
+      }
+    }
+
     const payload = {
       ownerId: user.value.uid,
       name: form.value.name,
+      sex: form.value.sex || undefined,
       description: form.value.description,
       lastSeenAt: form.value.lastSeenAt ? new Date(form.value.lastSeenAt).getTime() : null,
       location: form.value.location,
-      contact: form.value.contact || user.value.email,
+      contact: form.value.contact,
       reward: form.value.reward,
       images: imageUrls,
+      ogImage: ogImageUrl || undefined,
       status: form.value.status || 'perdido',
       archived: !!form.value.archived,
     }
