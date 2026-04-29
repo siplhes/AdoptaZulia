@@ -107,7 +107,7 @@ export default defineNuxtConfig({
     },
   },
   image: {
-    provider: 'vercel',
+    provider: 'ipx',
     quality: 80,
     domains: [
       process.env.AWS_S3_BUCKET_DOMAIN,
@@ -118,9 +118,6 @@ export default defineNuxtConfig({
     alias: {
       youtube: 'https://img.youtube.com',
       vimeo: 'https://i.vimeocdn.com',
-    },
-    vercel: {
-      baseURL: process.env.BASE_URL || 'https://www.adoptazulia.org.ve',
     },
   },
   vite: {

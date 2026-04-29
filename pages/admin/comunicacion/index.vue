@@ -221,6 +221,9 @@ import { es } from 'date-fns/locale'
 import { useAuth } from '~/composables/useAuth'
 import { fetchData, pushData } from '~/utils/firebase'
 
+// ...
+import { useAdminLogs } from '~/composables/useAdminLogs'
+
 definePageMeta({
   middleware: ['admin'],
   layout: 'admin',
@@ -332,9 +335,6 @@ const resetForm = () => {
     type: 'internal',
   }
 }
-
-// ...
-import { useAdminLogs } from '~/composables/useAdminLogs'
 
 // ...
 const { logAction } = useAdminLogs()

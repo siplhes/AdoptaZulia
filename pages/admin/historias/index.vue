@@ -326,6 +326,9 @@ import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { useAdoptionStories } from '~/composables/useAdoptionStories'
 
+// ...
+import { useAdminLogs } from '~/composables/useAdminLogs'
+
 definePageMeta({
   middleware: ['admin'],
   layout: 'admin',
@@ -410,9 +413,6 @@ const refreshData = async () => {
 const viewStory = (story) => {
   selectedStory.value = story
 }
-
-// ...
-import { useAdminLogs } from '~/composables/useAdminLogs'
 
 // ...
 const { logAction } = useAdminLogs()
