@@ -42,7 +42,7 @@
             v-if="isAuthenticated"
             class="relative ml-4 flex items-center border-l border-emerald-600/50 pl-4"
           >
-            <NotificationsPanel class="mr-4 text-emerald-200 transition-colors hover:text-white" />
+            <NotificationsPanel class="mr-4 text-white transition-colors hover:text-emerald-100" />
 
             <div class="relative">
               <button
@@ -72,7 +72,7 @@
                 </div>
                 <Icon
                   name="heroicons:chevron-down"
-                  class="h-4 w-4 text-emerald-200"
+                  class="h-4 w-4 text-white"
                   :class="{ 'rotate-180': userMenuOpen }"
                 />
               </button>
@@ -156,13 +156,13 @@
           <div v-else class="flex items-center gap-4">
             <NuxtLink
               to="/login"
-              class="text-sm font-medium text-emerald-100 transition-colors hover:text-white"
+              class="text-sm font-medium text-white transition-colors hover:text-emerald-100"
             >
               Iniciar sesión
             </NuxtLink>
             <NuxtLink
               to="/registro"
-              class="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-bold text-white shadow-sm transition-all hover:bg-emerald-400 hover:shadow-emerald-500/30"
+              class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white shadow-sm transition-all hover:bg-emerald-500 hover:shadow-emerald-500/30"
             >
               Registrarse
             </NuxtLink>

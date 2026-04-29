@@ -36,7 +36,7 @@ const legals = [
             v-for="link in links"
             :key="link.to"
             :to="link.to"
-            class="text-sm font-medium text-gray-500 transition-colors hover:text-emerald-600"
+            class="text-sm font-medium text-gray-600 transition-colors hover:text-emerald-600"
           >
             {{ link.label }}
           </NuxtLink>
@@ -82,7 +82,7 @@ const legals = [
               v-for="legal in legals"
               :key="legal.to"
               :to="legal.to"
-              class="transition-colors hover:text-gray-600"
+              class="text-gray-600 transition-colors hover:text-gray-800"
             >
               {{ legal.label }}
             </NuxtLink>

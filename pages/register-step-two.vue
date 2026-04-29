@@ -168,6 +168,11 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '~/composables/useAuth'
 
+useSeoMeta({
+  title: 'Completar perfil | Adopta Zulia',
+  description: 'Completa tu perfil en Adopta Zulia para publicar mascotas y gestionar tus adopciones.',
+})
+
 definePageMeta({
   layout: false, // Standalone page
   middleware: 'auth',

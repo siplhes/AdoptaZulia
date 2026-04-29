@@ -2,6 +2,8 @@
   <div>
     <NuxtLoadingIndicator />
     <UiToastContainer />
+    <SpeedInsights />
+    <Analytics />
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
@@ -9,11 +11,37 @@
 </template>
 
 <script setup>
+import { SpeedInsights } from '@vercel/speed-insights/vue'
+import { Analytics } from '@vercel/analytics/vue'
+
 const config = useRuntimeConfig()
 const baseUrl = config.public.baseUrl || 'https://www.adoptazulia.org.ve/'
 const route = useRoute()
 
 const canonicalUrl = computed(() => `${baseUrl}${route.path}`)
+
+useHead({
+  script: [
+    {
+      type: 'speculationrules',
+      innerHTML: JSON.stringify({
+        prerender: [
+          {
+            where: {
+              and: [
+                { href_matches: '/*' },
+                { not: { href_matches: '/logout' } },
+                { not: { selector_matches: '[rel=nofollow]' } },
+                { not: { selector_matches: '[data-no-prerender]' } },
+              ],
+            },
+            eagerness: 'moderate',
+          },
+        ],
+      }),
+    },
+  ],
+})
 
 useSeoMeta({
   title: 'Adopta Zulia | Adopta, no compres',

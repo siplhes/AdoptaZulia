@@ -61,10 +61,7 @@ const formattedDate = computed(() => {
 })
 
 const previewText = computed(() => {
-  // Simple strip HTML logic for preview text
   if (!props.noticia.content) return ''
-  const tmp = document.createElement('DIV')
-  tmp.innerHTML = props.noticia.content
-  return tmp.textContent || tmp.innerText || ''
+  return props.noticia.content.replace(/<[^>]*>/g, '').substring(0, 200)
 })
 </script>

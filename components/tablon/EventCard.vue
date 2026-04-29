@@ -66,21 +66,31 @@ const props = defineProps({
   },
 })
 
-const eventDate = computed(() => new Date(props.evento.date))
+const eventDate = computed(() => {
+  if (!props.evento.date) return null
+  const d = new Date(props.evento.date)
+  return isNaN(d.getTime()) ? null : d
+})
 
 const monthString = computed(() => {
+  if (!eventDate.value) return ''
   return format(eventDate.value, 'MMM', { locale: es })
 })
 
 const dayString = computed(() => {
+  if (!eventDate.value) return ''
   return format(eventDate.value, 'dd')
 })
 
 const timeString = computed(() => {
+  if (!eventDate.value) return ''
   return format(eventDate.value, "EEEE d 'de' MMMM, h:mm a", { locale: es })
 })
 
 const statusBadge = computed(() => {
+  if (!eventDate.value) {
+    return { text: 'Próximamente', class: 'bg-amber-100 text-amber-800' }
+  }
   if (isToday(eventDate.value)) {
     return { text: 'Hoy', class: 'bg-emerald-100 text-emerald-800' }
   } else if (isFuture(eventDate.value)) {

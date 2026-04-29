@@ -24,7 +24,7 @@
           <!-- Step Indicator -->
           <span 
             class="absolute top-6 left-6 text-[10px] font-black uppercase tracking-widest transition-colors duration-300"
-            :class="index % 2 === 0 ? 'text-emerald-200 group-hover:text-emerald-600' : 'text-amber-200 group-hover:text-amber-600'"
+            :class="index % 2 === 0 ? 'text-emerald-700 group-hover:text-emerald-600' : 'text-amber-700 group-hover:text-amber-600'"
           >
             Paso 0{{ index + 1 }}
           </span>

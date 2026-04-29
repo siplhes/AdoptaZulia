@@ -298,7 +298,7 @@
                   }}
                 </p>
 
-                <div v-if="adoptionStatus === 'pending'" class="mt-3 flex flex-col gap-2">
+                <div v-if="canShowWhatsApp" class="mt-3 flex flex-col gap-2">
                   <button
                     class="flex w-full items-center justify-center gap-2 rounded-xl bg-green-500 py-2 text-sm font-bold text-white transition-colors hover:bg-green-600"
                     @click="contactWhatsapp"
@@ -313,14 +313,23 @@
               <div class="hidden flex-col gap-3 lg:flex">
                 <template v-if="!isOwner">
                   <button
-                    v-if="canAdopt && !hasApplied && pet.status !== 'adopted'"
+                    v-if="canAdopt && !hasApplied && pet.status !== 'adopted' && pet.requiresAdoptionRequest !== false"
                     class="w-full rounded-xl bg-emerald-600 py-3 font-bold text-white shadow-lg shadow-emerald-200 transition-transform hover:bg-emerald-700 active:scale-95"
                     @click="openAdoptionModal"
                   >
                     Solicitar Adopción
                   </button>
 
-                  <template v-if="adoptionStatus === 'approved'">
+                  <button
+                    v-if="canAdopt && !hasApplied && pet.status !== 'adopted' && pet.requiresAdoptionRequest === false"
+                    class="w-full rounded-xl bg-green-500 py-3 font-bold text-white shadow-lg shadow-green-200"
+                    @click="contactWhatsapp"
+                  >
+                    <Icon name="heroicons:chat-bubble-oval-left" class="h-5 w-5" />
+                    Contactar WhatsApp
+                  </button>
+
+                  <template v-if="canShowWhatsApp">
                     <button
                       class="flex w-full items-center justify-center gap-2 rounded-xl bg-green-500 py-3 font-bold text-white hover:bg-green-600"
                       @click="contactWhatsapp"
@@ -473,14 +482,22 @@
 
       <template v-if="!isOwner">
         <button
-          v-if="canAdopt && !hasApplied && pet?.status !== 'adopted'"
+          v-if="canAdopt && !hasApplied && pet?.status !== 'adopted' && pet?.requiresAdoptionRequest !== false"
           class="flex-1 rounded-xl bg-emerald-600 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-200"
           @click="openAdoptionModal"
         >
           Solicitar Adopción
         </button>
         <button
-          v-else-if="adoptionStatus === 'approved'"
+          v-if="canAdopt && !hasApplied && pet?.status !== 'adopted' && pet?.requiresAdoptionRequest === false"
+          class="flex-1 rounded-xl bg-green-500 py-3 text-sm font-bold text-white shadow-lg shadow-green-200"
+          @click="contactWhatsapp"
+        >
+          <Icon name="heroicons:chat-bubble-oval-left" class="h-5 w-5" />
+          Contactar WhatsApp
+        </button>
+        <button
+          v-else-if="canShowWhatsApp && pet?.requiresAdoptionRequest !== false"
           class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-green-500 py-3 text-sm font-bold text-white shadow-lg shadow-green-200"
           @click="contactWhatsapp"
         >
@@ -709,6 +726,12 @@ const canAdopt = computed(() => {
 
 const hasApplied = computed(() => {
   return adoptionStatus.value && adoptionStatus.value !== 'none'
+})
+
+const canShowWhatsApp = computed(() => {
+  const requiresRequest = pet.value?.requiresAdoptionRequest
+  if (requiresRequest === false) return true
+  return adoptionStatus.value === 'approved' || adoptionStatus.value === 'pending'
 })
 
 const shouldShowContact = computed(() => {

@@ -28,6 +28,7 @@ export interface Pet {
   idealFor?: string[]
   adoptionRequirements?: string
   adoptionFee?: number
+  requiresAdoptionRequest?: boolean
   contact: Contact
   createdAt?: number | string
   userId?: string | null

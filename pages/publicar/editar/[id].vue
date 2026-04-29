@@ -504,6 +504,21 @@
                 />
               </div>
 
+              <div class="rounded-lg border border-blue-200 bg-blue-50 p-4">
+                <label class="flex cursor-pointer items-center">
+                  <input
+                    type="checkbox"
+                    v-model="petData.requiresAdoptionRequest"
+                    class="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                  />
+                  <span class="ml-2 text-sm text-gray-700 font-medium">Requiere Solicitud de Adopción</span>
+                </label>
+                <p class="ml-6 mt-1 text-xs text-gray-500">
+                  Si está marcado, los interesados deben enviar una solicitud primero para ver el contacto.
+                  Si no está marcado, el botón de WhatsApp será visible para todos.
+                </p>
+              </div>
+
               <!-- Adopted Info (Conditional) -->
               <div
                 v-if="petData.status === 'adopted'"
@@ -641,6 +656,7 @@ const petData = reactive({
   description: '',
   image: '', // URL
   photos: [], // Array of URLs
+  ogImage: '', // OG Image URL
   urgent: false,
   vaccinated: false,
   neutered: false,
@@ -649,6 +665,7 @@ const petData = reactive({
   adoptionRequirements: '',
   requiresContract: false,
   requiresFollowUp: false,
+  requiresAdoptionRequest: true,
   contact: {
     name: '',
     email: '',
@@ -700,6 +717,7 @@ onMounted(async () => {
     petData.location = pet.location || ''
     petData.description = pet.description || ''
     petData.image = pet.image || ''
+    petData.ogImage = pet.ogImage || ''
     petData.photos = Array.isArray(pet.photos) ? pet.photos : []
     petData.urgent = !!pet.urgent
     petData.vaccinated = !!pet.vaccinated
@@ -709,6 +727,7 @@ onMounted(async () => {
     petData.adoptionRequirements = pet.adoptionRequirements || ''
     petData.requiresContract = !!pet.requiresContract
     petData.requiresFollowUp = !!pet.requiresFollowUp
+    petData.requiresAdoptionRequest = pet.requiresAdoptionRequest !== false
     petData.userId = pet.userId
     petData.status = pet.status || 'available'
     petData.adopterName = pet.adopterName || ''
@@ -786,8 +805,8 @@ const handleMainImageChange = async (event) => {
   reader.readAsDataURL(file)
 
   try {
-    mainImageFileWeb.value = await cropImageToAspectRatio(file, { aspectRatio: 4 / 3, mimeType: 'image/jpeg', quality: 0.9 })
-    mainImageFileOg.value = await resizeImageToExactSize(file, 1200, 630, { mimeType: 'image/jpeg', quality: 0.9 })
+    mainImageFileWeb.value = await cropImageToAspectRatio(file, { aspectRatio: 4 / 3, mimeType: 'image/jpeg', quality: 0.95 })
+    mainImageFileOg.value = await resizeImageToExactSize(file, 1200, 630, { mimeType: 'image/jpeg', quality: 0.98 })
   } catch (err) {
     console.warn('No se pudo recortar la imagen, se usará original:', err)
     mainImageFileWeb.value = file
@@ -880,7 +899,7 @@ const submitUpdate = async () => {
         `pets/${petData.userId}`,
         fileName,
         null,
-        { optimize: true, quality: 0.9, maxWidthOrHeight: 1200 }
+        { optimize: true, quality: 0.95, maxWidthOrHeight: 1600 }
       )
 
       // Upload OG Image (1200x630)
@@ -892,7 +911,7 @@ const submitUpdate = async () => {
           `pets/${petData.userId}`,
           ogFileName,
           null,
-          { optimize: true, quality: 0.92, maxWidthOrHeight: 1300 }
+          { optimize: true, quality: 0.98, maxWidthOrHeight: 1600 }
         )
       }
     }

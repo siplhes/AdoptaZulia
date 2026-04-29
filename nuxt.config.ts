@@ -28,6 +28,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     awsSecretKey: process.env.AWS_SECRET_ACCESS_KEY,
     cronSecret: process.env.CRON_SECRET,
+    autonomaClientId: process.env.AUTONOMA_CLIENT_ID,
+    autonomaClientSecret: process.env.AUTONOMA_CLIENT_SECRET,
     public: {
       recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
       awsRegion: process.env.AWS_REGION,
@@ -83,6 +85,14 @@ export default defineNuxtConfig({
         lang: 'es',
       },
       title: 'Adopta Zulia',
+      link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+        { rel: 'dns-prefetch', href: 'https://fonts.googleapis.com' },
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        { rel: 'dns-prefetch', href: 'https://fonts.gstatic.com' },
+        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: 'anonymous' },
+        { rel: 'dns-prefetch', href: 'https://www.adoptazulia.org.ve' },
+      ],
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -90,14 +100,15 @@ export default defineNuxtConfig({
           name: 'Content-Security-Policy',
           content:
             process.env.NODE_ENV === 'production'
-              ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://firebaseio.com https://*.firebaseio.com https://www.google-analytics.com; frame-src 'self' https://www.paypal.com; object-src 'none';"
+              ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com https://*.vercel-analytics.com https://*.vercel-insights.com https://*.vercel-scripts.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://firebaseio.com https://*.firebaseio.com https://www.google-analytics.com https://*.vercel-analytics.com https://*.vercel-insights.com; frame-src 'self' https://www.paypal.com; object-src 'none';"
               : "default-src 'self' 'unsafe-inline' 'unsafe-eval' *",
         },
       ],
-      link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
     },
   },
   image: {
+    provider: 'vercel',
+    quality: 80,
     domains: [
       process.env.AWS_S3_BUCKET_DOMAIN,
       'img.youtube.com',
@@ -108,14 +119,8 @@ export default defineNuxtConfig({
       youtube: 'https://img.youtube.com',
       vimeo: 'https://i.vimeocdn.com',
     },
-    ipx: {
-      remote: {
-        domains: [
-          process.env.AWS_S3_BUCKET_DOMAIN,
-          'img.youtube.com',
-          'i.vimeocdn.com',
-        ].filter(Boolean) as string[],
-      },
+    vercel: {
+      baseURL: process.env.BASE_URL || 'https://www.adoptazulia.org.ve',
     },
   },
   vite: {
@@ -123,20 +128,32 @@ export default defineNuxtConfig({
       chunkSizeWarningLimit: 2000,
     },
   },
+  fonts: {
+    families: [
+      {
+        name: 'Inter',
+        provider: 'google',
+      },
+      {
+        name: 'Bricolage Grotesque',
+        provider: 'google',
+      },
+    ],
+    defaults: {
+      weights: [400, 500, 600, 700],
+      styles: ['normal'],
+      subsets: ['latin'],
+      preload: true,
+      fallbacks: {
+        'sans-serif': ['system-ui', 'Arial', 'sans-serif'],
+      },
+    },
+  },
+
   booster: {
     detection: {
       performance: true,
       browserSupport: true,
-    },
-  },
-  performanceMetrics: {
-    device: {
-      hardwareConcurrency: { min: 2, max: 48 },
-      deviceMemory: { min: 2 },
-    },
-    timing: {
-      fcp: 800,
-      dcl: 1200,
     },
   },
 

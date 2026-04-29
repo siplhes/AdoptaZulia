@@ -12,6 +12,9 @@
         fetchpriority="high"
         width="1200"
         height="600"
+        format="webp"
+        quality="75"
+        sizes="(max-width: 640px) 640px, (max-width: 1024px) 1024px, 1200px"
       />
       <!-- Gradient Overlays -->
       <div

@@ -1,9 +1,44 @@
+# ============================================================
+# Adopta Zulia – robots.txt
+# https://www.adoptazulia.org.ve
+# ============================================================
 
 User-agent: *
-Allow: /
-Allow: /mascotas
-Allow: /donaciones
-Allow: /publicar
-Allow: /nosotros
 
+# Private / auth / admin
+Disallow: /admin
+Disallow: /login
+Disallow: /registro
+Disallow: /perfil
+Disallow: /mis-publicaciones
+Disallow: /register-step-two
+Disallow: /contacto
+Disallow: /mascotas/solicitudes/
+Disallow: /perdidas/crear
+Disallow: /perdidas/editar/
+Disallow: /historias/crear
+Disallow: /certificados/
+
+# API & internal assets
+Disallow: /api/
+Disallow: /_nuxt/
+Disallow: /_ipx/
+
+# Cloudflare internal paths
+Disallow: /cdn-cgi/
+
+# Query parameters (avoid duplicate content)
+Disallow: /*?
+Disallow: /*&
+
+# Everything else is public
+Allow: /
+
+# Sitemap
 Sitemap: https://www.adoptazulia.org.ve/sitemap.xml
+
+# Preferred host (Yandex / some crawlers)
+Host: https://www.adoptazulia.org.ve
+
+# Crawl-delay (be polite to the server)
+Crawl-delay: 1

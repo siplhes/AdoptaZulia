@@ -108,6 +108,11 @@ definePageMeta({
   layout: false, // Full screen layout
 })
 
+useSeoMeta({
+  title: 'Iniciar sesión | Adopta Zulia',
+  description: 'Inicia sesión en Adopta Zulia para publicar mascotas en adopción y gestionar tus publicaciones.',
+})
+
 const router = useRouter()
 const route = useRoute()
 const {
