@@ -43,8 +43,11 @@
             <NuxtImg
               src="/img1.webp"
               alt="Perro rescatado"
-              sizes="100em sm:50vw md:400px"
-              :placeholder="[50, 25, 75, 5]"
+              width="800"
+              height="600"
+              format="webp"
+              quality="80"
+              sizes="(max-width: 1024px) 100vw, 50vw"
               class="h-full w-full object-cover"
             />
           </div>
