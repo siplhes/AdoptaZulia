@@ -4,7 +4,7 @@
   >
     <!-- Background Image with Overlay -->
     <div class="absolute inset-0 z-0 select-none">
-      <NuxtImg
+      <img
         src="/img2.webp"
         class="animate-slow-zoom h-full w-full scale-105 object-cover object-center"
         alt="Mascotas felices"
@@ -12,9 +12,6 @@
         fetchpriority="high"
         width="1200"
         height="600"
-        format="webp"
-        quality="80"
-        sizes="(max-width: 640px) 640px, (max-width: 1024px) 1024px, 1200px"
       />
       <!-- Gradient Overlays -->
       <div

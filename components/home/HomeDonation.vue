@@ -40,14 +40,11 @@
             </NuxtLink>
           </div>
           <div class="relative hidden lg:block">
-            <NuxtImg
+            <img
               src="/img1.webp"
               alt="Perro rescatado"
               width="800"
               height="600"
-              format="webp"
-              quality="80"
-              sizes="(max-width: 1024px) 100vw, 50vw"
               class="h-full w-full object-cover"
             />
           </div>

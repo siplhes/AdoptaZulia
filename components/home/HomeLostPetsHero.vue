@@ -48,15 +48,13 @@
 
         <!-- Visual / Image -->
         <div class="relative bg-rose-100 md:w-2/5">
-          <NuxtImg
+          <img
             src="/lostpet.webp"
             alt="Mascota perdida mirando a la cámara"
             class="h-full w-full object-cover mix-blend-multiply"
-            format="webp"
             width="600"
             height="400"
             loading="lazy"
-            fallback="/img/default-lost.jpg"
           />
           <div
             class="absolute inset-0 bg-gradient-to-t from-rose-900/40 to-transparent md:bg-gradient-to-l"
