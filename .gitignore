@@ -98,11 +98,10 @@ firebase-adminsdk-*.json
 # Nuxt/Vue specifics
 *.nuxtrc
 
-# Lockfiles (optional, usually you want these but sometimes people ignore them)
-# package-lock.json
-# yarn.lock
-# pnpm-lock.yaml
-
+# Lockfiles - we use bun, ignore others
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
 reglas
 reglas.json

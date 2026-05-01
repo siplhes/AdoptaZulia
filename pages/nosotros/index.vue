@@ -8,7 +8,7 @@
       </p>
       <div class="flex justify-center">
         <img
-          src="/img4.webp"
+          src="/img2.webp"
           alt="Mascotas de AdoptaZulia"
           class="w-full max-w-2xl rounded-lg shadow-lg"
         />

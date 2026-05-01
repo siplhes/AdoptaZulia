@@ -33,8 +33,13 @@ function escapeXml(str: string): string {
     .replace(/'/g, '&apos;')
 }
 
-function buildUrlNode(loc: string, changefreq: string, priority: string) {
-  return `  <url>\n    <loc>${escapeXml(loc)}</loc>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`
+function buildUrlNode(loc: string, changefreq: string, priority: string, lastmod?: string) {
+  let node = `  <url>\n    <loc>${escapeXml(loc)}</loc>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>`
+  if (lastmod) {
+    node += `\n    <lastmod>${lastmod}</lastmod>`
+  }
+  node += '\n  </url>'
+  return node
 }
 
 const staticRoutes = [
@@ -46,16 +51,20 @@ const staticRoutes = [
   { path: '/comunidad/eventos', changefreq: 'weekly', priority: '0.7' },
   { path: '/donaciones', changefreq: 'weekly', priority: '0.8' },
   { path: '/historias', changefreq: 'weekly', priority: '0.8' },
+  { path: '/nosotros', changefreq: 'monthly', priority: '0.7' },
+  { path: '/recomendaciones', changefreq: 'monthly', priority: '0.6' },
   { path: '/terminos', changefreq: 'yearly', priority: '0.3' },
   { path: '/privacidad', changefreq: 'yearly', priority: '0.3' },
 ]
+
+const today = new Date().toISOString().split('T')[0]
 
 export default defineEventHandler(async (event) => {
   let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`
 
   // Static routes (always included)
   for (const route of staticRoutes) {
-    xml += '\n' + buildUrlNode(`${getBaseUrl()}${route.path}`, route.changefreq, route.priority)
+    xml += '\n' + buildUrlNode(`${getBaseUrl()}${route.path}`, route.changefreq, route.priority, today)
   }
 
   try {
@@ -84,25 +93,25 @@ export default defineEventHandler(async (event) => {
 
     for (const pet of pets) {
       if (pet.id) {
-        xml += '\n' + buildUrlNode(`${getBaseUrl()}/mascotas/${pet.id}`, 'weekly', '0.9')
+        xml += '\n' + buildUrlNode(`${getBaseUrl()}/mascotas/${pet.id}`, 'weekly', '0.9', today)
       }
     }
 
     for (const pet of lostPets) {
       if (pet.id) {
-        xml += '\n' + buildUrlNode(`${getBaseUrl()}/perdidas/${pet.id}`, 'weekly', '0.9')
+        xml += '\n' + buildUrlNode(`${getBaseUrl()}/perdidas/${pet.id}`, 'weekly', '0.9', today)
       }
     }
 
     for (const noticia of noticias) {
       if (noticia.id) {
-        xml += '\n' + buildUrlNode(`${getBaseUrl()}/comunidad/noticias/${noticia.id}`, 'weekly', '0.7')
+        xml += '\n' + buildUrlNode(`${getBaseUrl()}/comunidad/noticias/${noticia.id}`, 'weekly', '0.7', today)
       }
     }
 
     for (const story of stories) {
       if (story.id) {
-        xml += '\n' + buildUrlNode(`${getBaseUrl()}/historias/${story.id}`, 'weekly', '0.7')
+        xml += '\n' + buildUrlNode(`${getBaseUrl()}/historias/${story.id}`, 'weekly', '0.7', today)
       }
     }
   } catch (error) {

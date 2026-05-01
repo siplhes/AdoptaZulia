@@ -15,10 +15,10 @@ import { SpeedInsights } from '@vercel/speed-insights/vue'
 import { Analytics } from '@vercel/analytics/vue'
 
 const config = useRuntimeConfig()
-const baseUrl = config.public.baseUrl || 'https://www.adoptazulia.org.ve/'
+const baseUrl = (config.public.baseUrl || 'https://www.adoptazulia.org.ve').replace(/\/$/, '')
 const route = useRoute()
 
-const canonicalUrl = computed(() => `${baseUrl}${route.path}`)
+const canonicalUrl = computed(() => `${baseUrl}${route.path === '/' ? '' : route.path}`)
 
 useHead({
   script: [
@@ -44,22 +44,22 @@ useHead({
 })
 
 useSeoMeta({
-  title: 'Adopta Zulia | Adopta, no compres',
+  title: 'Adopta Zulia | Encuentra tu Compañero Perfecto en el Zulia',
   description:
-    'Plataforma de adopción de mascotas en el estado Zulia, Venezuela. Encuentra tu compañero perfecto, comparte historias de adopción y ayuda a mascotas que necesitan un hogar.',
-  ogTitle: 'Adopta Zulia | Adopta, no compres',
+    'La plataforma líder de adopción de mascotas en el Zulia, Venezuela. Publica mascotas en adopción, reporta extravíos, comparte historias de felicidad y encuentra un hogar para cada peludo.',
+  ogTitle: 'Adopta Zulia | Encuentra tu Compañero Perfecto en el Zulia',
   ogDescription:
-    'Plataforma de adopción de mascotas en el estado Zulia, Venezuela. Encuentra tu compañero perfecto, comparte historias de adopción y ayuda a mascotas que necesitan un hogar.',
+    'Publica mascotas en adopción, reporta extravíos y comparte historias de adopción en la plataforma líder del Zulia, Venezuela.',
   ogSiteName: 'Adopta Zulia',
-  ogImage: `${baseUrl}/og.jpg`,
-  ogImageAlt: 'Adopta Zulia - Plataforma de adopción de mascotas',
+  ogImage: `${baseUrl}/og-improved.png`,
+  ogImageAlt: 'Adopta Zulia - Plataforma de adopción de mascotas en el Zulia',
   ogUrl: canonicalUrl,
   ogType: 'website',
   ogLocale: 'es_VE',
-  twitterTitle: 'Adopta Zulia | Adopta, no compres',
+  twitterTitle: 'Adopta Zulia | Encuentra tu Compañero Perfecto en el Zulia',
   twitterDescription:
-    'Plataforma de adopción de mascotas en el estado Zulia, Venezuela. Encuentra tu compañero perfecto y ayuda a mascotas que necesitan un hogar.',
-  twitterImage: `${baseUrl}/og.jpg`,
+    'Publica mascotas en adopción, reporta extravíos y comparte historias de adopción en la plataforma líder del Zulia, Venezuela.',
+  twitterImage: `${baseUrl}/og-improved.png`,
   twitterCard: 'summary_large_image',
   twitterSite: '@AdoptaZulia',
 })

@@ -53,13 +53,20 @@
             </button>
             <NuxtLink
               v-if="isOwnProfile"
-            <NuxtLink
               to="/perfil/configuracion"
               class="flex items-center rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white shadow-sm backdrop-blur-md transition-all hover:bg-white/20 hover:shadow-md"
             >
               <Icon name="heroicons:pencil-square" class="mr-2 h-4 w-4" />
               Editar
             </NuxtLink>
+            <button
+              v-if="isOwnProfile"
+              class="flex items-center rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white shadow-sm backdrop-blur-md transition-all hover:bg-white/20 hover:shadow-md"
+              @click="handleLogout"
+            >
+              <Icon name="heroicons:arrow-right-on-rectangle" class="mr-2 h-4 w-4" />
+              Salir
+            </button>
           </div>
         </div>
 
@@ -403,13 +410,13 @@
                         </span>
                       </td>
                       <td class="px-6 py-4 text-right">
-                        <NuxtLink
-                          to="/perfil"
+                        <button
                           class="inline-flex items-center text-sm font-medium text-emerald-600 hover:text-emerald-800"
+                          @click="viewAdoptionDetails(adoption)"
                         >
                           Gestionar
                           <Icon name="heroicons:arrow-right" class="ml-1 h-3 w-3" />
-                        </NuxtLink>
+                        </button>
                       </td>
                     </tr>
                   </tbody>
@@ -503,6 +510,105 @@
         </transition>
       </div>
     </div>
+    <!-- Adoption Detail Modal -->
+    <div
+      v-if="selectedAdoption"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+    >
+      <div
+        class="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl"
+      >
+        <!-- Modal Header -->
+        <div
+          class="flex items-center justify-between border-b border-gray-100 bg-gray-50 px-6 py-4"
+        >
+          <h3 class="text-lg font-bold text-gray-900">Detalle de Solicitud</h3>
+          <button
+            class="text-gray-400 transition-colors hover:text-gray-600"
+            @click="selectedAdoption = null"
+          >
+            <Icon name="heroicons:x-mark" class="h-6 w-6" />
+          </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="overflow-y-auto p-6">
+          <div class="mb-6 flex gap-6">
+            <div class="h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-gray-200">
+              <img :src="selectedAdoption.pet?.imageUrl || selectedAdoption.pet?.image || '/placeholder.webp'" class="h-full w-full object-cover" />
+            </div>
+            <div>
+              <h4 class="text-xl font-bold text-gray-900">{{ selectedAdoption.pet?.name || 'Mascota' }}</h4>
+              <p class="text-sm text-gray-500">{{ selectedAdoption.pet?.breed }}</p>
+              <div class="mt-2 inline-block rounded bg-gray-100 px-2 py-1 text-sm">
+                Solicitante:
+                <span class="font-medium">{{ selectedAdoption.user?.name || 'Usuario' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-6 rounded-xl bg-gray-50 p-4">
+            <h5 class="mb-2 text-sm font-bold uppercase tracking-wide text-gray-700">
+              Mensaje del Solicitante
+            </h5>
+            <p class="text-sm leading-relaxed text-gray-600">
+              {{ selectedAdoption.message || 'Sin mensaje adjunto.' }}
+            </p>
+          </div>
+
+          <div class="mb-4 grid grid-cols-2 gap-4 text-sm">
+            <div class="rounded-lg border p-3">
+              <span class="block text-xs text-gray-500">Email</span>
+              <span class="font-medium">{{ selectedAdoption.user?.email || 'No disponible' }}</span>
+            </div>
+            <div class="rounded-lg border p-3">
+              <span class="block text-xs text-gray-500">Teléfono</span>
+              <span class="font-medium">
+                {{ selectedAdoption.user?.phone || 'No especificado' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Notes Section -->
+          <div class="mt-4">
+            <label class="mb-2 block text-sm font-medium text-gray-700">Notas Privadas</label>
+            <textarea
+              v-model="adminNotes"
+              class="w-full rounded-lg border-gray-300 text-sm"
+              rows="2"
+              placeholder="Notas internas sobre esta solicitud..."
+            />
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="flex items-center justify-between border-t border-gray-100 bg-gray-50 p-6">
+          <button class="text-sm font-medium text-emerald-600 hover:underline" @click="saveNotes">
+            Guardar nota
+          </button>
+
+          <div v-if="selectedAdoption.status === 'pending'" class="flex gap-3">
+            <button
+              class="rounded-lg border border-red-200 bg-white px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+              @click="rejectAdoption(selectedAdoption)"
+            >
+              Rechazar
+            </button>
+            <button
+              class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-emerald-200 hover:bg-emerald-700"
+              @click="approveAdoption(selectedAdoption)"
+            >
+              Aprobar Solicitud
+            </button>
+          </div>
+          <div v-else class="text-sm italic text-gray-500">
+            Esta solicitud está
+            <strong>{{ statusLabel(selectedAdoption.status) }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Share Modal -->
     <ShareModal
       v-model:isOpen="showShareModal"
@@ -519,11 +625,14 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useUserProfilePage } from '~/composables/useUserProfile'
+import { useAuth } from '~/composables/useAuth'
 import ShareModal from '~/components/common/ShareModal.vue'
 
 const route = useRoute()
+const router = useRouter()
+const { logout } = useAuth()
 const usernameParam = route.params.username
 const username = Array.isArray(usernameParam) ? usernameParam[0] : usernameParam
 
@@ -596,10 +705,36 @@ const statusLabel = (status) => {
 
 const showShareModal = ref(false)
 const shareUrl = ref('')
+const selectedAdoption = ref(null)
+const adminNotes = ref('')
 
 const shareProfile = () => {
   shareUrl.value = window.location.href
   showShareModal.value = true
+}
+
+const handleLogout = async () => {
+  await logout()
+  router.push('/')
+}
+
+const viewAdoptionDetails = (adoption) => {
+  selectedAdoption.value = adoption
+  adminNotes.value = adoption.notes || ''
+}
+
+const saveNotes = () => {
+  selectedAdoption.value = null
+}
+
+const approveAdoption = (a) => {
+  a.status = 'approved'
+  selectedAdoption.value = null
+}
+
+const rejectAdoption = (a) => {
+  a.status = 'rejected'
+  selectedAdoption.value = null
 }
 </script>
 

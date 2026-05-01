@@ -3,10 +3,8 @@
     <!-- Hero Section -->
     <section class="relative overflow-hidden bg-emerald-700 text-white">
       <div class="absolute inset-0 z-0">
-        <NuxtImg
-          src="/img4.webp"
-          width="1600"
-          height="600"
+        <img
+          src="/hero-donation.png"
           alt="Mascotas rescatadas"
           loading="lazy"
           class="h-full w-full object-cover opacity-20"

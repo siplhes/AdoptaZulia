@@ -4,15 +4,11 @@
       <!-- Hero Section -->
       <div class="relative mb-8 overflow-hidden rounded-xl bg-emerald-700 p-6 text-white md:p-10">
         <div class="absolute inset-0 z-0">
-          <NuxtImg
-            src="/img3.webp"
-            height="400"
-            width="1200"
+          <img
+            src="/img2.webp"
             alt="Mascotas en adopción"
             class="h-full w-full object-cover opacity-20"
             loading="lazy"
-            sizes="sm:100vw md:100vw lg:100vw"
-            placeholder
           />
         </div>
         <div class="relative z-10 max-w-3xl">

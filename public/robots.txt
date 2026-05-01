@@ -12,7 +12,6 @@ Disallow: /registro
 Disallow: /perfil
 Disallow: /mis-publicaciones
 Disallow: /register-step-two
-Disallow: /contacto
 Disallow: /mascotas/solicitudes/
 Disallow: /perdidas/crear
 Disallow: /perdidas/editar/
@@ -27,9 +26,23 @@ Disallow: /_ipx/
 # Cloudflare internal paths
 Disallow: /cdn-cgi/
 
-# Query parameters (avoid duplicate content)
+# Query parameters (avoid duplicate content), but allow static assets
 Disallow: /*?
 Disallow: /*&
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.png$
+Allow: /*.webp$
+Allow: /*.gif$
+Allow: /*.css$
+Allow: /*.js$
+Allow: /*.svg$
+Allow: /*.ico$
+Allow: /*.woff2$
+
+# OG images must be crawlable
+Allow: /og.jpg
+Allow: /og-improved.png
 
 # Everything else is public
 Allow: /
