@@ -30,6 +30,8 @@ export default defineNuxtConfig({
     cronSecret: process.env.CRON_SECRET,
     autonomaClientId: process.env.AUTONOMA_CLIENT_ID,
     autonomaClientSecret: process.env.AUTONOMA_CLIENT_SECRET,
+    instagramAccessToken: process.env.INSTAGRAM_ACCESS_TOKEN,
+    instagramBusinessId: process.env.INSTAGRAM_BUSINESS_ID,
     public: {
       recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
       awsRegion: process.env.AWS_REGION,

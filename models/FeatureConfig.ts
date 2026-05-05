@@ -7,6 +7,7 @@ export interface FeatureConfig {
   comments: boolean
   imageGeneration: boolean
   adoption: boolean
+  instagramAutoPublish: boolean
   createdAt?: number
   updatedAt?: number
 }
@@ -15,4 +16,5 @@ export const DEFAULT_FEATURES: FeatureConfig = {
   comments: false,
   imageGeneration: true,
   adoption: true,
+  instagramAutoPublish: false,
 }

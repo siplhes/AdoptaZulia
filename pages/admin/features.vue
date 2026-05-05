@@ -103,6 +103,36 @@
             </div>
           </div>
 
+          <!-- Feature Card: Instagram Auto-Publish -->
+          <div
+            class="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all hover:shadow-md"
+          >
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-4">
+                <div class="rounded-xl bg-pink-100 p-3 text-pink-600">
+                  <Icon name="heroicons:camera" class="h-8 w-8" />
+                </div>
+                <div>
+                  <h3 class="text-lg font-bold text-gray-800">Auto-publicar en Instagram</h3>
+                  <p class="text-sm text-gray-500">
+                    Publica automáticamente las mascotas nuevas en Instagram.
+                  </p>
+                </div>
+              </div>
+              <!-- Toggle -->
+              <button
+                class="relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                :class="localFeatures.instagramAutoPublish ? 'bg-emerald-500' : 'bg-gray-200'"
+                @click="toggleFeature('instagramAutoPublish')"
+              >
+                <span
+                  class="inline-block h-5 w-5 transform rounded-full bg-white transition-transform"
+                  :class="localFeatures.instagramAutoPublish ? 'translate-x-6' : 'translate-x-1'"
+                />
+              </button>
+            </div>
+          </div>
+
           <!-- Info Box -->
           <div class="rounded-2xl border border-blue-100 bg-blue-50 p-5">
             <div class="flex gap-4">
@@ -170,6 +200,7 @@ const { features, loading, error, fetchFeatures, updateFeatures } = useFeatures(
 const localFeatures = reactive({
   comments: false,
   imageGeneration: false,
+  instagramAutoPublish: false,
 })
 
 const savingFeature = ref(false)
@@ -188,6 +219,7 @@ const syncLocalFeatures = () => {
   if (features.value) {
     localFeatures.comments = features.value.comments === true
     localFeatures.imageGeneration = features.value.imageGeneration === true
+    localFeatures.instagramAutoPublish = features.value.instagramAutoPublish === true
   }
 }
 

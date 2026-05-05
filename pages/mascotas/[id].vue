@@ -940,7 +940,10 @@ const generatePoster = async () => {
 
   try {
     const imageUrl = pet.value.photos?.[0] || pet.value.image
-    await generatePetImage(pet.value.name, imageUrl, petId, { autoDownload: true })
+    await generatePetImage(pet.value.name, imageUrl, petId, {
+      autoDownload: true,
+      phone: pet.value.contact?.phone || '',
+    })
   } catch (e) {
     console.error('Error generating poster:', e)
     alert('Error al generar la imagen. Por favor, intenta de nuevo.')

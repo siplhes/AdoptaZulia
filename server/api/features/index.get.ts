@@ -5,6 +5,7 @@ const DEFAULT_FEATURES = {
   comments: false,
   imageGeneration: true,
   adoption: true,
+  instagramAutoPublish: false,
 }
 
 export default defineEventHandler(async (event) => {

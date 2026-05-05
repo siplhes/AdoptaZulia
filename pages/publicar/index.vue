@@ -666,6 +666,8 @@ import { ref, reactive, onMounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 import { usePets } from '~/composables/usePets'
 import { useS3 } from '~/composables/useS3'
+import { useInstagram } from '~/composables/useInstagram'
+import { useFeatures } from '~/composables/useFeatures'
 import ModalAlert from '~/components/common/ModalAlert.vue'
 import LoadingButton from '~/components/ui/LoadingButton.vue'
 import { COMMON_LOCATIONS, DOG_BREEDS, CAT_BREEDS, AGE_OPTIONS } from '~/utils/petData'
@@ -684,6 +686,8 @@ const router = useRouter()
 const { user, isAuthenticated } = useAuth()
 const { createPet, loading: petsLoading } = usePets()
 const { uploadFileWithProgress } = useS3()
+const { publishToInstagram, generateCaption } = useInstagram()
+const { isFeatureEnabled, ensureInitialized } = useFeatures()
 const loading = ref(false)
 const otherBreed = ref('')
 const otherLocation = ref('')
@@ -744,11 +748,12 @@ const petData = reactive({
 })
 
 // === Logica de Inicialización ===
-onMounted(() => {
+onMounted(async () => {
   if (user.value) {
     petData.contact.name = user.value.displayName || ''
     petData.userId = user.value.uid
   }
+  await ensureInitialized()
 })
 
 // === Generador de nombres ===
@@ -926,6 +931,20 @@ const submitForm = async () => {
       )
     }
 
+    // Upload versión JPEG para Instagram (Instagram no acepta WebP)
+    let instagramImageUrl = ''
+    const igFile = mainImageFileWeb.value || mainImageFile.value
+    if (igFile) {
+      const igFileName = `${userId}-ig-${Date.now()}.jpg`
+      instagramImageUrl = await uploadFileWithProgress(
+        igFile,
+        `pets/${userId}`,
+        igFileName,
+        null,
+        { optimize: false } // ya es JPEG, evitamos conversión a WebP
+      )
+    }
+
     // Upload Additionals
     const additionalUrls = []
     for (let i = 0; i < additionalImageFiles.value.length; i++) {
@@ -951,6 +970,31 @@ const submitForm = async () => {
     }
 
     const petId = await createPet(petToSave)
+
+    // Publicar en Instagram de forma asíncrona (no bloquea al usuario)
+    if (instagramImageUrl && isFeatureEnabled('instagramAutoPublish')) {
+      const petUrl = `${window.location.origin}/mascotas/${petId}`
+      const caption = generateCaption({
+        name: finalPetData.name,
+        type: finalPetData.type,
+        age: finalPetData.age,
+        ageValue: finalPetData.ageValue,
+        gender: finalPetData.gender,
+        location: finalLocation,
+        description: finalPetData.description,
+        url: petUrl,
+      })
+
+      publishToInstagram({ imageUrl: instagramImageUrl, caption })
+        .then((success) => {
+          if (success) {
+            console.log('[Instagram] Publicación sincronizada exitosamente')
+          } else {
+            console.warn('[Instagram] No se pudo sincronizar la publicación')
+          }
+        })
+        .catch((err) => console.error('[Instagram] Error:', err))
+    }
 
     showModalAlert('success', '¡Publicado!', 'La mascota está lista para encontrar hogar.')
     modalCallback.value = () => router.push(`/mascotas/${petId}`)
