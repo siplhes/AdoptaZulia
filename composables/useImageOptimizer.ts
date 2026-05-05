@@ -160,13 +160,6 @@ export function useImageOptimizer() {
       progress.value = 100
       optimizing.value = false
 
-      console.log(`✅ [ImageOptimizer] ${imageFile.name} → ${newName}`, {
-        original: formatBytes(originalSize),
-        optimized: formatBytes(compressedSize),
-        savings: `${savingsPercent}%`,
-        format: targetMime,
-      })
-
       return { file: optimizedFile, originalSize, compressedSize, savings, savingsPercent }
     } catch (err) {
       console.error('[ImageOptimizer] Error:', err)

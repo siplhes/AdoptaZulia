@@ -306,9 +306,6 @@ const checkUserAdoptions = async () => {
       })
     }
 
-    console.log('Pets map size:', petsMap.size)
-    console.log('Pets found:', Array.from(petsMap.keys()))
-
     if (petsMap.size > 0) {
       const petsList = []
       // Fetch details for all pets

@@ -22,6 +22,7 @@ export interface TablonNoticia {
   imageUrl: string
   authorId: string
   authorName?: string
+  organizationId?: string
   createdAt: number
   updatedAt?: number
 }
@@ -35,6 +36,7 @@ export interface TablonEvento {
   imageUrl: string
   authorId: string
   authorName?: string
+  organizationId?: string
   createdAt: number
   updatedAt?: number
   attendees?: Record<string, boolean>

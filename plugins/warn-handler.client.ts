@@ -9,11 +9,6 @@ export default defineNuxtPlugin((nuxtApp) => {
       return
     }
 
-    // Suppress specific ToastContainer warnings if they still appear (though we removed the component)
-    if (msg.includes('Failed to resolve component: ToastContainer')) {
-      return
-    }
-
     if (originalWarnHandler) {
       originalWarnHandler(msg, instance, trace)
     } else {

@@ -188,5 +188,43 @@ const handleToggleAttendance = async () => {
 
 useHead({
   title: computed(() => evento.value ? `${evento.value.title} | Eventos Adopta Zulia` : 'Evento | Adopta Zulia'),
+  meta: computed(() => {
+    if (!evento.value) return []
+
+    const description = evento.value.description
+      ? evento.value.description.substring(0, 160).replace(/\s+/g, ' ').trim() + '...'
+      : `Participa en ${evento.value.title}, un evento organizado por Adopta Zulia para el rescate y adopción de mascotas.`
+
+    return [
+      { name: 'description', content: description },
+      { name: 'keywords', content: `${evento.value.title}, eventos, adopción de mascotas, rescate animal, ${evento.value.location}, Adopta Zulia` },
+      
+      // Open Graph
+      { property: 'og:title', content: `${evento.value.title} | Eventos Adopta Zulia` },
+      { property: 'og:description', content: description },
+      { property: 'og:image', content: evento.value.imageUrl || '/og-default.jpg' },
+      { property: 'og:image:alt', content: evento.value.title },
+      { property: 'og:type', content: 'event' },
+      { property: 'og:url', content: `https://adoptazulia.org.ve/comunidad/eventos/${route.params.id}` },
+      { property: 'og:site_name', content: 'Adopta Zulia' },
+      { property: 'event:start_time', content: evento.value.date ? new Date(evento.value.date).toISOString() : '' },
+      { property: 'event:location', content: evento.value.location },
+      
+      // Twitter Card
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:title', content: `${evento.value.title} | Eventos Adopta Zulia` },
+      { name: 'twitter:description', content: description },
+      { name: 'twitter:image', content: evento.value.imageUrl || '/og-default.jpg' },
+      
+      // Additional SEO
+      { name: 'robots', content: 'index, follow' },
+    ]
+  }),
+  link: computed(() => {
+    if (!evento.value) return []
+    return [
+      { rel: 'canonical', href: `https://adoptazulia.org.ve/comunidad/eventos/${route.params.id}` }
+    ]
+  }),
 })
 </script>

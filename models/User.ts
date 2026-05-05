@@ -5,7 +5,7 @@ export interface UserProfile {
   displayName?: string
   email?: string | null
   photoURL?: string | null
-  role?: 'admin' | 'user' | 'volunteer' | 'shelter'
+  role?: 'admin' | 'user' | 'volunteer' | 'shelter' | 'organization'
   status?: 'active' | 'inactive' | 'suspended'
   phone?: string
   phoneNumber?: string // Para compatibilidad con diferentes campos
@@ -23,6 +23,7 @@ export interface UserProfile {
     adoptionId?: string
     verifiedAt?: number
   }>
+  organizationId?: string // ID de la organización si el usuario es miembro de una
 }
 
 export interface UserData {
@@ -32,7 +33,7 @@ export interface UserData {
   displayName?: string
   email?: string | null
   photoURL?: string | null
-  role?: 'admin' | 'user' | 'volunteer' | 'shelter'
+  role?: 'admin' | 'user' | 'volunteer' | 'shelter' | 'organization'
   status?: 'active' | 'inactive' | 'suspended'
   phone?: string
   phoneNumber?: string
@@ -44,6 +45,5 @@ export interface UserData {
   postCount?: number
   isAdmin?: boolean
   preferences?: Record<string, any>
+  organizationId?: string
 }
-
-export type { UserProfile, UserData }

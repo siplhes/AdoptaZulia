@@ -34,6 +34,7 @@ export interface Pet {
   userId?: string | null
   status?: 'available' | 'adopted' | 'pending' | 'lost' | 'found'
   lastBumpReminderAt?: number
+  organizationId?: string | null // ID of the organization this pet belongs to
 }
 
 export interface Vaccine {

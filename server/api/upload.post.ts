@@ -41,8 +41,6 @@ export default defineEventHandler(async (event) => {
       type: fileField.type || deriveContentType(fileName),
     }
 
-    console.log('📤 [upload] Subiendo a S3:', { folder, fileName, type: file.type, bytes: file.data.length })
-
     const fileUrl = await s3Service.uploadFile(file, folder, fileName)
 
     return { fileUrl }

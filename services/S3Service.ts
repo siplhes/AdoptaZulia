@@ -50,19 +50,6 @@ export class S3Service {
     const timestamp = Date.now()
     const key = `${folder}/${timestamp}_${fileName}`
 
-    console.log('🔧 S3Service.uploadFile - Input:', {
-      hasFile: !!file,
-      hasData: !!file.data,
-      dataType: file.data ? typeof file.data : 'N/A',
-      dataLength: file.data?.length,
-      isBuffer: file.data instanceof Buffer,
-      isUint8Array: file.data instanceof Uint8Array,
-      filename: file.filename,
-      type: file.type,
-      folder,
-      fileName,
-      key,
-    })
 
     try {
       // Detect content type from file
@@ -74,12 +61,6 @@ export class S3Service {
         // file.data from readMultipartFormData is already a Buffer
         fileBody = file.data
         
-        console.log('📄 Processing file.data:', {
-          isBuffer: fileBody instanceof Buffer,
-          isUint8Array: fileBody instanceof Uint8Array,
-          length: fileBody.length,
-          firstBytes: fileBody.slice(0, 20).toString('hex'),
-        })
         
         // Try to get content type from the file object
         if (file.type) {
@@ -106,13 +87,6 @@ export class S3Service {
         contentType = file.type || 'application/octet-stream'
       }
 
-      console.log('☁️ Uploading to S3:', {
-        bucket: this.bucketName,
-        key,
-        contentType,
-        bodyLength: fileBody?.length || fileBody?.size || 'unknown',
-        bodyType: typeof fileBody,
-      })
 
       const upload = new Upload({
         client: this.s3Client,
@@ -127,10 +101,6 @@ export class S3Service {
       const result = await upload.done()
       const fileUrl = `https://${this.bucketName}.s3.${this.region}.amazonaws.com/${key}`
       
-      console.log('✅ S3 Upload successful:', {
-        fileUrl,
-        result: result,
-      })
       
       return fileUrl
     } catch (error) {

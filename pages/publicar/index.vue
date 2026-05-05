@@ -988,7 +988,7 @@ const submitForm = async () => {
       publishToInstagram({ imageUrl: instagramImageUrl, caption })
         .then((success) => {
           if (success) {
-            console.log('[Instagram] Publicación sincronizada exitosamente')
+            // Instagram publication synchronized successfully
           } else {
             console.warn('[Instagram] No se pudo sincronizar la publicación')
           }

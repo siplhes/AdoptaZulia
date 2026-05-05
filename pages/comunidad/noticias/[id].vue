@@ -99,5 +99,43 @@ const formattedDate = computed(() => {
 
 useHead({
   title: computed(() => noticia.value ? `${noticia.value.title} | Adopta Zulia` : 'Noticia | Adopta Zulia'),
+  meta: computed(() => {
+    if (!noticia.value) return []
+
+    const description = noticia.value.content
+      ? noticia.value.content.replace(/<[^>]*>/g, '').substring(0, 160).replace(/\s+/g, ' ').trim() + '...'
+      : `Lee las últimas noticias y novedades de Adopta Zulia sobre rescate y adopción de mascotas.`
+
+    return [
+      { name: 'description', content: description },
+      { name: 'keywords', content: `${noticia.value.title}, noticias, adopción de mascotas, rescate animal, Adopta Zulia` },
+      
+      // Open Graph
+      { property: 'og:title', content: `${noticia.value.title} | Adopta Zulia` },
+      { property: 'og:description', content: description },
+      { property: 'og:image', content: noticia.value.imageUrl || '/og-default.jpg' },
+      { property: 'og:image:alt', content: noticia.value.title },
+      { property: 'og:type', content: 'article' },
+      { property: 'og:url', content: `https://adoptazulia.org.ve/comunidad/noticias/${route.params.id}` },
+      { property: 'og:site_name', content: 'Adopta Zulia' },
+      { property: 'article:published_time', content: noticia.value.createdAt ? new Date(noticia.value.createdAt).toISOString() : '' },
+      { property: 'article:author', content: noticia.value.authorName || 'Administrador' },
+      
+      // Twitter Card
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:title', content: `${noticia.value.title} | Adopta Zulia` },
+      { name: 'twitter:description', content: description },
+      { name: 'twitter:image', content: noticia.value.imageUrl || '/og-default.jpg' },
+      
+      // Additional SEO
+      { name: 'robots', content: 'index, follow' },
+    ]
+  }),
+  link: computed(() => {
+    if (!noticia.value) return []
+    return [
+      { rel: 'canonical', href: `https://adoptazulia.org.ve/comunidad/noticias/${route.params.id}` }
+    ]
+  }),
 })
 </script>

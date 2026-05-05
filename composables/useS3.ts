@@ -47,11 +47,6 @@ export const useS3 = () => {
       let fileToUpload = file
       let uploadName = fileName
 
-      console.log('🖼️ [S3] Archivo original:', {
-        name: file.name,
-        size: formatBytes(file.size),
-        type: file.type,
-      })
 
       if (shouldOptimize && file.type.startsWith('image/')) {
         const optimizationOptions = {
@@ -71,13 +66,6 @@ export const useS3 = () => {
           uploadName = toWebPName(fileName)
         }
 
-        console.log('✨ [S3] Imagen optimizada:', {
-          original: formatBytes(result.originalSize),
-          optimizada: formatBytes(result.compressedSize),
-          ahorro: `${result.savingsPercent}%`,
-          formato: fileToUpload.type,
-          nombre: uploadName,
-        })
       }
 
       // Build FormData
@@ -136,13 +124,6 @@ export const useS3 = () => {
         uploadName = toWebPName(fileName)
       }
 
-      console.log('✨ [S3] Imagen optimizada (con progreso):', {
-        original: formatBytes(result.originalSize),
-        optimizada: formatBytes(result.compressedSize),
-        ahorro: `${result.savingsPercent}%`,
-        formato: fileToUpload.type,
-        nombre: uploadName,
-      })
     }
 
     // Report 0 % while optimization was happening
