@@ -131,6 +131,37 @@ export function useImageGen2() {
   }
 
   /**
+   * Draw image fitting within the canvas (object-fit: contain)
+   */
+  function drawImageContain(
+    ctx: CanvasRenderingContext2D,
+    img: HTMLImageElement,
+    canvasWidth: number,
+    canvasHeight: number
+  ) {
+    const imgAspect = img.width / img.height
+    const canvasAspect = canvasWidth / canvasHeight
+
+    let drawWidth: number, drawHeight: number, offsetX: number, offsetY: number
+
+    if (imgAspect > canvasAspect) {
+      // Image is wider relative to canvas: fit width, leave space top/bottom
+      drawWidth = canvasWidth
+      drawHeight = canvasWidth / imgAspect
+      offsetX = 0
+      offsetY = (canvasHeight - drawHeight) / 2
+    } else {
+      // Image is taller relative to canvas: fit height, leave space sides
+      drawHeight = canvasHeight
+      drawWidth = canvasHeight * imgAspect
+      offsetX = (canvasWidth - drawWidth) / 2
+      offsetY = 0
+    }
+
+    ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight)
+  }
+
+  /**
    * Generate a shareable pet image with frame, text and QR code
    */
   async function generatePetImage(
@@ -196,8 +227,8 @@ export function useImageGen2() {
       ])
       progress.value = 50
 
-      // Draw pet image covering the entire canvas
-      drawImageCover(ctx, petImage, WIDTH, HEIGHT)
+      // Draw pet image fitting within the canvas (no cropping)
+      drawImageContain(ctx, petImage, WIDTH, HEIGHT)
       progress.value = 60
 
       // Draw semi-transparent gradient overlay at top for text legibility
