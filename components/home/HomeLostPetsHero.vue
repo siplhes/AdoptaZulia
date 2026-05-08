@@ -51,10 +51,10 @@
           <img
             src="/lostpet.webp"
             alt="Mascota perdida mirando a la cámara"
+            loading="lazy"
             class="h-full w-full object-cover mix-blend-multiply"
             width="600"
             height="400"
-            loading="lazy"
           />
           <div
             class="absolute inset-0 bg-gradient-to-t from-rose-900/40 to-transparent md:bg-gradient-to-l"

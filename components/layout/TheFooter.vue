@@ -36,7 +36,7 @@ const legals = [
             v-for="link in links"
             :key="link.to"
             :to="link.to"
-            class="text-sm font-medium text-gray-600 transition-colors hover:text-emerald-600"
+            class="px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-emerald-600 hover:bg-gray-50 rounded-lg"
           >
             {{ link.label }}
           </NuxtLink>
@@ -50,26 +50,26 @@ const legals = [
           <a
             href="https://instagram.com/adopta.zulia"
             target="_blank"
-            class="text-gray-400 transition-colors hover:text-pink-600"
+            class="flex h-12 w-12 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-pink-50 hover:text-pink-600"
+            aria-label="Instagram"
           >
             <Icon name="mdi:instagram" class="h-6 w-6" />
-            <span class="sr-only">Instagram</span>
           </a>
           <a
             href="https://x.com/AdoptaZulia"
             target="_blank"
-            class="text-gray-400 transition-colors hover:text-black"
+            class="flex h-12 w-12 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-black"
+            aria-label="X (Twitter)"
           >
             <Icon name="mdi:twitter" class="h-6 w-6" />
-            <span class="sr-only">Twitter</span>
           </a>
           <a
             href="https://facebook.com/adopta.zulia"
             target="_blank"
-            class="text-gray-400 transition-colors hover:text-blue-600"
+            class="flex h-12 w-12 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-600"
+            aria-label="Facebook"
           >
             <Icon name="mdi:facebook" class="h-6 w-6" />
-            <span class="sr-only">Facebook</span>
           </a>
         </div>
 
@@ -82,7 +82,7 @@ const legals = [
               v-for="legal in legals"
               :key="legal.to"
               :to="legal.to"
-              class="text-gray-600 transition-colors hover:text-gray-800"
+              class="px-2 py-2 text-gray-600 transition-colors hover:text-gray-800 hover:bg-gray-50 rounded-lg"
             >
               {{ legal.label }}
             </NuxtLink>

@@ -22,6 +22,7 @@ import HomeAdoptionStories from '~/components/home/HomeAdoptionStories.vue'
 import HomeDonation from '~/components/home/HomeDonation.vue'
 import HomeSocial from '~/components/home/HomeSocial.vue'
 import HomeLostPetsHero from '~/components/home/HomeLostPetsHero.vue'
+import { createOrganizationSchema, createBreadcrumbSchema } from '~/composables/useSeo'
 
 const canonicalUrl = useCanonicalUrl('/')
 const ogImage = useOgImage('/og-improved.png')
@@ -62,6 +63,10 @@ useHead({
       description: 'Descubre mascotas en adopción en el estado Zulia, Venezuela',
       url: canonicalUrl,
     }),
+    useStructuredData(createOrganizationSchema()),
+    useStructuredData(createBreadcrumbSchema([
+      { name: 'Inicio', url: canonicalUrl },
+    ])),
   ],
 })
 </script>

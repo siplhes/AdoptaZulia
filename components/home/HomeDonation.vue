@@ -43,6 +43,7 @@
             <img
               src="/img1.webp"
               alt="Perro rescatado"
+              loading="lazy"
               width="800"
               height="600"
               class="h-full w-full object-cover"

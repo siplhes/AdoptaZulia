@@ -2,8 +2,10 @@
   <div>
     <NuxtLoadingIndicator />
     <UiToastContainer />
-    <SpeedInsights />
-    <Analytics />
+    <ClientOnly>
+      <SpeedInsights />
+      <Analytics />
+    </ClientOnly>
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>

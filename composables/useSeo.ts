@@ -2,9 +2,9 @@
 function safeGetBaseUrl(): string {
   try {
     const config = useRuntimeConfig()
-    return config.public?.baseUrl || 'https://adopta-zulia.vercel.app'
+    return config.public?.baseUrl || 'https://www.adoptazulia.org.ve'
   } catch {
-    return 'https://adopta-zulia.vercel.app'
+    return 'https://www.adoptazulia.org.ve'
   }
 }
 
@@ -50,10 +50,14 @@ export function createOrganizationSchema() {
     '@type': 'Organization',
     name: 'Adopta Zulia',
     url: baseUrl,
-    logo: `${baseUrl}/logo.png`,
+    logo: `${baseUrl}/logo.svg`,
     description:
       'Plataforma de adopción de mascotas en el estado Zulia, Venezuela. Ayudamos a encontrar hogares para mascotas que necesitan una familia.',
-    sameAs: [],
+    sameAs: [
+      'https://instagram.com/adopta.zulia',
+      'https://facebook.com/adopta.zulia',
+      'https://x.com/AdoptaZulia',
+    ],
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'Customer Service',
