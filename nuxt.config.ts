@@ -157,6 +157,7 @@ export default defineNuxtConfig({
   },
 
   nitro: {
+    preset: 'bun',
     compressPublicAssets: true,
     routeRules: {
       '/_nuxt/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
