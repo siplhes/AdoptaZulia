@@ -117,9 +117,15 @@ export default defineNuxtConfig({
       'i.vimeocdn.com',
       'vimeocdn.com',
     ].filter(Boolean) as string[],
+    format: ['webp', 'avif', 'jpg'],
     alias: {
       youtube: 'https://img.youtube.com',
       vimeo: 'https://i.vimeocdn.com',
+    },
+    sharp: {
+      // Suppress Sharp binary warnings for Vercel
+      concurrency: 1,
+      onDemand: true,
     },
   },
   vite: {

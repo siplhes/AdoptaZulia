@@ -26,12 +26,3 @@ export async function getFeatureFlag<T = boolean>(key: string): Promise<T | unde
   }
 }
 
-/**
- * Verifica si una feature flag está activada.
- * @example
- * const isEnabled = await isFeatureEnabled('show_new_adoption_flow')
- */
-export async function isFeatureEnabled(key: string): Promise<boolean> {
-  const value = await getFeatureFlag(key)
-  return value === true
-}

@@ -76,7 +76,7 @@
     <!-- Right Side: Image Banner -->
     <div class="relative hidden w-0 flex-1 lg:block overflow-hidden">
       <NuxtImg
-        class="absolute inset-0 h-full w-full object-cover transition-transform duration-[20s] hover:scale-105 ease-in-out"
+        class="absolute inset-0 h-full w-full object-cover transition-transform duration-&lsqb;20s&rsqb; hover:scale-105 ease-in-out"
         src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80"
         alt="Perrito feliz esperando adopción"
         placeholder

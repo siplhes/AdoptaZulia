@@ -17,6 +17,12 @@ export default defineNuxtPlugin(async (nuxtApp) => {
       }
     }
   }
+
+  // Disable analytics tracking in development to avoid 404 errors
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Analytics tracking disabled in development mode')
+    return
+  }
   
   let sessionStartTime = Date.now()
   let pageStartTime = Date.now()

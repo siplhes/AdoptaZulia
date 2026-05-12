@@ -429,6 +429,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 import { useAdoptions } from '~/composables/useAdoptions'
+import { getPetImage } from '~/utils/petUtils'
 import ModalAlert from '~/components/common/ModalAlert.vue'
 
 // Verificar si el usuario es administrador

@@ -298,6 +298,7 @@ import { ref, computed, onMounted } from 'vue'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { useLostPets } from '~/composables/useLostPets'
+import { getPetImage } from '~/utils/petUtils'
 
 definePageMeta({
   middleware: ['admin'],

@@ -55,25 +55,17 @@ export class OrganizationService {
    * Obtiene una organización por su slug
    */
   async getOrganizationBySlug(slug: string): Promise<Organization | null> {
+    console.log('Getting organization by slug:', slug, 'using fallback approach')
+    // Always use the fallback approach to avoid index issues
     try {
-      const orgsQuery = query(this.organizationsRef, orderByChild('slug'), equalTo(slug))
-      const snapshot = await get(orgsQuery)
-
-      if (snapshot.exists()) {
-        let org: Organization | null = null
-        snapshot.forEach((childSnapshot) => {
-          org = { id: childSnapshot.key, ...childSnapshot.val() } as Organization
-        })
-        return org
-      }
+      const allOrgs = await this.getAllOrganizations()
+      const foundOrg = allOrgs.find((org) => org.slug === slug) || null
+      console.log('Found organization:', foundOrg)
+      return foundOrg
     } catch (error) {
       console.error('Error al obtener organización por slug:', error)
-      // Fallback: obtener todas y filtrar manualmente
-      const allOrgs = await this.getAllOrganizations()
-      return allOrgs.find((org) => org.slug === slug) || null
+      return null
     }
-
-    return null
   }
 
   /**

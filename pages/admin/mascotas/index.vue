@@ -278,6 +278,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { usePets } from '~/composables/usePets'
+import { getPetImage } from '~/utils/petUtils'
 import ModalAlert from '~/components/common/ModalAlert.vue'
 
 // Verificar si el usuario es administrador
