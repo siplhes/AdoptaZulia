@@ -17,6 +17,7 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@aejkatappaja/phantom-ui": "^0.10.1",
     "@aws-sdk/client-s3": "^3.782.0",
     "@aws-sdk/lib-storage": "^3.782.0",
     "@geoql/v-maplibre": "^1.7.1",

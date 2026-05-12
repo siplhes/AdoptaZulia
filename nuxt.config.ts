@@ -46,7 +46,6 @@ export default defineNuxtConfig({
         appId: process.env.FIREBASE_APP_ID,
         storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
         messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-        measurementId: process.env.FIREBASE_MEASUREMENT_ID,
         databaseURL: process.env.FIREBASE_DATABASE_URL,
       },
       adminEmails: process.env.ADMIN_EMAILS,
@@ -65,7 +64,6 @@ export default defineNuxtConfig({
       appId: process.env.FIREBASE_APP_ID,
       storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
       messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-      measurementId: process.env.FIREBASE_MEASUREMENT_ID,
       databaseURL: process.env.FIREBASE_DATABASE_URL,
     },
     admin: {
@@ -102,7 +100,7 @@ export default defineNuxtConfig({
           name: 'Content-Security-Policy',
           content:
             process.env.NODE_ENV === 'production'
-              ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com https://*.vercel-analytics.com https://*.vercel-insights.com https://*.vercel-scripts.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://firebaseio.com https://*.firebaseio.com https://www.google-analytics.com https://*.vercel-analytics.com https://*.vercel-insights.com; frame-src 'self' https://www.paypal.com; object-src 'none';"
+              ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://*.vercel-analytics.com https://*.vercel-insights.com https://*.vercel-scripts.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://firebaseio.com https://*.firebaseio.com https://*.vercel-analytics.com https://*.vercel-insights.com; frame-src 'self' https://www.paypal.com; object-src 'none';"
               : "default-src 'self' 'unsafe-inline' 'unsafe-eval' *",
         },
       ],

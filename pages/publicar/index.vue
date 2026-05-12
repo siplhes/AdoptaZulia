@@ -296,7 +296,7 @@
                 <span class="text-red-500">*</span>
               </label>
               <div
-                class="group relative flex h-48 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 transition-all hover:border-emerald-500 hover:bg-emerald-50"
+                class="group relative flex aspect-square w-full max-w-md cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 transition-all hover:border-emerald-500 hover:bg-emerald-50 mx-auto"
                 @click="$refs.mainImageInput.click()"
               >
                 <img
