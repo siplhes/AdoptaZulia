@@ -8,6 +8,16 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   const router = useRouter()
   const route = useRoute()
   
+  // Initialize Vercel Analytics window function if not available
+  if (typeof window !== 'undefined' && !window.va) {
+    // Create a mock window.va function for development/debugging
+    window.va = (command: string, properties?: any) => {
+      if (command === 'event' && properties) {
+        console.log('Analytics Event:', properties.name, properties.data)
+      }
+    }
+  }
+  
   let sessionStartTime = Date.now()
   let pageStartTime = Date.now()
   let interactionCount = 0

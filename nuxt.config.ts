@@ -19,9 +19,10 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxt/scripts',
     '@nuxt/test-utils',
-    // '@nuxtjs/tailwindcss',
+    '@nuxtjs/tailwindcss',
     '@nuxtjs/color-mode',
     'nuxt-vuefire',
+    'nuxt-booster',
   ],
 
   runtimeConfig: {
@@ -45,6 +46,7 @@ export default defineNuxtConfig({
         appId: process.env.FIREBASE_APP_ID,
         storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
         messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+        measurementId: process.env.FIREBASE_MEASUREMENT_ID,
         databaseURL: process.env.FIREBASE_DATABASE_URL,
       },
       adminEmails: process.env.ADMIN_EMAILS,
@@ -63,20 +65,14 @@ export default defineNuxtConfig({
       appId: process.env.FIREBASE_APP_ID,
       storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
       messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+      measurementId: process.env.FIREBASE_MEASUREMENT_ID,
       databaseURL: process.env.FIREBASE_DATABASE_URL,
     },
     admin: {
       // AQUÍ ESTÁ LA CLAVE:
       // Si existe la variable, la parseamos. Si no, undefined (para evitar error en build)
       serviceAccount: process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON
-        ? (() => {
-            try {
-              return JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
-            } catch (error) {
-              console.warn('Invalid GOOGLE_APPLICATION_CREDENTIALS_JSON format');
-              return undefined;
-            }
-          })()
+        ? JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON)
         : undefined,
     },
   },
@@ -106,7 +102,7 @@ export default defineNuxtConfig({
           name: 'Content-Security-Policy',
           content:
             process.env.NODE_ENV === 'production'
-              ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://*.vercel-analytics.com https://*.vercel-insights.com https://*.vercel-scripts.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://firebaseio.com https://*.firebaseio.com https://*.vercel-analytics.com https://*.vercel-insights.com; frame-src 'self' https://www.paypal.com; object-src 'none';"
+              ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com https://*.vercel-analytics.com https://*.vercel-insights.com https://*.vercel-scripts.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://firebaseio.com https://*.firebaseio.com https://www.google-analytics.com https://*.vercel-analytics.com https://*.vercel-insights.com; frame-src 'self' https://www.paypal.com; object-src 'none';"
               : "default-src 'self' 'unsafe-inline' 'unsafe-eval' *",
         },
       ],
@@ -161,7 +157,6 @@ export default defineNuxtConfig({
   },
 
   nitro: {
-    preset: 'node',
     compressPublicAssets: true,
     routeRules: {
       '/_nuxt/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },

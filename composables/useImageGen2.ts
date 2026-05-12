@@ -185,7 +185,7 @@ export function useImageGen2() {
       }
       // Config with defaults
       const config = {
-        backgroundColor: options.backgroundColor || '#117F60',
+        backgroundColor: options.backgroundColor || '#f5f5f4',
         frameImageUrl: options.frameImageUrl || '/frame.png',
         quality: options.quality || 0.92,
         format: options.format || 'png',
@@ -227,93 +227,99 @@ export function useImageGen2() {
       ])
       progress.value = 50
 
-      // Draw pet image occupying 75% of poster height with cover fit
-      const petImageAreaHeight = HEIGHT * 0.75
-      const imgAspect = petImage.width / petImage.height
-      const canvasAspect = WIDTH / petImageAreaHeight
-
-      let drawWidth: number, drawHeight: number, offsetX: number, offsetY: number
-
-      if (imgAspect > canvasAspect) {
-        // Image is wider: fit height, crop sides
-        drawHeight = petImageAreaHeight
-        drawWidth = petImageAreaHeight * imgAspect
-        offsetX = (WIDTH - drawWidth) / 2
-        offsetY = 0
-      } else {
-        // Image is taller: fit width, crop top/bottom
-        drawWidth = WIDTH
-        drawHeight = WIDTH / imgAspect
-        offsetX = 0
-        offsetY = (petImageAreaHeight - drawHeight) / 2
-      }
-
-      ctx.drawImage(petImage, offsetX, offsetY, drawWidth, drawHeight)
+      // Draw pet image fitting within the canvas (no cropping)
+      drawImageContain(ctx, petImage, WIDTH, HEIGHT)
       progress.value = 60
 
-      // Draw green background below pet image
-      const greenBackgroundY = petImageAreaHeight
-      ctx.fillStyle = config.backgroundColor
-      ctx.fillRect(0, greenBackgroundY, WIDTH, HEIGHT - petImageAreaHeight)
+      // Draw semi-transparent gradient overlay at top for text legibility
+      const topGradient = ctx.createLinearGradient(0, 0, 0, 300)
+      topGradient.addColorStop(0, 'rgba(0, 0, 0, 0.55)')
+      topGradient.addColorStop(1, 'rgba(0, 0, 0, 0)')
+      ctx.fillStyle = topGradient
+      ctx.fillRect(0, 0, WIDTH, 300)
 
+      // Draw semi-transparent gradient overlay at bottom for text legibility
+      const bottomGradient = ctx.createLinearGradient(0, HEIGHT - 280, 0, HEIGHT)
+      bottomGradient.addColorStop(0, 'rgba(0, 0, 0, 0)')
+      bottomGradient.addColorStop(1, 'rgba(0, 0, 0, 0.6)')
+      ctx.fillStyle = bottomGradient
+      ctx.fillRect(0, HEIGHT - 280, WIDTH, 280)
       progress.value = 70
 
-      // Calculate column positions for 3-column layout
-      const columnWidth = WIDTH / 3
-      const greenAreaHeight = HEIGHT - petImageAreaHeight
-      const centerY = greenBackgroundY + greenAreaHeight / 2
+      // Draw logo (top right corner with white circular background)
+      if (logoImage) {
+        const logoSize = 90
+        const logoPadding = 40
+        const logoCenterX = WIDTH - logoPadding - logoSize / 2
+        const logoCenterY = logoPadding + logoSize / 2
 
-      // Left column: Text (Adopta a + pet name)
-      drawTextWithOutline(ctx, 'Adopta a', columnWidth / 2, centerY - 50, {
-        font: 'bold 48px "Bricolage Grotesque", system-ui, sans-serif',
+        // White circular background for visibility
+        ctx.beginPath()
+        ctx.arc(logoCenterX, logoCenterY, logoSize / 2 + 8, 0, Math.PI * 2)
+        ctx.fillStyle = '#117F60'
+        ctx.fill()
+
+        // Maintain logo aspect ratio within the square area
+        const logoAspect = logoImage.width / logoImage.height
+        let drawW = logoSize
+        let drawH = logoSize
+
+        if (logoAspect > 1) {
+          // Wider than tall: fit width, scale height
+          drawH = logoSize / logoAspect
+        } else if (logoAspect < 1) {
+          // Taller than wide: fit height, scale width
+          drawW = logoSize * logoAspect
+        }
+
+        const drawX = WIDTH - logoPadding - logoSize + (logoSize - drawW) / 2
+        const drawY = logoPadding + (logoSize - drawH) / 2
+
+        ctx.drawImage(logoImage, drawX, drawY, drawW, drawH)
+      }
+
+      // Draw "Adopta a" text (top left)
+      drawTextWithOutline(ctx, 'Adopta a', 50, 90, {
+        font: 'bold 42px "Bricolage Grotesque", system-ui, sans-serif',
         fillColor: '#ffffff',
         strokeColor: '#121212',
-        strokeWidth: 6,
-        textAlign: 'center',
+        strokeWidth: 5,
+        textAlign: 'left',
       })
 
-      drawTextWithOutline(ctx, petName, columnWidth / 2, centerY + 40, {
+      // Draw pet name (larger, below "Adopta a")
+      drawTextWithOutline(ctx, petName, 50, 155, {
         font: 'bold 78px "Bricolage Grotesque", system-ui, sans-serif',
         fillColor: '#ffffff',
         strokeColor: '#121212',
-        strokeWidth: 8,
-        textAlign: 'center',
+        strokeWidth: 7,
+        textAlign: 'left',
       })
-
-      // Middle column: Logo (much larger)
-      if (logoImage) {
-        const logoSize = 200
-        const logoX = columnWidth + (columnWidth - logoSize) / 2
-        const logoY = centerY - logoSize / 2
-        ctx.drawImage(logoImage, logoX, logoY, logoSize, logoSize)
-      }
-
       progress.value = 80
 
       // Generate QR code
       const qrUrl = `${window.location.origin}/mascotas/${petId}`
       const qrDataUrl = await QRCode.toDataURL(qrUrl, {
         color: { dark: '#121212', light: '#ffffff' },
-        width: 300,
+        width: 200,
         margin: 1,
         errorCorrectionLevel: 'M',
       })
       const qrImage = await loadImage(qrDataUrl)
 
-      // Right column: QR code (much larger)
-      const qrSize = 220
-      const qrX = columnWidth * 2 + (columnWidth - qrSize) / 2
-      const qrY = centerY - qrSize / 2
-      ctx.drawImage(qrImage, qrX, qrY, qrSize, qrSize)
+      // Draw QR code (bottom right corner)
+      const qrSize = 150
+      const qrPadding = 40
+      ctx.drawImage(qrImage, WIDTH - qrSize - qrPadding, HEIGHT - qrSize - qrPadding, qrSize, qrSize)
 
-      // Draw phone number below QR code if available
+      // Draw phone number (bottom left) if available
       if (phone) {
-        drawTextWithOutline(ctx, phone, columnWidth * 2 + columnWidth / 2, centerY + qrSize / 2 + 50, {
+        drawTextWithOutline(ctx, phone, 50, HEIGHT - 60, {
           font: 'bold 36px "Bricolage Grotesque", system-ui, sans-serif',
           fillColor: '#ffffff',
           strokeColor: '#121212',
-          strokeWidth: 6,
-          textAlign: 'center',
+          strokeWidth: 5,
+          textAlign: 'left',
         })
       }
       progress.value = 90

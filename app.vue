@@ -15,7 +15,6 @@
 <script setup>
 import { SpeedInsights } from '@vercel/speed-insights/vue'
 import { Analytics } from '@vercel/analytics/vue'
-import "@aejkatappaja/phantom-ui/ssr.css";
 
 const config = useRuntimeConfig()
 const baseUrl = (config.public.baseUrl || 'https://www.adoptazulia.org.ve').replace(/\/$/, '')

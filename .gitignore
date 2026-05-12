@@ -105,5 +105,3 @@ pnpm-lock.yaml
 
 reglas
 reglas.json
-.vercel
-.env*.local

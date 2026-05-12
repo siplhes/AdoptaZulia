@@ -6,6 +6,7 @@
 // Analytics provider types
 export type AnalyticsProvider = 'vercel' | 'google' | 'custom'
 
+
 // Enhanced event interface with validation and metadata
 export interface AnalyticsEvent {
   name: string
@@ -160,8 +161,15 @@ export function useAnalytics() {
       try {
         switch (provider) {
           case 'vercel':
-            if (window.va) {
+            // Use Vercel Analytics track function if available
+            if (typeof window !== 'undefined' && window.va) {
               window.va('event', { name: event.name, data: event.data })
+            }
+            // For Vercel Analytics, we need to use the track function from the Analytics component
+            // Since we're using the Vue component, events are tracked automatically
+            // We'll log in debug mode for visibility
+            if (analyticsConfig.enableDebugMode) {
+              console.log(`Vercel Analytics event: ${event.name}`, event.data)
             }
             break
           // Future: Add Google Analytics, custom endpoints, etc.
