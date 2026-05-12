@@ -54,7 +54,7 @@
     "lucide-vue-next": "^0.487.0",
     "nuxt": "^4.3.1",
     "nuxt-booster": "^3.2.8",
-    "nuxt-vuefire": "^1.1.0",
+    "nuxt-vuefire": "^1.0.0",
     "qrcode": "^1.5.4",
     "resend": "^6.9.1",
     "shadcn": "^4.7.0",
