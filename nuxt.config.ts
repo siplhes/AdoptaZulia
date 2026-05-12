@@ -19,10 +19,9 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxt/scripts',
     '@nuxt/test-utils',
-    '@nuxtjs/tailwindcss',
+    // '@nuxtjs/tailwindcss',
     '@nuxtjs/color-mode',
     'nuxt-vuefire',
-    'nuxt-booster',
   ],
 
   runtimeConfig: {
@@ -162,7 +161,7 @@ export default defineNuxtConfig({
   },
 
   nitro: {
-    preset: 'bun',
+    preset: 'node',
     compressPublicAssets: true,
     routeRules: {
       '/_nuxt/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
