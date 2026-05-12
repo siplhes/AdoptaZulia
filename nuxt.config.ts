@@ -70,7 +70,14 @@ export default defineNuxtConfig({
       // AQUÍ ESTÁ LA CLAVE:
       // Si existe la variable, la parseamos. Si no, undefined (para evitar error en build)
       serviceAccount: process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON
-        ? JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON)
+        ? (() => {
+            try {
+              return JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+            } catch (error) {
+              console.warn('Invalid GOOGLE_APPLICATION_CREDENTIALS_JSON format');
+              return undefined;
+            }
+          })()
         : undefined,
     },
   },
@@ -157,9 +164,6 @@ export default defineNuxtConfig({
   nitro: {
     preset: 'bun',
     compressPublicAssets: true,
-    output: {
-      dir: 'dist'
-    },
     routeRules: {
       '/_nuxt/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
       '/_ipx/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
