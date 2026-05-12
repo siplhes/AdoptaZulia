@@ -22,6 +22,9 @@ Este proyecto está construido con un stack moderno y eficiente:
 - **Backend/BaaS**: [Firebase](https://firebase.google.com) (Auth, Firestore, Hosting)
 - **Almacenamiento**: AWS S3 (para imágenes optimizadas)
 - **Validación**: Zod / VeeValidate (si aplica)
+- **Analytics**: Vercel Analytics con sistema de tracking avanzado
+- **A/B Testing**: Sistema integrado de pruebas A/B con análisis estadístico
+- **Performance Monitoring**: Core Web Vitals y métricas de usuario
 
 ## 🚀 Requisitos Previos
 
@@ -81,6 +84,59 @@ Asegúrate de que tus cambios no rompan nada ejecutando las pruebas:
 ```bash
 npm run test
 ```
+
+## 📊 Analytics y A/B Testing
+
+Este proyecto incluye un sistema de analytics avanzado con las siguientes características:
+
+### 🎯 Sistema de Analytics
+- **Event Tracking**: Tracking de eventos con validación de esquemas y enriquecimiento automático de datos
+- **Batch Processing**: Procesamiento por lotes para optimizar el rendimiento
+- **Múltiples Proveedores**: Soporte para Vercel Analytics, Google Analytics y endpoints personalizados
+- **Metadata Rica**: Enriquecimiento automático con ID de usuario, sesión, dispositivo y contexto
+- **Performance Monitoring**: Core Web Vitals (LCP, FID, CLS) y métricas de carga
+- **Error Tracking**: Monitoreo comprehensivo de errores con contexto y categorización
+
+### 🧪 A/B Testing
+- **Análisis Estadístico**: Prueba de chi-cuadrado para determinar significancia estadística
+- **Traffic Splitting**: Distribución configurable de tráfico entre variantes
+- **Resultados en Tiempo Real**: Tracking de impresiones, clics y conversiones
+- **Detección de Ganadores**: Recomendación automática de variantes ganadoras
+- **Métricas Avanzadas**: Tasas de conversión, adopción e ingresos
+
+### 📈 Dashboard de Analytics
+- **Métricas en Tiempo Real**: Vistas de página, solicitudes de adopción, tasas de conversión
+- **Resultados de A/B Tests**: Comparación visual de variantes con significancia estadística
+- **Performance Insights**: Core Web Vitals y métricas de rendimiento
+- **Error Monitoring**: Monitoreo comprehensivo de errores y tasas de error
+- **Activity Feed**: Stream en tiempo real de eventos de usuario
+
+### 🔧 Uso del Sistema
+
+```typescript
+// Tracking de eventos
+const analytics = useAnalytics()
+analytics.interactions.adoptionRequest('pet-123', 'dog', 'user-456')
+analytics.trackPageView('/pets/dog-123', { source: 'search' })
+
+// A/B Testing
+const abTesting = useABTesting()
+const variant = abTesting.getTestVariant('petCardLayout')
+abTesting.recordImpression('petCardLayout')
+abTesting.recordClick('petCardLayout', { pet_id: 'pet-123' })
+
+// Performance Monitoring
+analytics.performance.pageLoadTime(1800, '/pets/dog-123')
+analytics.performance.coreWebVitals('LCP', 2100, 'needs-improvement')
+```
+
+### 📋 Componentes Disponibles
+- `AnalyticsDashboard.vue`: Dashboard completo para visualización de métricas
+- `useAnalytics()`: Composable para tracking de eventos
+- `useABTesting()`: Composable para pruebas A/B
+- `analytics.client.ts`: Plugin automático de performance tracking
+
+Para más detalles, consulta el [CHANGELOG.md](./CHANGELOG.md) y la documentación en los archivos de composables.
 
 ## 📦 Construcción (Build)
 
