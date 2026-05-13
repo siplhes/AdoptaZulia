@@ -1,14 +1,3 @@
-import { get, createClient } from '@vercel/edge-config'
-
-let client: ReturnType<typeof createClient> | null = null
-
-function getClient() {
-  if (!client) {
-    client = createClient(process.env.EDGE_CONFIG)
-  }
-  return client
-}
-
 /**
  * Lee una feature flag desde Vercel Edge Config.
  * Gratis en plan Hobby con límites generosos.
@@ -17,12 +6,7 @@ function getClient() {
  * const showNewAdoptionFlow = await getFeatureFlag('show_new_adoption_flow')
  */
 export async function getFeatureFlag<T = boolean>(key: string): Promise<T | undefined> {
-  try {
-    const c = getClient()
-    return await c.get<T>(key)
-  } catch {
-    // Fallback silencioso si Edge Config no está configurado
-    return undefined
-  }
+  // Fallback silencioso - Edge Config removido
+  return undefined
 }
 

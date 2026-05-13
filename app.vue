@@ -2,10 +2,6 @@
   <div>
     <NuxtLoadingIndicator />
     <UiToastContainer />
-    <ClientOnly>
-      <SpeedInsights />
-      <Analytics />
-    </ClientOnly>
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
@@ -13,9 +9,6 @@
 </template>
 
 <script setup>
-import { SpeedInsights } from '@vercel/speed-insights/vue'
-import { Analytics } from '@vercel/analytics/vue'
-
 const config = useRuntimeConfig()
 const baseUrl = (config.public.baseUrl || 'https://www.adoptazulia.org.ve').replace(/\/$/, '')
 const route = useRoute()

@@ -245,36 +245,38 @@
             <!-- Main Image -->
             <div>
               <label class="mb-2 block text-sm font-medium text-gray-700">Foto Principal</label>
-              <div
-                class="group relative flex h-48 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 transition-all hover:border-emerald-500 hover:bg-emerald-50"
-                @click="$refs.mainImageInput.click()"
-              >
-                <img
-                  v-if="mainImagePreview || petData.image"
-                  :src="mainImagePreview || petData.image"
-                  class="absolute inset-0 h-full w-full object-cover"
-                />
-                <div v-else class="flex flex-col items-center text-gray-500">
-                  <Icon name="heroicons:camera" class="mb-2 h-10 w-10" />
-                  <span class="text-sm font-medium">Click para subir foto</span>
-                </div>
-
-                <input
-                  ref="mainImageInput"
-                  type="file"
-                  accept="image/*"
-                  class="hidden"
-                  @change="handleMainImageChange"
-                />
-
-                <!-- Overlay -->
+              <div class="flex justify-center">
                 <div
-                  class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100"
+                  class="group relative aspect-square w-48 cursor-pointer overflow-hidden rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 transition-all hover:border-emerald-500 hover:bg-emerald-50"
+                  @click="$refs.mainImageInput.click()"
                 >
-                  <span class="flex items-center gap-2 font-medium text-white">
-                    <Icon name="heroicons:arrow-path" class="h-5 w-5" />
-                    Cambiar foto
-                  </span>
+                  <img
+                    v-if="mainImagePreview || petData.image"
+                    :src="mainImagePreview || petData.image"
+                    class="absolute inset-0 h-full w-full object-cover"
+                  />
+                  <div v-else class="flex h-full flex-col items-center justify-center text-gray-500">
+                    <Icon name="heroicons:camera" class="mb-2 h-10 w-10" />
+                    <span class="text-sm font-medium">Click para subir foto</span>
+                  </div>
+
+                  <input
+                    ref="mainImageInput"
+                    type="file"
+                    accept="image/*"
+                    class="hidden"
+                    @change="handleMainImageChange"
+                  />
+
+                  <!-- Overlay -->
+                  <div
+                    class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100"
+                  >
+                    <span class="flex items-center gap-2 font-medium text-white">
+                      <Icon name="heroicons:arrow-path" class="h-5 w-5" />
+                      Cambiar foto
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

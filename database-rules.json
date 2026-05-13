@@ -1,0 +1,95 @@
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": "auth != null",
+    
+    "users": {
+      ".indexOn": ["email", "userName", "isAdmin", "createdAt"],
+      "$uid": {
+        ".read": "auth != null && ($uid === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true)",
+        ".write": "auth != null && ($uid === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true)"
+      }
+    },
+    
+    "organizations": {
+      ".indexOn": ["slug", "type", "city", "ownerId", "status", "verified"],
+      "$orgId": {
+        ".read": "auth != null",
+        ".write": "auth != null && (data.child('ownerId').val() === auth.uid || data.child('admins').hasChild(auth.uid) || root.child('users').child(auth.uid).child('isAdmin').val() === true)"
+      }
+    },
+    
+    "pets": {
+      ".indexOn": ["type", "typeValue", "status", "ownerId", "organizationId", "createdAt", "userId", "breed"],
+      "$petId": {
+        ".read": "auth != null",
+        ".write": "auth != null && (data.child('ownerId').val() === auth.uid || data.child('organizationId').val() === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true)"
+      }
+    },
+    
+    "adoptions": {
+      ".indexOn": ["petId", "userId", "status", "createdAt", "petOwnerId"],
+      "$adoptionId": {
+        ".read": "auth != null && (data.child('userId').val() === auth.uid || data.child('petOwnerId').val() === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true)",
+        ".write": "auth != null && (data.child('userId').val() === auth.uid || data.child('petOwnerId').val() === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true)"
+      }
+    },
+    
+    "lost_pets": {
+      ".indexOn": ["status", "ownerId", "createdAt"],
+      "$lostPetId": {
+        ".read": "auth != null",
+        ".write": "auth != null && (data.child('ownerId').val() === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true)"
+      }
+    },
+    
+    "adoption_stories": {
+      ".indexOn": ["type", "status", "createdAt", "petId", "userId"],
+      "$storyId": {
+        ".read": "auth != null",
+        ".write": "auth != null && (data.child('userId').val() === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true)"
+      }
+    },
+    
+    "petStories": {
+      ".indexOn": ["petId", "createdAt"],
+      "$petId": {
+        ".read": "auth != null",
+        ".write": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() === true"
+      }
+    },
+    
+    "tablon": {
+      "noticias": {
+        ".indexOn": ["createdAt"],
+        "$noticiaId": {
+          ".read": "auth != null",
+          ".write": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() === true"
+        }
+      },
+      "eventos": {
+        ".indexOn": ["date", "createdAt"],
+        "$eventoId": {
+          ".read": "auth != null",
+          ".write": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() === true"
+        }
+      }
+    },
+    
+    "reports": {
+      ".indexOn": ["createdAt", "status", "type"],
+      "$reportId": {
+        ".read": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() === true",
+        ".write": "auth != null && root.child('users').child(auth.uid).child('isAdmin').val() === true"
+      }
+    },
+    
+    "notifications": {
+      ".indexOn": ["userId", "createdAt", "type"],
+      "$notificationId": {
+        ".read": "auth != null && data.child('userId').val() === auth.uid",
+        ".write": "auth != null && (data.child('userId').val() === auth.uid || root.child('users').child(auth.uid).child('isAdmin').val() === true)"
+      }
+    }
+  }
+}

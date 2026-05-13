@@ -2,6 +2,6 @@
   // This file is required so VS Code's TypeScript language server can resolve
   // the ~ / @ path aliases that Nuxt defines in .nuxt/tsconfig.json.
   // Do NOT edit the generated .nuxt/tsconfig.json directly — it is overwritten
-  // on every `nuxt prepare` / `npm run dev`.
+  // on every `nuxt prepare` / `pnpm run dev`.
   "extends": "./.nuxt/tsconfig.json"
 }

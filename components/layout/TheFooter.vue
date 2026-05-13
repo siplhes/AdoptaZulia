@@ -71,11 +71,20 @@ const legals = [
           >
             <Icon name="mdi:facebook" class="h-6 w-6" />
           </a>
+
+          <a
+            href="https://github.com/siplhes/AdoptaZulia"
+            target="_blank"
+            class="flex h-12 w-12 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-600"
+            aria-label="GitHub"
+          >
+            <Icon name="mdi:github" class="h-6 w-6" />
+          </a>
         </div>
 
         <!-- Copyright & Legal -->
         <div class="flex flex-col items-center gap-4 text-xs text-gray-400 md:flex-row">
-          <p>&copy; {{ currentYear }} Adopta Zulia</p>
+          <p>&copy; {{ currentYear }} Adopta Zulia by <a href="https://siplhes.vercel.app/" target="_blank" class="text-emerald-600 hover:underline">Siplhes</a></p>
           <span class="hidden md:block">•</span>
           <div class="flex gap-4">
             <NuxtLink

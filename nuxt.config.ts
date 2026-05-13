@@ -32,6 +32,7 @@ export default defineNuxtConfig({
     autonomaClientSecret: process.env.AUTONOMA_CLIENT_SECRET,
     instagramAccessToken: process.env.INSTAGRAM_ACCESS_TOKEN,
     instagramBusinessId: process.env.INSTAGRAM_BUSINESS_ID,
+    cerebrasApiKey: process.env.CEREBRAS_API_KEY,
     public: {
       recaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
       awsRegion: process.env.AWS_REGION,

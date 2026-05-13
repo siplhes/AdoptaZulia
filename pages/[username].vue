@@ -655,7 +655,8 @@ const {
   loadProfile,
 } = useUserProfilePage()
 
-useAsyncData(`profile-${username}`, () => loadProfile(username || ''))
+// Load profile data
+loadProfile(username || '')
 
 const formatDate = (ts) => {
   if (!ts) return 'fecha desconocida'

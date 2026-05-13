@@ -295,40 +295,42 @@
                 Foto Principal
                 <span class="text-red-500">*</span>
               </label>
-              <div
-                class="group relative flex h-48 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 transition-all hover:border-emerald-500 hover:bg-emerald-50"
-                @click="$refs.mainImageInput.click()"
-              >
-                <img
-                  v-if="mainImagePreview"
-                  :src="mainImagePreview"
-                  class="absolute inset-0 h-full w-full object-cover"
-                />
+              <div class="flex justify-center">
                 <div
-                  v-else
-                  class="flex flex-col items-center text-gray-500 group-hover:text-emerald-600"
+                  class="group relative aspect-square w-48 cursor-pointer overflow-hidden rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 transition-all hover:border-emerald-500 hover:bg-emerald-50"
+                  @click="$refs.mainImageInput.click()"
                 >
-                  <Icon name="heroicons:camera" class="mb-2 h-10 w-10" />
-                  <span class="text-sm font-medium">Click para seleccionar foto principal</span>
-                </div>
+                  <img
+                    v-if="mainImagePreview"
+                    :src="mainImagePreview"
+                    class="absolute inset-0 h-full w-full object-cover"
+                  />
+                  <div
+                    v-else
+                    class="flex h-full flex-col items-center justify-center text-gray-500 group-hover:text-emerald-600"
+                  >
+                    <Icon name="heroicons:camera" class="mb-2 h-10 w-10" />
+                    <span class="text-sm font-medium">Click para seleccionar foto principal</span>
+                  </div>
 
-                <input
-                  ref="mainImageInput"
-                  type="file"
-                  accept="image/*"
-                  class="hidden"
-                  @change="handleMainImageChange"
-                />
+                  <input
+                    ref="mainImageInput"
+                    type="file"
+                    accept="image/*"
+                    class="hidden"
+                    @change="handleMainImageChange"
+                  />
 
-                <!-- Change Overlay -->
-                <div
-                  v-if="mainImagePreview"
-                  class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100"
-                >
-                  <span class="flex items-center gap-2 font-medium text-white">
-                    <Icon name="heroicons:arrow-path" class="h-5 w-5" />
-                    Cambiar foto
-                  </span>
+                  <!-- Change Overlay -->
+                  <div
+                    v-if="mainImagePreview"
+                    class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100"
+                  >
+                    <span class="flex items-center gap-2 font-medium text-white">
+                      <Icon name="heroicons:arrow-path" class="h-5 w-5" />
+                      Cambiar foto
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

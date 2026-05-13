@@ -39,6 +39,11 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Username is required' })
   }
 
+  // Prevent treating static files as usernames
+  if (username.includes('.') || username.includes('/') || username.startsWith('_')) {
+    throw createError({ statusCode: 404, statusMessage: 'Perfil no encontrado' })
+  }
+
   if (getApps().length === 0) {
     throw createError({ statusCode: 500, statusMessage: 'Firebase Admin not initialized' })
   }
@@ -56,6 +61,9 @@ export default defineEventHandler(async (event) => {
 
     const usersData = userSnapshot.val()
     const userId = Object.keys(usersData)[0]
+    if (!userId) {
+      throw createError({ statusCode: 404, statusMessage: 'Perfil no encontrado' })
+    }
     const userProfile = { uid: userId, ...usersData[userId] }
 
     const [pets, lostReports, stories] = await Promise.all([

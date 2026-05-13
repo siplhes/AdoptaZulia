@@ -28,7 +28,7 @@ Este proyecto está construido con un stack moderno y eficiente:
 Para colaborar, asegúrate de tener instalado:
 
 - [Node.js](https://nodejs.org/) (versión 18+ recomendada)
-- [NPM](https://www.npmjs.com/)
+- [pnpm](https://pnpm.io/)
 
 ## ⚙️ Configuración del Entorno de Desarrollo
 
@@ -65,12 +65,12 @@ ADMIN_EMAILS=admin@example.com
 1.  **Instalar dependencias**:
 
     ```bash
-    npm install
+    pnpm install
     ```
 
 2.  **Iniciar servidor de desarrollo**:
     ```bash
-    npm run dev
+    pnpm run dev
     ```
     Visita `http://localhost:3000` en tu navegador.
 
@@ -79,7 +79,7 @@ ADMIN_EMAILS=admin@example.com
 Asegúrate de que tus cambios no rompan nada ejecutando las pruebas:
 
 ```bash
-npm run test
+pnpm run test
 ```
 
 ## 📦 Construcción (Build)
@@ -87,6 +87,6 @@ npm run test
 Si necesitas verificar la construcción final:
 
 ```bash
-npm run build
-npm run preview
+pnpm run build
+pnpm run preview
 ```
